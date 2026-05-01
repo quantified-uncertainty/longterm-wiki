@@ -720,6 +720,191 @@ describe('crux fb backfill-sources — --batch path', () => {
     expect(parsed.summary.engineErrors).toBeGreaterThanOrEqual(1);
     expect(parsed.summary.discovered).toBe(0);
   });
+
+  it('counts missing batch responses as engineErrors with reconciliation (QUA-963 PR-B)', async () => {
+    // QUA-963 HIGH: when Anthropic accepts a batch but never returns a
+    // response for a customId, the work is silently dropped pre-fix.
+    // Post-fix, the wrapper walks customIdToFact at the end of the response
+    // loop and emits an engineError + missingResponses++ + a synthetic
+    // FactDiscovery so the report can name the dropped fact.
+    //
+    // CodeRabbit fix: the test previously hardcoded `expect(missingResponses).toBe(2)`,
+    // which would fail if the KB had < 2 unsourced born-year facts (e.g.,
+    // after the QUA-933 smoke test wrote a Wikipedia source for Andrej
+    // Karpathy's born-year). Resolve the actual count up-front via
+    // collectUnsourcedFacts and assert against `n`, capping at 2 to keep
+    // the test bounded.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 2 });
+    if (available.length === 0) return; // skip if no born-year facts at all
+    const n = available.length;
+
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'ended', request_counts: {} });
+
+    // Return ZERO responses despite however many we submitted. Worst case:
+    // every fact is dropped.
+    mockGetBatchResults.mockResolvedValue(new Map());
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: String(n),
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    // All n facts must be reconciled as missing.
+    expect(parsed.summary.missingResponses).toBe(n);
+    expect(parsed.summary.engineErrors).toBe(n);
+    // scanned must equal the number of facts we submitted, NOT the number
+    // of responses (the pre-fix bug). Otherwise scanned < requested and the
+    // operator can't reconcile the report against the input.
+    expect(parsed.summary.scanned).toBe(n);
+    expect(parsed.summary.unknownCustomIds).toBe(0);
+    // Per-fact results array should have n entries with kind=error.
+    expect(parsed.results.length).toBe(n);
+    for (const r of parsed.results) {
+      expect(r.error).toContain('did not return a response');
+    }
+  });
+
+  it('counts unknown customIds separately from missing responses (QUA-963 PR-B)', async () => {
+    // The inverse case: Anthropic returns a customId we DIDN'T submit.
+    // Provider drift / response corruption — must be counted distinctly so
+    // operators can tell "we lost work" (missingResponses) from "they sent
+    // garbage" (unknownCustomIds).
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_drift', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_drift', processing_status: 'ended', request_counts: {} });
+
+    mockGetBatchResults.mockImplementation(async () => {
+      const results = new Map<string, unknown>();
+      // Return one valid response for the actual fact submitted.
+      for (const callArgs of mockBuildDiscoveryBatchRequest.mock.calls) {
+        const fact = (callArgs[0] as { fact: { id: string } }).fact;
+        results.set(`discover_${fact.id}`, {
+          custom_id: `discover_${fact.id}`,
+          result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+        });
+      }
+      // Plus one customId we never submitted.
+      results.set('discover_GHOST_FACT', {
+        custom_id: 'discover_GHOST_FACT',
+        result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+      });
+      return results;
+    });
+
+    mockParseDiscoveryResponse.mockReturnValue({
+      candidates: [{ url: 'https://x.example.com', confidence: 0.9, summary: 's' }],
+      best: 'https://x.example.com',
+      reason: 'good',
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: '1',
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.unknownCustomIds).toBe(1);
+    expect(parsed.summary.missingResponses).toBe(0);
+    // The legitimate fact still scanned and discovered.
+    expect(parsed.summary.scanned).toBe(1);
+    expect(parsed.summary.discovered).toBe(1);
+  });
+
+  it('mixed: some facts dropped + some unknown customIds (QUA-963 PR-B)', async () => {
+    // Combined edge case: submit n facts (n >= 2), get back 1 valid
+    // response + 1 unknown customId, leaving (n - 1) actual facts
+    // unaccounted for. The reconciliation pass should catch the dropped
+    // facts.
+    //
+    // Same KB-fragility fix as the "missing responses" test above —
+    // resolve actual count up-front and skip if KB doesn't have ≥ 2
+    // unsourced born-year facts available.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 3 });
+    if (available.length < 2) return; // skip if we can't simulate "1 of n returned"
+    const n = available.length;
+    const droppedCount = n - 1;
+
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'ended', request_counts: {} });
+
+    mockGetBatchResults.mockImplementation(async () => {
+      const results = new Map<string, unknown>();
+      // Return a response only for the FIRST submitted fact.
+      const calls = mockBuildDiscoveryBatchRequest.mock.calls;
+      if (calls.length > 0) {
+        const firstFact = (calls[0][0] as { fact: { id: string } }).fact;
+        results.set(`discover_${firstFact.id}`, {
+          custom_id: `discover_${firstFact.id}`,
+          result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+        });
+      }
+      // Plus an unknown customId.
+      results.set('discover_PHANTOM', {
+        custom_id: 'discover_PHANTOM',
+        result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+      });
+      return results;
+    });
+
+    mockParseDiscoveryResponse.mockReturnValue({
+      candidates: [{ url: 'https://x.example.com', confidence: 0.9, summary: 's' }],
+      best: 'https://x.example.com',
+      reason: 'good',
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: String(n),
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.unknownCustomIds).toBe(1);
+    expect(parsed.summary.missingResponses).toBe(droppedCount);
+    expect(parsed.summary.engineErrors).toBe(droppedCount);
+    expect(parsed.summary.discovered).toBe(1);
+    // All n facts accounted for in scanned (1 succeeded + droppedCount reconciled-as-error).
+    expect(parsed.summary.scanned).toBe(n);
+  });
+
+  it('charges batch cost up-front based on submission count, not on successes (QUA-963 PR-B)', async () => {
+    // CodeRabbit fix: pre-fix, summary.costUsd was incremented only inside
+    // the success-response branch. A 50-fact batch with 1 dropped response
+    // would report $0.98 even though Anthropic billed for the full
+    // submission (~$1.00). Post-fix, cost is charged once up-front based
+    // on requests.length so the report matches submission semantics.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 2 });
+    if (available.length === 0) return;
+    const n = available.length;
+
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_cost', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_cost', processing_status: 'ended', request_counts: {} });
+
+    // Drop ALL responses — the reported cost should still reflect what we
+    // submitted, not what came back.
+    mockGetBatchResults.mockResolvedValue(new Map());
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: String(n),
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+
+    // Cost should equal n * ESTIMATED_BATCH_COST_USD (0.02), even though
+    // 0 succeeded.
+    const expectedCost = Number((n * 0.02).toFixed(4));
+    expect(parsed.summary.costUsd).toBe(expectedCost);
+    // Sanity check: zero discoveries (all dropped).
+    expect(parsed.summary.discovered).toBe(0);
+  });
 });
 
 describe('crux fb backfill-sources — option parsing', () => {

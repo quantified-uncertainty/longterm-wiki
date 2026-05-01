@@ -151,6 +151,21 @@ interface BackfillSummary {
   discovered: number;
   noBest: number;
   engineErrors: number;
+  /**
+   * Batch-mode only: count of customIds Anthropic returned that we never
+   * submitted (provider-side bug or response corruption). Counted separately
+   * from `engineErrors` because the work was never even our request, so
+   * conflating it with our own failure rate would mislead operators.
+   */
+  unknownCustomIds: number;
+  /**
+   * Batch-mode only: count of facts we submitted whose customId did not
+   * appear in the response set. The work was lost — Anthropic accepted the
+   * request but never produced a response for it. Folded into `engineErrors`
+   * via the response-loop reconciliation pass; tracked here so operators
+   * can distinguish "never returned" from "returned with errored type".
+   */
+  missingResponses: number;
   writesAttempted: number;
   writesSucceeded: number;
   writesSkippedExisting: number;
@@ -208,6 +223,8 @@ function zeroSummary(): BackfillSummary {
     discovered: 0,
     noBest: 0,
     engineErrors: 0,
+    unknownCustomIds: 0,
+    missingResponses: 0,
     writesAttempted: 0,
     writesSucceeded: 0,
     writesSkippedExisting: 0,
@@ -393,14 +410,37 @@ async function discoverBatch(
   const responses = await getBatchResults(client, submitted.id);
   const results: FactDiscovery[] = [];
 
+  // Charge the cost estimate up-front based on submission count, not on
+  // successful responses. Anthropic bills for every request that processed
+  // (including errored ones), and for our budget-tracking purposes a fact
+  // we lost (provider dropped the response) still consumed quota. Charging
+  // only on the success branch under-reported cost — operators saw
+  // `costUsd: $0.98` after a 50-fact run with 1 drop while actual billing
+  // was ~$1.00. Charging once up-front matches submission semantics and
+  // makes the budget-gate math (which is also estimate-based) consistent
+  // across runs.
+  summary.costUsd += requests.length * ESTIMATED_BATCH_COST_USD;
+
+  // Track which submitted customIds we saw a response for so we can detect
+  // facts Anthropic accepted but never returned a result for. Pre-fix, those
+  // facts would silently disappear from `summary.scanned` — operators couldn't
+  // reconcile "facts to process: N" against "scanned: M < N" and would have
+  // no error trail. Post-fix, every missing response is counted as an
+  // engineError with a synthetic FactDiscovery so the report can name it.
+  const seenCustomIds = new Set<string>();
+
   for (const [customId, response] of responses) {
     const ctx = customIdToFact.get(customId);
     if (!ctx) {
-      // Unknown customId — possible if Anthropic returned a result we didn't
-      // submit. Skip with a warning rather than crashing.
-      options.log(`  [warn] batch returned unknown customId: ${customId}`);
+      // Unknown customId — Anthropic returned a result we didn't submit.
+      // Provider-side bug or response-set corruption. Counted separately
+      // from `engineErrors` so operators can distinguish "we lost work" from
+      // "they sent us garbage." Skip with a warning rather than crashing.
+      summary.unknownCustomIds++;
+      options.log(`  [warn] batch returned unknown customId: ${customId} (provider drift; not in our submission set)`);
       continue;
     }
+    seenCustomIds.add(customId);
     summary.scanned++;
 
     if (response.result.type !== 'succeeded') {
@@ -422,10 +462,8 @@ async function discoverBatch(
 
     const text = extractTextFromMessage(response.result.message);
     const parsed = parseDiscoveryResponse(text, options.threshold);
-    // Batch cost is settled by the batch summary, not per-response. Track it
-    // approximately: estimated rather than precise. The engine returns
-    // costUsd: 0 for the batch path (per source-discover.ts contract).
-    summary.costUsd += ESTIMATED_BATCH_COST_USD;
+    // No per-response cost increment — already charged up-front. The engine
+    // returns costUsd: 0 for the batch path (per source-discover.ts contract).
     const discoverResult: DiscoverResult = { ...parsed, costUsd: 0 };
     results.push({
       entity: ctx.entity,
@@ -436,6 +474,32 @@ async function discoverBatch(
     });
     if (discoverResult.best) summary.discovered++;
     else summary.noBest++;
+  }
+
+  // Reconciliation pass: emit synthetic engine-error entries for any
+  // customId we submitted but never saw in the response set. Without this,
+  // the work is silently dropped — `summary.scanned < submitted.length`
+  // with no error trail, and the per-fact report skips them entirely.
+  for (const [customId, ctx] of customIdToFact) {
+    if (seenCustomIds.has(customId)) continue;
+    summary.scanned++;
+    summary.engineErrors++;
+    summary.missingResponses++;
+    options.log(`  [warn] batch did not return a response for customId ${customId} (fact ${ctx.fact.id})`);
+    results.push({
+      entity: ctx.entity,
+      fact: ctx.fact,
+      propertyName: ctx.propertyName,
+      formattedValue: ctx.formattedValue,
+      result: null,
+      error: `batch did not return a response for this customId (provider drop)`,
+    });
+  }
+
+  if (summary.missingResponses > 0 || summary.unknownCustomIds > 0) {
+    options.log(
+      `  [reconcile] submitted ${requests.length} request(s), got ${responses.size} response(s): ${summary.missingResponses} dropped, ${summary.unknownCustomIds} unknown customId(s) returned`,
+    );
   }
 
   return results;
@@ -823,6 +887,14 @@ function formatReport(
   lines.push(`Discovered (best):     ${summary.discovered}`);
   lines.push(`No best candidate:     ${summary.noBest}`);
   lines.push(`Engine errors:         ${summary.engineErrors}`);
+  // Batch-mode reconciliation counters. Hidden when zero to keep real-time
+  // mode's report uncluttered (those fields are always 0 in real-time).
+  if (summary.missingResponses > 0) {
+    lines.push(`  Missing responses:   ${summary.missingResponses} (provider dropped — included in engine errors)`);
+  }
+  if (summary.unknownCustomIds > 0) {
+    lines.push(`  Unknown customIds:   ${summary.unknownCustomIds} (provider returned customIds we didn't submit)`);
+  }
   if (apply) {
     lines.push(`Writes attempted:      ${summary.writesAttempted}`);
     lines.push(`Writes succeeded:      ${summary.writesSucceeded}`);
