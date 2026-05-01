@@ -26,7 +26,9 @@ import {
 import type { GitHubIssue } from '../lib/github.ts';
 import {
   dedupLinearWellnessIssue,
+  createLinearWellnessIssue,
   closeLinearWellnessOnAllClear,
+  type CreateLinearWellnessResult,
   type LinearDedupDeps,
   type LinearWellnessAction,
 } from './wellness-linear-dedup.ts';
@@ -256,13 +258,29 @@ function handleLinearDedupAction(
   }
 }
 
+/**
+ * Translate a `CreateLinearWellnessResult` into a short-circuit result, or
+ * return null when the caller should fall through to the GitHub create path.
+ * `failed` always returns null so the caller's resilience fallback runs.
+ */
+function handleLinearCreateResult(
+  result: CreateLinearWellnessResult,
+): WellnessIssueResult | null {
+  if (result.kind === 'created') {
+    console.log(`Created new Linear wellness ticket ${result.identifier} (${result.url})`);
+    return { action: 'linear-created', linearIdentifier: result.identifier };
+  }
+  return null;
+}
+
 export type WellnessIssueAction =
   | 'created'
   | 'updated'
   | 'closed'
   | 'none'
   | 'linear-commented'
-  | 'linear-reopened';
+  | 'linear-reopened'
+  | 'linear-created';
 
 export interface WellnessIssueResult {
   action: WellnessIssueAction;
@@ -309,9 +327,8 @@ export async function manageWellnessIssue(
       return { action: 'updated', issueNumber: existingIssue };
     }
 
-    // No open GitHub issue. Before filing a new one (which Linear's GitHub
-    // integration would mirror into a brand-new Linear ticket), check Linear
-    // directly for an existing open or recently-closed wellness ticket.
+    // No open GitHub issue. Check Linear for an existing open or recently
+    // closed wellness ticket so we don't duplicate.
     // See QUA-577 for the 8-duplicate-tickets incident this prevents.
     const linearComment = runUrl
       ? `Wellness check failing again at ${report.timestamp}. See [run](${runUrl}) for details.`
@@ -324,12 +341,35 @@ export async function manageWellnessIssue(
     const handled = handleLinearDedupAction(linearAction);
     if (handled) return handled;
 
-    // Misconfig path (QUA-676): if Linear dedup is dormant because the
-    // LINEAR_API_KEY secret is missing, every close-then-reopen cycle of the
-    // GitHub issue mirrors into a fresh QUA ticket — that's the duplicate
-    // cascade. We can't fix the secret from code, but we can stamp a banner
-    // on the GitHub issue so whoever reads it sees the cause + the action.
-    const misconfig = linearAction.kind === 'skipped' && linearAction.reason === 'misconfig';
+    // Linear-first path (QUA-970): on `no-match` (Linear is healthy, just no
+    // existing ticket), file the wellness ticket DIRECTLY in Linear — no
+    // longer via the GitHub-mirror sync, which produced orphan tickets without
+    // projects. The misconfig and lookup-failed reasons fall through to the
+    // GitHub create below as a resilience fallback so a Linear outage doesn't
+    // silently drop the alert entirely.
+    let linearCreateResult: CreateLinearWellnessResult | null = null;
+    if (linearAction.kind === 'skipped' && linearAction.reason === 'no-match') {
+      linearCreateResult = await createLinearWellnessIssue(
+        WELLNESS_ISSUE_TITLE,
+        report.issueBody,
+        options.linearDedupDeps,
+      );
+      const linearHandled = handleLinearCreateResult(linearCreateResult);
+      if (linearHandled) return linearHandled;
+      // Fell through: createLinearWellnessIssue returned a `failed` result.
+      // Continue to the GitHub fallback below.
+    }
+
+    // GitHub fallback path. Reaches here when Linear is unreachable (misconfig,
+    // transient outage, or project lookup/create failure). The misconfig case
+    // (QUA-676) stamps an in-body banner so whoever reads the synced GitHub
+    // mirror sees the cause + the fix path. The banner ONLY applies when the
+    // underlying cause is the missing LINEAR_API_KEY secret — transient
+    // lookup-failed/api-error reasons don't get the banner because the fix
+    // (set the secret) doesn't apply.
+    const misconfig =
+      (linearAction.kind === 'skipped' && linearAction.reason === 'misconfig') ||
+      (linearCreateResult?.kind === 'failed' && linearCreateResult.reason === 'misconfig');
     const issueBody = misconfig ? prependMisconfigBanner(report.issueBody) : report.issueBody;
 
     // Create new GitHub issue with a stable title (no timestamp) so concurrent

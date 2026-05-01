@@ -208,7 +208,14 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
 
     const report = buildWellnessReport(failingChecks);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment, setState, now: () => Date.parse('2026-04-19T20:00:00.000Z') },
+      linearDedupDeps: {
+        search,
+        comment,
+        setState,
+        createIssue: vi.fn(),
+        getProject: vi.fn(),
+        now: () => Date.parse('2026-04-19T20:00:00.000Z'),
+      },
     });
 
     expect(result.action).toBe('linear-commented');
@@ -217,29 +224,77 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     expect(comment).toHaveBeenCalledWith('QUA-570', expect.stringContaining('failing again'));
   });
 
-  it('falls through to GitHub create when Linear has no match', async () => {
+  it('creates a Linear ticket directly (Linear-first) when no Linear match exists (QUA-970)', async () => {
+    // Linear-first migration: instead of letting the GitHub-mirror sync produce
+    // an orphan ticket without a project, file directly into Linear.
     const search = vi.fn().mockResolvedValue([]);
+    const createIssue = vi
+      .fn()
+      .mockResolvedValue({ identifier: 'QUA-9999', url: 'https://linear.app/q/issue/QUA-9999' });
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: 'Automation & Infrastructure' });
+
+    const report = buildWellnessReport(failingChecks);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: {
+        search,
+        comment: vi.fn(),
+        setState: vi.fn(),
+        createIssue,
+        getProject,
+        now: () => 0,
+      },
+    });
+
+    expect(result.action).toBe('linear-created');
+    expect(result.linearIdentifier).toBe('QUA-9999');
+    // Critical: the GitHub create path must NOT have been taken.
+    expect(mockCreateIssue).not.toHaveBeenCalled();
+    // The Linear create must carry the wellness project so the ticket isn't orphaned.
+    expect(getProject).toHaveBeenCalledWith('Automation & Infrastructure');
+    expect(createIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: WELLNESS_ISSUE_TITLE,
+        projectId: 'project-uuid-aaaa',
+      }),
+    );
+  });
+
+  it('falls back to GitHub create when Linear create fails on api-error (no banner)', async () => {
+    // Resilience: a transient Linear API error during create shouldn't drop
+    // the alert. The GH fallback fires, but without the misconfig banner —
+    // that banner is for the missing-secret case only.
+    const search = vi.fn().mockResolvedValue([]);
+    const apiError = new Error('Linear API unreachable');
+    const createIssue = vi.fn().mockRejectedValue(apiError);
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: 'Automation & Infrastructure' });
     mockCreateIssue.mockResolvedValue({ number: 9999 });
 
-    // `deduplicateWellnessIssues` uses fake timers to skip the 2s concurrent-
-    // create settle delay in tests. Advance the single pending timer as soon
-    // as it's registered so the create path returns without sleeping.
     vi.useFakeTimers();
     try {
       const report = buildWellnessReport(failingChecks);
       const promise = manageWellnessIssue(report, {
-        linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
+        linearDedupDeps: {
+          search,
+          comment: vi.fn(),
+          setState: vi.fn(),
+          createIssue,
+          getProject,
+          now: () => 0,
+        },
       });
-      // Let microtasks run, advance the 2s settle timer, then await.
       await vi.runAllTimersAsync();
       const result = await promise;
 
       expect(result.action).toBe('created');
       expect(result.issueNumber).toBe(9999);
+      // GH fallback runs without the misconfig banner.
       expect(mockCreateIssue).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: WELLNESS_ISSUE_TITLE,
-          labels: ['wellness', 'bug'],
+          body: expect.not.stringContaining(MISCONFIG_BANNER_MARKER),
         }),
       );
     } finally {
@@ -253,7 +308,14 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
 
     const report = buildWellnessReport(failingChecks);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
+      linearDedupDeps: {
+        search,
+        comment: vi.fn(),
+        setState: vi.fn(),
+        createIssue: vi.fn(),
+        getProject: vi.fn(),
+        now: () => 0,
+      },
     });
 
     expect(result.action).toBe('updated');
@@ -264,10 +326,15 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
 
   it('stamps the misconfig banner on the new GitHub issue when LINEAR_API_KEY is missing (QUA-676)', async () => {
     // Reproduces the QUA-676 cascade: Linear-side dedup throws because the
-    // secret is missing → caller falls through to createIssue. The new issue
-    // body must carry the misconfig banner so whoever reads the ticket sees
-    // the cause + the fix path. Without the banner, the duplicate cascade
+    // secret is missing → caller falls through to GitHub createIssue. The new
+    // issue body must carry the misconfig banner so whoever reads the ticket
+    // sees the cause + the fix path. Without the banner, the duplicate cascade
     // recurs invisibly (which is what happened from QUA-577 → QUA-686).
+    //
+    // Post-QUA-970: Linear-first means we try createLinearWellnessIssue
+    // BEFORE the GH fallback. The misconfig path must reject at search time
+    // so we never reach Linear create either — otherwise the test would also
+    // need to mock createIssue.
     const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
     const search = vi.fn().mockRejectedValue(apiKeyError);
     mockCreateIssue.mockResolvedValue({ number: 4577 });
@@ -277,7 +344,14 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     try {
       const report = buildWellnessReport(failingChecks);
       const promise = manageWellnessIssue(report, {
-        linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
+        linearDedupDeps: {
+          search,
+          comment: vi.fn(),
+          setState: vi.fn(),
+          createIssue: vi.fn(),
+          getProject: vi.fn(),
+          now: () => 0,
+        },
       });
       await vi.runAllTimersAsync();
       const result = await promise;
@@ -319,7 +393,14 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     const passing = [makeCheck({ ok: true })];
     const report = buildWellnessReport(passing);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment, setState, now: () => 0 },
+      linearDedupDeps: {
+        search,
+        comment,
+        setState,
+        createIssue: vi.fn(),
+        getProject: vi.fn(),
+        now: () => 0,
+      },
     });
 
     expect(result.action).toBe('closed');

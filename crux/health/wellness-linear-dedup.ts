@@ -28,10 +28,20 @@
 import {
   searchIssues,
   commentOnIssue,
+  createIssue as createLinearIssueRaw,
   updateIssueState,
   type SearchedIssue,
 } from '../lib/linear/issues.ts';
+import { getProject } from '../lib/linear/projects.ts';
 import { isOpenStateType } from '../lib/linear/workflow-states.ts';
+
+/**
+ * Project that owns wellness tickets. Past wellness tickets (QUA-577,
+ * QUA-676, QUA-590, QUA-607) all live here, so new ones land alongside them.
+ * Per `docs/agent-rules/linear-project-ownership.md`, Automation & Infrastructure
+ * owns "scheduled jobs" — wellness checks are scheduled health monitors.
+ */
+export const WELLNESS_PROJECT_NAME = 'Automation & Infrastructure';
 
 /**
  * Window for treating a closed Linear wellness ticket as "still recent
@@ -69,6 +79,14 @@ export interface LinearDedupDeps {
    * for both transitions (Backlog on reopen, Done on all-clear close).
    */
   setState: typeof updateIssueState;
+  /**
+   * Linear issue creation + project lookup, used by the new
+   * `createLinearWellnessIssue` Linear-first path. Bundled into the same
+   * deps interface (rather than its own type) so tests inject one
+   * `linearDedupDeps` object instead of two.
+   */
+  createIssue: typeof createLinearIssueRaw;
+  getProject: typeof getProject;
   now: () => number;
 }
 
@@ -76,6 +94,8 @@ const DEFAULT_DEPS: LinearDedupDeps = {
   search: searchIssues,
   comment: commentOnIssue,
   setState: updateIssueState,
+  createIssue: createLinearIssueRaw,
+  getProject,
   now: Date.now,
 };
 
@@ -257,4 +277,68 @@ export async function closeLinearWellnessOnAllClear(
   });
   if (closed.length > 0) return { kind: 'closed', identifiers: closed };
   return { kind: 'close-failed', attempted: candidates.map((c) => c.identifier) };
+}
+
+export type CreateLinearWellnessResult =
+  | { kind: 'created'; identifier: string; url: string }
+  /** LINEAR_API_KEY missing — caller should fall back to GitHub create with the misconfig banner. */
+  | { kind: 'failed'; reason: 'misconfig'; error: string }
+  /** Project name didn't resolve, OR the create call threw. Caller should fall back to GitHub. */
+  | { kind: 'failed'; reason: 'project-missing' | 'api-error'; error: string };
+
+/**
+ * Create a new Linear wellness ticket (QUA-970). Replaces the legacy GitHub
+ * create path: instead of letting Linear's GitHub-mirror integration produce
+ * an orphan synced ticket, this files directly into Linear with the right
+ * project (so it doesn't show up as orphaned in `crux linear hygiene`).
+ *
+ * Returns a discriminated union so the caller can decide whether to fall
+ * back to GitHub. The fallback path is preserved for resilience: if Linear
+ * is misconfigured or unreachable we still want the alert recorded SOMEWHERE.
+ */
+export async function createLinearWellnessIssue(
+  title: string,
+  body: string,
+  deps: Partial<LinearDedupDeps> = {},
+): Promise<CreateLinearWellnessResult> {
+  const { createIssue, getProject: _getProject } = { ...DEFAULT_DEPS, ...deps };
+
+  let projectId: string;
+  try {
+    const project = await _getProject(WELLNESS_PROJECT_NAME);
+    if (!project) {
+      // Project missing is a config drift on Linear's side, not the same as
+      // a missing API key. Surfaced as a separate reason so the caller logs
+      // it loudly rather than treating it as a transient blip.
+      const error = `Linear project "${WELLNESS_PROJECT_NAME}" not found — has it been renamed? Falling back to GitHub create.`;
+      console.warn(error);
+      return { kind: 'failed', reason: 'project-missing', error };
+    }
+    projectId = project.id;
+  } catch (err) {
+    if (isMissingLinearApiKeyError(err)) {
+      const error = err instanceof Error ? err.message : String(err);
+      return { kind: 'failed', reason: 'misconfig', error };
+    }
+    const error = err instanceof Error ? err.message : String(err);
+    console.warn(`Linear project lookup failed (${error}) — falling back to GitHub create`);
+    return { kind: 'failed', reason: 'api-error', error };
+  }
+
+  try {
+    const result = await createIssue({
+      title,
+      description: body,
+      projectId,
+    });
+    return { kind: 'created', identifier: result.identifier, url: result.url };
+  } catch (err) {
+    if (isMissingLinearApiKeyError(err)) {
+      const error = err instanceof Error ? err.message : String(err);
+      return { kind: 'failed', reason: 'misconfig', error };
+    }
+    const error = err instanceof Error ? err.message : String(err);
+    console.warn(`Linear wellness create failed (${error}) — falling back to GitHub create`);
+    return { kind: 'failed', reason: 'api-error', error };
+  }
 }
