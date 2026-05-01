@@ -24,19 +24,23 @@ describe("getNonVerifiablePropertyIds", () => {
     expect(ids.size).toBeGreaterThan(0);
   });
 
-  it("includes the well-known social-media + wikipedia + estimate properties", () => {
+  it("includes the well-known estimate + self-referential-URL properties", () => {
     _resetPropertyMetadataCache();
     const ids = getNonVerifiablePropertyIds();
-    // These three families are the canonical reasons a property is flagged
-    // verifiable:false:
-    //   1. self-referential URLs (`wikipedia-url`, `social-media`)
-    //   2. third-party-blocking handles (`twitter-handle`/`x-handle`)
-    //   3. unsourced estimates (`safety-staffing-ratio`, `equity-stake-percent`)
-    // Pick one canonical member of each family — losing any of these to a
-    // YAML edit would silently expand the "checkable" set and break the gate.
-    expect(ids.has("wikipedia-url")).toBe(true);
-    expect(ids.has("social-media")).toBe(true);
+    // QUA-927 moved self-referential-URL properties (`wikipedia-url`,
+    // `social-media`, `google-scholar`, `github-profile`) OUT of the
+    // non-verifiable set and into url-resolves verification — they are now
+    // checkable via cheap HEAD requests. They MUST NOT be in this set.
+    expect(ids.has("wikipedia-url")).toBe(false);
+    expect(ids.has("social-media")).toBe(false);
+    // The remaining canonical reasons a property stays verifiable:false:
+    //   1. unsourced estimates (`safety-staffing-ratio`, `equity-stake-percent`)
+    //   2. self-referential URLs that QUA-927 didn't migrate (`website`)
+    // Pick one canonical member of each — losing any of these to a YAML edit
+    // would silently expand the "checkable" set and break the gate.
     expect(ids.has("safety-staffing-ratio")).toBe(true);
+    expect(ids.has("equity-stake-percent")).toBe(true);
+    expect(ids.has("website")).toBe(true);
   });
 
   it("does NOT include verifiable properties", () => {
