@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { formatCount } from "@/lib/format-compact";
 import { freshnessSortKey, type Freshness } from "@/app/data-sources/freshness";
 import {
   FORMAT_LABELS, FORMAT_COLORS,
@@ -228,11 +229,11 @@ const columns: ColumnDef<DataSourceRow>[] = [
             href={`/grants?dataSource=${id}`}
             className="text-xs tabular-nums text-accent-foreground hover:underline"
           >
-            {count.toLocaleString()}
+            {formatCount(count)}
           </Link>
         );
       }
-      return <span className="text-xs tabular-nums">{count.toLocaleString()}</span>;
+      return <span className="text-xs tabular-nums">{formatCount(count)}</span>;
     },
     size: 80,
   },

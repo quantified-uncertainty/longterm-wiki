@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { stripMarkdownFormatting } from "@/lib/inline-markdown";
+import { formatCount, formatCompactNumber } from "@/lib/format-compact";
 import {
   Table,
   TableBody,
@@ -281,7 +282,7 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
         if (c != null) {
           return (
             <span className="text-xs tabular-nums text-muted-foreground" title={`${c} citations`}>
-              {c >= 1000 ? `${(c / 1000).toFixed(1)}k` : c}
+              {formatCompactNumber(c)}
             </span>
           );
         }
@@ -468,8 +469,8 @@ export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {
 
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {filtered === total
-            ? `${total.toLocaleString()} resources`
-            : `${filtered.toLocaleString()} of ${total.toLocaleString()} resources`}
+            ? `${formatCount(total)} resources`
+            : `${formatCount(filtered)} of ${formatCount(total)} resources`}
         </span>
       </div>
 

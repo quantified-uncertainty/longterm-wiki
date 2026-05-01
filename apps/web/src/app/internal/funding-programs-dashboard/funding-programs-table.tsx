@@ -14,6 +14,7 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { formatCompactCurrency } from "@/lib/format-compact";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,13 +45,7 @@ export interface FundingProgramRow {
 
 function formatBudget(amount: number | null, currency: string): string {
   if (amount == null || amount === 0) return "-";
-  if (currency === "USD") {
-    if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(2)}B`;
-    if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-    if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-    return `$${amount.toLocaleString()}`;
-  }
-  return `${amount.toLocaleString()} ${currency}`;
+  return formatCompactCurrency(amount, currency);
 }
 
 // ---------------------------------------------------------------------------
