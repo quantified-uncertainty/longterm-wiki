@@ -202,6 +202,9 @@ const COMMON_VERBS = new Set([
   "has", "have", "had", "having",
   "do", "does", "did", "doing", "done",
   "will", "would", "shall", "should", "can", "could", "may", "might", "must",
+  // residues from contraction stripping (won't → wo, can't → ca, shan't → sha)
+  // — included so the verb check still recognizes the modal stem.
+  "wo", "ca", "sha",
   // lexical verbs — prefer inflected forms
   "provides", "provide", "provided", "providing",
   "offers", "offered", "offering",
@@ -277,12 +280,13 @@ const PRODUCT_DATE_REVENUE_RE =
  * Exported for testing. See QUA-938.
  */
 export function normalizeProductDescription(input: string | null | undefined): string | null {
-  if (!input) return null;
-  let s = input.trim();
+  let s = (input ?? "").trim();
   if (!s) return null;
-  // Strip leading extraction artifacts: dots, ellipses, commas, whitespace.
-  // Catches "...exemplified by..." and ",and the company..." and similar.
-  s = s.replace(/^[.,\s…]+/u, "").trim();
+  // Strip leading extraction artifacts: dots, commas, ellipses, semicolons,
+  // colons, dashes, bullet markers ("- ", "* ", "• "), question/exclamation
+  // marks, and whitespace. Catches "...exemplified by...", ",and the company",
+  // "- Claude is...", "* Claude is...", "• Claude is..." etc.
+  s = s.replace(/^[-—*•:;?!.,\s…]+/u, "").trim();
   if (!s) return null;
   // Collapse mid-text ellipses (`...` or `…`) — these are almost always
   // signals that the extractor stitched two non-adjacent source snippets.
@@ -295,10 +299,17 @@ export function normalizeProductDescription(input: string | null | undefined): s
   // Normalize whitespace.
   s = s.replace(/\s+/g, " ").trim();
   if (!s) return null;
-  // If overly long, prefer the first sentence; otherwise hard-truncate at 300.
+  // If overly long, prefer the first sentence; otherwise truncate at the
+  // last word boundary within 300 chars and append `…` so the YAML reader
+  // can see the value was cut. Avoids mid-word truncation like "...mode".
   if (s.length > PRODUCT_DESC_MAX_LENGTH) {
     const firstSentence = s.match(/^[^.!?]+[.!?]/);
-    s = firstSentence ? firstSentence[0].trim() : s.slice(0, PRODUCT_DESC_MAX_LENGTH).trim();
+    if (firstSentence) {
+      s = firstSentence[0].trim();
+    } else {
+      const truncated = s.slice(0, PRODUCT_DESC_MAX_LENGTH).replace(/\s+\S*$/, "").trim();
+      s = truncated ? `${truncated}…` : "";
+    }
   }
   if (!s) return null;
   const words = s.split(/\s+/).filter(Boolean);
@@ -645,7 +656,17 @@ export function applyVerdictsToOrganization(
         continue;
       }
       if (existing) {
-        if (!existing.description || existing.description.length < cleaned.length) {
+        // Compare against the *normalized* existing description so a dirty
+        // legacy entry ("...exemplified by Claude...", 89 chars) cannot block
+        // a cleaner replacement just because the leading-artifact bytes
+        // inflated its length. If the existing description doesn't normalize
+        // (i.e. it's itself a fragment), treat it as length 0 so any clean
+        // candidate wins. QUA-938 review fix.
+        const existingClean = existing.description
+          ? normalizeProductDescription(existing.description)
+          : null;
+        const existingLen = existingClean?.length ?? 0;
+        if (existingLen < cleaned.length) {
           existing.description = cleaned;
           if (!existing.source) existing.source = v.sourceUrl;
           applied.push({ targetField: tf, action: "updated" });
