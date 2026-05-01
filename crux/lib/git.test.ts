@@ -5,7 +5,7 @@ vi.mock('child_process', () => ({
 }));
 
 import { execFileSync } from 'child_process';
-import { isValidBranchName, syncToMain } from './git.ts';
+import { isValidBranchName, syncToMain, safeSyncMain } from './git.ts';
 
 const mockExecFileSync = vi.mocked(execFileSync);
 
@@ -146,6 +146,93 @@ describe('syncToMain', () => {
     ]);
 
     const result = syncToMain();
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('git pull --ff-only origin main failed');
+    expect(result.error).toContain('fast-forward');
+  });
+});
+
+// ── safeSyncMain (QUA-403) ───────────────────────────────────────────────────
+//
+// `safeSyncMain` is the QUA-403-safe variant: it pulls main when on main, but
+// never switches off a feature branch. This prevents `agent-checklist init`
+// from silently abandoning the agent's in-progress feature branch.
+
+describe('safeSyncMain', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('pulls when already on main with a clean tree', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'main' },              // rev-parse
+      { ok: true, stdout: '' },                  // status --porcelain (clean)
+      { ok: true, stdout: 'Already up to date.' }, // pull
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(true);
+    expect(result.startBranch).toBe('main');
+    expect(result.switchedBranch).toBe(false);
+    expect(result.keptBranch).toBeFalsy();
+    expect(result.steps).toEqual(['Pulled main (already up to date)']);
+  });
+
+  it('leaves a feature branch untouched and does NOT pull', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'claude/qua-403-fix-footgun' }, // rev-parse
+      { ok: true, stdout: '' },                            // status (clean)
+      // No further git calls — must NOT checkout main, must NOT pull.
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(true);
+    expect(result.startBranch).toBe('claude/qua-403-fix-footgun');
+    expect(result.switchedBranch).toBe(false);
+    expect(result.keptBranch).toBe(true);
+    expect(result.steps).toEqual([
+      'On feature branch claude/qua-403-fix-footgun — skipping main sync',
+    ]);
+    // Crucially, exactly 2 git invocations: rev-parse + status. No checkout.
+    expect(mockExecFileSync).toHaveBeenCalledTimes(2);
+  });
+
+  it('aborts on dirty tree (on main)', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'main' },
+      { ok: true, stdout: ' M apps/web/foo.tsx' },
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('Working tree is not clean');
+    expect(result.error).toContain('apps/web/foo.tsx');
+    expect(result.switchedBranch).toBe(false);
+    expect(result.keptBranch).toBeFalsy();
+  });
+
+  it('aborts on dirty tree (on feature branch) without switching', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'claude/work-in-progress' },
+      { ok: true, stdout: ' M file.ts' },
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('Working tree is not clean');
+    expect(result.startBranch).toBe('claude/work-in-progress');
+    expect(result.switchedBranch).toBe(false);
+    expect(mockExecFileSync).toHaveBeenCalledTimes(2);
+  });
+
+  it('aborts when pull is non-fast-forward (on main)', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'main' },
+      { ok: true, stdout: '' },
+      { ok: false, stderr: 'fatal: Not possible to fast-forward, aborting.' },
+    ]);
+
+    const result = safeSyncMain();
     expect(result.ok).toBe(false);
     expect(result.error).toContain('git pull --ff-only origin main failed');
     expect(result.error).toContain('fast-forward');

@@ -72,6 +72,28 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
   getAgentSessionByBranch: vi.fn(async () => ({ ok: false })),
 }));
 
+// Mock the git sync helpers so we can observe which one init picks (QUA-403)
+// without actually shelling out to git.
+const { syncToMainMock, safeSyncMainMock } = vi.hoisted(() => ({
+  syncToMainMock: vi.fn(() => ({
+    ok: true as const,
+    steps: ['Switched claude/foo → main', 'Pulled main (already up to date)'],
+    switchedBranch: true,
+    startBranch: 'claude/foo',
+  })),
+  safeSyncMainMock: vi.fn(() => ({
+    ok: true as const,
+    steps: ['On feature branch claude/foo — skipping main sync'],
+    switchedBranch: false,
+    startBranch: 'claude/foo',
+    keptBranch: true,
+  })),
+}));
+vi.mock('../lib/git.ts', () => ({
+  syncToMain: syncToMainMock,
+  safeSyncMain: safeSyncMainMock,
+}));
+
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { commands } from './agent-checklist.ts';
 import * as githubLib from '../lib/github.ts';
@@ -565,6 +587,128 @@ describe('agent-checklist init', () => {
       expect(result.output).toContain('Synced to wiki-server DB');
       expect(result.output).not.toContain('agent_sessions row was NOT written');
     });
+  });
+
+  // ── Branch-safe sync (QUA-403) ─────────────────────────────────────────────
+
+  describe('branch-safe sync', () => {
+    beforeEach(() => {
+      syncToMainMock.mockClear();
+      safeSyncMainMock.mockClear();
+    });
+
+    it('default sync uses safeSyncMain — never switches off a feature branch', async () => {
+      const result = await commands.init(['A task'], {
+        type: 'infrastructure',
+        noIssueStart: true,
+        noLinearStart: true,
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(safeSyncMainMock).toHaveBeenCalledTimes(1);
+      expect(syncToMainMock).not.toHaveBeenCalled();
+      // Output should reflect the kept-branch path, not the legacy "Synced to main".
+      expect(result.output).toContain('Kept feature branch');
+      expect(result.output).toContain('skipping main sync');
+    });
+
+    it('--reset-to-main opts in to the legacy syncToMain behavior', async () => {
+      const result = await commands.init(['A task'], {
+        type: 'infrastructure',
+        resetToMain: true,
+        noIssueStart: true,
+        noLinearStart: true,
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(syncToMainMock).toHaveBeenCalledTimes(1);
+      expect(safeSyncMainMock).not.toHaveBeenCalled();
+      expect(result.output).toContain('Synced to main');
+      expect(result.output).toContain('Switched claude/foo → main');
+    });
+
+    it('--no-sync skips the sync step entirely', async () => {
+      const result = await commands.init(['A task'], {
+        type: 'infrastructure',
+        noSync: true,
+        noIssueStart: true,
+        noLinearStart: true,
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(syncToMainMock).not.toHaveBeenCalled();
+      expect(safeSyncMainMock).not.toHaveBeenCalled();
+      expect(result.output).not.toContain('Kept feature branch');
+      expect(result.output).not.toContain('Synced to main');
+    });
+
+    it('aborts with exit 1 when safeSyncMain returns ok:false (dirty tree)', async () => {
+      safeSyncMainMock.mockReturnValueOnce({
+        ok: false,
+        steps: [],
+        error: 'Working tree is not clean. Commit, stash, or discard before syncing:\n M file.ts',
+        switchedBranch: false,
+        startBranch: 'claude/foo',
+      });
+
+      const result = await commands.init(['A task'], {
+        type: 'infrastructure',
+        noIssueStart: true,
+        noLinearStart: true,
+      });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toContain('Failed to sync to main');
+      expect(result.output).toContain('Working tree is not clean');
+      // Checklist must NOT be written when sync aborts.
+      expect(mockWriteFileSync).not.toHaveBeenCalled();
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// default handler — unknown subcommand (QUA-403)
+// ---------------------------------------------------------------------------
+
+describe('agent-checklist default (unknown subcommand)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('errors with exit 2 when called with what looks like an unknown subcommand', async () => {
+    // Simulates the dispatcher path: `agent-checklist list` →
+    //   commandHandler = commands.default; args = ['list', ...]
+    const result = await commands.default(['list'], {});
+    expect(result.exitCode).toBe(2);
+    expect(result.output).toContain('Unknown subcommand');
+    expect(result.output).toContain('"list"');
+    expect(result.output).toContain('init, check, verify, status');
+    // Crucially, the destructive paths must NOT have been triggered.
+    expect(mockWriteFileSync).not.toHaveBeenCalled();
+    expect(syncToMainMock).not.toHaveBeenCalled();
+    expect(safeSyncMainMock).not.toHaveBeenCalled();
+  });
+
+  it('suggests using `init "task description"` for free-text task descriptions', async () => {
+    const result = await commands.default(['Add', 'feature'], {});
+    expect(result.exitCode).toBe(2);
+    expect(result.output).toContain('crux sys agent-checklist init "Add feature"');
+  });
+
+  it('shows help with exit 1 when no args are given', async () => {
+    const result = await commands.default([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('No subcommand specified');
+    expect(result.output).toContain('Agent Checklist');
+    expect(result.output).toContain('init <task>');
+  });
+
+  it('ignores leading flags and treats the first positional as the unknown subcommand', async () => {
+    // `agent-checklist --ci list` should still flag `list` as unknown.
+    const result = await commands.default(['--ci', 'list'], { ci: true });
+    expect(result.exitCode).toBe(2);
+    expect(result.output).toContain('Unknown subcommand');
+    expect(result.output).toContain('"list"');
   });
 });
 

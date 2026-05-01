@@ -275,6 +275,72 @@ export interface SyncToMainResult {
   switchedBranch: boolean;
   /** The branch we were on before syncing. */
   startBranch: string;
+  /** True if a feature branch was kept (not switched). */
+  keptBranch?: boolean;
+}
+
+/**
+ * Safely sync without ever switching off a feature branch (QUA-403).
+ *
+ *   1. Verify the working tree is clean (no uncommitted or untracked files).
+ *      If dirty, abort without making any changes.
+ *   2. If on main: run `git pull --ff-only origin main`.
+ *   3. If on any other branch: leave it untouched and return ok with a note.
+ *
+ * Use this from `crux sys agent-checklist init` so an agent that started a
+ * feature branch (the documented step 0 of the workflow) does not get its
+ * branch silently rewritten back to main. Callers that genuinely want the
+ * old "always reset to main" behavior should call `syncToMain()` directly.
+ */
+export function safeSyncMain(): SyncToMainResult {
+  const startBranch = currentBranch();
+  const steps: string[] = [];
+
+  const status = gitSafe('status', '--porcelain');
+  if (!status.ok) {
+    return {
+      ok: false,
+      steps,
+      error: `git status failed: ${status.stderr || status.output}`,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+  if (status.output.length > 0) {
+    return {
+      ok: false,
+      steps,
+      error:
+        `Working tree is not clean. Commit, stash, or discard before syncing:\n` +
+        status.output,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+
+  if (startBranch !== 'main') {
+    steps.push(`On feature branch ${startBranch} — skipping main sync`);
+    return { ok: true, steps, switchedBranch: false, startBranch, keptBranch: true };
+  }
+
+  const pull = gitSafe('pull', '--ff-only', 'origin', 'main');
+  if (!pull.ok) {
+    return {
+      ok: false,
+      steps,
+      error: `git pull --ff-only origin main failed: ${pull.stderr || pull.output}`,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+  if (pull.output.includes('Already up to date')) {
+    steps.push('Pulled main (already up to date)');
+  } else {
+    const summary = pull.output.split('\n').slice(-2)[0]?.trim() || 'updated';
+    steps.push(`Pulled main (${summary})`);
+  }
+
+  return { ok: true, steps, switchedBranch: false, startBranch };
 }
 
 /**
@@ -285,9 +351,10 @@ export interface SyncToMainResult {
  *   2. If not on main, run `git checkout main`.
  *   3. Run `git pull --ff-only origin main`.
  *
- * Used by `crux sys agent-checklist init` so every new session starts from a
- * fresh main, instead of inheriting whatever stale branch the slot happened
- * to be on.
+ * NOTE: this DOES switch off a feature branch onto main if you're on one. For
+ * the QUA-403-safe variant that leaves feature branches alone, use
+ * `safeSyncMain()` instead. This function is kept for explicit opt-in callers
+ * (e.g. `agent-checklist init --reset-to-main`).
  */
 export function syncToMain(): SyncToMainResult {
   const startBranch = currentBranch();
