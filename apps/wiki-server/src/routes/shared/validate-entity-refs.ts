@@ -119,9 +119,18 @@ export async function validateEntityRefs(
     .map((m) => `${m.fieldName}: ${m.missingIds.join(", ")}`)
     .join("; ");
 
-  return validationError(
-    c,
+  // QUA-952 (Phase 0a-ii): emit structured `code: "fk_missing"` so canary
+  // callers can dispatch retry-with-feedback by FK class. The first missing
+  // field populates the structured `field`/`value` slots; the full
+  // multi-field summary stays in `message` (preserved verbatim for back-compat
+  // with existing string-matching consumers and for the QUA-940 deny-message
+  // contract on the bypass instruction).
+  const first = missing[0];
+  return validationError(c, {
+    code: "fk_missing",
+    field: first.fieldName,
+    value: first.missingIds,
     // skipEntityValidation-ok: error message text instructs callers how to bypass after providing a reason
-    `Entity references not found: ${details}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`,
-  );
+    message: `Entity references not found: ${details}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`,
+  });
 }

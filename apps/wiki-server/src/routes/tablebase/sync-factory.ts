@@ -40,6 +40,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  zodErrorToValidationBody,
 } from "../shared/utils.js";
 import {
   validateEntityRefs,
@@ -472,7 +473,9 @@ export function createSyncHandler<
       batchSchema.safeParse(body),
     );
     if (!parsed.success) {
-      return validationError(c, parsed.error.message);
+      // QUA-952 (Phase 0a-ii): emit structured `code` so canary callers
+      // can dispatch retry-with-feedback on `enum_violation` vs generic `zod`.
+      return validationError(c, zodErrorToValidationBody(parsed.error));
     }
     const items = parsed.data.items as TItem[];
 
