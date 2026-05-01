@@ -155,16 +155,13 @@ export default async function RaceDetailPage({
     </span>
   );
 
-  const metadataParts: React.ReactNode[] = [];
-  metadataParts.push(<span key="level">{RACE_LEVEL_LABELS[race.level] ?? race.level}</span>);
-  if (race.district) metadataParts.push(<span key="district">{race.district}</span>);
-  if (race.state) metadataParts.push(<span key="state">{race.state}</span>);
-  if (race.electionDate) metadataParts.push(<span key="election">Election: {race.electionDate}</span>);
-  if (race.party) metadataParts.push(<span key="party" className="capitalize">{race.party}</span>);
-
   const metadata = (
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      {metadataParts}
+      <span>{RACE_LEVEL_LABELS[race.level] ?? race.level}</span>
+      {race.district && <span>{race.district}</span>}
+      {race.state && <span>{race.state}</span>}
+      {race.electionDate && <span>Election: {race.electionDate}</span>}
+      {race.party && <span className="capitalize">{race.party}</span>}
     </span>
   );
 
