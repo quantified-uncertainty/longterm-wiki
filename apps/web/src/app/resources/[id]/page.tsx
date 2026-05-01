@@ -196,8 +196,12 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
     </>
   );
 
-  const metadata = (publisherInfo || hasExternalUrl) ? (
-    <span className="inline-flex items-center gap-x-1.5 gap-y-1 flex-wrap">
+  // Render metadata + summary as the shell `subtitle` so they appear on
+  // their own line below the title (matching the original layout). Putting
+  // either in the shell `metadata` slot would right-align it against the
+  // title row, which wraps awkwardly when the URL is long.
+  const metadataRow = (publisherInfo || hasExternalUrl) ? (
+    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
       {publisherInfo && (
         publisherInfo.href ? (
           <Link
@@ -231,7 +235,14 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
           </a>
         </>
       )}
-    </span>
+    </div>
+  ) : null;
+
+  const subtitle = (metadataRow || resource.summary) ? (
+    <>
+      {metadataRow}
+      {resource.summary && <p className={metadataRow ? "mt-1.5" : ""}>{resource.summary}</p>}
+    </>
   ) : undefined;
 
   return (
@@ -242,8 +253,7 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
       ]}
       title={title}
       titlePills={titlePills}
-      metadata={metadata}
-      subtitle={resource.summary || undefined}
+      subtitle={subtitle}
     >
       <div className="space-y-6">
         {/* Tabular Source Details */}
@@ -494,9 +504,12 @@ export default async function ResourcePage({ params }: PageProps) {
     </span>
   ) : null;
 
-  // Metadata row — year, publication, URL
-  const metadata = (resource.published_date || publication || domain || resource.url) ? (
-    <span className="inline-flex items-center gap-x-1.5 gap-y-1 flex-wrap">
+  // Render the metadata row in the shell `subtitle` slot — keeps it on its
+  // own line below the title (matching the original layout). The shell's
+  // `metadata` slot would right-align it against the title row, which wraps
+  // awkwardly when the URL is long.
+  const subtitle = (resource.published_date || publication || domain || resource.url) ? (
+    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
       {resource.published_date && (
         <span>{resource.published_date.slice(0, 4)}</span>
       )}
@@ -544,7 +557,7 @@ export default async function ResourcePage({ params }: PageProps) {
           </>
         );
       })()}
-    </span>
+    </div>
   ) : undefined;
 
   return (
@@ -555,7 +568,7 @@ export default async function ResourcePage({ params }: PageProps) {
       ]}
       title={plainTitle}
       titlePills={titlePills}
-      metadata={metadata}
+      subtitle={subtitle}
     >
       <div className="space-y-6">
         {/* Authors section */}

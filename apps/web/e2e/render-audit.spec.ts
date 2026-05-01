@@ -85,12 +85,15 @@ const SIDEBAR_ONLY_PAGES = [
  * EntityProfileShell. Loaded into the same body-render check as simple pages.
  */
 const NO_SIDEBAR_PAGES = [
-  // Resources/[id] — migrated to EntityProfileShell in QUA-490. The page has
-  // two render paths: local YAML resource (literature) and server-fetched
-  // (tabular sources). The IDs below come from the resources-snapshot used at
-  // build time and exercise both shapes via the local path; the server path
-  // is exercised only for resources that have no local entry at all.
-  "/resources/2cc177984ead7389",  // ARIA Safeguarded AI Programme (tabular source, local thin)
+  // Resources/[id] — migrated to EntityProfileShell in QUA-490. The local
+  // (YAML literature) path is exercised here. The server-fetched (tabular)
+  // path is structurally similar to the local path and is covered by build
+  // (Next.js typechecks both branches) but cannot be reliably exercised by
+  // this test, since the resources-snapshot mirrors prod and any prod-known
+  // ID resolves locally — the server-fetch fallback only fires for IDs that
+  // exist on the wiki-server but were excluded from the snapshot, which we
+  // cannot pin down deterministically.
+  "/resources/2cc177984ead7389",  // ARIA Safeguarded AI Programme (local path)
 ];
 
 /**
