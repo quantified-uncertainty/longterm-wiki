@@ -367,8 +367,26 @@ export function spawnClaude(
 
     // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions,
     // unless the caller explicitly passes it in extraEnv (parallel patrol needs it for auth).
+    //
+    // Strip ANTHROPIC_API_KEY so the spawned `claude` CLI uses our OAuth Claude
+    // Code subscription, not API-direct billing. `.env.base` carries the key
+    // for legitimate API-direct callers (crux internal LLM calls), but patrol
+    // must not pass it through to claude — see QUA-1010 / QUA-612. Without
+    // this strip, every patrol fix attempt silently bills the API.
+    //
+    // Fail loud, not silent: if the key was present, log a prominent warning
+    // so an unattended overnight patrol run still leaves a trail for the
+    // operator to see. The delete itself is the safety net; the warning is
+    // the alarm bell.
     const env = { ...process.env };
     delete env.CLAUDECODE;
+    const apiKeyEnvName = 'ANTHROPIC_API_KEY'; // anthropic-billing-key-remap-ok
+    if (env[apiKeyEnvName]) {
+      log(
+        `  ${cl.yellow}⚠ ${apiKeyEnvName} was set in patrol env — stripping it before spawning claude so the OAuth subscription is used (see QUA-1010). Unset the key in your shell/.env to silence this warning.${cl.reset}`,
+      );
+      delete env[apiKeyEnvName];
+    }
     if (opts?.extraEnv) Object.assign(env, opts.extraEnv);
 
     const child = spawn('claude', args, {
