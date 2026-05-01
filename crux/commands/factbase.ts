@@ -19,7 +19,9 @@ import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
 import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
+import { commands as sourceDiscoverCommands } from './factbase-source-discover.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
+import { commands as verdictsCommands } from './factbase-verdicts.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
 import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/factbase-loader.ts';
@@ -1112,10 +1114,13 @@ export const commands = {
   'sync-sources': syncSourcesCommand,
   'sourcing': sourcingCommand,
   'source-backfill': sourceBackfillCommands.default,
+  'source-discover': sourceDiscoverCommands.default,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
   'migrate-entities-status': migrateEntitiesCommands.status,
+  // QUA-930: FactBase-scoped wrapper around POST /api/sourcing/cleanup-orphans
+  'verdicts': verdictsCommands.default,
 };
 
 export function getHelp(): string {
@@ -1140,8 +1145,10 @@ Commands:
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   sourcing          Check KB facts against source URLs using LLM
   source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
+  source-discover       Find canonical source URL(s) for one fact via LLM + web search (QUA-926)
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
+  verdicts prune-orphans        Delete orphan fact verdicts (QUA-930) [--apply]
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)

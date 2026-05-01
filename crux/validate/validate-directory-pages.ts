@@ -19,6 +19,7 @@
 
 import { join } from "path";
 import { readFileSync, existsSync } from "fs";
+import { fileURLToPath } from "url";
 import { PROJECT_ROOT, ensureDataLayer } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
 
@@ -150,32 +151,14 @@ function isReasonableDateFormat(value: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Main
+// Core validation (testable)
 // ---------------------------------------------------------------------------
 
-async function main(): Promise<void> {
-  const verbose = process.argv.includes("--verbose");
-  const ci = process.argv.includes("--ci");
-  const c = getColors(ci);
-
-  const typeArg = process.argv.find((a) => a.startsWith("--type="));
-  const filterType = typeArg ? typeArg.split("=")[1] : null;
-
-  ensureDataLayer();
-
-  const dbPath = join(PROJECT_ROOT, "apps/web/src/data/database.json");
-  if (!existsSync(dbPath)) {
-    console.error(c.red + "database.json not found. Run: pnpm build-data" + c.reset);
-    process.exit(1);
-  }
-
-  const db = JSON.parse(readFileSync(dbPath, "utf-8"));
-  const typedEntities: Record<string, unknown>[] = db.typedEntities || [];
-
-  if (typedEntities.length === 0) {
-    console.error(c.red + "No typedEntities in database.json." + c.reset);
-    process.exit(1);
-  }
+export function runValidation(opts: {
+  typedEntities: Record<string, unknown>[];
+  filterType?: string | null;
+}): { results: DirectoryResult[] } {
+  const { typedEntities, filterType = null } = opts;
 
   const entitiesByType = new Map<string, Record<string, unknown>[]>();
   for (const entity of typedEntities) {
@@ -194,12 +177,6 @@ async function main(): Promise<void> {
   const configs = filterType
     ? DIRECTORY_CONFIGS.filter((d) => d.entityType === filterType)
     : DIRECTORY_CONFIGS;
-
-  if (filterType && configs.length === 0) {
-    console.error(c.red + "Unknown entity type: " + filterType + c.reset);
-    console.error("Valid types: " + DIRECTORY_CONFIGS.map((d) => d.entityType).join(", "));
-    process.exit(1);
-  }
 
   const results: DirectoryResult[] = [];
 
@@ -244,21 +221,26 @@ async function main(): Promise<void> {
         }
       }
 
-      // Check 3: Display fields contain slug-like values
+      // Check 3: Display fields contain slug-like values that won't resolve.
+      // Directory pages call getTypedEntityById(slug) and render entity.title
+      // when found, so a slug that resolves never reaches the user. Only flag
+      // slugs that don't resolve — those genuinely leak via the fallback path
+      // in apps/web/src/app/<directory>/page.tsx (e.g. orgName = orgId).
+      // Use Map.has() (existence) rather than truthy-checking the value: an
+      // entity with an empty/undefined title is still a real entity that the
+      // rendering layer would resolve, just to a different display string.
       for (const field of config.displayFields) {
         if (field === "title") continue;
         const value = entity[field];
         if (typeof value === "string" && looksLikeSlug(value)) {
-          const resolvedTitle = entityTitleById.get(value);
+          if (entityTitleById.has(value)) continue;
           issues.push({
             entityId: id,
             entityTitle: title,
             issueType: "slug-in-display",
             field,
             value,
-            detail: resolvedTitle
-              ? field + " shows slug \"" + value + "\" instead of \"" + resolvedTitle + "\""
-              : field + " contains slug-like value \"" + value + "\"",
+            detail: field + " contains slug-like value \"" + value + "\" with no matching entity (will leak to user via rendering fallback)",
           });
         }
       }
@@ -290,6 +272,45 @@ async function main(): Promise<void> {
       fieldCoverage,
     });
   }
+
+  return { results };
+}
+
+// ---------------------------------------------------------------------------
+// Main (CLI entry point)
+// ---------------------------------------------------------------------------
+
+async function main(): Promise<void> {
+  const verbose = process.argv.includes("--verbose");
+  const ci = process.argv.includes("--ci");
+  const c = getColors(ci);
+
+  const typeArg = process.argv.find((a) => a.startsWith("--type="));
+  const filterType = typeArg ? typeArg.split("=")[1] : null;
+
+  ensureDataLayer();
+
+  const dbPath = join(PROJECT_ROOT, "apps/web/src/data/database.json");
+  if (!existsSync(dbPath)) {
+    console.error(c.red + "database.json not found. Run: pnpm build-data" + c.reset);
+    process.exit(1);
+  }
+
+  const db = JSON.parse(readFileSync(dbPath, "utf-8"));
+  const typedEntities: Record<string, unknown>[] = db.typedEntities || [];
+
+  if (typedEntities.length === 0) {
+    console.error(c.red + "No typedEntities in database.json." + c.reset);
+    process.exit(1);
+  }
+
+  if (filterType && !DIRECTORY_CONFIGS.some((d) => d.entityType === filterType)) {
+    console.error(c.red + "Unknown entity type: " + filterType + c.reset);
+    console.error("Valid types: " + DIRECTORY_CONFIGS.map((d) => d.entityType).join(", "));
+    process.exit(1);
+  }
+
+  const { results } = runValidation({ typedEntities, filterType });
 
   // ── Output ──────────────────────────────────────────────────────
 
@@ -426,7 +447,13 @@ async function main(): Promise<void> {
   console.log("");
 }
 
-main().catch((err) => {
-  console.error("Directory page validation crashed:", err);
-  process.exit(1);
-});
+// Only run main() when invoked as a script — not when imported by tests.
+// Use exact-path comparison rather than substring match so an importing test
+// file that happens to contain "validate-directory-pages" in its path doesn't
+// trigger the CLI side effects.
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error("Directory page validation crashed:", err);
+    process.exit(1);
+  });
+}

@@ -615,7 +615,7 @@ The architecture has known limitations and missing pieces. Documenting them prev
 | **No incremental builds** | `build-data.mjs` rebuilds everything from scratch each time (≈30s for content-only, ~2min full). No caching or dirty-file detection | Use `--scope=content` for faster content-only builds |
 | **No real-time updates** | Wiki content is fully static — changes require a build + deploy cycle. ISR helps dashboards but content pages are build-time only | Deploy pipeline; auto-update runs daily |
 | **No FactBase → WikiBase auto-sync** | When a FactBase fact changes, the wiki page prose isn't automatically updated to match | `crux w improve` can update pages, but must be triggered manually |
-| **Source-check coverage is partial** | Only about 15% of wiki pages have been sourcinged. Many facts lack source URLs entirely | `crux fb sourcing` and `crux w sourcing-wiki-pages` are available but expensive (about \$0.07/page) |
+| **Source-check coverage is partial** | Only about 15% of wiki pages have been sourced. Many facts lack source URLs entirely | `crux fb sourcing` and `crux w sourcing-wiki-pages` are available but expensive (about \$0.07/page) |
 | **No rollback for PG-primary data** | YAML-primary data has full git history. PG-primary data (grants, personnel) has no version history beyond edit logs | Consider adding a changelog table for PG-primary records |
 | **`things` table can go stale** | The cross-base index is synced at build time. Between builds, newly created PG records won't appear in `things` search | Rebuild or wait for next deploy |
 

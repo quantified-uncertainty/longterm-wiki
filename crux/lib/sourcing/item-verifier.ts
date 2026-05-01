@@ -25,6 +25,7 @@ import {
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
 import { tryWikidataMatch } from './wikidata-matcher.ts';
 import { tryOpenAlexMatch } from './openalex-matcher.ts';
+import { tryUrlResolvesVerify } from './url-resolves-verifier.ts';
 import { searchForEntity } from './item-collectors.ts';
 import { isRelevanceGateEnabled, runRelevanceGate } from './relevance-gate.ts';
 import type {
@@ -286,6 +287,36 @@ export async function verifySingleItem(
   client: ReturnType<typeof createLlmClient>,
   useWebSearch: boolean,
 ): Promise<VerifyResult | VerifyError> {
+  // ── URL-resolves verifier (QUA-927) ──
+  // Cheapest path: facts with `verifierKind: url-resolves` are verified by an
+  // HTTP HEAD request, no LLM, no source-content fetch. Returns null when the
+  // fact isn't tagged for url-resolves verification, so this is safe to run
+  // unconditionally.
+  if (item.data.kind === 'fact' && item.data.verifierKind === 'url-resolves') {
+    try {
+      const urlResolvesResult = await tryUrlResolvesVerify(item);
+      if (urlResolvesResult) return urlResolvesResult;
+    } catch (e: unknown) {
+      // Don't fall through to LLM content-claim — these properties (wikipedia-url,
+      // github-profile, …) have no claim text to verify; the LLM path is meaningless
+      // here. Return unverifiable so the orchestrator records *something* and a
+      // future pass retries.
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${message}`);
+      return {
+        itemId: item.id,
+        kind: item.kind,
+        description: item.description,
+        verdict: 'unverifiable' as SourcingVerdict,
+        confidence: 0.7,
+        extractedValue: '',
+        reasoning: `[url-resolves] verifier threw: ${message}`,
+        sourceUrl: item.sourceUrl ?? '',
+        checkerModel: 'url-resolves',
+      };
+    }
+  }
+
   // ── Deterministic matching path (Discussion #3567 Phase 3) ──
   // For any record-type item, try deterministic row-matching against a source
   // snapshot before falling back to LLM sourcing. tryDeterministicMatch

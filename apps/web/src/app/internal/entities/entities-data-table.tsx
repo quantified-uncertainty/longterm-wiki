@@ -981,7 +981,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   {
     accessorKey: "scUnchecked",
     sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Records not yet sourcinged">Unchk</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column} title="Records not yet sourced">Unchk</SortableHeader>,
     cell: ({ row }) => <VerdictCount value={row.original.scUnchecked} color="text-muted-foreground/60" icon="&#x25CB;" />,
   },
   {

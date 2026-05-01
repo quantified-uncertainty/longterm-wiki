@@ -27,6 +27,7 @@ import {
   buildEntitySourcingPrompt,
   MODELS,
 } from './item-verifier.ts';
+import { tryUrlResolvesVerify } from './url-resolves-verifier.ts';
 import { prefetchWikidataEntities } from './wikidata-matcher.ts';
 import { clampSourcingConcurrency } from './concurrency.ts';
 import { fetchSourceContent } from './source-fetcher.ts';
@@ -286,6 +287,58 @@ async function runBatchExecution(
   async function prepareItem(item: VerifyItem, index: number): Promise<void> {
     preparedCount++;
     const progress = `[${preparedCount}/${itemsToVerify.length}]`;
+
+    // URL-resolves verifier (QUA-927): handle inline, never queue for LLM batch.
+    // These checks are ~10ms each so concurrency is fine, and the result is
+    // final (no LLM second opinion).
+    if (item.data.kind === 'fact' && item.data.verifierKind === 'url-resolves') {
+      try {
+        const urlResolvesResult = await tryUrlResolvesVerify(item);
+        if (urlResolvesResult) {
+          summary[urlResolvesResult.verdict]++;
+          summary.actualVerified++;
+          summary.byKind[item.kind].verified++;
+          summary.results.push(urlResolvesResult);
+          console.log(`  ${progress} ${item.description.slice(0, 80)}`);
+          console.log(`    \x1b[32murl-resolves: ${urlResolvesResult.verdict}\x1b[0m`);
+          try {
+            await storeResult(item, urlResolvesResult);
+          } catch (e: unknown) {
+            summary.storageErrors++;
+            console.warn(`[sourcing] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+          }
+          return;
+        }
+      } catch (e: unknown) {
+        // Don't fall through to LLM batch — these properties have no claim text.
+        // Record an unverifiable verdict so the orchestrator counts it correctly,
+        // and skip the rest of the prepare flow for this item.
+        const message = e instanceof Error ? e.message : String(e);
+        console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${message}`);
+        const errorVerdict: VerifyResult = {
+          itemId: item.id,
+          kind: item.kind,
+          description: item.description,
+          verdict: 'unverifiable',
+          confidence: 0.7,
+          extractedValue: '',
+          reasoning: `[url-resolves] verifier threw: ${message}`,
+          sourceUrl: item.sourceUrl ?? '',
+          checkerModel: 'url-resolves',
+        };
+        summary.unverifiable++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(errorVerdict);
+        try {
+          await storeResult(item, errorVerdict);
+        } catch (storageErr: unknown) {
+          summary.storageErrors++;
+          console.warn(`[sourcing] Storage failed: ${storageErr instanceof Error ? storageErr.message : String(storageErr)}`);
+        }
+        return;
+      }
+    }
 
     // Handle deterministic matching for any record type first (falls through
     // to LLM when no manifest matches the source URL)

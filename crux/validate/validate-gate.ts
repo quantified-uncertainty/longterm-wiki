@@ -347,6 +347,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-897: block the non-word "sourcinged" — a mass-rename artifact
+    // from QUA-237 that surfaced on /divisions and 4 other pages.
+    id: 'no-sourcinged',
+    name: 'No "sourcinged" non-word (QUA-897 regression check)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-sourcinged.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-730: any newly added/modified manifest in data/tablebase-manifests/
     // must have at least one record with sourcing data. Catches the
     // "agent ran with --skip-sourcing because the billing key was missing"

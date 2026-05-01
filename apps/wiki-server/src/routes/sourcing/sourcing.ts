@@ -136,6 +136,7 @@ const LIVE_RECORDS_CTE = sql`
     UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
     UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
     UNION ALL SELECT 'fact', fact_id FROM facts
+    UNION ALL SELECT 'scorecard_grade', id::text FROM scorecard_grades
   )
 `;
 
@@ -1963,6 +1964,8 @@ const sourcingApp = new Hono()
       SELECT 'wiki-page', count(*)::int FROM wiki_pages
       UNION ALL
       SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
+      UNION ALL
+      SELECT 'scorecard_grade', count(*)::int FROM scorecard_grades
     `);
 
     const totalsByType: Record<string, number> = {};
@@ -2235,6 +2238,8 @@ const sourcingApp = new Hono()
       SELECT 'wiki-page', count(*)::int FROM wiki_pages
       UNION ALL
       SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
+      UNION ALL
+      SELECT 'scorecard_grade', count(*)::int FROM scorecard_grades
     `);
 
     const totalsByType: Record<string, number> = {};

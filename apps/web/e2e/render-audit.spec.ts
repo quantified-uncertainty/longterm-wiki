@@ -118,6 +118,7 @@ const SIMPLE_PAGES = [
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
+  "/divisions",  // QUA-897 sourcing-summary header
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -208,6 +209,35 @@ test.describe("Render audit — sidebar-only pages", () => {
       checkAntiPatterns(await getMainText(page), url);
     });
   }
+});
+
+test.describe("Render audit — QUA-897 sourcing summary banner", () => {
+  // Regression check: /divisions header used to render
+  //   "120 of 101 records sourcinged"
+  // Two defects: a non-word ("sourcinged" — botched mass rename of
+  // "source-checked") and an impossible ratio (numerator > denominator,
+  // because the page deduplicates raw division rows but the banner counted
+  // every verdict).
+  test("/divisions banner has no 'sourcinged' typo and checked <= total", async ({ page }) => {
+    await loadPage(page, "/divisions");
+    const text = await getMainText(page);
+
+    expect(text, "the non-word 'sourcinged' must not appear anywhere on /divisions")
+      .not.toContain("sourcinged");
+
+    // SourcingSummaryBanner returns null when no verdicts exist, so the regex
+    // may not match in fresh-data environments. When it DOES match, the
+    // numerator must not exceed the denominator (the QUA-897 invariant).
+    const m = text.match(/(\d+)\s+of\s+(\d+)\s+records\s+sourced/);
+    if (m) {
+      const checked = Number(m[1]);
+      const total = Number(m[2]);
+      expect(
+        checked,
+        `banner ratio inverted: ${checked} of ${total} (QUA-897 regression)`,
+      ).toBeLessThanOrEqual(total);
+    }
+  });
 });
 
 test.describe("Render audit — critical data tables", () => {
@@ -357,6 +387,62 @@ test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => 
       await loadPage(page, url);
       const hrefs = await page.locator('a[href^="/sourcing/entity/"]').count();
       expect(hrefs, `${url} has ${hrefs} dead /sourcing/entity/ link(s)`).toBe(0);
+    });
+  }
+});
+
+test.describe("Render audit — directory Coverage columns render dots (QUA-900)", () => {
+  // QUA-900 was filed against six directory pages claiming the Coverage
+  // column was 100% empty. The columns actually render a CoverageDots
+  // (or RecordStatusDots, which embeds CoverageDots) indicator in every
+  // row — the QA sweep counted text content only and missed the
+  // aria-label="Coverage: <pct>%" dot. This test pins down the
+  // invariant so the sweep tool can't false-positive again without a
+  // CI failure here.
+  //
+  // Robustness:
+  //   - Per-row assertion (not total dot count) so a row that grows a
+  //     second indicator doesn't false-fail the whole page.
+  //   - Skips when the table has zero rows (CI builds without
+  //     LONGTERMWIKI_SERVER_URL → kb-pg merge skipped → most directory
+  //     tables empty). The render-audit runs against prod nightly, so
+  //     the assertion still fires there. Each url must verify the page
+  //     rendered (h1 present) so an empty table from a real bug — not
+  //     a missing data source — still surfaces.
+  for (const url of [
+    "/research-areas",
+    "/funding-programs",
+    "/publications",
+    "/projects",
+    "/approaches",
+    "/divisions",
+  ]) {
+    test(`${url} renders a Coverage dot in every row`, async ({ page }) => {
+      await loadPage(page, url);
+      // Sanity: the page itself rendered (catches blank-page regressions
+      // that empty the table for a real reason rather than data absence).
+      await expect(page.locator("h1").first()).toBeVisible();
+
+      // Exclude empty-state rows (single <td colspan=N> "No X match" rows).
+      // CI without PG data hits these — they're a UI placeholder, not a real
+      // table row, so they have no Coverage dot by design.
+      const rows = page.locator("table tbody tr:not(:has(td[colspan]))");
+      const rowCount = await rows.count();
+      if (rowCount === 0) {
+        // Trivially passes — no data to check. CI without PG access
+        // hits this path. Prod runs always have rows.
+        return;
+      }
+      for (let i = 0; i < rowCount; i++) {
+        const dots = await rows
+          .nth(i)
+          .locator('[aria-label^="Coverage:"]')
+          .count();
+        expect(
+          dots,
+          `${url} row ${i + 1}/${rowCount} has ${dots} Coverage dot(s) (expected ≥1)`,
+        ).toBeGreaterThan(0);
+      }
     });
   }
 });

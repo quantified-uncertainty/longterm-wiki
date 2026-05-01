@@ -3,6 +3,7 @@ import {
   applyVerdictsToOrganization,
   applyVerdictsToPolicy,
   canonicalizePersonKey,
+  MIN_POSITION_CONFIDENCE,
   type VerifiedVerdict,
 } from "../apply-verdicts.ts";
 import type { OrganizationEntity, OrganizationKeyPersonObject, PolicyEntity } from "../gap-analyzer.ts";
@@ -63,6 +64,257 @@ describe("applyVerdictsToPolicy", () => {
     ]);
     expect(result.entity.billNumber).toBeUndefined();
     expect(result.applied).toEqual([]);
+  });
+
+  // ─── Stakeholder canonicalization (QUA-872) ──────────────────────────────
+  describe("stakeholder canonicalization", () => {
+    it("collapses FISC and foreign-intelligence-surveillance-court targetFields", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fisc",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Approves Section 702 targeting procedures.",
+        }),
+        v({
+          targetField: "stakeholder.foreign-intelligence-surveillance-court",
+          displayHint: "Foreign Intelligence Surveillance Court",
+          extractedValue: "Reviews FBI queries of US-person data.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.applied[0].action).toBe("added");
+      expect(result.applied[1].action).toMatch(/updated|skipped/);
+    });
+
+    it("collapses FBI vs Federal Bureau of Investigation vs FBI (Federal Bureau of Investigation)", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fbi",
+          displayHint: "FBI",
+          extractedValue: "Queries Section 702 data for FBI investigations.",
+        }),
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "A much more comprehensive description of FBI's role here.",
+        }),
+        v({
+          targetField: "stakeholder.fbi-federal-bureau-of-investigation",
+          displayHint: "FBI (Federal Bureau of Investigation)",
+          extractedValue: "Performs queries of 702 data.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+    });
+
+    it("collapses DOJ vs U.S. Department of Justice vs Department of Justice", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.doj",
+          displayHint: "DOJ",
+          extractedValue: "Oversight role in 702.",
+        }),
+        v({
+          targetField: "stakeholder.us-department-of-justice",
+          displayHint: "U.S. Department of Justice",
+          extractedValue: "Oversees compliance.",
+        }),
+        v({
+          targetField: "stakeholder.department-of-justice",
+          displayHint: "Department of Justice",
+          extractedValue: "Reports semiannually to Congress.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+    });
+
+    it("collapses ACLU and EFF aliases", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.aclu",
+          displayHint: "ACLU",
+          extractedValue: "Opposes Section 702 reauthorization.",
+        }),
+        v({
+          targetField: "stakeholder.american-civil-liberties-union",
+          displayHint: "American Civil Liberties Union",
+          extractedValue: "Litigates FISA cases.",
+        }),
+        v({
+          targetField: "stakeholder.eff",
+          displayHint: "EFF",
+          extractedValue: "Advocates for end to backdoor searches.",
+        }),
+        v({
+          targetField: "stakeholder.electronic-frontier-foundation",
+          displayHint: "Electronic Frontier Foundation",
+          extractedValue: "Files amicus briefs in FISC.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(2);
+      const names = result.entity.stakeholders!.map((s) => s.name).sort();
+      // Display names come from the *first* verdict that won the slot.
+      expect(names).toEqual(["ACLU", "EFF"]);
+    });
+
+    it("collapses NSA, ODNI, CIA aliases", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({ targetField: "stakeholder.nsa", displayHint: "NSA", extractedValue: "Collects signals." }),
+        v({
+          targetField: "stakeholder.national-security-agency",
+          displayHint: "National Security Agency",
+          extractedValue: "Operates upstream collection.",
+        }),
+        v({ targetField: "stakeholder.odni", displayHint: "ODNI", extractedValue: "Coordinates IC." }),
+        v({ targetField: "stakeholder.dni", displayHint: "DNI", extractedValue: "Reports to Congress." }),
+        v({ targetField: "stakeholder.cia", displayHint: "CIA", extractedValue: "Targets foreigners." }),
+        v({
+          targetField: "stakeholder.central-intelligence-agency",
+          displayHint: "Central Intelligence Agency",
+          extractedValue: "Operates abroad.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(3);
+      const names = result.entity.stakeholders!.map((s) => s.name).sort();
+      expect(names).toEqual(["CIA", "NSA", "ODNI"]);
+    });
+
+    it("FISA-702 adversarial input — full duplicate scenario from QUA-872", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      // Two slugs proposed for FISC, two for DOJ, three for FBI — the case
+      // documented in the ticket. Should collapse to 3 entries total.
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fisc",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Approves targeting procedures.",
+        }),
+        v({
+          targetField: "stakeholder.foreign-intelligence-surveillance-court",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Reviews queries.",
+        }),
+        v({
+          targetField: "stakeholder.doj",
+          displayHint: "Department of Justice (DOJ)",
+          extractedValue: "Oversight reports.",
+        }),
+        v({
+          targetField: "stakeholder.us-department-of-justice",
+          displayHint: "Department of Justice (DOJ)",
+          extractedValue: "Compliance oversight.",
+        }),
+        v({
+          targetField: "stakeholder.fbi",
+          displayHint: "FBI",
+          extractedValue: "Queries 702 data.",
+        }),
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "FBI (Federal Bureau of Investigation)",
+          extractedValue: "Investigates threats.",
+        }),
+        v({
+          targetField: "stakeholder.fbi-federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "Performs U.S.-person queries.",
+        }),
+      ]);
+      // Three canonical stakeholders, no duplicates.
+      expect(result.entity.stakeholders).toHaveLength(3);
+      const names = result.entity.stakeholders!.map((s) => s.name);
+      // Each name should be unique under canonicalSlug.
+      const canonicals = new Set(names.map((n) =>
+        n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+      ));
+      expect(canonicals.size).toBe(3);
+    });
+
+    it("dedupes against pre-existing stakeholders with alias name", () => {
+      const entity: PolicyEntity = {
+        id: "fisa-702",
+        type: "policy",
+        stakeholders: [{ name: "FBI", position: "support", reason: "Existing" }],
+      };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "Much more detailed and comprehensive description of FBI role here.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.entity.stakeholders![0].name).toBe("FBI");
+      expect(result.entity.stakeholders![0].reason).toMatch(/comprehensive description/);
+      expect(result.applied[0].action).toBe("updated");
+    });
+
+    it("uses resolveStakeholderEntity to attach entityId on new stakeholder", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(
+        entity,
+        [
+          v({
+            targetField: "stakeholder.fbi",
+            displayHint: "FBI",
+            extractedValue: "Queries 702 data.",
+          }),
+        ],
+        {
+          resolveStakeholderEntity: (canon) =>
+            canon === "federal-bureau-of-investigation" ? "sid_fbi123" : null,
+        },
+      );
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.entity.stakeholders![0].entityId).toBe("sid_fbi123");
+    });
+
+    it("backfills entityId on existing stakeholder match", () => {
+      const entity: PolicyEntity = {
+        id: "fisa-702",
+        type: "policy",
+        stakeholders: [{ name: "FBI", position: "support", reason: "Long enough existing reason." }],
+      };
+      const result = applyVerdictsToPolicy(
+        entity,
+        [
+          v({
+            targetField: "stakeholder.federal-bureau-of-investigation",
+            displayHint: "Federal Bureau of Investigation",
+            // Shorter than existing — would normally skip.
+            extractedValue: "Short.",
+          }),
+        ],
+        {
+          resolveStakeholderEntity: (canon) =>
+            canon === "federal-bureau-of-investigation" ? "sid_fbi123" : null,
+        },
+      );
+      expect(result.entity.stakeholders![0].entityId).toBe("sid_fbi123");
+      expect(result.applied[0].action).toBe("updated");
+    });
+
+    it("does not corrupt entries with no canonical match", () => {
+      const entity: PolicyEntity = { id: "x", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.some-novel-org",
+          displayHint: "Some Novel Org",
+          extractedValue: "Reason 1.",
+        }),
+        v({
+          targetField: "stakeholder.another-novel-org",
+          displayHint: "Another Novel Org",
+          extractedValue: "Reason 2.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(2);
+    });
   });
 });
 
@@ -326,5 +578,244 @@ describe("applyVerdictsToOrganization", () => {
       v({ targetField: "product.q", displayHint: "Q" }),
     ]);
     expect(JSON.stringify(entity)).toBe(before);
+  });
+});
+
+// ─── stakeholder position classification (QUA-875) ─────────────────────────
+
+const baseEntity: PolicyEntity = {
+  id: "fisa-702",
+  type: "policy",
+  title: "FISA Section 702",
+  stakeholders: [],
+};
+
+function verdict(overrides: Partial<VerifiedVerdict>): VerifiedVerdict {
+  return {
+    targetField: "stakeholder.american-civil-liberties-union",
+    claimText: "ACLU has sued the NSA over 702 surveillance.",
+    extractedValue: null,
+    proposedValue: "ACLU has challenged 702 surveillance in federal court.",
+    sourceUrl: "https://example.com/aclu-702",
+    status: "verified",
+    displayHint: "American Civil Liberties Union",
+    ...overrides,
+  };
+}
+
+describe("applyVerdictsToPolicy — stakeholder positions", () => {
+  it("applies the extractor's confident position to a new stakeholder", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ position: "oppose", positionConfidence: 0.9 }),
+    ]);
+    expect(result.applied).toEqual([
+      { targetField: "stakeholder.american-civil-liberties-union", action: "added" },
+    ]);
+    expect(result.entity.stakeholders).toHaveLength(1);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.name).toBe("American Civil Liberties Union");
+    expect(sh.position).toBe("oppose");
+    expect(sh.importance).toBe("medium");
+    expect(sh.reason).toBe("ACLU has challenged 702 surveillance in federal court.");
+  });
+
+  it("omits position entirely when extractor returns null (no 'reform' default)", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ position: null, positionConfidence: null }),
+    ]);
+    expect(result.entity.stakeholders).toHaveLength(1);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.name).toBe("American Civil Liberties Union");
+    // Critical: no fallback to "reform". The previous behavior was to set
+    // position: "reform" when unknown, which produced obviously-wrong values
+    // (NSA marked "reform"). After QUA-875 we leave it unset.
+    expect(sh.position).toBeUndefined();
+    expect("position" in sh).toBe(false);
+    expect(sh.reason).toBe("ACLU has challenged 702 surveillance in federal court.");
+  });
+
+  it("treats below-threshold confidence as no opinion (omits position)", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ position: "oppose", positionConfidence: 0.3 }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBeUndefined();
+    expect("position" in sh).toBe(false);
+  });
+
+  it("applies position at exactly the threshold", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ position: "support", positionConfidence: MIN_POSITION_CONFIDENCE }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBe("support");
+  });
+
+  it("uses extractor's value over any prior default — extractor is single source of truth", () => {
+    // Acceptance criterion 3: "position mismatched between extractor and apply-step
+    // → take extractor's value". The legacy code unconditionally wrote "reform";
+    // the new code writes whatever the extractor (with confidence) classified,
+    // even when that classification differs from the old hardcoded default.
+    const cases: Array<{ pos: "support" | "oppose" | "reform" | "neutral"; expected: string }> = [
+      { pos: "support", expected: "support" },
+      { pos: "oppose", expected: "oppose" },
+      { pos: "neutral", expected: "neutral" },
+      { pos: "reform", expected: "reform" },
+    ];
+    for (const c of cases) {
+      const result = applyVerdictsToPolicy(baseEntity, [
+        verdict({
+          targetField: `stakeholder.test-${c.pos}`,
+          displayHint: `Test ${c.pos}`,
+          position: c.pos,
+          positionConfidence: 0.9,
+        }),
+      ]);
+      const sh = result.entity.stakeholders![0];
+      expect(sh.position).toBe(c.expected);
+    }
+  });
+
+  it("backfills position on an existing stakeholder that has no position set", () => {
+    const seeded: PolicyEntity = {
+      ...baseEntity,
+      stakeholders: [
+        {
+          name: "American Civil Liberties Union",
+          importance: "medium",
+          reason: "short",
+        },
+      ],
+    };
+    const result = applyVerdictsToPolicy(seeded, [
+      verdict({ position: "oppose", positionConfidence: 0.9 }),
+    ]);
+    expect(result.entity.stakeholders).toHaveLength(1);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBe("oppose");
+    // The reason was shorter than the new value, so it gets updated.
+    expect(sh.reason).toBe("ACLU has challenged 702 surveillance in federal court.");
+  });
+
+  it("backfills position even when existing reason is LONGER than new value", () => {
+    // QUA-875 hostile-review HIGH #1: position backfill must not be gated on
+    // reason replacement. If the existing reason is longer, we skip the reason
+    // update — but a missing position should still be filled in when the
+    // extractor is confident. Otherwise high-confidence positions are silently
+    // discarded for any stakeholder that already has a thorough description.
+    const seeded: PolicyEntity = {
+      ...baseEntity,
+      stakeholders: [
+        {
+          name: "American Civil Liberties Union",
+          importance: "medium",
+          reason:
+            "A long, detailed, human-curated reason that exceeds anything the new verdict will say. Lots of context, history, and references. Already comprehensive and not in need of replacement.",
+          // No position field — eligible for backfill.
+        },
+      ],
+    };
+    const result = applyVerdictsToPolicy(seeded, [
+      verdict({ position: "oppose", positionConfidence: 0.9 }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    // Reason is preserved (it was longer)
+    expect(sh.reason).toMatch(/^A long, detailed/);
+    // Position IS backfilled even though reason wasn't replaced
+    expect(sh.position).toBe("oppose");
+  });
+
+  it("does NOT overwrite a curated position with a less-confident guess", () => {
+    const seeded: PolicyEntity = {
+      ...baseEntity,
+      stakeholders: [
+        {
+          name: "American Civil Liberties Union",
+          position: "oppose", // Human-curated
+          importance: "medium",
+          reason: "short",
+        },
+      ],
+    };
+    // Even with high confidence, the existing position wins. The apply step
+    // never overwrites a position field that was already set.
+    const result = applyVerdictsToPolicy(seeded, [
+      verdict({ position: "support", positionConfidence: 0.95 }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBe("oppose");
+  });
+
+  it("does not write position on existing stakeholder when extractor is below threshold", () => {
+    const seeded: PolicyEntity = {
+      ...baseEntity,
+      stakeholders: [
+        {
+          name: "American Civil Liberties Union",
+          importance: "medium",
+          reason: "short",
+        },
+      ],
+    };
+    const result = applyVerdictsToPolicy(seeded, [
+      verdict({ position: "oppose", positionConfidence: 0.4 }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBeUndefined();
+  });
+
+  it("ignores position fields on non-stakeholder verdicts", () => {
+    // Defense-in-depth: even if position somehow leaks onto a provision verdict,
+    // it must not affect the provision branch.
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({
+        targetField: "provision.targeting-non-us-persons",
+        displayHint: "Targeting Non-US Persons",
+        proposedValue: "Authorizes targeting non-US persons abroad.",
+        position: "oppose",
+        positionConfidence: 0.9,
+      }),
+    ]);
+    expect(result.entity.provisions).toHaveLength(1);
+    expect(result.entity.stakeholders).toEqual([]);
+    const prov = result.entity.provisions![0];
+    expect(prov.title).toBe("Targeting Non-US Persons");
+    // Provisions don't have a position field; this is just a sanity check.
+    expect("position" in prov).toBe(false);
+  });
+
+  it("only applies verdicts with verified or partial status", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ status: "contradicted", position: "oppose", positionConfidence: 0.9 }),
+      verdict({ status: "unverifiable", position: "support", positionConfidence: 0.9 }),
+    ]);
+    expect(result.entity.stakeholders).toEqual([]);
+    expect(result.applied).toEqual([]);
+  });
+
+  it("handles partial verdicts the same as verified", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({ status: "partial", position: "oppose", positionConfidence: 0.9 }),
+    ]);
+    const sh = result.entity.stakeholders![0];
+    expect(sh.position).toBe("oppose");
+  });
+
+  it("preserves stakeholder order across multiple verdicts", () => {
+    const result = applyVerdictsToPolicy(baseEntity, [
+      verdict({
+        targetField: "stakeholder.nsa",
+        displayHint: "National Security Agency",
+        position: "support",
+        positionConfidence: 0.9,
+      }),
+      verdict({
+        targetField: "stakeholder.american-civil-liberties-union",
+        displayHint: "ACLU",
+        position: "oppose",
+        positionConfidence: 0.9,
+      }),
+    ]);
+    expect(result.entity.stakeholders!.map((s) => s.position)).toEqual(["support", "oppose"]);
   });
 });

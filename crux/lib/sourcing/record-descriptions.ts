@@ -79,6 +79,22 @@ export function buildRecordDescription(recordType: RecordType, item: Record<stri
       const developer = strOrNull(item, 'developer');
       return developer ? `AI Model: ${title} (${developer})` : `AI Model: ${title}`;
     }
+    case 'scorecard_grade': {
+      // QUA-864: claim shape is "publisher X scored entity Y as Z on dimension D
+      // (wave W)". scoreLetter is preferred for display since it's the original
+      // grade (e.g. "B+", "Fulfilled"); scoreRaw covers cases where there's no
+      // letter mapping; scoreNumeric is the normalized 0–100 fallback.
+      const entity = resolveName(item, 'entityTitle', 'entityDisplayName', 'entityId');
+      const dimension = strOrNull(item, 'dimensionLabel') ?? str(item, 'dimensionSlug');
+      const score =
+        strOrNull(item, 'scoreLetter') ??
+        strOrNull(item, 'scoreRaw') ??
+        (numOrNull(item, 'scoreNumeric')?.toString() ?? 'N/A');
+      const source = strOrNull(item, 'scorecardSource') ?? 'unknown source';
+      const publishedAt = strOrNull(item, 'publishedAt');
+      const wave = publishedAt ? ` ${publishedAt.slice(0, 10)}` : '';
+      return `Scorecard: ${source}${wave} scored ${entity} on ${dimension} = ${score}`;
+    }
     default:
       return `${recordType}: ${strOrNull(item, 'name') ?? strOrNull(item, 'title') ?? 'unknown'}`;
   }
@@ -168,6 +184,20 @@ export function extractRecordFields(recordType: RecordType, item: Record<string,
         outputPrice: numOrNull(item, 'outputPrice'),
         contextWindow: numOrNull(item, 'contextWindow'),
         safetyLevel: strOrNull(item, 'safetyLevel'),
+      };
+    case 'scorecard_grade':
+      // QUA-864: fields the LLM verifies against the scorecard's published
+      // page/PDF. The publisher (scorecardSource) is the asserter; the
+      // entity, dimension, and one of the score fields together identify
+      // the cell. publishedAt scopes the claim to a specific wave.
+      return {
+        publisher: strOrNull(item, 'scorecardSource'),
+        publishedAt: strOrNull(item, 'publishedAt'),
+        entity: resolveName(item, 'entityTitle', 'entityDisplayName', 'entityId'),
+        dimension: strOrNull(item, 'dimensionLabel') ?? strOrNull(item, 'dimensionSlug'),
+        scoreLetter: strOrNull(item, 'scoreLetter'),
+        scoreRaw: strOrNull(item, 'scoreRaw'),
+        scoreNumeric: numOrNull(item, 'scoreNumeric'),
       };
     default:
       return { name: strOrNull(item, 'name') ?? strOrNull(item, 'title') };
