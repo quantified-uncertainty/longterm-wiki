@@ -17,22 +17,26 @@ export const TRACKER_PATH = join(PROJECT_ROOT, '.claude/review-phases-done');
 /**
  * Canonical phase IDs that map 1:1 to /agent-review-pr phases.
  *
- * `phase-1-triage`, `phase-2-mechanical`, and `phase-9-final` are not
- * skippable — they always execute. The remaining phases are skippable with
- * `reason=...`. The marker write requires every phase to have either a
- * recorded timestamp or a skip reason.
+ * QUA-961 (merged 2026-04-30) consolidated the prior 10-phase list down to
+ * 7 by folding the simplification + coverage-audit passes into Phase 3b's
+ * hostile-reviewer prompt — they reliably found nothing on their own
+ * because 3b already covered them. This list tracks the post-QUA-961
+ * structure; do NOT split simplify/coverage back out as standalone
+ * phases (per QUA-961's directive in the skill text).
+ *
+ * `phase-1-triage`, `phase-2-mechanical`, and `phase-6-final` are not
+ * skippable — they always execute. The remaining phases are skippable
+ * with `reason=...`. The marker write requires every phase to have
+ * either a recorded timestamp or a skip reason.
  */
 export const PHASE_IDS = [
   'phase-1-triage',
   'phase-2-mechanical',
   'phase-3a-narrow',
   'phase-3b-hostile',
-  'phase-4-simplify',
-  'phase-5-coverage',
-  'phase-6-redteam',
-  'phase-7-ui',
-  'phase-8-api',
-  'phase-9-final',
+  'phase-4-redteam',
+  'phase-5-category',
+  'phase-6-final',
 ] as const;
 
 export type PhaseId = (typeof PHASE_IDS)[number];
@@ -47,7 +51,7 @@ export type PhaseId = (typeof PHASE_IDS)[number];
 export const NON_SKIPPABLE_PHASES = new Set<PhaseId>([
   'phase-1-triage',
   'phase-2-mechanical',
-  'phase-9-final',
+  'phase-6-final',
 ]);
 
 export interface PhaseEntry {

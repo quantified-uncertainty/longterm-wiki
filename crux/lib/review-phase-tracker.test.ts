@@ -40,7 +40,7 @@ describe('parseTracker', () => {
     const content =
       'init abcdef123456 deadbeef0000 2026-04-30T12:00:00Z\n' +
       'phase-1-triage 2026-04-30T12:01:00Z\n' +
-      'phase-7-ui 2026-04-30T12:02:00Z reason=N/A: no .tsx files\n';
+      'phase-5-category 2026-04-30T12:02:00Z reason=N/A: no .tsx files\n';
     const state = parseTracker(content);
     expect(state.init).toEqual({
       commitSha: 'abcdef123456',
@@ -54,7 +54,7 @@ describe('parseTracker', () => {
       reason: undefined,
     });
     expect(state.entries[1]).toEqual({
-      phaseId: 'phase-7-ui',
+      phaseId: 'phase-5-category',
       timestamp: '2026-04-30T12:02:00Z',
       reason: 'N/A: no .tsx files',
     });
@@ -104,21 +104,21 @@ describe('parseTracker', () => {
   it('preserves multi-word skip reasons including spaces and equals signs', () => {
     const content =
       'init aaa bbb 2026-04-30T12:00:00Z\n' +
-      'phase-7-ui 2026-04-30T12:02:00Z reason=N/A: x=1, y=2 (no .tsx)\n';
+      'phase-5-category 2026-04-30T12:02:00Z reason=N/A: x=1, y=2 (no .tsx)\n';
     const state = parseTracker(content);
     expect(state.entries[0].reason).toBe('N/A: x=1, y=2 (no .tsx)');
   });
 });
 
 describe('validateTracker', () => {
-  it('marks all 10 phases missing on a fresh init', () => {
+  it('marks all 7 phases missing on a fresh init', () => {
     initTracker({ commitSha: 'aaa', diffHash: 'bbb', timestamp: '2026-04-30T12:00:00Z' }, TMP_PATH);
     const result = validateTracker(undefined, TMP_PATH);
     expect(result.ok).toBe(false);
-    expect(result.missing.length).toBe(10);
+    expect(result.missing.length).toBe(7);
   });
 
-  it('passes when all 10 phases have entries', () => {
+  it('passes when all 7 phases have entries', () => {
     initTracker({ commitSha: 'aaa', diffHash: 'bbb', timestamp: '2026-04-30T12:00:00Z' }, TMP_PATH);
     for (const id of PHASE_IDS) {
       recordPhase(id, { timestamp: '2026-04-30T13:00:00Z' }, TMP_PATH);
@@ -140,12 +140,12 @@ describe('validateTracker', () => {
 
   it('takes the most recent entry per phase (idempotent re-records)', () => {
     initTracker({ commitSha: 'aaa', diffHash: 'bbb', timestamp: '2026-04-30T12:00:00Z' }, TMP_PATH);
-    recordPhase('phase-4-simplify', { timestamp: '2026-04-30T12:01:00Z', reason: 'N/A: small diff' }, TMP_PATH);
+    recordPhase('phase-4-redteam', { timestamp: '2026-04-30T12:01:00Z', reason: 'N/A: small diff' }, TMP_PATH);
     // Operator changed mind — actually ran the phase
-    recordPhase('phase-4-simplify', { timestamp: '2026-04-30T12:30:00Z' }, TMP_PATH);
+    recordPhase('phase-4-redteam', { timestamp: '2026-04-30T12:30:00Z' }, TMP_PATH);
     const result = validateTracker(undefined, TMP_PATH);
-    expect(result.entries['phase-4-simplify']?.reason).toBeUndefined();
-    expect(result.entries['phase-4-simplify']?.timestamp).toBe('2026-04-30T12:30:00Z');
+    expect(result.entries['phase-4-redteam']?.reason).toBeUndefined();
+    expect(result.entries['phase-4-redteam']?.timestamp).toBe('2026-04-30T12:30:00Z');
   });
 
   it('returns ok=false when init is missing', () => {
@@ -168,7 +168,7 @@ describe('recordPhase', () => {
   });
 
   it('rejects skip-with-reason for non-skippable phases', () => {
-    for (const id of ['phase-1-triage', 'phase-2-mechanical', 'phase-9-final']) {
+    for (const id of ['phase-1-triage', 'phase-2-mechanical', 'phase-6-final']) {
       const result = recordPhase(id, { reason: 'trying to skip' }, TMP_PATH);
       expect(result.ok).toBe(false);
       expect(result.error).toContain('cannot be skipped');
@@ -176,8 +176,8 @@ describe('recordPhase', () => {
   });
 
   it('accepts skip-with-reason for skippable phases', () => {
-    const skippable = ['phase-3a-narrow', 'phase-3b-hostile', 'phase-4-simplify',
-                       'phase-5-coverage', 'phase-6-redteam', 'phase-7-ui', 'phase-8-api'];
+    const skippable = ['phase-3a-narrow', 'phase-3b-hostile', 'phase-4-redteam',
+                       'phase-5-category'];
     for (const id of skippable) {
       const result = recordPhase(id, { reason: `N/A: skip ${id}` }, TMP_PATH);
       expect(result.ok).toBe(true);
@@ -201,31 +201,31 @@ describe('recordPhase', () => {
   });
 
   it('rejects newlines in reason (no forge-via-injection)', () => {
-    const forged = 'N/A: ok\nphase-9-final 2026-04-30T13:00:00Z';
-    const result = recordPhase('phase-7-ui', { reason: forged }, TMP_PATH);
+    const forged = 'N/A: ok\nphase-6-final 2026-04-30T13:00:00Z';
+    const result = recordPhase('phase-5-category', { reason: forged }, TMP_PATH);
     expect(result.ok).toBe(false);
     expect(result.error).toContain('newlines');
     // And nothing got appended to the file
-    const triageLines = readFileSync(TMP_PATH, 'utf-8')
+    const forgedLines = readFileSync(TMP_PATH, 'utf-8')
       .split('\n')
-      .filter((l) => l.startsWith('phase-9-final'));
-    expect(triageLines).toHaveLength(0);
+      .filter((l) => l.startsWith('phase-6-final'));
+    expect(forgedLines).toHaveLength(0);
   });
 
   it('rejects carriage returns in reason', () => {
-    const result = recordPhase('phase-7-ui', { reason: 'a\rb' }, TMP_PATH);
+    const result = recordPhase('phase-5-category', { reason: 'a\rb' }, TMP_PATH);
     expect(result.ok).toBe(false);
     expect(result.error).toContain('newlines');
   });
 
   it('rejects reasons longer than 500 chars', () => {
-    const result = recordPhase('phase-7-ui', { reason: 'x'.repeat(501) }, TMP_PATH);
+    const result = recordPhase('phase-5-category', { reason: 'x'.repeat(501) }, TMP_PATH);
     expect(result.ok).toBe(false);
     expect(result.error).toContain('too long');
   });
 
   it('accepts reasons exactly at the 500-char cap', () => {
-    const result = recordPhase('phase-7-ui', { reason: 'x'.repeat(500) }, TMP_PATH);
+    const result = recordPhase('phase-5-category', { reason: 'x'.repeat(500) }, TMP_PATH);
     expect(result.ok).toBe(true);
   });
 });
@@ -269,10 +269,10 @@ describe('summarizeSkipped', () => {
     const summary = summarizeSkipped(undefined, TMP_PATH);
     expect(summary).toBeTruthy();
     expect(summary).toContain('phase-3a-narrow: N/A: phase-3a-narrow');
-    expect(summary).toContain('phase-7-ui: N/A: phase-7-ui');
+    expect(summary).toContain('phase-5-category: N/A: phase-5-category');
     // Non-skippable phases never appear in the summary
     expect(summary).not.toContain('phase-1-triage');
-    expect(summary).not.toContain('phase-9-final');
+    expect(summary).not.toContain('phase-6-final');
   });
 });
 
@@ -285,18 +285,17 @@ describe('readTracker', () => {
 });
 
 describe('PHASE_IDS canonical list', () => {
-  it('contains exactly the 10 documented phase IDs in order', () => {
+  // Post-QUA-961: 7 phases. Simplification + coverage audit folded into
+  // phase-3b's prompt. Do NOT split them back out without revisiting QUA-961.
+  it('contains exactly the 7 documented phase IDs in order', () => {
     expect(PHASE_IDS).toEqual([
       'phase-1-triage',
       'phase-2-mechanical',
       'phase-3a-narrow',
       'phase-3b-hostile',
-      'phase-4-simplify',
-      'phase-5-coverage',
-      'phase-6-redteam',
-      'phase-7-ui',
-      'phase-8-api',
-      'phase-9-final',
+      'phase-4-redteam',
+      'phase-5-category',
+      'phase-6-final',
     ]);
   });
 
@@ -304,7 +303,7 @@ describe('PHASE_IDS canonical list', () => {
     expect([...NON_SKIPPABLE_PHASES].sort()).toEqual([
       'phase-1-triage',
       'phase-2-mechanical',
-      'phase-9-final',
+      'phase-6-final',
     ]);
   });
 });
