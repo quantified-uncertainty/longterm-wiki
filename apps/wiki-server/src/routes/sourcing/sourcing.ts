@@ -2493,6 +2493,11 @@ const sourcingApp = new Hono()
       totals: {
         totalRecords: grandTotalRecords,
         checkableRecords: grandCheckableRecords,
+        // QUA-928 review: expose checkedRecords in aggregate totals so
+        // downstream consumers can render a semantically correct "Checked"
+        // total instead of falling back to totalVerdicts (which over-counts
+        // because a single record can have multiple per-field verdict rows).
+        checkedRecords: grandCheckedRecords,
         totalVerdicts: grandTotalVerdicts,
         confirmedPercent: pct1(grandConfirmed, grandTotalVerdicts),
         ...coveragePercents(

@@ -59,6 +59,13 @@ interface CoverageMatrixResult {
   totals: {
     totalRecords: number;
     checkableRecords?: number;
+    /**
+     * QUA-928 review: aggregate sum of per-record `checkedRecords`
+     * (records with at least one verdict). Distinct from `totalVerdicts`,
+     * which can over-count because a single record may produce multiple
+     * per-field verdict rows.
+     */
+    checkedRecords?: number;
     totalVerdicts: number;
     confirmedPercent: number;
     checkabilityPercent?: number;
@@ -601,16 +608,33 @@ export async function SourcingCoverageContent() {
                     {(coverageMatrix.totals.checkableRecords ?? coverageMatrix.totals.totalRecords).toLocaleString()}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.totalVerdicts.toLocaleString()} verdicts
+                    {/* QUA-928 review: prefer aggregate checkedRecords (one per
+                       record); fall back to totalVerdicts for the deploy
+                       window where the wiki-server may not have shipped the
+                       new field yet. */}
+                    {coverageMatrix.totals.checkedRecords !== undefined
+                      ? coverageMatrix.totals.checkedRecords.toLocaleString()
+                      : `${coverageMatrix.totals.totalVerdicts.toLocaleString()} verdicts`}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.checkabilityPercent ?? "—"}%
+                    {/* QUA-928 review: render `%` only for numeric values to
+                       avoid the "—%" placeholder when the field is absent. */}
+                    {typeof coverageMatrix.totals.checkabilityPercent === "number"
+                      ? `${coverageMatrix.totals.checkabilityPercent}%`
+                      : "—"}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.checkableCoveragePercent ?? "—"}%
+                    {typeof coverageMatrix.totals.checkableCoveragePercent === "number"
+                      ? `${coverageMatrix.totals.checkableCoveragePercent}%`
+                      : "—"}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.fullCoveragePercent ?? coverageMatrix.totals.coveragePercent ?? "—"}%
+                    {(() => {
+                      const v =
+                        coverageMatrix.totals.fullCoveragePercent ??
+                        coverageMatrix.totals.coveragePercent;
+                      return typeof v === "number" ? `${v}%` : "—";
+                    })()}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
                     {coverageMatrix.totals.confirmedPercent}%
