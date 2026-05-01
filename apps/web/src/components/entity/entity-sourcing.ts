@@ -63,11 +63,6 @@ function pickHighestPriorityVerdict(verdicts: readonly string[]): string | null 
   return best;
 }
 
-/**
- * Reduces a per-entity verdict count row to a single rollup verdict, preferring
- * the most actionable verdict present (contradicted > outdated > partial > ...).
- * Returns null when no verdicts are recorded.
- */
 const SUMMARY_VERDICT_KEYS = [
   "contradicted",
   "outdated",
@@ -77,6 +72,11 @@ const SUMMARY_VERDICT_KEYS = [
   "unchecked",
 ] as const;
 
+/**
+ * Reduces a per-entity verdict count row to a single rollup verdict, preferring
+ * the most actionable verdict present (contradicted > outdated > partial > ...).
+ * Returns null when no verdicts are recorded.
+ */
 export function rollupVerdictFromSummary(
   summary: Pick<
     RpcEntitySummaryRow,
