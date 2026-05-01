@@ -108,24 +108,30 @@ function checkFile(filePath: string, baseDir: string): { relPath: string; violat
       continue;
     }
     // Multi-line pass: catches formatter-induced splits like
-    // `const VALID_X\n  = [...]` or `z.enum(\n  ["a"])`.
+    // `const VALID_X\n  = [...]` or `z.enum(\n  ["a"])`. Use checkLine
+    // semantics on the joined line so string-literal / comment / suppression
+    // filters apply (raw `pattern.test` would mis-fire on string literals
+    // that contain example code, and on a comment-then-real-code pair).
     if (i + 1 >= lines.length) continue;
+    if (isCommentLine(lines[i].trimStart())) continue;
     const nextLine = lines[i + 1];
     const nextTrim = nextLine.trimStart();
     if (isCommentLine(nextTrim)) continue;
-    if (lineIsSuppressed(lines[i]) || lineIsSuppressed(nextLine)) continue;
+    if (lineIsSuppressed(nextLine)) continue;
+    // Don't fire on the joined line if `lines[i]` ALREADY would single-line
+    // match (already reported on this iteration's first branch is impossible
+    // because we continued; this guards against the edge case where the
+    // single-line regex matches inside a string literal that checkLine
+    // filtered, but the joined regex would also match the same string).
+    if (checkLine(lines[i]) !== null) continue;
     const joined = lines[i].trimEnd() + ' ' + nextTrim;
-    for (const { pattern, kind: mlKind } of PATTERNS) {
-      // Only report if the joined-line match wasn't already a single-line
-      // match on `lines[i]` (which would have been caught above).
-      if (pattern.test(joined) && !pattern.test(lines[i])) {
-        violations.push({
-          line: i + 1,
-          text: `${lines[i].trimStart()} ${nextTrim}`.trim(),
-          kind: mlKind,
-        });
-        break;
-      }
+    const joinedKind = checkLine(joined);
+    if (joinedKind !== null) {
+      violations.push({
+        line: i + 1,
+        text: `${lines[i].trimStart()} ${nextTrim}`.trim(),
+        kind: joinedKind,
+      });
     }
   }
   return { relPath, violations };
@@ -200,9 +206,16 @@ export function runCheck(
         break;
       }
     }
-    const header = headerLines.join('\n').replace(/\n+$/, '\n');
+    // Always normalize the header to end in exactly one `\n`. Without this,
+    // a header whose last line is a comment (no trailing blank) would be
+    // glued to the first allowlist entry on `header + body` concatenation,
+    // silently corrupting the file (the next `readAllowlist` call would
+    // treat the merged line as a comment and drop the first entry).
+    const header = headerLines.length > 0
+      ? headerLines.join('\n').replace(/\n+$/, '') + '\n'
+      : '';
     const body = sorted.join('\n') + '\n';
-    writeFileSync(allowlistPath, (header.length > 0 ? header : '') + body);
+    writeFileSync(allowlistPath, header + body);
     console.log(`${c.green}Wrote ${sorted.length} entries to ${relative(baseDir, allowlistPath)}${c.reset}`);
     return {
       passed: true, errors: 0, newViolations: [], staleEntries: [],

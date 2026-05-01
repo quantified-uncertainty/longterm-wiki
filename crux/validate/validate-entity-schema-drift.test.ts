@@ -154,6 +154,46 @@ describe("validate-entity-schema-drift runCheck", () => {
     expect(result.newViolations[0].file).toBe("routes/tablebase/n.ts");
     expect(result.newViolations[0].line).toBe(1);
   });
+
+  it("does not double-count when a comment precedes a real VALID_* declaration", () => {
+    // Regression: the multi-line pass used to join the comment line with the
+    // next code line and re-match the pattern, producing a phantom violation
+    // on the comment line in addition to the real one on line 2.
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      '// kept VALID_OLD comment\nconst VALID_X = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].line).toBe(2);
+  });
+
+  it("does not double-count when a JSDoc closer precedes a real declaration", () => {
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      '/**\n * doc\n */\nconst VALID_X = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].line).toBe(4);
+  });
+
+  it("multi-line match is not blocked by an unrelated string literal on the prior line", () => {
+    // Regression: the prior multi-line guard `pattern.test(joined) &&
+    // !pattern.test(lines[i])` mis-fired when lines[i] contained a string
+    // literal whose contents matched the pattern, suppressing the legit
+    // multi-line match that followed.
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      'const msg = "see const VALID_FAKE = pattern"; const VALID_REAL\n  = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations.length).toBeGreaterThanOrEqual(1);
+    expect(result.newViolations.some(v => v.kind === "VALID_CONST")).toBe(true);
+  });
 });
 
 describe("validate-entity-schema-drift --update mode", () => {
@@ -193,6 +233,26 @@ describe("validate-entity-schema-drift --update mode", () => {
     expect(() => runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true })).not.toThrow();
     const written = readFileSync(allowlistPath, "utf-8");
     expect(written).toContain("routes/tablebase/x.ts");
+  });
+
+  it("preserves header without gluing it to the first entry (production baseline shape)", () => {
+    // Regression: the prior implementation produced
+    // `# last comment\napps/.../first.ts...` (no newline) when the input
+    // header had no trailing blank line — corrupting the allowlist on next
+    // read. The shipped baseline file has exactly this shape.
+    writeFileSync(join(routesDir, "a.ts"), 'const VALID_A = ["x"];\n');
+    writeFileSync(join(routesDir, "b.ts"), 'const VALID_B = ["y"];\n');
+    writeFileSync(allowlistPath, "# header line 1\n# header line 2\n");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true });
+    expect(result.passed).toBe(true);
+    const written = readFileSync(allowlistPath, "utf-8");
+    expect(written).toBe(
+      "# header line 1\n# header line 2\nroutes/tablebase/a.ts\nroutes/tablebase/b.ts\n",
+    );
+    // And the readback round-trips:
+    const readBack = readAllowlist(allowlistPath);
+    expect(readBack.has("routes/tablebase/a.ts")).toBe(true);
+    expect(readBack.has("routes/tablebase/b.ts")).toBe(true);
   });
 
   it("writes empty list when no drift exists", () => {
