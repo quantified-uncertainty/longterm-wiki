@@ -47,10 +47,11 @@ WHERE source_table = 'policy_stakeholders'
 --
 -- No FK references to policy_stakeholders.id exist in the schema (verified
 -- 2026-04-30 via information_schema), so this is safe without further
--- cascade work. source_check_verdicts / source_check_evidence rows that
--- pointed to deleted ids become orphans; they remain queryable but no
--- longer match a live record. Re-source-checking the canonical row writes
--- a fresh verdict; the orphans can be swept in a separate ticket.
+-- cascade work. source_check_verdicts / source_check_evidence /
+-- sourcing_url_suggestions rows that pointed to deleted ids become
+-- orphans; they remain queryable but no longer match a live record.
+-- Re-source-checking the canonical row writes a fresh verdict; the
+-- orphans can be swept in a separate ticket.
 DELETE FROM policy_stakeholders
 WHERE id IN (
   SELECT id FROM (
