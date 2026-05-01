@@ -25,6 +25,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { parseDocument } from 'yaml';
 
+// Each test in this file calls `backfill` which loads the full FactBase
+// graph (~2700 facts across ~700 entities). On a cold cache that takes
+// several seconds — local runs land at ~440ms but CI clocked the first
+// test at 5029ms, just past the 5000ms default. Bump the per-test timeout
+// to 30s so the cold-cache case has headroom without masking real hangs.
+vi.setConfig({ testTimeout: 30_000 });
+
 // ── Engine mocks ─────────────────────────────────────────────────────
 
 const mockDiscoverSourceForFact = vi.fn<(...args: unknown[]) => Promise<unknown>>();
