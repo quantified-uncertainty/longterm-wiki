@@ -21,6 +21,16 @@
 
 set -uo pipefail
 
+# ── User identity ────────────────────────────────────────────────────────────
+# launchd LaunchAgents do NOT inherit USER/LOGNAME from the user's shell, and
+# without these the macOS keychain lookup that claude uses for its OAuth
+# subscription returns "Not logged in" — patrol would silently fall back to
+# whatever ANTHROPIC_API_KEY is in the env (API billing) or fail outright.
+# Derive both from `id -un` so they match the launchd asid (gui/501) the
+# agent runs under.
+export USER="${USER:-$(id -un)}"
+export LOGNAME="${LOGNAME:-$USER}"
+
 # ── PATH setup ────────────────────────────────────────────────────────────────
 # launchd starts agents with a minimal PATH (/usr/bin:/bin:/usr/sbin:/sbin).
 # Source nvm so `pnpm`, `node`, and `tsx` resolve, then prepend the standard
