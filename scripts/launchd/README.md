@@ -55,11 +55,11 @@ script's TCC self-test catches this and prints clear next steps.
 **To grant:**
 
 1. **System Settings → Privacy & Security → Full Disk Access**
-2. Click **＋** and add either:
-   - `/bin/bash` (broadest — affects any launchd-spawned bash script)
-   - The supervisor script directly (more narrow): `<wiki-clone>/scripts/pr-patrol-supervisor.sh`
+2. Click **＋**, press **⌘-Shift-G**, type `/bin`, and select `bash`. The plist invokes `/bin/bash` explicitly (see [QUA-1004](https://linear.app/quantifieduncertainty/issue/QUA-1004)) so this single grant is what the supervisor needs.
 3. Toggle the new entry **ON**.
 4. Re-run `./pr-patrol.sh install` (or `./pr-patrol.sh tcc-check` to verify).
+
+> **Why not grant FDA to the supervisor script directly?** macOS's FDA picker filters out shell scripts (only Mach-O binaries are selectable). Drag-and-drop sometimes adds them to the list, but TCC attributes shell-script execution to the interpreter, not the script path — so the grant has no effect on the launchd-spawned supervisor.
 
 The same grant retroactively fixes any other `~/Library/LaunchAgents/com.qu.*.plist`
 that touches `~/Documents/` (e.g., `com.qu.lw-fix-tabs.plist`).
