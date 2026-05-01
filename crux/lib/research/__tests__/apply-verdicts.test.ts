@@ -205,7 +205,8 @@ describe("normalizeProductDescription", () => {
     const long = ("Claude is a family of language models from Anthropic " as string).repeat(20);
     const result = normalizeProductDescription(long);
     expect(result).not.toBeNull();
-    expect(result!.length).toBeLessThanOrEqual(300);
+    // Truncation appends "…" so the bound is 300 chars + 1 ellipsis.
+    expect(result!.length).toBeLessThanOrEqual(301);
   });
 
   it("normalizes whitespace", () => {
@@ -215,18 +216,70 @@ describe("normalizeProductDescription", () => {
   });
 
   it("recognizes contractions as containing a verb (QUA-938 review fix)", () => {
-    // "isn't" / "doesn't" / "won't" must be detected as containing the
-    // verb stem after stripping the contraction suffix.
+    // "isn't" / "doesn't" / "won't" / "can't" must all be detected as
+    // containing the verb stem after stripping the contraction suffix.
     expect(
       normalizeProductDescription("Claude isn't just a chatbot but a full coding assistant today."),
     ).toBe("Claude isn't just a chatbot but a full coding assistant today.");
     expect(
       normalizeProductDescription("Claude doesn't merely answer queries — it writes complete code."),
     ).toBe("Claude doesn't merely answer queries — it writes complete code.");
+    // Modal contractions: won't → wo, can't → ca, shan't → sha — all included
+    // in COMMON_VERBS as residue forms.
+    expect(
+      normalizeProductDescription("Claude won't be deployed without safety review across customer environments."),
+    ).toBe("Claude won't be deployed without safety review across customer environments.");
+    expect(
+      normalizeProductDescription("Claude can't be jailbroken because of constitutional AI training methods."),
+    ).toBe("Claude can't be jailbroken because of constitutional AI training methods.");
     // Curly-quote apostrophes (U+2019) are common in copy-paste from web sources.
     expect(
       normalizeProductDescription("Claude isn’t just a chatbot but a full coding assistant today."),
     ).toBe("Claude isn’t just a chatbot but a full coding assistant today.");
+  });
+
+  it("recognizes 'can' and 'shall' as verbs (QUA-938 review fix)", () => {
+    expect(
+      normalizeProductDescription("Claude can answer complex coding questions across many programming languages today."),
+    ).toBe("Claude can answer complex coding questions across many programming languages today.");
+    expect(
+      normalizeProductDescription("This product shall conform to all applicable regulations for the EU AI Act."),
+    ).toBe("This product shall conform to all applicable regulations for the EU AI Act.");
+  });
+
+  it("strips broader leading punctuation including bullets and dashes (QUA-938 review fix)", () => {
+    expect(
+      normalizeProductDescription("- Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("* Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("• Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription(": Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("— Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+  });
+
+  it("hard-truncates at a word boundary with trailing ellipsis (QUA-938 review fix)", () => {
+    const long = ("Claude is a family of language models from Anthropic " as string).repeat(20);
+    const result = normalizeProductDescription(long);
+    expect(result).not.toBeNull();
+    expect(result!.length).toBeLessThanOrEqual(301); // 300 + "…"
+    // Trailing ellipsis signals the truncation.
+    expect(result!).toMatch(/…$/);
+    // Must end on a word boundary, not mid-word: every word in the source
+    // is one of {Claude, is, a, family, of, language, models, from, Anthropic}.
+    // Strip the trailing "…" and confirm the final token is one of these.
+    const stripped = result!.slice(0, -1).trim();
+    const lastToken = stripped.split(/\s+/).pop() ?? "";
+    expect(["Claude", "is", "a", "family", "of", "language", "models", "from", "Anthropic"]).toContain(
+      lastToken,
+    );
   });
 
   it("does not pass noun-only phrases that previously slipped through (QUA-938 review fix)", () => {
@@ -733,6 +786,32 @@ describe("applyVerdictsToOrganization", () => {
       action: "skipped",
       reason: "description too thin",
     });
+  });
+
+  it("replaces a non-normalizing (longer) existing description with a clean shorter one (QUA-938 review fix)", () => {
+    // Length asymmetry bug: a legacy description that's a noun-phrase
+    // fragment can be longer than its clean replacement. Old code compared
+    // raw lengths and skipped the update. New code normalizes the existing
+    // description first; when it fails normalization (no verb), its
+    // effective length is treated as 0, so any clean candidate wins.
+    const dirty =
+      "An overview of the company's flagship product line for enterprise customers worldwide today."; // 93 chars, no verb
+    const clean = "Claude is a family of language models from Anthropic."; // 53 chars
+    expect(dirty.length).toBeGreaterThan(clean.length);
+    const entity: OrganizationEntity = {
+      id: "x",
+      type: "organization",
+      products: [{ name: "Claude", description: dirty }],
+    };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: clean,
+        displayHint: "Claude",
+      }),
+    ]);
+    expect(result.entity.products![0].description).toBe(clean);
+    expect(result.applied[0].action).toBe("updated");
   });
 
   it("trims overlong product descriptions to the first sentence (QUA-938)", () => {
