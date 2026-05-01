@@ -226,13 +226,17 @@ describe('fetchWithPlaywright', () => {
 
   // ---- Browser launch failure (QUA-229) ----
 
-  it('returns null (does not throw) when chromium.launch fails', async () => {
+  it('returns null (does not throw) and logs a warning when chromium.launch fails', async () => {
     // Reproduces QUA-229: chromium fails to launch (e.g. OOM-killed in worker
     // pod during startup) and throws "browserType.launch: Target page, context
     // or browser has been closed". The fetcher must honor its "returns null
     // on failure" contract so source-fetcher can fall back to Firecrawl/built-in
-    // and the job doesn't fail.
+    // and the job doesn't fail. The warning log is asserted so the operator-
+    // visible "Browser launch failed" signal can't be silently dropped by a
+    // future refactor.
     await closeBrowser(); // reset singleton so the next call re-launches
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { chromium } = await import('playwright');
     vi.mocked(chromium.launch).mockRejectedValueOnce(
@@ -247,6 +251,12 @@ describe('fetchWithPlaywright', () => {
     expect(result).toBeNull();
     // No context creation since the browser never launched
     expect(mockBrowser.newContext).not.toHaveBeenCalled();
+    // Operator-visible signal — must be loud, not silent
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Browser launch failed, skipping Playwright')
+    );
+
+    warnSpy.mockRestore();
   });
 
   it('retries the launch on the next call after a launch failure', async () => {
@@ -255,9 +265,13 @@ describe('fetchWithPlaywright', () => {
     await closeBrowser();
 
     const { chromium } = await import('playwright');
+    // `as any` because mockBrowser is a partial mock — the real Browser type
+    // has many methods we don't stub. The loose typing matches the pattern
+    // already used at the top of the file (`vi.fn().mockResolvedValue(mockBrowser)`).
     vi.mocked(chromium.launch)
       .mockRejectedValueOnce(new Error('browserType.launch: Target page, context or browser has been closed'))
-      .mockResolvedValueOnce(mockBrowser);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .mockResolvedValueOnce(mockBrowser as any);
 
     const failed = await fetchWithPlaywright('https://example.com/first-attempt');
     expect(failed).toBeNull();
