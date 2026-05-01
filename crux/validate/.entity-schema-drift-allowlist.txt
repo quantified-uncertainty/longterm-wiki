@@ -31,7 +31,7 @@ apps/wiki-server/src/routes/tablebase/model-aliases.ts
 apps/wiki-server/src/routes/tablebase/model-system-cards.ts
 apps/wiki-server/src/routes/tablebase/personnel.ts
 apps/wiki-server/src/routes/tablebase/platform-accounts.ts
-apps/wiki-server/src/routes/tablebase/policy-stakeholders.ts
+apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts
 apps/wiki-server/src/routes/tablebase/political-offices.ts
 apps/wiki-server/src/routes/tablebase/political-races.ts
 apps/wiki-server/src/routes/tablebase/political-votes.ts

@@ -493,6 +493,20 @@ const PARALLEL_STEPS: Step[] = [
     // error from PG. Static-checkable, so we keep it cheap and CI-blocking.
   },
   {
+    id: 'policy-stakeholders-strict',
+    name: 'Policy stakeholders strict Zod schema (QUA-964 / QUA-941 bridge)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-policy-stakeholders-strict.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: runs the canonical sync-route Zod schema against every
+    // policy.stakeholders[] block in data/entities/. QUA-941 shipped 10
+    // rows of `position: reform` that the route silently rejected with a
+    // 400 and the build helper swallowed; this gate catches the same class
+    // of mistake at PR-review time. Companion fix in
+    // apps/web/scripts/lib/wiki-server-data.mjs makes runtime sync 400s
+    // also fail loud.
+  },
+  {
     id: 'things-denorm-dead',
     name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
     command: 'npx',
