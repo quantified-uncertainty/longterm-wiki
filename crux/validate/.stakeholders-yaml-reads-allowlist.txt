@@ -1,0 +1,27 @@
+# YAML stakeholder reads — baseline (QUA-960 prep PR).
+#
+# Each line is a path that currently reads `entity.stakeholders` or accesses
+# the `stakeholders` field type from YAML-loaded data. The cutover PR
+# (QUA-960) replaces these consumers with PG reads via
+# `fetchPolicyStakeholdersFromPG()` and shrinks this allowlist.
+#
+# Update the file (after migrating a consumer):
+#   npx tsx crux/validate/validate-stakeholders-yaml-reads.ts --update
+#
+# Suppress a single legitimate use (rare — most reads should migrate):
+#   add `// stakeholders-yaml-ok: <reason>` on the same line.
+
+apps/web/src/app/legislation/[slug]/page.tsx
+apps/web/src/app/legislation/page.tsx
+apps/web/src/app/organizations/[slug]/policy-positions-section.tsx
+apps/web/src/app/people/[slug]/policy-positions.tsx
+crux/commands/extract-structured-data.ts
+crux/commands/legislation/auto-verify-stakeholders.ts
+crux/commands/legislation/verify-stakeholders.ts
+crux/commands/political-data.ts
+crux/commands/research-improve-entity.ts
+crux/lib/political/stakeholder-resolver.ts
+crux/lib/research/apply-verdicts.ts
+crux/lib/research/gap-analyzer.ts
+crux/lib/research/sync-applied.ts
+crux/lib/sourcing/item-collectors.ts

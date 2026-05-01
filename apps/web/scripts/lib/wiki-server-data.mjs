@@ -1015,6 +1015,76 @@ export async function syncPolicyStakeholders(typedEntities) {
 }
 
 /**
+ * Fetch all policy stakeholders from the wiki-server PG database (QUA-960 prep).
+ *
+ * Returns a map keyed by `policyEntityId` (entity stableId) → array of stakeholders
+ * in YAML shape `{name, entityId, position, role, importance, reason, source, context}`.
+ * Compatible with how `entity.stakeholders` is consumed by the legislation renderer.
+ *
+ * Returns `null` on wiki-server failure so callers can fall back to snapshot or YAML.
+ *
+ * **Known gap (QUA-984):** the PG `policy_stakeholders` table does not yet have a
+ * `role` column, so the `role` field on every returned stakeholder is `undefined`.
+ * The cutover PR (QUA-960 step 6) cannot ship until QUA-984 closes this — otherwise
+ * rendering from PG silently drops "Co-sponsor", "Primary Author / Sponsor", etc.
+ *
+ * Currently called from build-data only when `STAKEHOLDERS_SOURCE=pg` (the
+ * default is `yaml` in the prep PR, so this path is dormant until cutover).
+ */
+export async function fetchPolicyStakeholdersFromPG() {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  const headers = buildHeaders();
+  const byPolicy = new Map();
+  const pageSize = 200;
+  let offset = 0;
+
+  try {
+    while (true) {
+      const resp = await fetch(
+        `${serverUrl}/api/policy-stakeholders/all?limit=${pageSize}&offset=${offset}`,
+        { headers, signal: AbortSignal.timeout(30_000) },
+      );
+      if (!resp.ok) {
+        logWikiServerWarning('policy-stakeholders-pg', `HTTP ${resp.status}`);
+        return null;
+      }
+      const data = await resp.json();
+      const rows = data.policyStakeholders || [];
+      for (const r of rows) {
+        if (!r.policyEntityId) continue;
+        if (!byPolicy.has(r.policyEntityId)) byPolicy.set(r.policyEntityId, []);
+        // Map PG camelCase → YAML shape. `role` is intentionally absent — the
+        // PG table doesn't have a `role` column yet (QUA-984). Until that
+        // lands, callers using this reader will lose role display.
+        const stakeholder = {
+          name: r.stakeholderDisplayName,
+          position: r.position,
+        };
+        if (r.stakeholderEntityId) stakeholder.entityId = r.stakeholderEntityId;
+        if (r.importance) stakeholder.importance = r.importance;
+        if (r.reason) stakeholder.reason = r.reason;
+        if (r.source) stakeholder.source = r.source;
+        if (Array.isArray(r.context) && r.context.length > 0) {
+          stakeholder.context = r.context;
+        }
+        byPolicy.get(r.policyEntityId).push(stakeholder);
+      }
+      if (rows.length < pageSize) break;
+      offset += rows.length;
+    }
+    const policyCount = byPolicy.size;
+    const total = [...byPolicy.values()].reduce((n, arr) => n + arr.length, 0);
+    console.log(`  policy-stakeholders-pg: ${total} stakeholders across ${policyCount} policies`);
+    return byPolicy;
+  } catch (err) {
+    logWikiServerWarning('policy-stakeholders-pg', err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}
+
+/**
  * Generate a deterministic 10-char ID from a string using SHA-256.
  * Matches the pattern used by crux/lib/grant-import/id.ts:generateId().
  */

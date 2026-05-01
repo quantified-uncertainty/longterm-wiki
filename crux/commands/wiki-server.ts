@@ -73,6 +73,11 @@ const SCRIPTS = {
     description: 'Export PG resources to data/resources-snapshot.json',
     passthrough: ['dryRun', 'dry-run'],
   },
+  'snapshot-policy-stakeholders': {
+    script: 'wiki-server/snapshot-policy-stakeholders.ts',
+    description: 'Export PG policy stakeholders to data/policy-stakeholders-snapshot.json (QUA-960)',
+    passthrough: ['dryRun', 'dry-run'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'sync');
@@ -111,5 +116,6 @@ Examples:
   crux sys wiki-server sync-auto-update-runs   Sync all auto-update runs
   crux sys wiki-server sync-entity-events      Sync org timelines from data/entity-events/
   crux sys wiki-server snapshot-resources      Export PG resources to snapshot JSON
+  crux sys wiki-server snapshot-policy-stakeholders  Export PG policy stakeholders to snapshot JSON
 `;
 }

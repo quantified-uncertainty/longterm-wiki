@@ -507,6 +507,21 @@ const PARALLEL_STEPS: Step[] = [
     // also fail loud.
   },
   {
+    id: 'stakeholders-yaml-reads',
+    name: 'No new YAML stakeholder reads outside allowlist (QUA-960 prep)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-stakeholders-yaml-reads.ts'],
+    cwd: PROJECT_ROOT,
+    advisory: true,
+    // Advisory in the prep PR. Bans new code paths that read
+    // `entity.stakeholders` or `stakeholders?:` field types outside the
+    // baseline allowlist (`crux/validate/.stakeholders-yaml-reads-allowlist.txt`).
+    // The QUA-960 cutover PR shrinks the allowlist as readers migrate to
+    // `fetchPolicyStakeholdersFromPG()`; once the allowlist is empty, the
+    // QUA-943 closure metric for stakeholders is at zero and we can flip
+    // this to blocking.
+  },
+  {
     id: 'things-denorm-dead',
     name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
     command: 'npx',

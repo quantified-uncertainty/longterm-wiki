@@ -1,0 +1,70 @@
+name: Refresh Policy Stakeholders Snapshot
+run-name: "Refresh Policy Stakeholders Snapshot${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Fetches all policy stakeholders from PG and refreshes the snapshot at
+# data/policy-stakeholders-snapshot.json (committed to git, ~600KB). The
+# snapshot is the build-data fallback when the wiki-server is unreachable
+# during a build (QUA-960 step 9 / R-B5). Without it, every CI build during
+# a wiki-server outage would fail post-cutover.
+#
+# Commits the refreshed snapshot back to main when the file changes.
+#
+# To run locally: pnpm crux wiki-server snapshot-policy-stakeholders
+
+on:
+  schedule:
+    - cron: "45 4 * * *" # daily at 04:45 UTC (after wiki-server export at 04:00 + resources at 04:30)
+  workflow_dispatch:
+
+concurrency:
+  group: snapshot-policy-stakeholders
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    uses: ./.github/workflows/_preflight-wiki-server.yml
+    secrets: inherit
+
+  snapshot:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Refresh policy-stakeholders snapshot
+        run: pnpm crux wiki-server snapshot-policy-stakeholders
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
+      - name: Commit refreshed snapshot
+        run: |
+          if git diff --quiet data/policy-stakeholders-snapshot.json; then
+            echo "Snapshot unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name "longterm-wiki-bot"
+          git config user.email "actions@github.com"
+          git add data/policy-stakeholders-snapshot.json
+          git commit -m "chore: refresh policy-stakeholders snapshot (QUA-960)"
+          git push
