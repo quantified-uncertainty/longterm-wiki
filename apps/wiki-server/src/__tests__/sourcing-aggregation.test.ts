@@ -17,8 +17,9 @@ function row(
   verdict: EvidenceRow["verdict"],
   relevanceScore: number | null = 1.0,
   confidence: number | null = null,
+  checkedAt: Date | null = null,
 ): EvidenceRow {
-  return { verdict, relevanceScore, confidence };
+  return { verdict, relevanceScore, confidence, checkedAt };
 }
 
 describe("aggregateEvidence — empty / degenerate input", () => {
@@ -150,6 +151,90 @@ describe("aggregateEvidence — tiebreaking by priority", () => {
     // more actionable than 'couldn't tell').
     const r = aggregateEvidence([row("outdated", 0.7), row("unverifiable", 0.7)]);
     expect(r.verdict).toBe("outdated");
+  });
+});
+
+describe("aggregateEvidence — tiebreaking by recency (QUA-992)", () => {
+  // Real-world scenario from QUA-979: re-verifying a personnel record finds
+  // a better source URL and writes a fresh `confirmed` evidence row, but the
+  // record still has stale `unverifiable` evidence from a generic homepage
+  // check. Without the recency tie-break, priority would pick `unverifiable`
+  // (3 < 4) and the fresh re-check would be silently overridden.
+  it("prefers the most-recent bucket on weight ties when both have checkedAt", () => {
+    const old = new Date("2026-04-09T00:00:00Z");
+    const fresh = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      row("unverifiable", 1.0, 0.95, old),
+      row("confirmed", 1.0, 0.99, fresh),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.contributing[0].verdict).toBe("confirmed");
+    expect(r.contributing[0].latestCheckedAt).toEqual(fresh);
+  });
+
+  it("recency tie-break works in either direction (newer unverifiable beats older confirmed)", () => {
+    const old = new Date("2026-01-01T00:00:00Z");
+    const fresh = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      row("confirmed", 1.0, 0.9, old),
+      row("unverifiable", 1.0, 0.9, fresh),
+    ]);
+    // The fresher unverifiable wins — recency outweighs the priority order's
+    // preference for confirmed in this direction (confirmed has priority 4,
+    // unverifiable has priority 3; without recency the priority tie-break
+    // would still pick unverifiable because it's lower-numbered, so this case
+    // converges with the legacy behavior — but the intent is cleaner now).
+    expect(r.verdict).toBe("unverifiable");
+  });
+
+  it("falls back to priority tie-break when checkedAt is missing on both sides", () => {
+    // Unchanged from pre-QUA-992: tests that don't supply checkedAt still see
+    // the legacy "more-actionable wins" semantics so older callers and the
+    // existing test corpus aren't disturbed.
+    const r = aggregateEvidence([row("contradicted", 0.8), row("confirmed", 0.8)]);
+    expect(r.verdict).toBe("contradicted");
+  });
+
+  it("falls back to priority when only one bucket has checkedAt", () => {
+    // Mixed presence is treated as 'no recency signal' — neither side gets a
+    // recency-driven win. Legacy data has NULL checkedAt; we don't want a
+    // single-row legacy bucket to lose just because the new bucket has a
+    // timestamp. The priority tie-break stays as the safety net.
+    const fresh = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      row("unverifiable", 1.0, 0.9, null),
+      row("confirmed", 1.0, 0.9, fresh),
+    ]);
+    expect(r.verdict).toBe("unverifiable");
+  });
+
+  it("recency tie-break does not override a true weight majority", () => {
+    // Weight desc still runs first. A heavier non-fresh bucket wins, even
+    // when a single fresh row dissents at lower weight.
+    const old = new Date("2026-01-01T00:00:00Z");
+    const fresh = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      row("confirmed", 1.0, 0.9, old),
+      row("confirmed", 1.0, 0.9, old),
+      row("unverifiable", 1.0, 0.9, fresh),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+  });
+
+  it("ContributingVerdict.latestCheckedAt surfaces the per-bucket max", () => {
+    const t1 = new Date("2026-04-01T00:00:00Z");
+    const t2 = new Date("2026-04-15T00:00:00Z");
+    const t3 = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      row("confirmed", 1.0, 0.9, t1),
+      row("confirmed", 1.0, 0.9, t3),
+      row("partial", 0.5, 0.7, t2),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    const conf = r.contributing.find((c) => c.verdict === "confirmed");
+    const part = r.contributing.find((c) => c.verdict === "partial");
+    expect(conf?.latestCheckedAt).toEqual(t3);
+    expect(part?.latestCheckedAt).toEqual(t2);
   });
 });
 

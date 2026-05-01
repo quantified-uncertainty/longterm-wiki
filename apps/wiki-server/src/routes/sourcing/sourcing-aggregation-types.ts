@@ -47,6 +47,13 @@ export interface EvidenceRow {
   relevanceScore: number | null;
   /** 0..1, NULL means "no confidence reported"; ignored in the average. */
   confidence: number | null;
+  /**
+   * QUA-992: when supplied, breaks ties between equal-weight verdict
+   * buckets in favor of the bucket whose latest evidence is most recent.
+   * NULL is treated as "no recency signal" — falls through to the
+   * priority tie-breaker below. Tests can omit it for back-compat.
+   */
+  checkedAt?: Date | null;
 }
 
 export interface ContributingVerdict {
@@ -55,6 +62,13 @@ export interface ContributingVerdict {
   weight: number;
   /** Number of evidence rows that voted for this verdict. */
   rowCount: number;
+  /**
+   * QUA-992: most-recent `checkedAt` across the rows that voted for this
+   * verdict. Used by the aggregation tie-breaker so a fresh re-check can
+   * supersede stale evidence at equal weight. NULL when none of the rows
+   * supplied a `checkedAt`.
+   */
+  latestCheckedAt?: Date | null;
 }
 
 export interface AggregationResult {
