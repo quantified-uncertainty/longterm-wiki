@@ -217,6 +217,17 @@ describe('recordPhase', () => {
     expect(result.ok).toBe(false);
     expect(result.error).toContain('newlines');
   });
+
+  it('rejects reasons longer than 500 chars', () => {
+    const result = recordPhase('phase-7-ui', { reason: 'x'.repeat(501) }, TMP_PATH);
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('too long');
+  });
+
+  it('accepts reasons exactly at the 500-char cap', () => {
+    const result = recordPhase('phase-7-ui', { reason: 'x'.repeat(500) }, TMP_PATH);
+    expect(result.ok).toBe(true);
+  });
 });
 
 describe('initTracker', () => {

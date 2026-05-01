@@ -217,6 +217,14 @@ export function recordPhase(
       error: `--reason must not contain newlines. Use a single-line justification.`,
     };
   }
+  // Sanity cap. Real skip reasons are sentence-length, not novel-length.
+  // A 100KB reason would still parse but signals operator confusion.
+  if (reason && reason.length > 500) {
+    return {
+      ok: false,
+      error: `--reason is too long (${reason.length} chars, max 500).`,
+    };
+  }
 
   if (!existsSync(path)) {
     return {
