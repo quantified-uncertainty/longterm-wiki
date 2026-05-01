@@ -5,22 +5,29 @@ import {
   Database,
   ShieldCheck,
   ExternalLink,
-  ArrowRight,
-  Layers,
 } from "lucide-react";
-import { Breadcrumbs } from "@/components/directory/Breadcrumbs";
 import { fetchDetailed } from "@/lib/wiki-server";
 import type { RpcSourcingDetailResult } from "@/lib/wiki-server";
 import { sanitizeRawLargeNumbers } from "@/lib/format-compact";
 import {
   VerdictBadge,
-  formatRecordType,
   getStoredVerdictHref,
 } from "../../sourcing/sourcing-shared";
 import { isAnySid } from "@longterm-wiki/id-utils";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import type { EntityProfileShellHeaderLink } from "@/components/entity/EntityProfileShell";
+import { rollupVerdictFromVerdictList } from "@/components/entity/entity-sourcing";
 
 export const revalidate = 300;
 export const dynamicParams = true;
+
+/**
+ * Wiki ID for the entity-profile dashboard route. The "View entity profile"
+ * header link routes through `/wiki/<id>?entity=<parent-thing-id>`. Hardcoded
+ * because there's no other lookup table for it; if the dashboard ever moves,
+ * grep for this constant.
+ */
+const ENTITY_PROFILE_WIKI_ID = "E1929";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -111,7 +118,7 @@ export async function generateMetadata({
 // ── Helpers ────────────────────────────────────────────────────────────
 
 function formatTimestamp(ts: string | null): string {
-  if (!ts) return "\u2014";
+  if (!ts) return "—";
   try {
     return new Date(ts).toLocaleString("en-US", {
       dateStyle: "medium",
@@ -123,7 +130,7 @@ function formatTimestamp(ts: string | null): string {
 }
 
 function ChildrenSummary({ count, byType }: { count: number; byType: Record<string, number> }) {
-  if (count === 0) return <span className="text-muted-foreground">{"\u2014"}</span>;
+  if (count === 0) return <span className="text-muted-foreground">{"—"}</span>;
 
   const entries = Object.entries(byType).sort(([, a], [, b]) => b - a);
   return (
@@ -154,7 +161,7 @@ function RecordValue({
 }) {
   // Null / undefined
   if (value === null || value === undefined) {
-    return <span className="text-muted-foreground">{"\u2014"}</span>;
+    return <span className="text-muted-foreground">{"—"}</span>;
   }
 
   // Boolean
@@ -196,9 +203,9 @@ function RecordValue({
             try {
               const url = new URL(value);
               const display = url.hostname + url.pathname;
-              return display.length > 80 ? display.slice(0, 80) + "\u2026" : display;
+              return display.length > 80 ? display.slice(0, 80) + "…" : display;
             } catch {
-              return value.length > 80 ? value.slice(0, 80) + "\u2026" : value;
+              return value.length > 80 ? value.slice(0, 80) + "…" : value;
             }
           })()}
         </a>
@@ -212,7 +219,7 @@ function RecordValue({
 
     // Long string — truncate
     if (value.length > 300) {
-      return <span className="text-sm">{value.slice(0, 300)}{"\u2026"}</span>;
+      return <span className="text-sm">{value.slice(0, 300)}{"…"}</span>;
     }
 
     return <span className="text-sm">{value}</span>;
@@ -257,7 +264,7 @@ function RecordValue({
     } catch {
       json = "[Unable to serialize]";
     }
-    const display = json.length > 300 ? json.slice(0, 300) + "\u2026" : json;
+    const display = json.length > 300 ? json.slice(0, 300) + "…" : json;
     return (
       <pre className="text-xs bg-muted px-2 py-1 rounded overflow-x-auto max-w-full whitespace-pre-wrap">
         {display}
@@ -304,8 +311,9 @@ export default async function ThingDetailPage({ params }: PageProps) {
 
   // Fetch sourcing verdicts and record data in parallel
   const recordType = sourceTableToRecordType(thing.sourceTable);
+  const supportsVerdicts = VERDICT_SOURCE_TABLES.has(thing.sourceTable);
 
-  const verdictsPromise = VERDICT_SOURCE_TABLES.has(thing.sourceTable)
+  const verdictsPromise = supportsVerdicts
     ? fetchDetailed<RpcSourcingDetailResult>(
         `/api/sourcing/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(thing.sourceId)}`,
         { revalidate: 300 }
@@ -322,17 +330,75 @@ export default async function ThingDetailPage({ params }: PageProps) {
     recordPromise,
   ]);
 
-  let verdicts: RpcSourcingDetailResult | null = null;
-  if (verdictsSettled.status === "fulfilled" && verdictsSettled.value && verdictsSettled.value.ok) {
+  // Distinguish "fetch failed" from "successfully fetched, no verdicts": only
+  // the latter should render an "unchecked" SourcingDot. A failed fetch leaves
+  // `verdicts === undefined` so the dot is hidden entirely.
+  let verdicts: RpcSourcingDetailResult | undefined;
+  if (
+    verdictsSettled.status === "fulfilled" &&
+    verdictsSettled.value &&
+    verdictsSettled.value.ok
+  ) {
     verdicts = verdictsSettled.value.data;
   }
 
   let recordData: RecordLookupResult | null = null;
-  if (recordSettled.status === "fulfilled" && recordSettled.value.ok) {
+  if (
+    recordSettled.status === "fulfilled" &&
+    recordSettled.value &&
+    recordSettled.value.ok
+  ) {
     recordData = recordSettled.value.data;
   }
 
-  const hasVerdicts = verdicts && verdicts.verdicts.length > 0;
+  const hasVerdicts = verdicts != null && verdicts.verdicts.length > 0;
+  // verdict prop semantics:
+  //   undefined → shell hides the SourcingDot entirely (record table doesn't
+  //               support verdicts, OR the verdicts fetch failed)
+  //   null      → SourcingDot renders "unchecked" (fetch succeeded with no rows)
+  //   "<verdict>" → SourcingDot renders the rollup state
+  const rollupVerdict =
+    !supportsVerdicts || verdicts === undefined
+      ? undefined
+      : rollupVerdictFromVerdictList(verdicts.verdicts);
+  const sourcingHref: string | undefined = supportsVerdicts
+    ? getStoredVerdictHref(recordType, thing.sourceId)
+    : undefined;
+
+  // Header pieces -----------------------------------------------------------
+
+  const titlePills = (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+      <Database className="h-3 w-3" />
+      {thing.thingType}
+    </span>
+  );
+
+  const subtitle = thing.parentTitle && thing.parentThingId ? (
+    <p className="text-sm text-muted-foreground">
+      Child of{" "}
+      <Link
+        href={`/things/${encodeURIComponent(thing.parentThingId)}`}
+        className="text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {thing.parentTitle}
+      </Link>
+    </p>
+  ) : undefined;
+
+  const headerLinks: EntityProfileShellHeaderLink[] = [];
+  if (thing.href) {
+    headerLinks.push({ label: "Full page", href: thing.href });
+  }
+  if (thing.parentThingId) {
+    headerLinks.push({
+      label: "Entity profile",
+      href: `/wiki/${ENTITY_PROFILE_WIKI_ID}?entity=${encodeURIComponent(thing.parentThingId)}`,
+    });
+  }
+  if (sourcingHref) {
+    headerLinks.push({ label: "Source checks", href: sourcingHref });
+  }
 
   // Metadata rows for the key-value table
   const metadataRows: { label: string; value: React.ReactNode }[] = [
@@ -374,7 +440,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
       value: (
         <span className="text-sm">
           {sanitized.length > 300
-            ? sanitized.slice(0, 300) + "\u2026"
+            ? sanitized.slice(0, 300) + "…"
             : sanitized}
         </span>
       ),
@@ -447,266 +513,201 @@ export default async function ThingDetailPage({ params }: PageProps) {
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: "Things", href: "/things" },
-          { label: thing.title },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
-            <Database className="h-3 w-3" />
-            {thing.thingType}
-          </span>
-        </div>
-
-        <h1 className="text-2xl font-bold mb-1">{thing.title}</h1>
-
-        {thing.parentTitle && thing.parentThingId && (
-          <p className="text-sm text-muted-foreground mb-2">
-            Child of{" "}
-            <Link
-              href={`/things/${encodeURIComponent(thing.parentThingId)}`}
-              className="text-blue-600 hover:underline dark:text-blue-400"
-            >
-              {thing.parentTitle}
-            </Link>
-          </p>
-        )}
-      </div>
-
-      {/* Navigation links */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        {thing.href && (
-          <Link
-            href={thing.href}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
-          >
-            <ArrowRight className="h-3.5 w-3.5" />
-            View full page
-          </Link>
-        )}
-        {thing.parentThingId && (
-          <Link
-            href={`/wiki/E1929?entity=${encodeURIComponent(thing.parentThingId)}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
-          >
-            <Layers className="h-3.5 w-3.5" />
-            View entity profile
-          </Link>
-        )}
-        {VERDICT_SOURCE_TABLES.has(thing.sourceTable) && (
-          <Link
-            href={getStoredVerdictHref(recordType, thing.sourceId)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
-          >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Source checks
-          </Link>
-        )}
-      </div>
-
-      {/* Thing Metadata table */}
-      <section className="mb-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-          Metadata
-        </h2>
-        <div className="rounded-lg border border-border/60 overflow-hidden">
-          <table className="w-full text-sm">
-            <tbody className="divide-y divide-border/30">
-              {metadataRows.map((row) => (
-                <tr key={row.label}>
-                  <td className="px-4 py-2.5 text-muted-foreground font-medium whitespace-nowrap w-36 align-top">
-                    {row.label}
-                  </td>
-                  <td className="px-4 py-2.5">{row.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* Record Data */}
-      <section className="mb-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-          <span className="inline-flex items-center gap-1.5">
-            <Database className="h-4 w-4" />
-            Record Data
-          </span>
-        </h2>
-        {recordData && Object.keys(recordData.record).length > 0 ? (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "Things", href: "/things" },
+        { label: thing.title },
+      ]}
+      title={thing.title}
+      titlePills={titlePills}
+      subtitle={subtitle}
+      headerLinks={headerLinks}
+      verdict={rollupVerdict}
+      verdictHref={sourcingHref}
+    >
+      <div className="space-y-8">
+        {/* Thing Metadata table */}
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            Metadata
+          </h2>
           <div className="rounded-lg border border-border/60 overflow-hidden">
             <table className="w-full text-sm">
               <tbody className="divide-y divide-border/30">
-                {Object.entries(recordData.record)
-                  .filter(([key]) => !METADATA_FIELDS.has(key))
-                  .map(([key, value]) => (
-                    <tr key={key}>
-                      <td className="px-4 py-2.5 text-muted-foreground font-medium whitespace-nowrap w-48 align-top">
-                        <code className="text-[12px]">{key}</code>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <RecordValue
-                          fieldKey={key}
-                          value={value}
-                          displayNames={recordData!.displayNames}
-                        />
-                      </td>
-                    </tr>
-                  ))}
+                {metadataRows.map((row) => (
+                  <tr key={row.label}>
+                    <td className="px-4 py-2.5 text-muted-foreground font-medium whitespace-nowrap w-36 align-top">
+                      {row.label}
+                    </td>
+                    <td className="px-4 py-2.5">{row.value}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">Record data unavailable</p>
-        )}
-      </section>
+        </section>
 
-      {/* Source Check Verdicts */}
-      {hasVerdicts ? (
-        <section className="mb-8">
+        {/* Record Data */}
+        <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4" />
-              Source Check Verdicts
+              <Database className="h-4 w-4" />
+              Record Data
             </span>
           </h2>
-          <div className="space-y-3">
-            {verdicts!.verdicts.map((v, i) => (
-              <div
-                key={`${v.fieldName ?? "overall"}-${i}`}
-                className="rounded-lg border border-border/60 p-4"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    {v.fieldName && (
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Field:{" "}
-                        <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                          {v.fieldName}
-                        </code>
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3">
-                      <VerdictBadge verdict={v.verdict} />
-                      {v.confidence != null && (
-                        <span className="text-sm tabular-nums font-medium">
-                          {Math.round(v.confidence * 100)}% confidence
-                        </span>
+          {recordData && Object.keys(recordData.record).length > 0 ? (
+            <div className="rounded-lg border border-border/60 overflow-hidden">
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-border/30">
+                  {Object.entries(recordData.record)
+                    .filter(([key]) => !METADATA_FIELDS.has(key))
+                    .map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="px-4 py-2.5 text-muted-foreground font-medium whitespace-nowrap w-48 align-top">
+                          <code className="text-[12px]">{key}</code>
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <RecordValue
+                            fieldKey={key}
+                            value={value}
+                            displayNames={recordData!.displayNames}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Record data unavailable</p>
+          )}
+        </section>
+
+        {/* Source Check Verdicts */}
+        {hasVerdicts ? (
+          <section>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4" />
+                Source Check Verdicts
+              </span>
+            </h2>
+            <div className="space-y-3">
+              {verdicts!.verdicts.map((v, i) => (
+                <div
+                  key={`${v.fieldName ?? "overall"}-${i}`}
+                  className="rounded-lg border border-border/60 p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      {v.fieldName && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Field:{" "}
+                          <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                            {v.fieldName}
+                          </code>
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3">
+                        <VerdictBadge verdict={v.verdict} />
+                        {v.confidence != null && (
+                          <span className="text-sm tabular-nums font-medium">
+                            {Math.round(v.confidence * 100)}% confidence
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right text-xs text-muted-foreground">
+                      {v.lastComputedAt && (
+                        <p>
+                          Last checked:{" "}
+                          {new Date(v.lastComputedAt).toLocaleDateString()}
+                        </p>
+                      )}
+                      {v.needsRecheck && (
+                        <p className="text-amber-500 font-medium mt-0.5">
+                          Needs recheck
+                        </p>
                       )}
                     </div>
                   </div>
-                  <div className="text-right text-xs text-muted-foreground">
-                    {v.lastComputedAt && (
-                      <p>
-                        Last checked:{" "}
-                        {new Date(v.lastComputedAt).toLocaleDateString()}
-                      </p>
-                    )}
-                    {v.needsRecheck && (
-                      <p className="text-amber-500 font-medium mt-0.5">
-                        Needs recheck
-                      </p>
-                    )}
-                  </div>
+
+                  {v.reasoning && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {v.reasoning}
+                    </p>
+                  )}
                 </div>
+              ))}
+            </div>
+          </section>
+        ) : supportsVerdicts ? (
+          <section>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4" />
+                Source Check
+              </span>
+            </h2>
+            <div className="rounded-lg border border-dashed border-border/60 p-4">
+              <p className="text-sm text-muted-foreground">
+                This record has not been sourced yet.
+              </p>
+            </div>
+          </section>
+        ) : null}
 
-                {v.reasoning && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {v.reasoning}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="mt-3">
-            <Link
-              href={getStoredVerdictHref(recordType, thing.sourceId)}
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              View full evidence
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </section>
-      ) : VERDICT_SOURCE_TABLES.has(thing.sourceTable) ? (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4" />
-              Source Check
-            </span>
-          </h2>
-          <div className="rounded-lg border border-dashed border-border/60 p-4">
-            <p className="text-sm text-muted-foreground">
-              This record has not been sourced yet.
-            </p>
-            <Link
-              href={getStoredVerdictHref(recordType, thing.sourceId)}
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-2"
-            >
-              View source check page
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </section>
-      ) : null}
-
-      {/* Debug footer */}
-      <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        <summary className="cursor-pointer hover:text-foreground transition-colors">
-          Debug info
-        </summary>
-        <div className="mt-2 space-y-0.5">
-          <p>
-            Thing ID:{" "}
-            <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-              {thing.id}
-            </code>
-          </p>
-          <p>
-            Source Table:{" "}
-            <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-              {thing.sourceTable}
-            </code>
-          </p>
-          <p>
-            Source ID:{" "}
-            <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-              {thing.sourceId}
-            </code>
-          </p>
-          {thing.parentThingId && (
+        {/* Debug footer */}
+        <details className="text-xs text-muted-foreground border-t border-border pt-4">
+          <summary className="cursor-pointer hover:text-foreground transition-colors">
+            Debug info
+          </summary>
+          <div className="mt-2 space-y-0.5">
             <p>
-              Parent Thing ID:{" "}
+              Thing ID:{" "}
               <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.parentThingId}
+                {thing.id}
               </code>
             </p>
-          )}
-          {thing.wikiId && (
             <p>
-              Wiki ID:{" "}
+              Source Table:{" "}
               <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.wikiId}
+                {thing.sourceTable}
               </code>
             </p>
-          )}
-          {thing.entityType && (
             <p>
-              Entity Type:{" "}
+              Source ID:{" "}
               <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.entityType}
+                {thing.sourceId}
               </code>
             </p>
-          )}
-        </div>
-      </details>
-    </div>
+            {thing.parentThingId && (
+              <p>
+                Parent Thing ID:{" "}
+                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                  {thing.parentThingId}
+                </code>
+              </p>
+            )}
+            {thing.wikiId && (
+              <p>
+                Wiki ID:{" "}
+                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                  {thing.wikiId}
+                </code>
+              </p>
+            )}
+            {thing.entityType && (
+              <p>
+                Entity Type:{" "}
+                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                  {thing.entityType}
+                </code>
+              </p>
+            )}
+          </div>
+        </details>
+      </div>
+    </EntityProfileShell>
   );
 }
