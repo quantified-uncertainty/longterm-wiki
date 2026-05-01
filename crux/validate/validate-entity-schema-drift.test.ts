@@ -191,8 +191,8 @@ describe("validate-entity-schema-drift runCheck", () => {
     );
     writeFileSync(allowlistPath, "");
     const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
-    expect(result.newViolations.length).toBeGreaterThanOrEqual(1);
-    expect(result.newViolations.some(v => v.kind === "VALID_CONST")).toBe(true);
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].kind).toBe("VALID_CONST");
   });
 });
 

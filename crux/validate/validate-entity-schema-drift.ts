@@ -45,17 +45,9 @@ type Kind = 'VALID_CONST' | 'INLINE_ENUM';
  * `z.enum(` is harmless on the single-line case and lets the joined-line
  * pass catch formatter-induced splits like `z.enum(\n  [...])`.
  */
-const PATTERNS: Array<{ pattern: RegExp; globalPattern: RegExp; kind: Kind }> = [
-  {
-    pattern: /\bconst\s+VALID_[A-Z_]+\s*=/,
-    globalPattern: /\bconst\s+VALID_[A-Z_]+\s*=/g,
-    kind: 'VALID_CONST',
-  },
-  {
-    pattern: /z\.enum\(\s*\[/,
-    globalPattern: /z\.enum\(\s*\[/g,
-    kind: 'INLINE_ENUM',
-  },
+const PATTERNS: Array<{ globalPattern: RegExp; kind: Kind }> = [
+  { globalPattern: /\bconst\s+VALID_[A-Z_]+\s*=/g, kind: 'VALID_CONST' },
+  { globalPattern: /z\.enum\(\s*\[/g, kind: 'INLINE_ENUM' },
 ];
 
 export interface Violation {
@@ -118,12 +110,6 @@ function checkFile(filePath: string, baseDir: string): { relPath: string; violat
     const nextTrim = nextLine.trimStart();
     if (isCommentLine(nextTrim)) continue;
     if (lineIsSuppressed(nextLine)) continue;
-    // Don't fire on the joined line if `lines[i]` ALREADY would single-line
-    // match (already reported on this iteration's first branch is impossible
-    // because we continued; this guards against the edge case where the
-    // single-line regex matches inside a string literal that checkLine
-    // filtered, but the joined regex would also match the same string).
-    if (checkLine(lines[i]) !== null) continue;
     const joined = lines[i].trimEnd() + ' ' + nextTrim;
     const joinedKind = checkLine(joined);
     if (joinedKind !== null) {
