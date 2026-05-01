@@ -37,7 +37,7 @@ import {
 } from "@/data/factbase";
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
-import { formatAge } from "@/lib/format";
+import { formatAge, formatDateDeterministic } from "@/lib/format";
 import { FORMAT_LABELS, RECORD_TYPE_LABELS } from "@/app/data-sources/data-source-labels";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 
@@ -116,18 +116,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
-}
 
 /** Resolve a page slug to its display title */
 function getPageTitle(pageId: string): string {
@@ -224,14 +212,7 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
             className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
             <ExternalLink className="w-3 h-3" />
-            {(() => {
-              try {
-                const u = new URL(resource.url);
-                return u.hostname;
-              } catch {
-                return resource.url;
-              }
-            })()}
+            {getDomain(resource.url) ?? resource.url}
           </a>
         </>
       )}
@@ -301,7 +282,7 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
                 </div>
                 {ts.lastSnapshotAt && (
                   <div className="text-xs text-muted-foreground">
-                    {formatDate(ts.lastSnapshotAt)}
+                    {formatDateDeterministic(ts.lastSnapshotAt)}
                   </div>
                 )}
               </div>
@@ -1029,7 +1010,7 @@ export default async function ResourcePage({ params }: PageProps) {
                 </span>
               )}
               {contentData.fetchedAt && (
-                <span>Fetched {formatDate(contentData.fetchedAt)}</span>
+                <span>Fetched {formatDateDeterministic(contentData.fetchedAt)}</span>
               )}
               {contentData.contentLength && (
                 <span>
