@@ -1,20 +1,27 @@
 /**
- * QUA-952 (Phase 0a-ii) — canary `code:` discriminator response shapes.
+ * QUA-952 (Phase 0a-ii) — `code:` discriminator response shapes.
  *
- * Asserts that the 3 canary routes emit structured `code:` discriminators in
- * their 400 responses so Phase 2 dual-write retry-with-feedback (Phase 3) can
- * dispatch on `code` instead of pattern-matching `message`:
+ * Asserts that the canary's three validation paths emit structured `code:`
+ * discriminators in their 400 responses, so Phase 2 dual-write
+ * retry-with-feedback (Phase 3) can dispatch on `code` instead of
+ * pattern-matching `message`:
  *
- *   1. `policy-stakeholders` Zod parse → `code: "zod"` or `code: "enum_violation"`
- *      (emitted by sync-factory's Zod return path; bullet 3 of the ticket).
- *   2. `validate-entity-refs` FK miss → `code: "fk_missing"` (bullet 2).
- *   3. Sync-factory Zod parse fields populate `field`/`value`/`allowed` so a
- *      retry consumer can re-prompt with the rejected input (bullet 3).
+ *   1. policy-stakeholders body Zod parse → `code: "zod"` or
+ *      `code: "enum_violation"` (emitted by sync-factory's Zod return path,
+ *      inherited by every route mounted on `createSyncHandler`).
+ *   2. `validateEntityRefs` FK miss → `code: "fk_missing"`.
+ *   3. Sync-factory Zod parse populates `field`/`value`/`allowed` so a retry
+ *      consumer can re-prompt with the rejected input.
  *
- * Other 156+ legacy 1-arg `validationError(c, "...")` callsites are NOT in
- * scope for QUA-952 — see QUA-943 v4 RFC §0a-ii. Their response shapes are
- * unchanged and intentionally untested here so this file stays focused on
- * the canary contract.
+ * **Scope note.** policy-stakeholders has only one FK field
+ * (`policyEntityId`), so the multi-field `fk_missing` test below uses
+ * `/api/personnel/sync` — not because personnel is a canary route, but
+ * because the change to `validateEntityRefs` is shared infrastructure used
+ * by all sync routes, and personnel is the simplest mount with two FK
+ * fields. Other 156+ legacy 1-arg `validationError(c, "...")` callsites
+ * (which include the entire query-param `zv()` validator path and the
+ * natural-key collision path inside sync-factory) are NOT in scope and are
+ * unchanged.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -242,9 +249,11 @@ describe("QUA-952 — canary `code:` discriminator shapes", () => {
       // `value` carries the array of missing IDs in that field — a retry
       // consumer iterates over it to know which references to fix.
       expect(body.value).toEqual(["sid_policy01"]);
-      // The bypass instruction in the human-readable message is preserved
-      // verbatim for the QUA-940 deny-message contract — `validate-entity-refs`'s
-      // shouldSkipEntityValidation rule depends on this exact wording.
+      // The bypass instruction is preserved verbatim in `message` so an
+      // operator pasting a 400 into chat can read the syntax without
+      // server-log access. (The QUA-940 deny-message contract proper lives
+      // in the error-level log inside `shouldSkipEntityValidation`, not
+      // here — this body string is just the operator-facing mirror.)
       expect(body.message).toContain(
         "skipEntityValidation=true&skipEntityValidationReason=<why>",
       );
@@ -288,5 +297,150 @@ describe("QUA-952 — canary `code:` discriminator shapes", () => {
       expect(body.message).toContain("organizationId");
       expect(body.message).toContain("missORG001");
     });
+
+    it("caps `value` at FK_MISSING_VALUE_CAP for very large batches", async () => {
+      // Sanity: a 60-item batch with every reference missing produces 60
+      // missing IDs in one field. The structured `value` array caps at 50
+      // (FK_MISSING_VALUE_CAP); the full list is still in `message`.
+      // Without a cap a 500-item all-invalid batch would push 10–50KB of
+      // IDs into the response body.
+      // id must be exactly 10 alphanumeric chars (personnel schema regex).
+      const items = Array.from({ length: 60 }, (_, i) => ({
+        id: `Pca${String(i).padStart(7, "0")}`,
+        personId: `nxPER${String(i).padStart(5, "0")}`,
+        organizationId: "nxOrg00000",
+        role: "CEO",
+        roleType: "key-person",
+      }));
+
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
+        items,
+      });
+
+      expect(res.status).toBe(400);
+      const body = await res.json();
+
+      expect(body.code).toBe("fk_missing");
+      expect(Array.isArray(body.value)).toBe(true);
+      // The cap protects only the structured `value`, not `message`, so
+      // both halves of the contract live in this assertion pair.
+      expect((body.value as unknown[]).length).toBeLessThanOrEqual(50);
+      // …and the full set still appears in the message (last item proves
+      // we didn't truncate that side).
+      expect(body.message).toContain("nxPER00059");
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Direct unit tests for the zodErrorToValidationBody helper. These exercise
+// edge cases that no canary route triggers (empty issues array, root-level
+// path, hand-constructed ZodError shapes), so they live here rather than in
+// the route-integration suites above.
+// ---------------------------------------------------------------------------
+
+describe("zodErrorToValidationBody (direct unit)", () => {
+  it("returns code: 'zod' with no field for a root-path issue", async () => {
+    const { z } = await import("zod");
+    const { zodErrorToValidationBody } = await import(
+      "../routes/shared/utils.js"
+    );
+
+    const err = new z.ZodError([
+      {
+        code: "custom",
+        path: [],
+        message: "root-level failure",
+      },
+    ]);
+    const body = zodErrorToValidationBody(err);
+
+    expect(body.code).toBe("zod");
+    // Empty path → no field key (omitted, not literal undefined string).
+    expect(Object.prototype.hasOwnProperty.call(body, "field")).toBe(false);
+    // No `received` on a `custom` issue → no `value` key.
+    expect(Object.prototype.hasOwnProperty.call(body, "value")).toBe(false);
+  });
+
+  it("returns code: 'zod' with the issue's message when issues[] is empty", async () => {
+    const { z } = await import("zod");
+    const { zodErrorToValidationBody } = await import(
+      "../routes/shared/utils.js"
+    );
+
+    // Hand-constructed ZodError with no issues — won't happen in practice
+    // (Zod always populates at least one) but the helper has an explicit
+    // fallback branch that should not throw.
+    const err = new z.ZodError([]);
+    const body = zodErrorToValidationBody(err);
+
+    expect(body.code).toBe("zod");
+    expect(typeof body.message).toBe("string");
+  });
+
+  it("formats array-index path with bracket notation", async () => {
+    const { z } = await import("zod");
+    const { zodErrorToValidationBody } = await import(
+      "../routes/shared/utils.js"
+    );
+
+    const err = new z.ZodError([
+      {
+        code: "invalid_type",
+        path: ["items", 0, "policyEntityId"],
+        message: "Required",
+        expected: "string",
+        received: "undefined",
+      },
+    ]);
+    const body = zodErrorToValidationBody(err);
+
+    expect(body.field).toBe("items[0].policyEntityId");
+  });
+
+  it("formats number-only path as bare bracket", async () => {
+    const { z } = await import("zod");
+    const { zodErrorToValidationBody } = await import(
+      "../routes/shared/utils.js"
+    );
+
+    // Edge case: top-level array with index path. `[0]` is meaningful even
+    // without a parent field; the formatter must not produce `"0"` (which
+    // would be ambiguous with a string-keyed `"0"` field).
+    const err = new z.ZodError([
+      {
+        code: "invalid_type",
+        path: [0, "id"],
+        message: "Required",
+        expected: "string",
+        received: "undefined",
+      },
+    ]);
+    const body = zodErrorToValidationBody(err);
+
+    expect(body.field).toBe("[0].id");
+  });
+
+  it("populates allowed[] from invalid_enum_value options", async () => {
+    const { z } = await import("zod");
+    const { zodErrorToValidationBody } = await import(
+      "../routes/shared/utils.js"
+    );
+
+    const err = new z.ZodError([
+      {
+        code: "invalid_enum_value",
+        path: ["position"],
+        message: "Invalid enum value",
+        received: "endorse",
+        options: ["support", "oppose", "neutral", "mixed"],
+      },
+    ]);
+    const body = zodErrorToValidationBody(err);
+
+    expect(body.code).toBe("enum_violation");
+    expect(body.field).toBe("position");
+    expect(body.value).toBe("endorse");
+    expect(body.allowed).toEqual(["support", "oppose", "neutral", "mixed"]);
   });
 });

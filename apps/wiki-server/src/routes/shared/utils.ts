@@ -205,6 +205,17 @@ function formatZodPath(path: ReadonlyArray<string | number>): string {
  * `error.message` preserves the full list under `message` for human-readable
  * fallback (and back-compat with legacy string-matching consumers).
  *
+ * **JSON-safety contract.** This helper forwards the issue's `received`
+ * field directly into `value`, inheriting the {@link ValidationErrorBody}
+ * caveat that values must be JSON-safe (no `BigInt`, `Symbol`, function,
+ * or circular reference). For `ZodError`s produced by `safeParse(json)` —
+ * the case sync-factory uses — `received` is a primitive (`string`,
+ * `number`, `boolean`, `null`) or the `ZodParsedType` enum (`"undefined"`,
+ * `"object"`, etc.) and is always JSON-safe. Schemas with custom
+ * `transform` outputs that re-fail downstream Zod checks could in
+ * principle yield non-JSON-safe values; do not pass `ZodError`s from
+ * such pipelines through this helper without sanitizing first.
+ *
  * QUA-952: introduced for the Phase 0a-ii canary slice. Used by
  * `createSyncHandler` and any new callsite that wants structured Zod codes.
  */
@@ -231,9 +242,7 @@ export function zodErrorToValidationBody(
   // Many other ZodIssue variants (`invalid_type`, `invalid_literal`, etc.)
   // carry a `received` field — surface it as `value` when available so a
   // retry-with-feedback consumer can reprompt with the rejected input.
-  const issueWithReceived = issue as { received?: unknown };
-  const value =
-    "received" in issue ? issueWithReceived.received : undefined;
+  const value = (issue as { received?: unknown }).received;
   return {
     code: "zod",
     ...(field !== undefined ? { field } : {}),

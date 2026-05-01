@@ -119,18 +119,43 @@ export async function validateEntityRefs(
     .map((m) => `${m.fieldName}: ${m.missingIds.join(", ")}`)
     .join("; ");
 
-  // QUA-952 (Phase 0a-ii): emit structured `code: "fk_missing"` so canary
-  // callers can dispatch retry-with-feedback by FK class. The first missing
-  // field populates the structured `field`/`value` slots; the full
-  // multi-field summary stays in `message` (preserved verbatim for back-compat
-  // with existing string-matching consumers and for the QUA-940 deny-message
-  // contract on the bypass instruction).
+  // QUA-952 (Phase 0a-ii): emit structured `code: "fk_missing"` so callers
+  // can dispatch retry-with-feedback by FK class. The first missing field
+  // populates the structured `field`/`value` slots; the full multi-field
+  // summary stays in `message` for human-readable detail and to preserve
+  // back-compat with existing 1-arg-style string-matching consumers.
+  //
+  // The bypass instruction is intentionally repeated in `message` (not just
+  // logged) so an operator pasting a 400 response into a chat can read the
+  // bypass syntax without server-log access. The QUA-940 deny-message
+  // contract proper lives in the `error`-level log inside
+  // `shouldSkipEntityValidation` — this body string just mirrors the
+  // operator-facing hint.
+  //
+  // `value` caps at FK_MISSING_VALUE_CAP IDs to keep 400 responses bounded
+  // when a 500-item batch has every reference invalid. The full list still
+  // appears in `message` for now; a structured-only consumer will need to
+  // page over `field` if it has more than CAP missing IDs (Phase 3 retry
+  // re-prompts on one item at a time anyway).
   const first = missing[0];
+  const value =
+    first.missingIds.length > FK_MISSING_VALUE_CAP
+      ? first.missingIds.slice(0, FK_MISSING_VALUE_CAP)
+      : first.missingIds;
   return validationError(c, {
     code: "fk_missing",
     field: first.fieldName,
-    value: first.missingIds,
+    value,
     // skipEntityValidation-ok: error message text instructs callers how to bypass after providing a reason
     message: `Entity references not found: ${details}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`,
   });
 }
+
+/**
+ * Cap the size of the `value` array in fk_missing 400 responses. A 500-item
+ * batch with every reference invalid would otherwise serialize 500 IDs into
+ * `value` AND into the human-readable `message` (which already enumerates
+ * all of them), producing 10–50KB+ 400 responses. The full list is still
+ * available in `message`; this cap protects only the structured `value`.
+ */
+const FK_MISSING_VALUE_CAP = 50;
