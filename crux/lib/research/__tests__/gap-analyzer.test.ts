@@ -208,9 +208,13 @@ describe("coverageScoreForEntity", () => {
   });
 
   it("returns null for unsupported types", () => {
-    expect(coverageScoreForEntity({ type: "person" })).toBeNull();
-    expect(coverageScoreForEntity({ type: "ai-model" })).toBeNull();
-    expect(coverageScoreForEntity({ type: "" })).toBeNull();
+    // The signature is the supported union, but a real YAML-loaded record
+    // could carry any string `type`; cast through the union to test the
+    // null branch honestly.
+    const make = (type: string): PolicyEntity => ({ id: "x", type });
+    expect(coverageScoreForEntity(make("person"))).toBeNull();
+    expect(coverageScoreForEntity(make("ai-model"))).toBeNull();
+    expect(coverageScoreForEntity(make(""))).toBeNull();
   });
 });
 

@@ -17,6 +17,7 @@ import {
   coverageScoreForEntity,
   isSupportedCoverageType,
   SUPPORTED_COVERAGE_TYPES,
+  type SupportedCoverageType,
 } from "../lib/research/gap-analyzer.ts";
 import { findEntity, type EntityWithType } from "../lib/research/entity-loader.ts";
 
@@ -28,13 +29,17 @@ export interface BenchmarkSnapshot {
   /** Entity type (`policy`, `organization`, ...). Added in QUA-936 so diff/list
    *  consumers don't have to re-look up the type. Optional on read because
    *  pre-QUA-936 snapshots don't carry it. */
-  entity_type?: string;
+  entity_type?: SupportedCoverageType;
   tag: string;
   timestamp: string;
   git_sha: string | null;
   coverage_score: number;
   components: Record<string, number>;
   facts_in_yaml: Record<string, number>;
+  /** Raw YAML-loaded entity. Pre-QUA-936 this was always `PolicyEntity`; now
+   *  it's any supported type — read `entity_type` to discriminate before
+   *  accessing type-specific fields like `provisions` (policy) or
+   *  `products` (organization). */
   yaml_excerpt: EntityWithType;
 }
 

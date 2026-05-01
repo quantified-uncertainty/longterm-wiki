@@ -37,11 +37,24 @@ const SuiteSchema = z.array(SuiteEntrySchema);
 
 export type SuiteEntry = z.infer<typeof SuiteEntrySchema>;
 
-/** Types that have a coverage scorer. Sourced from gap-analyzer (QUA-936). */
-const SUPPORTED_TYPES: ReadonlySet<string> = new Set(SUPPORTED_COVERAGE_TYPES);
+// Supported types are sourced from `isSupportedCoverageType` (gap-analyzer)
+// so the dispatcher and the suite stay in lockstep automatically (QUA-936).
 
-/** Per-entity outcome status. */
-export type EntityStatus = "scored" | "missing_entity" | "unsupported_type";
+/** Per-entity outcome status.
+ *  - `scored`           — entity found, type supported, coverage computed
+ *  - `missing_entity`   — slug not present in any entity YAML
+ *  - `unsupported_type` — suite entry's type lacks a coverage scorer
+ *  - `type_mismatch`    — entity exists but its `type` disagrees with the
+ *                          suite entry's `type` (e.g. suite says
+ *                          `organization`, YAML says `policy`). Surfaces
+ *                          schema drift instead of silently masking it as
+ *                          `missing_entity`. (QUA-936)
+ */
+export type EntityStatus =
+  | "scored"
+  | "missing_entity"
+  | "unsupported_type"
+  | "type_mismatch";
 
 /** Tag flows into the snapshot filename. Allowlist prevents path traversal
  *  and shell/filesystem surprises. */
@@ -132,15 +145,15 @@ function makeRecord(
 }
 
 /**
- * Score every entry in `suite` against `entities`. Entries with unsupported
- * types, missing entities, or suite/YAML type mismatches get `status` set
- * and `coverage_score: null`.
+ * Score every entry in `suite` against `entities`. Entries that don't score
+ * get a non-`scored` `status` and `coverage_score: null` (see `EntityStatus`
+ * for the four cases).
  *
  * Entity YAML files key under `id`; the suite YAML calls the same string
  * `slug`. We look up by `id` across all `data/entities/*.yaml` files
  * (QUA-936). Dispatch is by `entry.type` — the suite is canonical for what
- * scorer to use; if `entity.type` disagrees, the entry is flagged as
- * `missing_entity` rather than scored against the wrong shape.
+ * scorer to use; if `entity.type` disagrees, we surface that as
+ * `type_mismatch` rather than scoring against the wrong shape.
  */
 export function scoreSuite(
   suite: SuiteEntry[],
@@ -148,18 +161,10 @@ export function scoreSuite(
 ): PerEntityRecord[] {
   const byId = new Map(entities.map((e) => [e.id, e]));
   return suite.map((entry) => {
-    if (!SUPPORTED_TYPES.has(entry.type)) return makeRecord(entry, "unsupported_type", null);
+    if (!isSupportedCoverageType(entry.type)) return makeRecord(entry, "unsupported_type", null);
     const ent = byId.get(entry.slug);
     if (!ent) return makeRecord(entry, "missing_entity", null);
-    if (ent.type !== entry.type) {
-      // Defensive: suite says X but the YAML now says Y. The scorer would
-      // run on the wrong shape and produce noise. Treat as missing so the
-      // aggregate doesn't silently shift; surfaces the drift in --list/--diff.
-      return makeRecord(entry, "missing_entity", null);
-    }
-    if (!isSupportedCoverageType(ent.type)) {
-      return makeRecord(entry, "unsupported_type", null);
-    }
+    if (ent.type !== entry.type) return makeRecord(entry, "type_mismatch", null);
     return makeRecord(entry, "scored", coverageScoreForEntity(ent));
   });
 }
@@ -170,6 +175,8 @@ export interface AggregateMetrics {
   scored_count: number;
   unsupported_count: number;
   missing_count: number;
+  /** Entries where suite YAML and entity YAML disagree on `type` (QUA-936). */
+  type_mismatch_count: number;
   median_coverage_score: number | null;
   p25_coverage_score: number | null;
   count_below_min: number;
@@ -192,6 +199,7 @@ export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
     scored_count: scored.length,
     unsupported_count: records.filter((r) => r.status === "unsupported_type").length,
     missing_count: records.filter((r) => r.status === "missing_entity").length,
+    type_mismatch_count: records.filter((r) => r.status === "type_mismatch").length,
     median_coverage_score: median(scores),
     p25_coverage_score: p25(scores),
     count_below_min: belowMin.length,
@@ -297,7 +305,8 @@ export function formatSnapshotSummary(snap: SuiteSnapshot): string {
   lines.push(
     `  scored=${snap.aggregate.scored_count}` +
       `  unsupported=${snap.aggregate.unsupported_count}` +
-      `  missing=${snap.aggregate.missing_count}`,
+      `  missing=${snap.aggregate.missing_count}` +
+      `  type_mismatch=${snap.aggregate.type_mismatch_count}`,
   );
   lines.push(
     `  median=${fmt2(snap.aggregate.median_coverage_score)}` +

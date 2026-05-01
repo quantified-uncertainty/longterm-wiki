@@ -23,9 +23,11 @@ export interface EntityWithType {
  * Load every entity from every `*.yaml` file in `entitiesDir`.
  *
  * Files that don't parse as YAML or aren't a top-level array are skipped
- * silently (mirrors `findEntity` in research-improve-entity.ts) — the
- * caller cares about "all the entities I can lookup," not file health.
- * Validation is the gate's job.
+ * with a warn log — gate validators (`validate-yaml-schema` etc.) are
+ * authoritative for file health, but a silent skip would mask the
+ * presence-of-the-bug here (e.g. "12 entities scored" vs "8 scored, 4
+ * silently dropped because foo.yaml has a syntax error"). Per
+ * `error-handling.md`, log warnings instead of swallowing.
  */
 export function loadAllEntities(entitiesDir: string = DEFAULT_ENTITIES_DIR): EntityWithType[] {
   const out: EntityWithType[] = [];
@@ -33,10 +35,16 @@ export function loadAllEntities(entitiesDir: string = DEFAULT_ENTITIES_DIR): Ent
     let parsed: unknown;
     try {
       parsed = yaml.load(fs.readFileSync(path.join(entitiesDir, f), "utf8"));
-    } catch {
+    } catch (e) {
+      console.warn(
+        `[entity-loader] skipping ${f}: ${e instanceof Error ? e.message : String(e)}`,
+      );
       continue;
     }
-    if (!Array.isArray(parsed)) continue;
+    if (!Array.isArray(parsed)) {
+      console.warn(`[entity-loader] skipping ${f}: top-level value is not an array`);
+      continue;
+    }
     for (const e of parsed) {
       if (
         e &&

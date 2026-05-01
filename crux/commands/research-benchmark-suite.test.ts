@@ -204,13 +204,14 @@ describe("scoreSuite", () => {
     expect(records[0].coverage_score).toBeNull();
   });
 
-  it("treats suite/entity type disagreement as missing_entity", () => {
+  it("flags suite/entity type disagreement as type_mismatch (QUA-936)", () => {
     // Suite says fisa-702 is an organization, but the YAML says policy.
-    // The defensive check returns missing_entity rather than scoring with
-    // the wrong scorer (which would produce noise).
+    // Surfacing this as `type_mismatch` instead of `missing_entity` makes
+    // schema drift visible in `--list` / `--diff` rather than masking it.
     const suite: SuiteEntry[] = [{ slug: "fisa-702", type: "organization" }];
     const records = scoreSuite(suite, entities);
-    expect(records[0].status).toBe("missing_entity");
+    expect(records[0].status).toBe("type_mismatch");
+    expect(records[0].coverage_score).toBeNull();
   });
 
   it("does not throw on a mixed suite", () => {
@@ -219,6 +220,7 @@ describe("scoreSuite", () => {
       { slug: "anthropic", type: "organization" },
       { slug: "no-such-policy", type: "policy" },
       { slug: "anything", type: "person" },
+      { slug: "fisa-702", type: "organization" }, // type drift
     ];
     const records = scoreSuite(suite, entities);
     expect(records.map((r) => r.status)).toEqual([
@@ -226,6 +228,7 @@ describe("scoreSuite", () => {
       "scored",
       "missing_entity",
       "unsupported_type",
+      "type_mismatch",
     ]);
   });
 });
@@ -233,17 +236,19 @@ describe("scoreSuite", () => {
 // ── computeAggregate ────────────────────────────────────────────────────────
 
 describe("computeAggregate", () => {
-  it("ignores unsupported and missing entries when computing percentiles", () => {
+  it("ignores unsupported, missing, and type-mismatched entries when computing percentiles", () => {
     const records: PerEntityRecord[] = [
       makeRecord("a", 0.9, 0.8),
       makeRecord("b", 0.5, 0.8),
       makeRecord("c", null, undefined, "unsupported_type"),
       makeRecord("d", null, undefined, "missing_entity"),
+      makeRecord("e", null, undefined, "type_mismatch"),
     ];
     const agg = computeAggregate(records);
     expect(agg.scored_count).toBe(2);
     expect(agg.unsupported_count).toBe(1);
     expect(agg.missing_count).toBe(1);
+    expect(agg.type_mismatch_count).toBe(1);
     expect(agg.median_coverage_score).toBeCloseTo(0.7, 10);
   });
 
@@ -405,6 +410,7 @@ describe("loadAllEntities", () => {
 
   it("skips non-array YAML files instead of crashing", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
       fs.writeFileSync(path.join(tmp, "bad.yaml"), yaml.dump({ id: "not-an-array" }));
       fs.writeFileSync(
@@ -414,6 +420,7 @@ describe("loadAllEntities", () => {
       const all = loadAllEntities(tmp);
       expect(all.map((e) => e.id)).toEqual(["p1"]);
     } finally {
+      warn.mockRestore();
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
@@ -577,6 +584,8 @@ describe("formatters", () => {
     expect(out).toContain("baseline");
     expect(out).toContain("scored=2");
     expect(out).toContain("median=0.95");
+    // QUA-936: type_mismatch must always appear so schema drift is visible.
+    expect(out).toContain("type_mismatch=0");
   });
 
   it("formatDiff renders per-entity table + aggregate rows", () => {

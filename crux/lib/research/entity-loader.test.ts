@@ -2,7 +2,7 @@
  * Tests for the multi-file entity loader (QUA-936).
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -32,8 +32,9 @@ describe("loadAllEntities", () => {
     }
   });
 
-  it("skips files that don't parse or aren't an array", () => {
+  it("skips files that don't parse or aren't an array, with a warn log", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "entity-loader-"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
       fs.writeFileSync(path.join(tmp, "bad.yaml"), "not: an: array");
       fs.writeFileSync(path.join(tmp, "broken.yaml"), "{{{{not yaml at all");
@@ -44,7 +45,13 @@ describe("loadAllEntities", () => {
       const all = loadAllEntities(tmp);
       expect(all).toHaveLength(1);
       expect(all[0].id).toBe("p1");
+      // Both bad files should produce a warn — silent skips would mask the
+      // failure mode (e.g. "8 entities scored" hides "4 dropped").
+      const messages = warn.mock.calls.map((c) => String(c[0]));
+      expect(messages.some((m) => m.includes("bad.yaml"))).toBe(true);
+      expect(messages.some((m) => m.includes("broken.yaml"))).toBe(true);
     } finally {
+      warn.mockRestore();
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
