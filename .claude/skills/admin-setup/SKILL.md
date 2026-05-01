@@ -67,8 +67,9 @@ pgrep -f "crux gh pr-patrol run" && echo "✓ PR patrol already running" || echo
 
 If not running, start it:
 ```bash
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main
-nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
+cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
+  export GITHUB_TOKEN=$(gh auth token) && \
+  nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
 disown
 echo "Started PR patrol, PID $!"
 ```
