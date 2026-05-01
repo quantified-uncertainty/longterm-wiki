@@ -119,6 +119,11 @@ const SIMPLE_PAGES = [
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
   "/divisions",  // QUA-897 sourcing-summary header
+  // NOTE: /things/[id] was migrated to EntityProfileShell in QUA-489 but is
+  // not in this list — its records live only in PG, so the page 404s in the
+  // PR-CI build (LONGTERMWIKI_SERVER_URL unset). Validated locally with
+  // PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com, same pattern as
+  // investments/funding-rounds/funding-programs from QUA-487.
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
