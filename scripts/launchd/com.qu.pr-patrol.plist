@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template for ~/Library/LaunchAgents/com.qu.pr-patrol.plist.
+
+  Install via scripts/launchd/pr-patrol.sh — the install script fills in
+  the absolute supervisor and home-dir paths before copying.
+
+  Why these keys:
+    KeepAlive       respawn the supervisor if it crashes (network OOM, kill -9,
+                    panic-quit on missing PATH, etc.). Combined with the inner
+                    while-loop in pr-patrol-supervisor.sh, this gives two layers
+                    of recovery.
+    RunAtLoad       start at login + on launchctl load, no manual nudge.
+    ThrottleInterval=30  prevent tight crash loops if something is fundamentally
+                    broken (wiki clone missing, pnpm uninstalled, etc.). Matches
+                    the inner sleep so the user-visible cadence is consistent.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.qu.pr-patrol</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__SUPERVISOR__</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/.cache/pr-patrol/launchd.out</string>
+
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.cache/pr-patrol/launchd.err</string>
+</dict>
+</plist>
