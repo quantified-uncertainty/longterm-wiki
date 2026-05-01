@@ -3,6 +3,8 @@ facts:
   - id: f_ovejtkoBgA
     property: born-year
     value: 1986
+    source: https://en.wikipedia.org/wiki/Andrej_Karpathy
+    notes: "[auto-discovered by qua-926]"
 
   - id: f_JOFyWsItEQ
     property: notable-for
