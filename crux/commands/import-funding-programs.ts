@@ -130,13 +130,13 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|coefficient-giving|lead-exposure",
     name: "Lead Exposure Action Fund (LEAF)",
     description:
-      "Multi-donor pooled fund addressing lead exposure globally. $100-125M raised with Gates Foundation, UNICEF, and others.",
+      "Multi-donor pooled fund addressing lead exposure globally. $60M+ given across 20+ grants per Coefficient Giving.",
     programType: "grant-round",
-    totalBudget: 125_000_000,
+    totalBudget: 60_000_000,
     status: "open",
     deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/lead-exposure-action-fund",
-    notes: "20+ grants. Launched 2024. Partners include Gates Foundation, UNICEF.",
+    notes: "$60M+ given across 20+ grants. Launched 2024. Partners include Gates Foundation, UNICEF.",
   },
   {
     idSeed: "prog|coefficient-giving|abundance-growth-grants",
@@ -201,10 +201,9 @@ const PROGRAMS: FundingProgramDef[] = [
       "Grantmaking for forecasting infrastructure, prediction markets, and forecasting research. 30+ grants totaling ~$50M.",
     programType: "grant-round",
     totalBudget: 50_000_000,
-    status: "open",
-    deadline: "Rolling",
+    status: "closed",
     source: "https://coefficientgiving.org/funds/forecasting",
-    notes: "Led by Benjamin Tereick.",
+    notes: "Led by Benjamin Tereick. Fund closed 2026-03-30.",
   },
   {
     idSeed: "prog|coefficient-giving|effective-giving-careers",
@@ -334,14 +333,14 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|sff|sff-main",
     name: "Speculation Grants",
     description:
-      "Faster-turnaround grants from SFF using novel donor coordination with ~35 grantors",
+      "Faster-turnaround grants from SFF using novel donor coordination with ~40 grantors",
     programType: "grant-round",
     status: "open",
     deadline: "Rolling",
     source: "https://survivalandflourishing.fund/speculation-grants",
     notes:
-      "Budget grown from $4M to $16M. Complementary to S-Process; allows faster funding decisions.",
-    totalBudget: 16_000_000,
+      "~40 Speculators with combined $20M budget (up from $4M initially). Complementary to S-Process; allows faster funding decisions.",
+    totalBudget: 20_000_000,
   },
   {
     idSeed: "prog|sff|matching-pledges",
@@ -401,12 +400,12 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|fli|grants-program",
     name: "2023 Grants",
     description:
-      "16 grants for AI safety research, policy, and governance",
+      "16 grants distributed in 2023 for AI safety research, policy, and governance",
     programType: "grant-round",
-    totalBudget: 8_438_000,
+    totalBudget: 8_638_000,
     status: "awarded",
     source: "https://futureoflife.org/grant-program/2023-grants/",
-    notes: "Largest to FAR AI ($1.86M) and ARC ($1.4M).",
+    notes: "16 grants distributed totaling $8.64M. Largest to FAR AI ($1.86M) and ARC ($1.4M).",
   },
   {
     idSeed: "prog|fli|2024-grants",
@@ -442,10 +441,10 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "13 projects addressing AI-driven power concentration. Largest $1.66M to OpenMined Foundation.",
     programType: "rfp",
-    totalBudget: 5_637_000,
-    status: "open",
+    totalBudget: 4_000_000,
+    status: "awarded",
     source: "https://futureoflife.org/grant-program/mitigate-ai-driven-power-concentration/",
-    notes: "Two review rounds (July and October 2024).",
+    notes: "Two review rounds (July and October 2024). Up-to-$4M cap; 13 projects awarded totaling $5.64M (exceeded cap). Funds allocated.",
   },
   {
     idSeed: "prog|fli|global-institutions-ai",
@@ -479,9 +478,9 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "5-year tuition + $40K/year stipend + $10K research fund. 14 fellows at UC Berkeley, Stanford, MIT, Cambridge.",
     programType: "fellowship",
-    status: "open",
+    status: "closed",
     source: "https://futureoflife.org/grant-program/phd-fellowships/",
-    notes: "Run with BAIF (Berkeley AI Foundation). Funded by Vitalik Buterin's $665.8M donation.",
+    notes: "Run with BAIF (Berkeley AI Foundation). Funded by Vitalik Buterin's $665.8M donation. Closed for submissions; deadline was 2025-11-21.",
   },
   {
     idSeed: "prog|fli|postdoc-fellowships",
@@ -491,9 +490,9 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "$80K/year stipend + $10K research fund. Fellows at Berkeley/CHAI, MIT, Oxford.",
     programType: "fellowship",
-    status: "open",
+    status: "closed",
     source: "https://futureoflife.org/grant-program/postdoctoral-fellowships/",
-    notes: "Run with BAIF. Fellows include Nisan Stiennon (Berkeley), Peter S. Park (MIT).",
+    notes: "Run with BAIF. Fellows include Nisan Stiennon (Berkeley), Peter S. Park (MIT). Closed for submissions.",
   },
   {
     idSeed: "prog|fli|us-china-fellowships",
@@ -503,9 +502,9 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "Same structure as technical PhD fellowship. Focused on US-China AI governance.",
     programType: "fellowship",
-    status: "open",
+    status: "closed",
     source: "https://futureoflife.org/grant-program/us-china-ai-governance-phd-fellowship/",
-    notes: "2025 class: Ruofei Wang, John Ferguson, Kayla Blomquist.",
+    notes: "2025 class: Ruofei Wang, John Ferguson, Kayla Blomquist. Closed for submissions; deadline was 2025-11-21.",
   },
   {
     idSeed: "prog|fli|multistakeholder-engagement",
@@ -516,8 +515,9 @@ const PROGRAMS: FundingProgramDef[] = [
       "Up to $5M for multi-stakeholder engagement projects. Individual grants $100K-$500K, multi-year up to 3 years.",
     programType: "rfp",
     totalBudget: 5_000_000,
-    status: "open",
+    status: "closed",
     source: "https://futureoflife.org/grant-program/multistakeholder-engagement-for-safe-and-prosperous-ai/",
+    notes: "Closed for submissions; LOI deadline was 2025-02-04.",
   },
   {
     idSeed: "prog|fli|religious-projects",
@@ -528,9 +528,9 @@ const PROGRAMS: FundingProgramDef[] = [
       "Up to $1.5M total; individual grants $30K-$300K. Faith community engagement with AI risks.",
     programType: "rfp",
     totalBudget: 1_500_000,
-    status: "open",
+    status: "closed",
     source: "https://futureoflife.org/grant-program/rfp-on-religious-projects/",
-    notes: "Launched 2026.",
+    notes: "Launched 2026. Closed for submissions; deadline was 2026-02-02.",
   },
 
   // ---- Schmidt Futures / Schmidt Sciences ----
@@ -687,9 +687,10 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "Regranting program funded primarily by Coefficient Giving; multiple regrantors.",
     programType: "grant-round",
-    totalBudget: 1_400_000,
+    totalBudget: 1_550_000,
     status: "awarded",
     source: "https://manifund.org/about/regranting",
+    notes: "13 regrantors with combined ~$1.55M budget across cohort.",
   },
   {
     idSeed: "prog|manifund|impact-certificates",
