@@ -109,8 +109,15 @@ export type ValidationErrorCode =
  * canary dual-write callers that need to distinguish 400-class causes
  * structurally rather than by string-matching the message field.
  *
- * The function adds the literal `error: "validation_error"` envelope; callers
- * supply the discriminator (`code`) plus optional context fields.
+ * The function adds the literal `error: "validation_error"` envelope last so a
+ * caller cannot clobber the discriminator; callers supply `code` plus optional
+ * context fields.
+ *
+ * `value` and `allowed[]` / `similar[]` must be JSON-safe — `c.json()` calls
+ * `JSON.stringify` under the hood, so passing `BigInt`, `Symbol`, functions,
+ * or circular references will surface as a 500 from the error handler rather
+ * than the intended 400. Stringify or coerce server-side before passing them
+ * here.
  */
 export interface ValidationErrorBody {
   code: ValidationErrorCode;
@@ -169,7 +176,7 @@ export function validationError(
   if (typeof arg === "string") {
     return c.json({ error: VALIDATION_ERROR, message: arg }, 400);
   }
-  return c.json({ error: VALIDATION_ERROR, ...arg }, 400);
+  return c.json({ ...arg, error: VALIDATION_ERROR }, 400);
 }
 
 /** Return a 400 invalid JSON error response. */

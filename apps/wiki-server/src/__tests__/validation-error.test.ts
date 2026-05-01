@@ -127,4 +127,25 @@ describe("validationError", () => {
       message: "future shape",
     });
   });
+
+  it("body overload cannot clobber the error envelope discriminator", async () => {
+    // The interface doesn't list `error`, but excess-property checks only
+    // fire on object literals — a value cast through `as any` (or arriving
+    // from a wider source like a generic helper) could carry an `error` key.
+    // The implementation must spread first and write the literal last.
+    const evil = {
+      code: "fk_missing",
+      message: "y",
+      error: "not_validation_error",
+    } as unknown as ValidationErrorBody;
+    const app = new Hono().get("/x", (c) => validationError(c, evil));
+    const res = await app.request("/x");
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "validation_error",
+      code: "fk_missing",
+      message: "y",
+    });
+  });
 });
