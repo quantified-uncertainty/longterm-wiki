@@ -94,7 +94,7 @@ interface CommandOptions extends BaseOptions {
   // Bypass ticket-sizing red-flag check on `crux linear create`. Without
   // this, oversized-ticket patterns (Phase/Wave language, row-count
   // batching, mixed shapes, multi-table enumeration) refuse the create.
-  // See QUA-575 + .claude/rules/ticket-sizing.md.
+  // See QUA-575 + docs/agent-rules/ticket-sizing.md.
   allowBig?: boolean;
   // Bypass the "no project" refusal on `crux linear create`. Without this,
   // a create with neither --project nor a project-bearing --parent refuses
@@ -515,7 +515,7 @@ function formatNoProjectRefusal(
     out += `  --parent=${parentArg} was given, but that issue has no project to inherit from.\n`;
   }
   out += 'Why: 9% of recent QUA issues were filed projectless, breaking the\n';
-  out += 'project-ownership doctrine in .claude/rules/linear-project-ownership.md.\n';
+  out += 'project-ownership doctrine in docs/agent-rules/linear-project-ownership.md.\n';
   out += 'Run `pnpm crux linear hygiene` to see current orphan count.\n\n';
   out += 'Fix: pick one —\n';
   out += '  1) --project="<name>" — see `pnpm crux linear project list`\n';
@@ -594,7 +594,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 
   // Orphan-prevention: refuse a create with no project unless --allow-no-project is set.
   // Reason: 9% of recent open issues were filed projectless, breaking the project-ownership
-  // doctrine in .claude/rules/linear-project-ownership.md. The hygiene scan catches them
+  // doctrine in docs/agent-rules/linear-project-ownership.md. The hygiene scan catches them
   // after the fact; this catches them at creation time.
   if (!projectId) {
     const refusal = formatNoProjectRefusal(options.parent, parentProject);
@@ -1382,7 +1382,7 @@ Options (create):
                              --allow-no-project is set.
                              When --parent has a project and --project is
                              omitted, the parent's project is inherited.
-  --allow-big                Bypass the ticket-sizing red-flag check (see .claude/rules/ticket-sizing.md)
+  --allow-big                Bypass the ticket-sizing red-flag check (see docs/agent-rules/ticket-sizing.md)
   --allow-no-project         Bypass the no-project refusal (creates an orphan).
                              Only use when the issue genuinely has no project home yet.
 

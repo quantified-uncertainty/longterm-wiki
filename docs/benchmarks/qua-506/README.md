@@ -342,7 +342,7 @@ is viable for QUA-506 Deliverables 2-5.
 - **The initial deploy-time populate costs ~14 s** (CREATE MV + REFRESH + index
   build). This is well within a normal deploy window and does not need
   `NOT VALID` + `VALIDATE CONSTRAINT` tricks per
-  [`.claude/rules/database-migrations.md`](../../../.claude/rules/database-migrations.md).
+  [`docs/agent-rules/database-migrations.md`](../../../docs/agent-rules/database-migrations.md).
 - **Staleness monitoring is non-negotiable** (Deliverable 2). A silently-failing
   refresh job is the only remaining operational risk the benchmark did not
   close, and it must be visible.

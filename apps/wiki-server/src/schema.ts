@@ -4525,7 +4525,7 @@ export const scorecardSnapshots = pgTable(
     /**
      * Source enum: `fli_index`, `saferai`, `ailabwatch`, `fmti`,
      * `seoul_tracker`. CHECK constraint enumerated against prod when
-     * additional sources are added (see .claude/rules/database-migrations.md).
+     * additional sources are added (see docs/agent-rules/database-migrations.md).
      */
     scorecardSource: text("scorecard_source").notNull(),
     /** Human label for the wave, e.g. "Summer 2025" or "v1.1 May 2024". */

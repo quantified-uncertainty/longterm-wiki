@@ -2,7 +2,7 @@
  * Prompts for the three LLM stages and the parsers for their JSON responses.
  *
  * Each prompt builder strips control chars from user-controlled inputs and
- * fences untrusted scraped content per `.claude/rules/llm-prompt-safety.md`.
+ * fences untrusted scraped content per `docs/agent-rules/llm-prompt-safety.md`.
  *
  * Each parser tolerates extra text around the JSON object — Haiku and Sonnet
  * both occasionally wrap their reply in prose despite "respond with only JSON"

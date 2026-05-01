@@ -6,7 +6,7 @@
 
 ## Context
 
-`apps/web/src/app/internal/` contains 32 dashboard pages — entity profiles, source-check coverage, system health, agent activity, jobs queue, page changes, improve runs, auto-update runs, groundskeeper runs, etc. They're built as full Next.js App Router pages with the wiki's MDX rendering pipeline (Pattern A per `.claude/rules/internal-dashboards.md`).
+`apps/web/src/app/internal/` contains 32 dashboard pages — entity profiles, source-check coverage, system health, agent activity, jobs queue, page changes, improve runs, auto-update runs, groundskeeper runs, etc. They're built as full Next.js App Router pages with the wiki's MDX rendering pipeline (Pattern A per `docs/agent-rules/internal-dashboards.md`).
 
 Properties:
 

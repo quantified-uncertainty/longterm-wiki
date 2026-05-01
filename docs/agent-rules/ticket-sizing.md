@@ -56,6 +56,6 @@ Plan documents under `docs/plans/` already enumerate scope by shape. When a plan
 
 ## See also
 
-- `.claude/rules/dispatched-agent-review.md` § Dispatcher pre-flight
-- `.claude/rules/linear-project-ownership.md` — project assignment at filing time
+- `docs/agent-rules/dispatched-agent-review.md` § Dispatcher pre-flight
+- `docs/agent-rules/linear-project-ownership.md` — project assignment at filing time
 - `docs/plans/` — current planning docs apply this rule implicitly

@@ -273,7 +273,7 @@ No data is lost. The entities exist. But for the diff, 1,102 `wikiId` mismatches
 
 Breakdown:
 - **117 rows** have slugs like `aart-de-geus-displaced-dn1KAP` — these are slug-reassignment artifacts created by `sync-entities.ts`'s displacement logic (`entities.ts:968`). They are **cruft and should be pruned**.
-- **~666 rows** are lightweight personnel entities (example: `aaron-eckhouse`, stableId `ksOXPR3kvY` — note the legacy format, no `sid_` prefix). These were created by personnel syncs (grant recipients, paper authors, board members) per the Tier 2 pattern in `.claude/rules/id-system.md`. They exist in PG as FK targets for personnel/grants tables but do **not** have wiki pages and should **not** appear in `typedEntities` at all.
+- **~666 rows** are lightweight personnel entities (example: `aaron-eckhouse`, stableId `ksOXPR3kvY` — note the legacy format, no `sid_` prefix). These were created by personnel syncs (grant recipients, paper authors, board members) per the Tier 2 pattern in `docs/agent-rules/id-system.md`. They exist in PG as FK targets for personnel/grants tables but do **not** have wiki pages and should **not** appear in `typedEntities` at all.
 
 **Fix**:
 1. Add a pruning pass for `-displaced-*` rows in `sync-entities.ts` (or a periodic cleanup). Effort: **half a day**. Not a Phase 3 blocker but worth filing.

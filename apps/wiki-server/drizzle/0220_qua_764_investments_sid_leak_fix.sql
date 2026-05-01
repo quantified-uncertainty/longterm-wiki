@@ -33,7 +33,7 @@
 -- application; second run is a no-op.
 --
 -- Pattern-based, not hardcoded by row id (see
--- .claude/rules/database-migrations.md "Adding unique constraints" —
+-- docs/agent-rules/database-migrations.md "Adding unique constraints" —
 -- analogous reasoning: hardcoded ids miss any new rows that match the
 -- same shape, e.g. if the bad sync re-ran).
 --

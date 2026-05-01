@@ -179,7 +179,7 @@ describe('formatRedFlagsWarning', () => {
   it('mentions the rule file path so the user can read more', () => {
     const flags = detectRedFlags('Phase 2', '');
     const out = formatRedFlagsWarning(flags);
-    expect(out).toContain('.claude/rules/ticket-sizing.md');
+    expect(out).toContain('docs/agent-rules/ticket-sizing.md');
   });
 
   it('mentions the --allow-big escape hatch', () => {

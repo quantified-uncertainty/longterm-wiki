@@ -10,7 +10,7 @@
 -- while holding ACCESS EXCLUSIVE — any concurrent writer would time out
 -- against the 60s lock_timeout configured in apps/wiki-server/src/db.ts.
 -- Use the NOT VALID + VALIDATE CONSTRAINT pattern from
--- .claude/rules/database-migrations.md so Phase 1 is a metadata-only
+-- docs/agent-rules/database-migrations.md so Phase 1 is a metadata-only
 -- operation (milliseconds) and Phase 2 scans without ACCESS EXCLUSIVE.
 --
 -- source_check_verdicts is smaller (~12K rows today) so the same pattern

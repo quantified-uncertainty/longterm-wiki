@@ -2,7 +2,7 @@
  * `crux sys dispatch` — QUA-437
  *
  * Structural wrapper around `./ws open <N> --claude` that enforces the
- * dispatch pre-flight checks (`.claude/rules/dispatched-agent-review.md`
+ * dispatch pre-flight checks (`docs/agent-rules/dispatched-agent-review.md`
  * § "Dispatcher pre-flight") before opening a slot. Designed to make
  * the checks unskippable under context pressure — the coordinator
  * cannot hand-roll their way around a wrapper that exits non-zero on
@@ -434,7 +434,7 @@ Examples:
   crux sys dispatch --linear=QUA-397 --slot=7 --force --reason="slot a9 abandoned, PR #4296 closed"
   crux sys dispatch --linear=QUA-440 --slot=7 --dry-run
 
-See .claude/rules/dispatched-agent-review.md § "Dispatcher pre-flight" for the full rule
+See docs/agent-rules/dispatched-agent-review.md § "Dispatcher pre-flight" for the full rule
 this wrapper enforces, and QUA-406 / QUA-437 for the incident history that motivated it.
 `;
 }

@@ -230,7 +230,7 @@ The factory-based handlers (Cluster B) have three optional hooks that map direct
 - **`toThing`** — the thing row composer. Currently a pure function of `(item, titleMap)`. For Phase 4b-B, this would either (a) be deleted entirely (things derives at read time) or (b) reduced to a pure identity pointer: `{ id, thingType, sourceTable, sourceId, parentThingId }`.
 - **`postUpsert`** — a general-purpose post-commit hook. `personnel.ts` uses it to do a re-fetch + re-resolve of person/org titles because `fkResolve` runs between upsert and `toThing`.
 
-The hook budget rule ("max 1 per route", per `.claude/rules/tablebase-sync-factory.md`) means personnel is already at its limit. When 4b-B lands, personnel's `postUpsert` should be deletable.
+The hook budget rule ("max 1 per route", per `docs/agent-rules/tablebase-sync-factory.md`) means personnel is already at its limit. When 4b-B lands, personnel's `postUpsert` should be deletable.
 
 ## 6. Findings — bugs, gaps, and inconsistencies discovered during audit
 

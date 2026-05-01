@@ -19,7 +19,7 @@
 -- in sync with the CREATE OR REPLACE bodies below by convention (same
 -- pattern as 0199_install_swap_fk_target.sql).
 --
--- Caller docs: .claude/rules/audit-log.md.
+-- Caller docs: docs/agent-rules/audit-log.md.
 
 -- ---- 1. Table ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS full_audit_log (

@@ -94,7 +94,7 @@ describe("migration 0183 — QUA-525 numeric and temporal CHECK constraints", ()
   }
 
   it("uses NOT VALID + VALIDATE CONSTRAINT for every constraint", () => {
-    // Per .claude/rules/database-migrations.md: split DDL into metadata
+    // Per docs/agent-rules/database-migrations.md: split DDL into metadata
     // registration (NOT VALID, fast) and validation (VALIDATE CONSTRAINT,
     // non-blocking) to avoid ACCESS EXCLUSIVE contention.
     for (const { constraint } of expectedConstraints) {

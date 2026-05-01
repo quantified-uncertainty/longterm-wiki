@@ -49,7 +49,7 @@ type StepName = (typeof STEP)[keyof typeof STEP];
 
 // ── Config schema ───────────────────────────────────────────────────────
 
-// Per .claude/rules/id-system.md, refs are sid_-prefixed stableIds. Slugs
+// Per docs/agent-rules/id-system.md, refs are sid_-prefixed stableIds. Slugs
 // are also accepted today (organizations.yaml uses both), so allow either.
 const RelatedEntrySchema = z.object({
   id: z

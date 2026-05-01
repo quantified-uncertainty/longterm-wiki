@@ -126,7 +126,7 @@ describe("migration 0220 — QUA-764 investments sid_ leak fix", () => {
   });
 
   it("uses pattern-based DELETE (not hardcoded row ids)", () => {
-    // .claude/rules/database-migrations.md: never hardcode specific row ids
+    // docs/agent-rules/database-migrations.md: never hardcode specific row ids
     // in dedup-style migrations — they miss future rows that match the same
     // shape. Match by predicate (LIKE 'sid_%' AND entity_id IS NULL AND no
     // matching entity).
@@ -152,7 +152,7 @@ describe("migration 0220 — QUA-764 investments sid_ leak fix", () => {
   });
 
   it("does not opt out of the audit trigger (no app.audit_skip)", () => {
-    // .claude/rules/audit-log.md "When NOT to use it": application
+    // docs/agent-rules/audit-log.md "When NOT to use it": application
     // bug fixes should be audited. Only bulk migrations (>>10 rows) opt out.
     expect(sql).not.toMatch(/SET LOCAL app\.audit_skip/);
   });
