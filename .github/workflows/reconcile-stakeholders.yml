@@ -1,0 +1,63 @@
+name: Reconcile policy_stakeholders (PG ↔ YAML)
+run-name: "Reconcile policy_stakeholders${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# QUA-958 (parent QUA-943): daily PG-vs-YAML diff for the canary
+# `policy_stakeholders` dual-write. Heartbeat-style comment on
+# LINEAR_RECONCILIATION_TICKET so "no comment" unambiguously means
+# "cron is broken" rather than "0 diffs" (red-team finding #2).
+
+on:
+  schedule:
+    # 09:00 UTC daily — picks an hour distinct from auto-update's 06:00 to
+    # spread cron load. No deep reason for the time beyond "after auto-update
+    # finishes its potential window".
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      trigger:
+        description: 'Run trigger label (scheduled | manual)'
+        required: false
+        default: 'manual'
+        type: string
+
+permissions:
+  contents: read
+
+# Only one reconciliation at a time per domain — concurrent runs would write
+# overlapping reconciliation_runs rows and post duplicate Linear comments.
+concurrency:
+  group: reconcile-stakeholders
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    uses: ./.github/workflows/_preflight-wiki-server.yml
+    secrets: inherit
+
+  reconcile:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run reconcile-stakeholders
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LINEAR_RECONCILIATION_TICKET: ${{ vars.LINEAR_RECONCILIATION_TICKET }}
+        run: |
+          TRIGGER="${{ github.event.inputs.trigger || 'scheduled' }}"
+          pnpm crux maintain reconcile-stakeholders --trigger="$TRIGGER"

@@ -307,6 +307,19 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
   // ---- Post-upsert hook ----
 
   /**
+   * Custom in-transaction setup hook. Runs INSIDE the transaction, AFTER
+   * `applyAuditContext` and BEFORE the chunked upsert. Use for things that must
+   * survive the entire write (e.g. `pg_advisory_xact_lock` to serialize
+   * concurrent writes for the same logical key — the lock is released when
+   * the transaction commits or rolls back, so it must be acquired here, not
+   * in `preValidate` which runs outside the tx).
+   *
+   * Hook contract: receives the live `tx` handle, must only do DB work on it,
+   * external side effects forbidden, throwing rolls back the entire sync.
+   */
+  txStart?: (tx: Tx, c: Context, items: TItem[]) => Promise<void>;
+
+  /**
    * Custom post-upsert hook. Runs INSIDE the transaction, AFTER all standard
    * phases (audit, FK resolve, things, verdicts). Use for routes with unique
    * post-processing like personnel.ts's `new:` prefix display-name backfill.
@@ -408,6 +421,7 @@ export type SyncPhase =
   | "validateEntityRefs"
   | "validateClaimRefs"
   | "preValidate"
+  | "txStart"
   | "upsert"
   | "audit"
   | "fkResolve"
@@ -905,6 +919,13 @@ export function createSyncHandler<
 
     await db.transaction(async (tx) => {
       await applyAuditContext(tx, c);
+
+      // ---- Phase 2.5: txStart hook (in-tx setup, e.g. pg_advisory_xact_lock) ----
+      if (config.txStart) {
+        await runPhase(name, "txStart", async () => {
+          await config.txStart!(tx, c, items);
+        });
+      }
 
       // ---- Phase 3: upsert (chunked) + Phase 4: audit ----
       for (let offset = 0; offset < allVals.length; offset += chunkSize) {

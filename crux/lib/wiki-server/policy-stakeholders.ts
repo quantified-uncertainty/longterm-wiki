@@ -14,7 +14,11 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { PolicyStakeholdersRoute } from '../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders.ts';
-import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+import type {
+  SyncResponse,
+  BestEffortSyncResponse,
+  BestEffortRejected,
+} from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 import {
   VALID_POSITIONS,
   type SyncStakeholderItem,
@@ -44,6 +48,9 @@ export type PolicyStakeholdersDeleteBatchResult = InferResponseType<
 // the factory body. Alias the factory's standard response shape — the same
 // pattern grants.ts uses for its hand-rolled /sync.
 export type PolicyStakeholdersSyncResult = SyncResponse;
+/** QUA-958: response shape when posting `?mode=best_effort`. */
+export type PolicyStakeholdersBestEffortResult = BestEffortSyncResponse;
+export type { BestEffortRejected };
 
 /** A single stakeholder row (from the `/all` endpoint). */
 export type PolicyStakeholderRow = PolicyStakeholdersAllResult['policyStakeholders'][number];
@@ -155,6 +162,45 @@ export async function syncPolicyStakeholders(
   return apiRequest<PolicyStakeholdersSyncResult>(
     'POST',
     `/api/policy-stakeholders/sync${qs ? `?${qs}` : ''}`,
+    { items },
+  );
+}
+
+/**
+ * Sync policy stakeholders in best-effort partial-success mode (QUA-958).
+ *
+ * Posts `?mode=best_effort` so the route partitions per-item: validated items
+ * commit, the rest land in `rejected[]` with a structured `code` (`"zod"`,
+ * `"fk_missing"`, `"natural_key"`, `"sourcing_required"`, `"claim_invalid"`).
+ * Returns HTTP 200 with both lists; the caller decides what to do with
+ * rejections (canary policy: any `code: "zod"` aborts the whole improve-entity
+ * run; `code: "fk_missing"` is recorded to followup_actions).
+ *
+ * The route only honours `?mode=best_effort` because it set
+ * `bestEffortAllowed: true` in `policy-stakeholders.ts` — a future contributor
+ * who flips that off will get back the atomic `SyncResponse` shape and any
+ * client branching on `committed`/`rejected` will surface the regression as
+ * a runtime type mismatch instead of silently atomic'ing.
+ */
+export async function syncPolicyStakeholdersBestEffort(
+  items: readonly SyncStakeholderItem[],
+  options?: SyncPolicyStakeholdersOptions,
+): Promise<ApiResult<PolicyStakeholdersBestEffortResult>> {
+  const params = new URLSearchParams();
+  params.set('mode', 'best_effort');
+  if (options?.forceSkipSourcing) {
+    params.set('forceSkipSourcing', 'true');
+    if (options.forceSkipSourcingReason) {
+      params.set('reason', options.forceSkipSourcingReason);
+    }
+  }
+  if (options?.skipEntityValidation) {
+    params.set('skipEntityValidation', 'true');
+    params.set('skipEntityValidationReason', options.skipEntityValidation.reason);
+  }
+  return apiRequest<PolicyStakeholdersBestEffortResult>(
+    'POST',
+    `/api/policy-stakeholders/sync?${params.toString()}`,
     { items },
   );
 }

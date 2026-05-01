@@ -31,6 +31,8 @@ import type {
 import { loadSessionLogsSince } from '../lib/maintain/session-logs.ts';
 import { findTodoComments, findLargeFiles, findCommentedCode } from '../lib/maintain/cruft-detection.ts';
 import { collectHealthMetrics } from '../lib/maintain/health-metrics.ts';
+import { runReconcile } from '../lib/research/reconcile-stakeholders-cron.ts';
+import { commentOnIssue } from '../lib/linear/issues.ts';
 
 // ---------------------------------------------------------------------------
 // GitHub API response interfaces (type-safe parsing)
@@ -926,6 +928,59 @@ async function healthSnapshot(_args: string[], options: CommandOptions): Promise
   return { output, exitCode: 0 };
 }
 
+/**
+ * QUA-958 (parent QUA-943): daily PG-vs-YAML reconciliation for the canary
+ * `policy_stakeholders` dual-write. See `crux/lib/research/reconcile-stakeholders-cron.ts`
+ * for the actual diff orchestration.
+ *
+ * Fires from `.github/workflows/reconcile-stakeholders.yml`. Posts a heartbeat
+ * comment to `LINEAR_RECONCILIATION_TICKET` (or `--ticket=QUA-NNN`) so the
+ * absence of a comment unambiguously means the cron is broken (cf QUA-31).
+ */
+async function reconcileStakeholders(
+  args: string[],
+  options: CommandOptions & { ticket?: string; trigger?: string },
+): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  void args;
+
+  const trigger = options.trigger === "manual" ? "manual" : "scheduled";
+  const ticket =
+    options.ticket ??
+    process.env.LINEAR_RECONCILIATION_TICKET ??
+    null;
+
+  let output = `${c.bold}${c.blue}Reconcile policy_stakeholders (PG ↔ YAML)${c.reset}\n`;
+  output += `${c.dim}trigger=${trigger} ticket=${ticket ?? "(none — comment skipped)"}${c.reset}\n\n`;
+
+  try {
+    const r = await runReconcile({
+      trigger,
+      trackingTicket: ticket,
+      postComment: commentOnIssue,
+    });
+    output += `runId: ${r.runId}\n`;
+    output += `entitiesScanned: ${r.result.entitiesScanned}\n`;
+    output += `entitiesNonEmpty: ${r.result.entitiesNonEmpty}\n`;
+    output += `entitiesWithDiff: ${r.result.entitiesWithDiff}\n`;
+    output += `entitiesNonEmptyWithDiff: ${r.result.entitiesNonEmptyWithDiff}\n`;
+    if (r.errorMessage) {
+      output += `${c.red}error: ${r.errorMessage}${c.reset}\n`;
+    }
+    if (r.commentedOn) {
+      output += `${c.dim}heartbeat comment posted to ${r.commentedOn}${c.reset}\n`;
+    }
+    // Exit non-zero on real divergence so the workflow's job summary is red
+    // and the on-call sees it. A scan-error also exits non-zero.
+    const exitCode = r.errorMessage || r.hadDivergence ? 1 : 0;
+    return { output, exitCode };
+  } catch (e) {
+    output += `${c.red}fatal: ${e instanceof Error ? e.message : String(e)}${c.reset}\n`;
+    return { output, exitCode: 2 };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -941,6 +996,7 @@ export const commands = {
   'health-snapshot': healthSnapshot,
   status,
   'mark-run': markRun,
+  'reconcile-stakeholders': reconcileStakeholders,
 };
 
 export function getHelp(): string {

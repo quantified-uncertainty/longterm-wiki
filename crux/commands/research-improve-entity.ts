@@ -59,8 +59,15 @@ import { canonicalSlug } from "../lib/research/canonical-names.ts";
 import {
   withPipelineRun,
   type WithPipelineRunOptions,
+  type PipelineRunCtx,
 } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import { dualWriteStakeholders } from "../lib/research/dual-write-stakeholders.ts";
+import {
+  checkCanaryHalt,
+  CanaryHaltedError,
+} from "../lib/research/canary-halt-guard.ts";
+import { commentOnIssue } from "../lib/linear/issues.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const ENTITIES_DIR = path.join(ROOT, "data/entities");
@@ -788,9 +795,11 @@ export { POSITION_STEM_PATTERNS };
 // ──────────────────────────────────────────────────────────────────────────────
 
 async function runIteration(
+  ctx: PipelineRunCtx,
   entity: EntityWithType,
   iter: number,
   budgetRemainingUsd: number,
+  noWrite: boolean,
 ): Promise<{ entity: EntityWithType; metrics: IterationMetrics; batch: SubmittedBatchInfo | null }> {
   const t0 = Date.now();
   const m: IterationMetrics = {
@@ -986,6 +995,34 @@ async function runIteration(
     for (const w of apply.warnings) console.warn(`[iter ${iter}] warning: ${w}`);
   }
 
+  // QUA-958 Phase 2 dual-write: for policy entities, mirror the in-memory
+  // stakeholder mutations into PG via the typed best-effort sync client.
+  // This runs BEFORE saveEntity (the YAML write) so:
+  //   - On `code: "zod"` → throws → withPipelineRun marks aborted → saveEntity
+  //     never fires → on-disk YAML untouched (R-A4 reload-from-disk semantics).
+  //   - On `code: "fk_missing"` → markFollowup, status=partial_failure, continue.
+  //     The valid items committed in PG; the in-memory apply.entity is still
+  //     written to YAML at end-of-run, so YAML matches PG for valid items and
+  //     overshoots for fk_missing items (caught by the reconciliation cron).
+  //   - On full success → continue.
+  // Skipped under `noWrite` (dry-run) and for non-policy entity types.
+  if (!noWrite && entity.type === "policy" && apply.applied.length > 0) {
+    const policyEntityId = entity.stableId ?? entity.id;
+    await dualWriteStakeholders({
+      ctx,
+      policyEntityId,
+      applyResult: apply as unknown as Parameters<typeof dualWriteStakeholders>[0]["applyResult"],
+      iter,
+      // Filed as QUA-975 (sibling of QUA-943) per spec § "Ops ticket".
+      // Override via env if a different routing ticket is preferred.
+      opsTicket:
+        process.env.LINEAR_OPS_STAKEHOLDER_WRITES ??
+        process.env.LINEAR_OPS_TICKET ??
+        "QUA-975",
+      postComment: commentOnIssue,
+    });
+  }
+
   // Mark every verified/partial claim ID as applied. The drain phase uses
   // this set to skip already-applied verdicts and only count NEW verifieds.
   markAppliedFromLastVerdicts(batch);
@@ -1039,8 +1076,8 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     parseAgentSessionId(getCachedAuditSessionId()),
   );
 
-  return withPipelineRun(runOptions, async () =>
-    doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
+  return withPipelineRun(runOptions, async (ctx) =>
+    doImproveSingleEntity({ ctx, found, slug, target, maxIters, budgetUsd, noWrite, opts }),
   );
 }
 
@@ -1087,6 +1124,7 @@ export function parseAgentSessionId(raw: string | null): number | null {
  * will additionally invoke the typed sync client from inside this body.
  */
 async function doImproveSingleEntity(args: {
+  ctx: PipelineRunCtx;
   found: { entity: EntityWithType; filePath: string };
   slug: string;
   target: number;
@@ -1095,7 +1133,7 @@ async function doImproveSingleEntity(args: {
   noWrite: boolean;
   opts: ImproveOptions;
 }): Promise<ImproveResult> {
-  const { found, slug, target, maxIters, budgetUsd, noWrite, opts } = args;
+  const { ctx, found, slug, target, maxIters, budgetUsd, noWrite, opts } = args;
   let entity = found.entity;
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
@@ -1104,12 +1142,37 @@ async function doImproveSingleEntity(args: {
   let hitTarget = false;
   let reason = "max-iters";
 
+  // QUA-958: pre-write canary halt guard. Before any iteration runs, ask the
+  // wiki-server "is the latest reconciliation_runs row clean?". A halt here
+  // throws so withPipelineRun marks the run aborted with an explicit reason
+  // — no silent skip, no half-run that wrote PG rows but no audit explanation.
+  // Skipped for non-policy entities since the halt only protects the
+  // policy_stakeholders canary. Skipped under `dryRun` to keep dev iteration
+  // unaffected.
+  if (entity.type === "policy" && !args.noWrite) {
+    const halt = await checkCanaryHalt();
+    if (halt.halt) {
+      ctx.markStatus('aborted', {
+        reason: 'canary_halted_by_health_gate',
+        errorCode: 'CanaryHaltedError',
+      });
+      ctx.markFollowup({
+        kind: 'canary_halt',
+        reason: halt.reason,
+        lastRunAt: halt.lastRunAt?.toISOString() ?? null,
+        nonEmptyDiffs: halt.nonEmptyDiffs,
+      });
+      throw new CanaryHaltedError(halt.reason);
+    }
+    console.log(`[canary-halt-guard] OK: ${halt.reason}`);
+  }
+
   for (let i = 1; i <= maxIters; i++) {
     if (budgetRemaining <= 0.05) {
       reason = "budget-exhausted";
       break;
     }
-    const out = await runIteration(entity, i, budgetRemaining);
+    const out = await runIteration(ctx, entity, i, budgetRemaining, args.noWrite);
     entity = out.entity;
     iterations.push(out.metrics);
     if (out.batch) submittedBatches.push(out.batch);

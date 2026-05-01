@@ -487,6 +487,7 @@ const SCHEDULED_ONLY_WORKFLOWS = new Set([
   'database-backup.yml',
   'scheduled-maintenance.yml',
   'server-health-monitor.yml',
+  'reconcile-stakeholders.yml',
 ]);
 
 export async function checkActions(): Promise<CheckResult> {
@@ -512,6 +513,10 @@ export async function checkActions(): Promise<CheckResult> {
     'scheduled-maintenance.yml',
     'server-health-monitor.yml',
     'ci.yml',
+    // QUA-958 (red-team #2): include the reconciliation cron so a stalled
+    // workflow surfaces as a health-check failure here instead of "no recent
+    // Linear comments — but is the cron alive?".
+    'reconcile-stakeholders.yml',
   ];
 
   for (const wf of workflowFiles) {

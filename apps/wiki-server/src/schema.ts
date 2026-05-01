@@ -1484,6 +1484,39 @@ export const pipelineRuns = pgTable(
   ]
 );
 
+// QUA-958: PG-vs-YAML reconciliation cron heartbeat (parent QUA-943).
+// One row per cron tick — see migration 0223 + auto_update_runs precedent.
+export const reconciliationRuns = pgTable(
+  "reconciliation_runs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    domain: text("domain").notNull(),
+    trigger: text("trigger").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    entitiesScanned: integer("entities_scanned"),
+    entitiesNonEmpty: integer("entities_non_empty"),
+    diffsDetected: integer("diffs_detected"),
+    nonEmptyDiffsObserved: integer("non_empty_diffs_observed"),
+    detailsJson: jsonb("details_json").$type<Record<string, unknown>>(),
+    errorCode: text("error_code"),
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_reconciliation_runs_domain_started_unique")
+      .on(table.domain, table.startedAt),
+    index("idx_reconciliation_runs_domain_started")
+      .on(table.domain, table.startedAt.desc()),
+    index("idx_reconciliation_runs_completed_at")
+      .on(table.completedAt.desc()),
+  ]
+);
+
 export const serviceHealthIncidents = pgTable(
   "service_health_incidents",
   {

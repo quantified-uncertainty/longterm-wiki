@@ -16,6 +16,7 @@ export { integrityRoute, type IntegrityRoute } from "./integrity.js";
 export { autoUpdateRunsRoute, type AutoUpdateRunsRoute } from "./auto-update-runs.js";
 export { autoUpdateNewsRoute, type AutoUpdateNewsRoute } from "./auto-update-news.js";
 export { groundskeeperRunsRoute, type GroundskeeperRunsRoute } from "./groundskeeper-runs.js";
+export { reconciliationRunsRoute, type ReconciliationRunsRoute } from "./reconciliation-runs.js";
 export { githubIssuesRoute, type GithubIssuesRoute } from "./github-issues.js";
 export { githubPullsRoute, type GithubPullsRoute, type OpenPR, type CheckResult, type CodeRabbitSummary, type ActionNeeded, type PatrolSummary } from "./github-pulls.js";
 export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";

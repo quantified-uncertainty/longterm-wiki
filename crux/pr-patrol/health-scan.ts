@@ -72,6 +72,23 @@ export const RATCHET_DRIFT_WINDOW_HOURS = 24;
  */
 export const RATCHET_DRIFT_SCORE = 150;
 
+/**
+ * Score for the QUA-958 PG-vs-YAML divergence sentinel (red-team finding #1).
+ * Sits between ratchet-drift (150) and main-ci-red (180) — divergence is more
+ * urgent than a baseline bump (it means the canary's two writes are out of
+ * sync and we may already be writing junk to PG) but less urgent than CI
+ * being broken outright.
+ */
+export const PG_YAML_DIVERGENCE_SCORE = 165;
+
+/**
+ * Maximum age of the latest reconciliation_runs row before we treat the cron
+ * itself as broken. Daily cron with a comfortable grace window — anything
+ * older than this means the cron hasn't fired today and the divergence
+ * status is unknown (which is itself worth halting on).
+ */
+export const RECONCILIATION_STALE_THRESHOLD_HOURS = 36;
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface WorkflowRun {
@@ -107,7 +124,24 @@ export interface MainCiResult {
   failingCommits: CommitStatus[];
 }
 
-export type HealthIssueType = 'deploy-stuck' | 'main-ci-red' | 'ratchet-drift';
+export type HealthIssueType =
+  | 'deploy-stuck'
+  | 'main-ci-red'
+  | 'ratchet-drift'
+  | 'pg-yaml-divergence';
+
+/**
+ * Result of the QUA-958 PG-vs-YAML reconciliation evaluator. `unhealthy` =
+ * either the cron last reported real divergence on a non-empty entity OR
+ * the cron itself hasn't run within the staleness window.
+ */
+export interface ReconciliationHealthResult {
+  healthy: boolean;
+  reason: string;
+  /** Latest run row from `/api/reconciliation-runs/summary`, or null if none. */
+  latestRunStartedAt: Date | null;
+  latestNonEmptyDiffsObserved: number | null;
+}
 
 export interface HealthIssue {
   type: HealthIssueType;
@@ -170,6 +204,8 @@ export interface HealthScanResult {
   deploy: DeployStatusResult;
   mainCi: MainCiResult;
   ratchet: RatchetDriftResult;
+  /** QUA-958 reconciliation evaluator result. Optional for back-compat. */
+  reconciliation?: ReconciliationHealthResult;
   issues: HealthIssue[];
 }
 
@@ -588,14 +624,101 @@ function commitTimestamp(
 }
 
 /**
- * Combine deploy + main-CI evaluations into a single HealthScanResult.
- * Pure — takes the two sub-results and assembles the issue list for the queue.
+ * Pure evaluator for the QUA-958 PG-vs-YAML reconciliation sentinel.
+ *
+ * Inputs are the shape returned by `/api/reconciliation-runs/summary`. The
+ * function decides healthy/unhealthy without IO so it can be unit-tested.
+ *
+ * Two failure modes:
+ *   - Real divergence: the latest completed run reported
+ *     `nonEmptyDiffsObserved > 0` AND no later clean run has overwritten that.
+ *     ("Latest" here means most-recent completed; the summary endpoint
+ *     filters out aborted runs.)
+ *   - Cron stale: no completed run in the last
+ *     `RECONCILIATION_STALE_THRESHOLD_HOURS`. We treat absence-of-data as
+ *     unhealthy, not healthy — silent cron is the failure mode QUA-31 caused.
+ *
+ * `nonEmptyDiffsObserved` is the right discriminator (not raw `diffsDetected`)
+ * because of red-team finding #4: the 112 policy entities with empty YAML
+ * trivially diff to "0 in PG", which is fine. Only divergences on entities
+ * we actually wrote count.
+ */
+export function evaluateReconciliation(
+  summary: {
+    latestRun: {
+      startedAt: string;
+      nonEmptyDiffsObserved: number | null;
+      errorCode: string | null;
+    } | null;
+  } | null,
+  now: Date = new Date(),
+): ReconciliationHealthResult {
+  if (!summary || !summary.latestRun) {
+    return {
+      healthy: false,
+      reason:
+        'no completed reconciliation_runs row found — cron may have never run, or only failed runs exist',
+      latestRunStartedAt: null,
+      latestNonEmptyDiffsObserved: null,
+    };
+  }
+
+  const latest = summary.latestRun;
+  const startedAt = new Date(latest.startedAt);
+  const ageHours = (now.getTime() - startedAt.getTime()) / 3_600_000;
+
+  if (ageHours > RECONCILIATION_STALE_THRESHOLD_HOURS) {
+    return {
+      healthy: false,
+      reason:
+        `latest reconciliation_runs row is ${ageHours.toFixed(1)}h old ` +
+        `(>${RECONCILIATION_STALE_THRESHOLD_HOURS}h threshold) — cron appears stalled`,
+      latestRunStartedAt: startedAt,
+      latestNonEmptyDiffsObserved: latest.nonEmptyDiffsObserved,
+    };
+  }
+
+  if (latest.errorCode) {
+    return {
+      healthy: false,
+      reason: `latest reconciliation_runs row finished with errorCode='${latest.errorCode}' — scan failed`,
+      latestRunStartedAt: startedAt,
+      latestNonEmptyDiffsObserved: latest.nonEmptyDiffsObserved,
+    };
+  }
+
+  const diffs = latest.nonEmptyDiffsObserved ?? 0;
+  if (diffs > 0) {
+    return {
+      healthy: false,
+      reason:
+        `${diffs} policy entit${diffs === 1 ? 'y has' : 'ies have'} non-empty YAML stakeholders that disagree with PG ` +
+        `(reconciliation cron at ${startedAt.toISOString()}). ` +
+        `Canary writes should halt until the divergence is reconciled.`,
+      latestRunStartedAt: startedAt,
+      latestNonEmptyDiffsObserved: diffs,
+    };
+  }
+
+  return {
+    healthy: true,
+    reason: `reconciliation cron is fresh (${ageHours.toFixed(1)}h ago) and reports zero non-empty divergence`,
+    latestRunStartedAt: startedAt,
+    latestNonEmptyDiffsObserved: diffs,
+  };
+}
+
+/**
+ * Combine deploy + main-CI + ratchet + reconciliation evaluations into a
+ * single HealthScanResult. Pure — takes the sub-results and assembles the
+ * issue list for the queue.
  */
 export function combineHealth(
   deploy: DeployStatusResult,
   mainCi: MainCiResult,
   ratchet: RatchetDriftResult,
   now: Date = new Date(),
+  reconciliation: ReconciliationHealthResult | null = null,
 ): HealthScanResult {
   const issues: HealthIssue[] = [];
   const detectedAt = now.toISOString();
@@ -633,11 +756,27 @@ export function combineHealth(
     });
   }
 
+  if (reconciliation && !reconciliation.healthy) {
+    issues.push({
+      type: 'pg-yaml-divergence',
+      score: PG_YAML_DIVERGENCE_SCORE,
+      reason: reconciliation.reason,
+      detectedAt,
+    });
+  }
+
+  // Reconciliation is optional for back-compat: callers that don't pass it
+  // can't have an unhealthy reconciliation signal so they aren't blocked by
+  // its absence. But if it WAS passed and is unhealthy, factor into the
+  // overall flag.
+  const reconciliationHealthy = reconciliation ? reconciliation.healthy : true;
+
   return {
-    healthy: deploy.healthy && mainCi.healthy && ratchet.healthy,
+    healthy: deploy.healthy && mainCi.healthy && ratchet.healthy && reconciliationHealthy,
     deploy,
     mainCi,
     ratchet,
+    ...(reconciliation ? { reconciliation } : {}),
     issues,
   };
 }
@@ -886,6 +1025,33 @@ export function rollupFailureIsCancellationOnly(contexts: RollupContext[]): bool
 }
 
 /**
+ * Fetch the reconciliation summary from wiki-server and evaluate. Returns
+ * `null` on transient API failure — callers (healthScan) treat absence as
+ * "skip the signal" rather than "unhealthy", matching the fail-soft contract
+ * for new sentinels added without a hard dependency.
+ *
+ * The wiki-server import is dynamic so this module stays usable in offline
+ * contexts (tests / non-network paths). Failure to load the client falls
+ * through to the same "skip the signal" branch.
+ */
+export async function checkReconciliation(
+  options: { now?: Date } = {},
+): Promise<ReconciliationHealthResult | null> {
+  try {
+    const { getReconciliationSummary } = await import(
+      '../lib/wiki-server/reconciliation-runs.ts'
+    );
+    const res = await getReconciliationSummary({ domain: 'policy_stakeholders' });
+    if (!res.ok) return null;
+    return evaluateReconciliation(res.data, options.now);
+  } catch {
+    // Wiki-server unavailable — return null so the patrol doesn't block on
+    // a transient outage of the reconciliation summary endpoint.
+    return null;
+  }
+}
+
+/**
  * Run both scanners and combine into one HealthScanResult. Intended to be
  * called at the start of each patrol cycle (Phase 3 wiring).
  *
@@ -901,10 +1067,11 @@ export async function healthScan(
 ): Promise<HealthScanResult> {
   const now = options.now ?? new Date();
   const repo = options.repo;
-  const [deploy, mainCi] = await Promise.all([
+  const [deploy, mainCi, reconciliation] = await Promise.all([
     checkDeployStatus({ now, repo }),
     checkMainCi({ repo }),
+    checkReconciliation({ now }),
   ]);
   const ratchet = checkRatchetDrift({ now });
-  return combineHealth(deploy, mainCi, ratchet, now);
+  return combineHealth(deploy, mainCi, ratchet, now, reconciliation);
 }

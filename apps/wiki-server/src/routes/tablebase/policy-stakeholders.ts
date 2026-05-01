@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { policyStakeholders } from "../../schema.js";
 import {
@@ -108,6 +108,13 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     syncSchema: SyncStakeholderItemSchema,
     enforceSourcing: true,
     entityRefs: ["policyEntityId"],
+    // QUA-958 (Phase 2 canary): opt into best-effort partial-success mode.
+    // Callers POSTing `?mode=best_effort` get per-item partitioning into
+    // `committed: [...ids]` / `rejected: [{idx, code, message, ...}]`. The
+    // canary dispatcher (research-improve-entity) decides per-rejection what
+    // to do: `code: "zod"` aborts the whole improve-entity run; `code: "fk_missing"`
+    // is recorded to followup_actions and the surviving items still commit.
+    bestEffortAllowed: true,
     naturalKey: (item) =>
       `${item.policyEntityId}::${item.stakeholderDisplayName}`,
     naturalKeyError:
@@ -116,6 +123,22 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
       policyStakeholders.policyEntityId,
       policyStakeholders.stakeholderDisplayName,
     ],
+    // QUA-958 red-team finding #3 (advisory lock pulled forward from Phase 6):
+    // serialize concurrent writes for the same `(policyEntityId, shape)` so
+    // two `improve-entity FISA-702` runs can't race the natural-key UNIQUE
+    // and silently discard one side's gate-approved correction. The lock is
+    // released when the upsert transaction commits or rolls back. We hash the
+    // composite key so a 64-bit advisory lock id fits regardless of stableId
+    // length. Lives in `txStart` (not `preValidate`) because xact-scoped
+    // advisory locks must be acquired inside the transaction that holds them.
+    txStart: async (tx, _c, items) => {
+      const entityIds = [...new Set(items.map((i) => i.policyEntityId))];
+      for (const entityId of entityIds) {
+        await tx.execute(
+          sql`SELECT pg_advisory_xact_lock(hashtext(${entityId} || ':policy_stakeholders'))`,
+        );
+      }
+    },
     toThing: (item) => ({
       id: item.id,
       thingType: "policy-stakeholder" as const,
