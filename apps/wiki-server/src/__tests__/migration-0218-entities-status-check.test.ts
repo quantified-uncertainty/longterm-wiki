@@ -39,7 +39,7 @@ describe("migration 0218 — QUA-526 entities.status CHECK constraint", () => {
   });
 
   it("uses NOT VALID + VALIDATE CONSTRAINT", () => {
-    // Per .claude/rules/database-migrations.md — split DDL into metadata
+    // Per docs/agent-rules/database-migrations.md — split DDL into metadata
     // registration (NOT VALID, milliseconds) and validation
     // (VALIDATE CONSTRAINT, SHARE UPDATE EXCLUSIVE) so the ACCESS EXCLUSIVE
     // window stays small.

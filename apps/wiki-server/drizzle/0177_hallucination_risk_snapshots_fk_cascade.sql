@@ -10,7 +10,7 @@
 -- The table is ~900 MB on prod, which triggered the QUA-302 incident on
 -- 2026-04-11 (migration 0173 held ACCESS EXCLUSIVE for ~12h while fighting the
 -- hallucination_risk_latest matview refresh). This migration MUST use the
--- NOT VALID pattern per `.claude/rules/database-migrations.md` so that:
+-- NOT VALID pattern per `docs/agent-rules/database-migrations.md` so that:
 --   - DROP + ADD NOT VALID only hold ACCESS EXCLUSIVE for milliseconds
 --     (no table scan), so the deploy PreSync completes cleanly.
 --   - VALIDATE CONSTRAINT is deferred to a follow-up manual script that runs

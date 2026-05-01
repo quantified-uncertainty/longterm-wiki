@@ -348,7 +348,7 @@ async function runCheckCycle(
   // If any of deploy-stuck / main-ci-red / ratchet-drift fires, skip PR work
   // this cycle and escalate. This is the precondition that keeps patrol from
   // churning out symptom-fix PRs while a deploy is stuck or a ratchet is
-  // drifting. See .claude/rules/patrol-health-gate.md for the rationale.
+  // drifting. See docs/agent-rules/patrol-health-gate.md for the rationale.
   const gate = await runHealthGate();
   if (!gate.proceed) {
     appendJsonl(JSONL_FILE_INTERNAL, {

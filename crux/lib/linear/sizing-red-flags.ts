@@ -3,7 +3,7 @@
  *
  * Scans a candidate ticket title + description for patterns that empirically
  * predict a ticket will need to be split mid-session. See
- * `.claude/rules/ticket-sizing.md` for the rule that motivates each pattern
+ * `docs/agent-rules/ticket-sizing.md` for the rule that motivates each pattern
  * and QUA-575 for the originating incidents.
  *
  * The detector is intentionally regex-based and conservative — false positives
@@ -98,7 +98,7 @@ export function formatRedFlagsWarning(flags: RedFlag[]): string {
   out += '\n';
   out += 'Why this matters: oversized tickets get split mid-session, costing\n';
   out += '~30-60min of coordination overhead each time. See\n';
-  out += '.claude/rules/ticket-sizing.md for the full rule and decomposition\n';
+  out += 'docs/agent-rules/ticket-sizing.md for the full rule and decomposition\n';
   out += 'guidance.\n';
   out += '\n';
   out += 'To proceed anyway (the ticket is legitimately large and atomic),\n';

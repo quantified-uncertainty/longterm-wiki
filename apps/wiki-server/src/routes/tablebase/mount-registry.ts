@@ -15,7 +15,7 @@
  *
  * Five routes are deliberately mounted MANUALLY in `app.ts` rather than
  * through this registry, matching the sync-factory exclusion list in
- * `.claude/rules/tablebase-sync-factory.md`:
+ * `docs/agent-rules/tablebase-sync-factory.md`:
  *
  * - `entities` — slug displacement + statement_timeout overrides
  * - `things` — IT IS the cross-base index

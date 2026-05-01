@@ -26,9 +26,9 @@ The longterm-wiki coordinator stack, in rough capability order:
 | Independent-clone slots `a1`–`a20` with port isolation | `lw/ws` + `crux/commands/agent-workspace.ts` (1,439 LOC) | "worktrees" in AO/Overstory, but with stronger isolation |
 | Headless dispatch with `claude -p` + stream-JSON capture | `crux/commands/dispatch.ts` (440 LOC) | `ao start`, `ov sling`, `bassimeledath /dispatch` |
 | Tmux window naming + `./ws open <N> --claude` | `lw/ws` | `ov inspect`, `ao` dashboard sessions |
-| PR patrol w/ health gate, ratchet-drift detector, per-fingerprint cooldown | `crux/commands/pr-patrol.ts` (364 LOC) + `.claude/rules/patrol-health-gate.md` | AO `reactions:` block (CI-failed, changes-requested) |
+| PR patrol w/ health gate, ratchet-drift detector, per-fingerprint cooldown | `crux/commands/pr-patrol.ts` (364 LOC) + `docs/agent-rules/patrol-health-gate.md` | AO `reactions:` block (CI-failed, changes-requested) |
 | Cross-session dedup against PG `agent_sessions` + Linear comments + open PRs | `crux/commands/dispatch.ts::preflight` + `crux sys dispatch` (QUA-437) | none of the 5 tools ship this — they assume single operator |
-| Linear-aware branch naming + auto-close + start/done state | `crux/commands/linear.ts` + `.claude/rules/linear-integration.md` | AO `tracker: linear`, MC GitHub-Issues sync (one-way) |
+| Linear-aware branch naming + auto-close + start/done state | `crux/commands/linear.ts` + `docs/agent-rules/linear-integration.md` | AO `tracker: linear`, MC GitHub-Issues sync (one-way) |
 | Hook layer: `inject-wip-checklist`, `verify-checklist-on-stop`, `recover-cwd`, `cleanup-worktrees` | `.claude/hooks/*.sh` | AO/MC: hook profiles (minimal/standard/strict) |
 | Session-end review via `/agent-review-pr` + `/agent-ship` mandatory pipeline | `.claude/commands/*.md` | none ship review-before-PR mandatorily |
 
@@ -113,7 +113,7 @@ Orchestrator (multi-repo)
 - ❌ Framework adapter for Claude is **read-only**. To make MC actually drive our slots, we'd write a new adapter that proxies to `./ws dispatch` — at which point we've built a Mission-Control-shaped facade over our own infra.
 - ⚠️ Alpha software. APIs and schemas may change between releases.
 
-**Verdict**: skip. If we want a live agent dashboard, the right path is to add a `/internal/dispatch-fleet` page (Pattern A — see `.claude/rules/internal-dashboards.md`) that reads `agent_sessions` + `~/.cache/crux-dispatch/log.jsonl` + tmux state. ~1 day of work, integrated into our existing nav, no new auth.
+**Verdict**: skip. If we want a live agent dashboard, the right path is to add a `/internal/dispatch-fleet` page (Pattern A — see `docs/agent-rules/internal-dashboards.md`) that reads `agent_sessions` + `~/.cache/crux-dispatch/log.jsonl` + tmux state. ~1 day of work, integrated into our existing nav, no new auth.
 
 ---
 
@@ -216,7 +216,7 @@ If it's a clear win, add a `crux sys dispatch --via=skill` mode that uses the sk
 
 ## What to do this week
 
-1. **File a Linear ticket** for the `bassimeledath/dispatch` spike above (Coordinator & Agent Tooling project per `.claude/rules/linear-project-ownership.md`). Estimated 1 day.
+1. **File a Linear ticket** for the `bassimeledath/dispatch` spike above (Coordinator & Agent Tooling project per `docs/agent-rules/linear-project-ownership.md`). Estimated 1 day.
 2. **File a Linear ticket** for "add `/internal/dispatch-fleet` dashboard" — single-page Pattern A view of `agent_sessions` + dispatch runs + tmux state. ~1 day. (Closes the visibility gap without adopting Mission Control.)
 3. **File a Linear ticket** for "investigate `crux pr-patrol --auto-fix`" — port AO's `reactions:` config pattern (CI-failed → re-dispatch with retries, changes-requested → send-to-agent with escalation timeout). ~3 days, gated on the spike showing dispatch is reliable enough to chain.
 4. **Consider** enabling `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `coord/.claude/settings.json` only, for review/research-heavy releases. Not urgent. Not for slots — slots are single-purpose, in-process teams would compete with our slot model.
@@ -228,4 +228,4 @@ If it's a clear win, add a `crux sys dispatch --via=skill` mode that uses the sk
 - [builderz-labs/mission-control](https://github.com/builderz-labs/mission-control)
 - [ComposioHQ/agent-orchestrator](https://github.com/ComposioHQ/agent-orchestrator)
 - [bassimeledath/dispatch](https://github.com/bassimeledath/dispatch) and [10x Your Claude Code Window Size with Dispatch](https://www.bassimeledath.com/blog/dispatch)
-- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/.claude/rules/worktree-isolation-bug.md`, `lw/a10/.claude/rules/dispatched-agent-review.md`
+- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/.claude/rules/worktree-isolation-bug.md`, `lw/a10/docs/agent-rules/dispatched-agent-review.md`

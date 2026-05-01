@@ -24,7 +24,7 @@ If you're adding a route that needs >1 escape hatch (`preValidate`, `postUpsert`
 
 ## Scaffolding a new route
 
-Use `pnpm crux tb scaffold <kebab-name>` (QUA-455). It generates the route file, CLI client, crux table-registry entry, and wiki-server mount-registry entry in one shot, with TODO markers for the table-specific bits. See `.claude/rules/tablebase-sync-factory.md` — the generator is the canonical way to add a new entity type.
+Use `pnpm crux tb scaffold <kebab-name>` (QUA-455). It generates the route file, CLI client, crux table-registry entry, and wiki-server mount-registry entry in one shot, with TODO markers for the table-specific bits. See `docs/agent-rules/tablebase-sync-factory.md` — the generator is the canonical way to add a new entity type.
 
 ## Hook budget: max 1 per route
 

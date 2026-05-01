@@ -62,7 +62,7 @@ Both care about user-facing content. Splits on **authoring vs navigation/display
 - **Authoring** (filling stub pages, adding sources to entities, writing MDX, curating facts) → **Content Quality & Enrichment**.
 - **Display/navigation** (entity profile shell, directory tables, coverage dots, data-source detail pages) → **Dashboards & Visibility**.
 
-The ambiguous case: a new `/internal/*` dashboard that's also a content page. **Follow Pattern A** (`.claude/rules/internal-dashboards.md`) — the dashboard itself is a wiki page, so the *infrastructure* for making the dashboard is Dashboards & Visibility, but the *content* on it is Content Quality. In practice, file the parent issue in Dashboards and any fact-curation work under it as Content Quality.
+The ambiguous case: a new `/internal/*` dashboard that's also a content page. **Follow Pattern A** (`docs/agent-rules/internal-dashboards.md`) — the dashboard itself is a wiki page, so the *infrastructure* for making the dashboard is Dashboards & Visibility, but the *content* on it is Content Quality. In practice, file the parent issue in Dashboards and any fact-curation work under it as Content Quality.
 
 ---
 
@@ -118,7 +118,7 @@ The 2026-04-14 Linear refactor pass found:
 
 The root cause of miscategorization wasn't malice — it was that the boundary between adjacent projects (sourcing/data-integrity, dashboards/automation, coordinator/automation) had never been written down. This doc is that boundary. Update it when a new systematic miscategorization emerges; don't let scope doctrine drift back into "gut feel."
 
-Full findings + methodology: [`docs/audits/2026-04-14-linear-refactor.md`](../../docs/audits/2026-04-14-linear-refactor.md).
+Full findings + methodology: [`docs/audits/2026-04-14-linear-refactor.md`](../audits/2026-04-14-linear-refactor.md).
 
 ## The `crux linear hygiene` tool
 

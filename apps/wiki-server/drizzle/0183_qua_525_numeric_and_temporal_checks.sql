@@ -10,7 +10,7 @@
 -- After this migration, both validators and their gate entries are deleted.
 -- The invariants are enforced at PG write time instead of at PR time.
 --
--- ## Prod enumeration (2026-04-16, per .claude/rules/database-migrations.md)
+-- ## Prod enumeration (2026-04-16, per docs/agent-rules/database-migrations.md)
 --
 -- Numeric ranges: 0 violations across 175 rows (funding_rounds=90, investments=72,
 --   equity_positions=13).
@@ -25,7 +25,7 @@
 --
 -- All target tables are small (largest is personnel with ~1000 rows). `NOT VALID`
 -- + `VALIDATE CONSTRAINT` is not strictly necessary at this size but is used for
--- consistency with the pattern in .claude/rules/database-migrations.md and to be
+-- consistency with the pattern in docs/agent-rules/database-migrations.md and to be
 -- future-proof as tables grow.
 --
 -- Each ADD CONSTRAINT is wrapped in a DO block with EXCEPTION handling so the

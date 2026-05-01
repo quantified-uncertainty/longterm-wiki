@@ -5,8 +5,8 @@
 -- to the function must be re-landed via a new CREATE OR REPLACE migration
 -- because Drizzle doesn't rescan helpers/.
 --
--- Caller docs: .claude/rules/audit-log.md and
--- .claude/rules/database-migrations.md § "Audit-log escape hatch".
+-- Caller docs: docs/agent-rules/audit-log.md and
+-- docs/agent-rules/database-migrations.md § "Audit-log escape hatch".
 
 -- The trigger function. Fires AFTER INSERT, UPDATE, DELETE on every table it's
 -- attached to. Writes a single row to `full_audit_log` with before/after

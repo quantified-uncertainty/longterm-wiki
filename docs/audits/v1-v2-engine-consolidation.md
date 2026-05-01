@@ -298,7 +298,7 @@ grep -rn "v1.*v2\|compare.*engine" crux/authoring/**/*.test.ts
 - **QUA-323** — Umbrella: all content-authoring paths must produce resource-backed citations. Touches both engines; would be simplified by phase extraction (one place to enforce instead of two).
 - **QUA-529** — Validator orchestrator audit. Different orchestrators (gate.ts, data.ts, daily.ts, unified.ts) — this audit is NOT about those.
 - **QUA-408** — Data-model unwind epic. Same spirit of "unwind accidental complexity" but different subsystem.
-- `.claude/rules/auto-update-system.md` — auto-update consumer documentation; should be updated after the rename in PR 1.
+- `docs/agent-rules/auto-update-system.md` — auto-update consumer documentation; should be updated after the rename in PR 1.
 - `content/docs/internal/data-architecture-overview.mdx:320-335` — user-facing engine docs; primary target for PR 1 rename.
 
 ---

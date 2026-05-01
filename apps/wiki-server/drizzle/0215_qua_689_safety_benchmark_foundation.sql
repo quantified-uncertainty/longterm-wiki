@@ -17,7 +17,7 @@
 --      The CHECK list below is a strict superset of the live values, plus
 --      the 4 new safety-focused buckets (dangerous-capability, robustness,
 --      honesty, adversarial) Phase 2 ingesters need. NOT VALID + VALIDATE
---      pattern per .claude/rules/database-migrations.md.
+--      pattern per docs/agent-rules/database-migrations.md.
 --
 --   2. benchmark_results: add provenance columns (tested_by,
 --      tested_by_org_id, evaluation_date, methodology_notes), and widen the
@@ -90,7 +90,7 @@ ALTER TABLE "benchmarks" VALIDATE CONSTRAINT "chk_benchmarks_category";
 -- failing on duplicate constraint / column / index names.
 --
 -- Live enumeration before writing this migration (per
--- .claude/rules/database-migrations.md § "Adding CHECK constraints"): the
+-- docs/agent-rules/database-migrations.md § "Adding CHECK constraints"): the
 -- 0212 allowlist was 'self-report' / 'third-party' / NULL, so the only
 -- legacy values that could exist on prod today are exactly those three.
 -- All three are preserved in the new constraint below ('third-party' kept

@@ -1,7 +1,7 @@
 -- QUA-696 Phase 7: widen ai_incidents.source CHECK constraint to include
 -- 'oecd-aim'.
 --
--- Pre-migration enumeration (per .claude/rules/database-migrations.md
+-- Pre-migration enumeration (per docs/agent-rules/database-migrations.md
 -- "Adding CHECK constraints on enum columns"):
 --
 --   $ curl -s "$WIKI_SERVER_URL/api/ai-incidents/stats" -H "Authorization: Bearer $KEY"

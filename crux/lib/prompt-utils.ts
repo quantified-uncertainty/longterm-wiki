@@ -2,7 +2,7 @@
  * Shared utilities for LLM prompt construction.
  *
  * All user-controlled data interpolated into LLM prompts must be escaped
- * to prevent prompt injection. See .claude/rules/llm-prompt-safety.md.
+ * to prevent prompt injection. See docs/agent-rules/llm-prompt-safety.md.
  */
 
 /**

@@ -12,7 +12,7 @@
 -- to the procedure must be landed via a new CREATE OR REPLACE migration;
 -- Drizzle doesn't rescan the helpers/ folder.
 --
--- Caller docs: .claude/rules/database-migrations.md § "Swapping an FK target
+-- Caller docs: docs/agent-rules/database-migrations.md § "Swapping an FK target
 -- column".
 
 CREATE OR REPLACE PROCEDURE swap_fk_target(
@@ -217,7 +217,7 @@ BEGIN
       -- ADD CONSTRAINT NOT VALID registers the constraint as unchecked
       -- metadata (ACCESS EXCLUSIVE for milliseconds, no row scan). Followed
       -- by VALIDATE CONSTRAINT which only needs SHARE UPDATE EXCLUSIVE.
-      -- See .claude/rules/database-migrations.md § "ADD CONSTRAINT ... NOT
+      -- See docs/agent-rules/database-migrations.md § "ADD CONSTRAINT ... NOT
       -- VALID + separate VALIDATE CONSTRAINT" for the when-to-use guidance
       -- and the QUA-302/QUA-156 incident note.
       EXECUTE format(

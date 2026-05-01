@@ -13,7 +13,7 @@
  *    session + tool attribution for every row written in the transaction.
  *
  * The sync-factory wires this automatically; hand-rolled routes need an
- * explicit call. See `.claude/rules/audit-log.md`.
+ * explicit call. See `docs/agent-rules/audit-log.md`.
  */
 
 import type { Context, MiddlewareHandler } from "hono";

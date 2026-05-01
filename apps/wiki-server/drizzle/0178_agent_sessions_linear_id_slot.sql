@@ -20,7 +20,7 @@
 --   VALIDATE CONSTRAINT        → SHARE UPDATE EXCLUSIVE, milliseconds (no rows to scan)
 --
 -- Safe on a loaded agent_sessions table; do NOT copy-paste this pattern to
--- a multi-GB table without re-reading .claude/rules/database-migrations.md
+-- a multi-GB table without re-reading docs/agent-rules/database-migrations.md
 -- and confirming the NOT VALID + VALIDATE split is actually safe for the
 -- lock profile there (cf. QUA-302 / migration 0173's 12-hour deploy stall).
 

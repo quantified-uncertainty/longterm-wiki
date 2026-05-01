@@ -4,7 +4,7 @@ AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI t
 
 **Production URL**: `https://www.longtermwiki.com` — do NOT use `longterm.wiki`, `longtermwiki.org`, or any other domain.
 
-**This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux --help` for full CLI reference.
+**This is a routing document.** Detailed guides live in `content/docs/internal/`, `.claude/rules/` (Tier 1 — auto-loaded session rules), and `docs/agent-rules/` (Tier 2 — subsystem maps, read on-demand). Use `pnpm crux --help` for full CLI reference.
 
 **Agent memory**: Read `.claude/memory/MEMORY.md` at session start for cross-session facts and corrections. Update it when you learn stable new facts.
 
@@ -191,10 +191,12 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 - **Wiki-server from agent slots (auto-prod, QUA-616)**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. Crux now **auto-detects that CWD is inside a slot and forces `WIKI_SERVER_ENV=prod`** — you no longer need to prefix every command with `WIKI_SERVER_ENV=prod`. The manual prefix still works and takes precedence; set `WIKI_SERVER_ENV=local` to force local from inside a slot (e.g. when testing against a locally-run wiki-server). The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available.
 - **No new bash scripts**: Write new scripts/tools as TypeScript in `crux/`. Bash is only acceptable for git hooks (`.githooks/`), Claude Code hooks (`.claude/hooks/`), and CI glue where Node.js isn't available.
 
-## Detailed Guides (loaded automatically by Claude Code)
+## Tier 1 — Always-loaded session rules (`.claude/rules/`)
+
+These cover the session lifecycle and the always-applicable conventions. They auto-load on every turn.
 
 - `.claude/rules/agent-session-workflow.md` — Session start/end workflow
-- `.claude/rules/environment-setup.md` — Worktree + LSP setup
+- `.claude/rules/environment-setup.md` — Worktree, LSP, slot ports, wiki-server auto-prod
 - `.claude/rules/page-authoring.md` — Content pipeline, self-review checklist
 - `.claude/rules/code-review-guidelines.md` — Code review rules
 - `.claude/rules/github-issue-tracking.md` — Issue tracking (Linear primary, GitHub legacy)
@@ -203,23 +205,33 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 - `.claude/rules/pre-pr-verification.md` — Build/test/gate checks before PRs
 - `.claude/rules/session-logging.md` — Session log format and storage
 - `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns
-- `.claude/rules/database-migrations.md` — Migration patterns and deploy flow
-- `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
-- `.claude/rules/auto-update-system.md` — Auto-update system
+- `.claude/rules/slot-isolation.md` — Don't touch other agent slots
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
-- `.claude/rules/linear-integration.md` — Linear-GitHub integration, branch naming, auto-close, `crux linear` commands
-- `.claude/rules/linear-project-ownership.md` — Decision rules for which of the 6 QUA projects a new issue belongs in (scope-boundary doctrine)
-- `.claude/rules/dispatched-agent-review.md` — Dispatched subagents MUST run `/agent-review-pr` + `/agent-ship`, never raw `gh pr create`
 
-## Subsystem Maps — Read BEFORE proposing work in these areas
+## Tier 2 — Subsystem maps (read on-demand, NOT auto-loaded)
 
-These are "mental model" maps. They list the components, endpoints, helpers, and conventions that already exist in each subsystem so agents don't re-implement things. **Read the relevant map at task-start, not after writing code.**
+These live in `docs/agent-rules/`. They are **NOT** auto-loaded — to keep cache cost down, the agent must `Read` the relevant map at task-start when its work touches that subsystem. **MANDATORY: if your task lands in any row below, your first action after `agent-checklist init` is to Read the map.** Each map opens with "Read this before X" — that "X" describes when it applies.
 
-- `.claude/rules/sourcing-system.md` — Source-check, verdict, and coverage scoring (if touching verdict UI, coverage scores, or `/api/sourcing/*`)
-- `.claude/rules/tablebase-sync-factory.md` — TableBase sync handler factory + shared helpers (`sqlInList`, `validateEntityRefs`, `deleteBatchHandler`, `resolveEntityFKs`)
-- `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase naming and which layer owns what
-- `.claude/rules/id-system.md` — `numericId` vs `stableId` vs `tableId`, allocation, validation
-- `.claude/rules/validation-gate-system.md` — `crux/validate/` 80+ validators, gate wiring, blocking vs advisory
-- `.claude/rules/audit-log.md` — Universal PG audit log (QUA-442) + legacy `tablebase_audit_log`. Read before touching trigger, middleware, or bulk migrations.
-- `docs/audits/things-denormalization-audit.md` — **Historical reference** (denorm columns dropped in QUA-507 / migration 0204). Retained for pre-QUA-507 composer logic per thing_type (useful if the `things_search` MV composition ever needs to change) and for the `*_display_name` sibling pattern audit (~20 columns across 13 tables) before proposing a new cache column.
+| When your task touches… | Read first |
+|---|---|
+| Linear issue lifecycle, branch naming `qua-NNN`, `crux linear` commands | `docs/agent-rules/linear-integration.md` |
+| Filing a new Linear ticket — picking the right project | `docs/agent-rules/linear-project-ownership.md` |
+| Filing a Linear ticket — sizing red flags | `docs/agent-rules/ticket-sizing.md` |
+| Database migrations (any `apps/wiki-server/drizzle/*.sql`) | `docs/agent-rules/database-migrations.md` |
+| PG audit triggers, `full_audit_log`, `tablebase_audit_log` | `docs/agent-rules/audit-log.md` |
+| TableBase sync routes (`apps/wiki-server/src/routes/tablebase/`) | `docs/agent-rules/tablebase-sync-factory.md` |
+| TableBase / FactBase / WikiBase naming, which layer owns what | `docs/agent-rules/three-bases-architecture.md` |
+| Source-check verdicts, coverage scoring, `/api/sourcing/*`, dot indicators | `docs/agent-rules/source-check-system.md` |
+| `numericId` vs `stableId` vs `tableId` — allocation, validation | `docs/agent-rules/id-system.md` |
+| Adding/changing a `crux/validate/` validator or the gate | `docs/agent-rules/validation-gate-system.md` |
+| Entity profile pages (`/organizations/[slug]`, `/people/[slug]`, etc.) | `docs/agent-rules/entity-profile-pages.md` |
+| Adding a new internal dashboard (`/internal/*`) | `docs/agent-rules/internal-dashboards.md` |
+| Auto-update system (cron, news pipeline) | `docs/agent-rules/auto-update-system.md` |
+| LLM prompt construction — escaping user content | `docs/agent-rules/llm-prompt-safety.md` |
+| Dispatching subagents from a coordinator session | `docs/agent-rules/dispatched-agent-review.md` |
+| PR patrol — health gate, fleet-level signals | `docs/agent-rules/patrol-health-gate.md` |
+
+Plus historical: `docs/audits/things-denormalization-audit.md` (denorm columns dropped in QUA-507 / migration 0204; retained for pre-QUA-507 composer logic per thing_type and for the `*_display_name` sibling pattern audit before proposing a new cache column).
+
+> **Why this split (QUA-949):** before this restructure, every Tier 2 map auto-loaded on every turn — ~55k tokens of subsystem reference manuals consumed even when the task didn't touch them. Moving them out of `.claude/rules/` cuts cache cost ~60% while keeping the table above as the explicit "go read X" pointer.

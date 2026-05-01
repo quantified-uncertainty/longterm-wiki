@@ -175,7 +175,7 @@ interface ScanSummary {
  *
  * All user-controlled fields (entity names, reasoning text, source content)
  * are wrapped in XML tags and escaped with `escapeXml` to prevent prompt
- * injection. See .claude/rules/llm-prompt-safety.md.
+ * injection. See docs/agent-rules/llm-prompt-safety.md.
  */
 export function buildSubjectIdentityPrompt(params: {
   claimSubjectLabel: string;

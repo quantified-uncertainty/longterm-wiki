@@ -37,7 +37,7 @@
 --     on_delete    => 'CASCADE'
 --   );
 --
--- See .claude/rules/database-migrations.md § "Swapping an FK target column"
+-- See docs/agent-rules/database-migrations.md § "Swapping an FK target column"
 -- for the decision rules and the when-to-use-NOT-VALID guidance.
 --
 -- ## What the procedure does
@@ -264,7 +264,7 @@ BEGIN
       -- ADD CONSTRAINT NOT VALID registers the constraint as unchecked
       -- metadata (ACCESS EXCLUSIVE for milliseconds, no row scan). Followed
       -- by VALIDATE CONSTRAINT which only needs SHARE UPDATE EXCLUSIVE.
-      -- See .claude/rules/database-migrations.md § "ADD CONSTRAINT ... NOT
+      -- See docs/agent-rules/database-migrations.md § "ADD CONSTRAINT ... NOT
       -- VALID + separate VALIDATE CONSTRAINT" for the when-to-use guidance
       -- and the QUA-302/QUA-156 incident note.
       EXECUTE format(

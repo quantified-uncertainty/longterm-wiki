@@ -81,7 +81,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "uq_msc_natural_key"
 
 -- source_format allowlist. Added NOT VALID so this DDL is lock-cheap
 -- (the table is new + empty, but we keep the pattern consistent with
--- .claude/rules/database-migrations.md for future ALTERs).
+-- docs/agent-rules/database-migrations.md for future ALTERs).
 ALTER TABLE "model_system_cards"
   ADD CONSTRAINT "chk_msc_source_format"
   CHECK ("source_format" IS NULL OR "source_format" IN (
