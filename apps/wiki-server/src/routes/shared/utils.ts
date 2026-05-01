@@ -1,4 +1,4 @@
-import type { Context } from "hono";
+import type { Context, TypedResponse } from "hono";
 import { validator } from "hono/validator";
 import { z } from "zod";
 import { logger as rootLogger } from "../../logger.js";
@@ -92,6 +92,35 @@ export function applyTruncation<T>(
 export const VALIDATION_ERROR = "validation_error" as const;
 export const INVALID_JSON_ERROR = "invalid_json" as const;
 
+/**
+ * Documented machine-readable codes for the structured `validationError` body.
+ * Open-ended: the `string & {}` branch keeps autocomplete on documented codes
+ * while still accepting future codes without forcing a type-system change.
+ */
+export type ValidationErrorCode =
+  | "zod"
+  | "fk_missing"
+  | "natural_key"
+  | "enum_violation"
+  | (string & {});
+
+/**
+ * Structured body shape for the `validationError` overload. Used by Phase 2
+ * canary dual-write callers that need to distinguish 400-class causes
+ * structurally rather than by string-matching the message field.
+ *
+ * The function adds the literal `error: "validation_error"` envelope; callers
+ * supply the discriminator (`code`) plus optional context fields.
+ */
+export interface ValidationErrorBody {
+  code: ValidationErrorCode;
+  message: string;
+  field?: string;
+  value?: unknown;
+  allowed?: unknown[];
+  similar?: unknown[];
+}
+
 /** Safely parse JSON body, returning null on parse failure. */
 export function parseJsonBody(c: Context) {
   return c.req.json().catch((e: unknown) => {
@@ -103,9 +132,44 @@ export function parseJsonBody(c: Context) {
   });
 }
 
-/** Return a 400 validation error response. */
-export function validationError(c: Context, message: string) {
-  return c.json({ error: VALIDATION_ERROR, message }, 400);
+/**
+ * Return a 400 validation error response.
+ *
+ * Two overloads:
+ *   validationError(c, "message")    → { error: "validation_error", message }
+ *   validationError(c, { code, message, field?, value?, allowed?, similar? })
+ *     → { error: "validation_error", code, message, field?, value?, allowed?, similar? }
+ *
+ * The structured form is additive: existing string callers are unchanged.
+ * Phase 2 canary callers should pass the structured body so consumers can
+ * branch on `code` instead of pattern-matching `message`.
+ */
+export function validationError(
+  c: Context,
+  message: string
+): Response &
+  TypedResponse<
+    { error: typeof VALIDATION_ERROR; message: string },
+    400,
+    "json"
+  >;
+export function validationError(
+  c: Context,
+  body: ValidationErrorBody
+): Response &
+  TypedResponse<
+    { error: typeof VALIDATION_ERROR } & ValidationErrorBody,
+    400,
+    "json"
+  >;
+export function validationError(
+  c: Context,
+  arg: string | ValidationErrorBody
+): Response {
+  if (typeof arg === "string") {
+    return c.json({ error: VALIDATION_ERROR, message: arg }, 400);
+  }
+  return c.json({ error: VALIDATION_ERROR, ...arg }, 400);
 }
 
 /** Return a 400 invalid JSON error response. */
