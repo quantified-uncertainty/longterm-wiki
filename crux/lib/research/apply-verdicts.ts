@@ -188,50 +188,65 @@ export function extractStructuredDate(
 // at least one common verb lets us reject those without leaning on full NLP.
 // This is a sanity floor, not a grammar checker — false negatives just leave
 // the slot for re-extraction next iteration.
+//
+// Design notes:
+//  - Auxiliaries / copulas are unambiguously verbs and listed bare.
+//  - For lexical verbs, prefer inflected forms (-s, -ed, -ing) over bare
+//    stems, because many bare stems double as common nouns ("a design",
+//    "a release", "a target") and would let pure noun phrases pass the check.
+//  - Bare forms are only included when the noun reading is uncommon
+//    ("provide", "include", "develop").
 const COMMON_VERBS = new Set([
+  // auxiliaries / copulas
   "is", "are", "was", "were", "be", "been", "being", "am",
   "has", "have", "had", "having",
   "do", "does", "did", "doing", "done",
   "will", "would", "shall", "should", "can", "could", "may", "might", "must",
+  // lexical verbs — prefer inflected forms
   "provides", "provide", "provided", "providing",
-  "offers", "offer", "offered", "offering",
-  "supports", "support", "supported", "supporting",
+  "offers", "offered", "offering",
+  "supports", "supported", "supporting",
   "enables", "enable", "enabled", "enabling",
   "allows", "allow", "allowed", "allowing",
   "creates", "create", "created", "creating",
-  "builds", "build", "built", "building",
+  "builds", "built", "building",
   "develops", "develop", "developed", "developing",
   "runs", "ran", "running",
-  "designed", "design", "designs", "designing",
-  "used", "use", "uses", "using",
+  "designed", "designs", "designing",
+  "used", "uses", "using",
   "called", "calls", "calling",
-  "named", "naming",
+  "named", "names", "naming",
   "includes", "include", "included", "including",
   "focuses", "focused", "focusing",
-  "makes", "make", "made", "making",
-  "lets", "let", "letting",
-  "helps", "help", "helped", "helping",
+  "makes", "made", "making",
+  "lets", "letting",
+  "helps", "helped", "helping",
   "generates", "generate", "generated", "generating",
   "produces", "produce", "produced", "producing",
-  "performs", "perform", "performed", "performing",
+  "performs", "performed", "performing",
   "processes", "processed", "processing",
   "trains", "trained", "training",
-  "launched", "launches", "launch", "launching",
-  "released", "releases", "release", "releasing",
+  "launched", "launches", "launching",
+  "released", "releases", "releasing",
   "powers", "powered", "powering",
   "delivers", "deliver", "delivered", "delivering",
   "combines", "combine", "combined", "combining",
   "represents", "represent", "represented", "representing",
-  "serves", "serve", "served", "serving",
+  "serves", "served", "serving",
   "operates", "operate", "operated", "operating",
-  "works", "worked", "working",
+  "worked", "working",
   "comprises", "comprise", "comprising",
   "consists", "consist", "consisting",
-  "targets", "target", "targeted", "targeting",
-  "handles", "handle", "handled", "handling",
+  "targets", "targeted", "targeting",
+  "handled", "handling",
   "extends", "extend", "extended", "extending",
-  "deploy", "deploys", "deployed", "deploying",
+  "deploys", "deployed", "deploying",
 ]);
+
+// Strip trailing contraction suffix ("isn't" → "isn", then "'t" stripped by
+// the non-letter strip). Simpler: explicitly strip n't, 's, 're, 've, 'll, 'd
+// before the lookup so the base verb is detectable.
+const CONTRACTION_SUFFIX_RE = /(n['’]t|['’](?:s|re|ve|ll|d|m))$/i;
 
 const PRODUCT_DESC_MAX_LENGTH = 300;
 const PRODUCT_DESC_MIN_WORDS = 8;
@@ -278,7 +293,16 @@ export function normalizeProductDescription(input: string | null | undefined): s
   if (!s) return null;
   const words = s.split(/\s+/).filter(Boolean);
   if (words.length < PRODUCT_DESC_MIN_WORDS) return null;
-  const hasVerb = words.some((w) => COMMON_VERBS.has(w.toLowerCase().replace(/[^a-z]/g, "")));
+  const hasVerb = words.some((raw) => {
+    // Lowercase, strip leading/trailing punctuation, then peel off any
+    // contraction suffix ("isn't" → "is", "claude's" → "claude") before
+    // looking up against COMMON_VERBS.
+    let w = raw.toLowerCase().replace(/^[^a-z]+|[^a-z'’]+$/g, "");
+    w = w.replace(CONTRACTION_SUFFIX_RE, "");
+    // Final strip of any remaining apostrophes (e.g. unmatched curly quote).
+    w = w.replace(/['’]/g, "");
+    return COMMON_VERBS.has(w);
+  });
   if (!hasVerb) return null;
   return s;
 }
@@ -595,6 +619,12 @@ export function applyVerdictsToOrganization(
       // Normalize the candidate description before comparison/write — strips
       // leading "..." extraction artifacts, collapses mid-text ellipses, and
       // returns null for fragments under 8 words or without a verb. QUA-938.
+      //
+      // Intentional: this floor runs BEFORE the existing-product comparison.
+      // A thin candidate is skipped even when the existing description is
+      // even thinner — the slot is left for a later iteration to extract
+      // something coherent. Replacing a 3-char placeholder with a 7-word
+      // fragment is a pyrrhic victory we don't want.
       const cleaned = normalizeProductDescription(value);
       if (!cleaned) {
         applied.push({ targetField: tf, action: "skipped", reason: "description too thin" });

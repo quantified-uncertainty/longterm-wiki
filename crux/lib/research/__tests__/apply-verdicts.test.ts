@@ -213,6 +213,36 @@ describe("normalizeProductDescription", () => {
       normalizeProductDescription("Claude   is\t a\nfamily   of large language models from Anthropic."),
     ).toBe("Claude is a family of large language models from Anthropic.");
   });
+
+  it("recognizes contractions as containing a verb (QUA-938 review fix)", () => {
+    // "isn't" / "doesn't" / "won't" must be detected as containing the
+    // verb stem after stripping the contraction suffix.
+    expect(
+      normalizeProductDescription("Claude isn't just a chatbot but a full coding assistant today."),
+    ).toBe("Claude isn't just a chatbot but a full coding assistant today.");
+    expect(
+      normalizeProductDescription("Claude doesn't merely answer queries — it writes complete code."),
+    ).toBe("Claude doesn't merely answer queries — it writes complete code.");
+    // Curly-quote apostrophes (U+2019) are common in copy-paste from web sources.
+    expect(
+      normalizeProductDescription("Claude isn’t just a chatbot but a full coding assistant today."),
+    ).toBe("Claude isn’t just a chatbot but a full coding assistant today.");
+  });
+
+  it("does not pass noun-only phrases that previously slipped through (QUA-938 review fix)", () => {
+    // These should NOT be accepted — bare-stem ambiguous nouns ("design",
+    // "support", "use", "release", "target", "process", "offer") were
+    // dropped from COMMON_VERBS so a noun phrase using them is rejected.
+    expect(
+      normalizeProductDescription("A clean design from Anthropic for the modern enterprise era today now."),
+    ).toBeNull();
+    expect(
+      normalizeProductDescription("A flexible support contract for enterprise customers and the public sector."),
+    ).toBeNull();
+    expect(
+      normalizeProductDescription("A new release of the open-source toolchain for developers in industry."),
+    ).toBeNull();
+  });
 });
 
 // ─── applyVerdictsToPolicy (smoke) ─────────────────────────────────────────
