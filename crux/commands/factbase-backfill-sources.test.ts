@@ -279,6 +279,169 @@ describe('crux fb backfill-sources — --apply path', () => {
     expect(mockSourcingCommand).toHaveBeenCalledWith([], { fact: target.fact.id });
   });
 
+  it('counts sourcingCommand "Fact not found" no-op as failed, not succeeded (QUA-963)', async () => {
+    // CRITICAL regression: sourcingCommand returns { exitCode: 0, output:
+    // "Fact not found or has no source URL: <id>" } when its post-write
+    // reload doesn't see the fact (race, fact-id collision, slug rename,
+    // atomic-rename lag). Pre-fix the wrapper counted this as `succeeded`,
+    // silently lying about how many verdicts actually landed. Post-fix it
+    // must count as `failed`.
+    const kb = await loadGraphFull();
+    const facts = collectUnsourcedFacts(kb, { property: 'born-year', limit: 1 });
+    if (facts.length === 0) return;
+
+    const target = facts[0];
+    const slug = kb.filenameMap.get(target.entity.id);
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    fakeFiles.set(
+      `/fake/${slug}.yaml`,
+      `facts:\n  - id: ${target.fact.id}\n    propertyId: ${target.fact.propertyId}\n    value: 1990\n`,
+    );
+
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: 'https://example.com/x', confidence: 0.9, summary: 's' }],
+      best: 'https://example.com/x',
+      reason: 'good',
+      costUsd: 0.04,
+    });
+
+    // Simulate the no-op path: sourcingCommand returns exit 0 with the
+    // "Fact not found" output. (This is exactly what factbase-sourcing.ts
+    // returns when collectFacts produces zero hits — see line ~395.)
+    mockSourcingCommand.mockResolvedValue({
+      exitCode: 0,
+      output: `Fact not found or has no source URL: ${target.fact.id}`,
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      entity: target.entity.id,
+      limit: '1',
+      apply: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(mockSourcingCommand).toHaveBeenCalledTimes(1);
+    expect(parsed.summary.verifyAttempted).toBe(1);
+    expect(parsed.summary.verifySucceeded).toBe(0);
+    expect(parsed.summary.verifyFailed).toBe(1);
+  });
+
+  it('counts genuine sourcingCommand success (exit 0, non-no-op output) as succeeded', async () => {
+    // Companion test: confirms the no-op detection doesn't have false
+    // positives that would suppress legitimate verify successes.
+    const kb = await loadGraphFull();
+    const facts = collectUnsourcedFacts(kb, { property: 'born-year', limit: 1 });
+    if (facts.length === 0) return;
+
+    const target = facts[0];
+    const slug = kb.filenameMap.get(target.entity.id);
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    fakeFiles.set(
+      `/fake/${slug}.yaml`,
+      `facts:\n  - id: ${target.fact.id}\n    propertyId: ${target.fact.propertyId}\n    value: 1990\n`,
+    );
+
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: 'https://example.com/x', confidence: 0.9, summary: 's' }],
+      best: 'https://example.com/x',
+      reason: 'good',
+      costUsd: 0.04,
+    });
+
+    // Real success output looks like "Verifying 1 fact(s)... confirmed".
+    // Doesn't match either no-op pattern.
+    mockSourcingCommand.mockResolvedValue({
+      exitCode: 0,
+      output: `Verifying 1 fact(s)...\n  [1/1] target / born-year (${target.fact.id})\n    confirmed (confidence: 90%)\n`,
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      entity: target.entity.id,
+      limit: '1',
+      apply: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.verifyAttempted).toBe(1);
+    expect(parsed.summary.verifySucceeded).toBe(1);
+    expect(parsed.summary.verifyFailed).toBe(0);
+  });
+
+  it('counts non-zero exit from sourcingCommand as failed', async () => {
+    const kb = await loadGraphFull();
+    const facts = collectUnsourcedFacts(kb, { property: 'born-year', limit: 1 });
+    if (facts.length === 0) return;
+
+    const target = facts[0];
+    const slug = kb.filenameMap.get(target.entity.id);
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    fakeFiles.set(
+      `/fake/${slug}.yaml`,
+      `facts:\n  - id: ${target.fact.id}\n    propertyId: ${target.fact.propertyId}\n    value: 1990\n`,
+    );
+
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: 'https://example.com/x', confidence: 0.9, summary: 's' }],
+      best: 'https://example.com/x',
+      reason: 'good',
+      costUsd: 0.04,
+    });
+
+    // sourcingCommand returns exit 1 (e.g., contradicted verdict or storage
+    // error). The wrapper's verify chain should count this as failed.
+    mockSourcingCommand.mockResolvedValue({
+      exitCode: 1,
+      output: `Verifying 1 fact(s)...\n  [1/1] target / born-year (${target.fact.id})\n    contradicted\n`,
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      entity: target.entity.id,
+      limit: '1',
+      apply: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.verifyFailed).toBe(1);
+    expect(parsed.summary.verifySucceeded).toBe(0);
+  });
+
+  it('counts sourcingCommand throwing as failed (QUA-963 coverage of catch branch)', async () => {
+    const kb = await loadGraphFull();
+    const facts = collectUnsourcedFacts(kb, { property: 'born-year', limit: 1 });
+    if (facts.length === 0) return;
+
+    const target = facts[0];
+    const slug = kb.filenameMap.get(target.entity.id);
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    fakeFiles.set(
+      `/fake/${slug}.yaml`,
+      `facts:\n  - id: ${target.fact.id}\n    propertyId: ${target.fact.propertyId}\n    value: 1990\n`,
+    );
+
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: 'https://example.com/x', confidence: 0.9, summary: 's' }],
+      best: 'https://example.com/x',
+      reason: 'good',
+      costUsd: 0.04,
+    });
+
+    mockSourcingCommand.mockRejectedValue(new Error('wiki-server unreachable'));
+
+    const res = await backfill([], {
+      property: 'born-year',
+      entity: target.entity.id,
+      limit: '1',
+      apply: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.verifyFailed).toBe(1);
+    expect(parsed.summary.verifySucceeded).toBe(0);
+  });
+
   it('does NOT run verify chain when --no-verify-chain is set', async () => {
     const kb = await loadGraphFull();
     const facts = collectUnsourcedFacts(kb, { property: 'born-year', limit: 1 });
