@@ -100,6 +100,13 @@ export interface ImproveResult {
   total_duration_s: number;
   hit_target: boolean;
   reason: string;
+  /** When `--wait-for-settle` is set: count of submitted claims still in
+   *  pending/verifying status when the main loop exited (target/iters/budget).
+   *  Omitted when the flag is off. */
+  pending_at_target_hit?: number;
+  /** When `--wait-for-settle` is set: additional verified+partial claims
+   *  finalized during the post-exit drain phase. Omitted when off. */
+  verified_after_drain?: number;
 }
 
 export interface ImproveOptions {
@@ -114,6 +121,269 @@ export interface ImproveOptions {
   dryRun?: boolean;
   /** When true, suppress the per-entity result dump. Used by the suite runner. */
   quiet?: boolean;
+  /** When true, after the main loop exits (target/iters/budget) keep polling
+   *  any unsettled batches until all claims reach a terminal status, applying
+   *  newly-verified verdicts to YAML. Default false (preserves prior
+   *  fast-exit behavior). Recommended for CI gate suite runs (QUA-871) so
+   *  per-run results aren't sensitive to worker-queue timing. */
+  waitForSettle?: boolean;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Wait-for-settle: per-batch tracking + drain helper (QUA-939)
+// ──────────────────────────────────────────────────────────────────────────────
+
+/** Default global wall-clock cap for the post-loop drain (30 min). The drain
+ *  bounds total time spent waiting for stuck batches; matches the
+ *  `MAX_POLL_ROUNDS * 30s = 30 min` per-iteration polling cap. */
+const DEFAULT_DRAIN_MAX_DURATION_MS = 30 * 60 * 1000;
+/** Default sleep between drain polls (30s). Matches the per-iteration polling
+ *  cadence — the worker queue moves on a similar timescale. */
+const DEFAULT_DRAIN_POLL_INTERVAL_MS = 30_000;
+
+/** A claim verdict row as returned by `getClaimStatus`. Mirrors the shape we
+ *  consume from `apps/wiki-server/src/routes/claims/claims.ts`. */
+export interface ClaimVerdictRow {
+  id: number;
+  status: string;
+  verdictReasoning: string | null;
+  extractedValue: string | null;
+  claimText: string;
+}
+
+/** Per-batch state tracked across iterations so `drainPendingBatches` can
+ *  reconstruct VerifiedVerdicts after the main loop exits. Exported for tests. */
+export interface SubmittedBatchInfo {
+  iter: number;
+  batchId: string;
+  /** Submitted claims in submission order (parallel to `claimIds`). */
+  submittedByOrder: PreFilterClaim[];
+  /** Claim IDs returned by proposeClaims (parallel to `submittedByOrder`).
+   *  An entry is undefined only if the propose response had fewer rows than
+   *  expected — we keep the index aligned so the apply path can skip cleanly. */
+  claimIds: Array<number | undefined>;
+  /** True once a poll returned `allSettled`. */
+  settled: boolean;
+  /** Set of claim IDs (subset of `claimIds`) whose verdicts have already been
+   *  applied to the entity. Pre-filled by the per-iteration apply step;
+   *  the drain only applies claim IDs not in this set. */
+  appliedClaimIds: Set<number>;
+  /** Latest verdict rows seen (used to determine pending-vs-terminal status
+   *  and to construct VerifiedVerdicts on drain). */
+  lastVerdicts: ClaimVerdictRow[];
+}
+
+/** Tally of verdict statuses produced by {@link buildVerifiedVerdictsFromBatch}. */
+export interface VerdictCounts {
+  verified: number;
+  partial: number;
+  contradicted: number;
+  unverifiable: number;
+}
+
+/**
+ * Build {@link VerifiedVerdict}s for a single batch by joining its
+ * `submittedByOrder` (carries targetField/displayHint/position) with
+ * `lastVerdicts` (carries verdict status + extracted value) via the parallel
+ * `claimIds` array.
+ *
+ * When `onlyNew` is true, claim IDs already in `batch.appliedClaimIds` are
+ * skipped — used by the drain phase to compute "verifieds caught after the
+ * main loop exited" without re-applying earlier verdicts.
+ *
+ * Exported for testing.
+ */
+export function buildVerifiedVerdictsFromBatch(
+  batch: SubmittedBatchInfo,
+  onlyNew: boolean,
+): { verdicts: VerifiedVerdict[]; counts: VerdictCounts } {
+  const verdictsByClaimId = new Map(batch.lastVerdicts.map((v) => [v.id, v]));
+  const out: VerifiedVerdict[] = [];
+  const counts: VerdictCounts = { verified: 0, partial: 0, contradicted: 0, unverifiable: 0 };
+  for (let i = 0; i < batch.submittedByOrder.length; i++) {
+    const insertedId = batch.claimIds[i];
+    if (insertedId == null) continue;
+    if (onlyNew && batch.appliedClaimIds.has(insertedId)) continue;
+    const v = verdictsByClaimId.get(insertedId);
+    if (!v) continue;
+    const status = v.status;
+    if (status === "verified") counts.verified++;
+    else if (status === "partial") counts.partial++;
+    else if (status === "contradicted") counts.contradicted++;
+    else if (status === "unverifiable") counts.unverifiable++;
+    if (status === "verified" || status === "partial") {
+      const submitted = batch.submittedByOrder[i] as PreFilterClaim & {
+        position?: StakeholderPosition | null;
+        positionConfidence?: number | null;
+      };
+      out.push({
+        targetField: String(submitted.targetField ?? ""),
+        claimText: v.claimText,
+        extractedValue: v.extractedValue,
+        proposedValue: submitted.proposedValue as string | null | undefined,
+        sourceUrl: String(submitted.sourceUrl),
+        status,
+        displayHint: (submitted.displayHint as string | null) ?? undefined,
+        position: submitted.position ?? null,
+        positionConfidence: submitted.positionConfidence ?? null,
+      });
+    }
+  }
+  return { verdicts: out, counts };
+}
+
+/** Mark every claim ID in `batch` whose latest verdict is verified/partial as
+ *  `appliedClaimIds`. Idempotent — safe to call after each apply. */
+function markAppliedFromLastVerdicts(batch: SubmittedBatchInfo): void {
+  for (let i = 0; i < batch.submittedByOrder.length; i++) {
+    const id = batch.claimIds[i];
+    if (id == null) continue;
+    const v = batch.lastVerdicts.find((x) => x.id === id);
+    if (!v) continue;
+    if (v.status === "verified" || v.status === "partial") batch.appliedClaimIds.add(id);
+  }
+}
+
+/** Count claim verdicts in pending/verifying status across all tracked batches. */
+function countPending(batches: SubmittedBatchInfo[]): number {
+  let n = 0;
+  for (const b of batches) {
+    for (const v of b.lastVerdicts) {
+      if (v.status === "pending" || v.status === "verifying") n++;
+    }
+  }
+  return n;
+}
+
+export interface DrainOptions {
+  /** Max wall-clock time to spend draining (ms). Default 30 min. */
+  maxDurationMs?: number;
+  /** Sleep between polls (ms). Default 30s — matches per-iteration cadence. */
+  pollIntervalMs?: number;
+  /** Injected for tests. Defaults to the real `getClaimStatus`. Returns the
+   *  unwrapped status payload, or null on transport/API failure. */
+  pollFn?: (batchId: string) => Promise<{ allSettled: boolean; claims: ClaimVerdictRow[] } | null>;
+  /** Injected for tests. Defaults to {@link applyVerdictsToEntity}. */
+  applyFn?: (entity: EntityWithType, verdicts: VerifiedVerdict[]) => Promise<ApplyResult<EntityWithType>>;
+}
+
+/**
+ * Post-exit drain: poll every unsettled batch until allSettled or a global
+ * time cap is hit, applying any verdicts whose claim IDs were not yet in
+ * `appliedClaimIds`. Mutates `batches` in place (updates `settled`,
+ * `lastVerdicts`, `appliedClaimIds`) so the caller can inspect post-drain
+ * state if needed.
+ *
+ * Called from {@link improveSingleEntity} only when `--wait-for-settle` is set.
+ * Exported for testing.
+ */
+export async function drainPendingBatches(
+  entity: EntityWithType,
+  batches: SubmittedBatchInfo[],
+  opts: DrainOptions = {},
+): Promise<{
+  entity: EntityWithType;
+  pendingAtStart: number;
+  verifiedAfterDrain: number;
+  partialAfterDrain: number;
+  appliedAfterDrain: number;
+  timedOut: boolean;
+}> {
+  const maxDurationMs = opts.maxDurationMs ?? DEFAULT_DRAIN_MAX_DURATION_MS;
+  const pollIntervalMs = opts.pollIntervalMs ?? DEFAULT_DRAIN_POLL_INTERVAL_MS;
+  const pollFn =
+    opts.pollFn ??
+    (async (batchId: string) => {
+      const r = await getClaimStatus(batchId);
+      if (!r.ok) return null;
+      // The route returns `{ batchId, totalClaims, byStatus, claims, allSettled, estimatedRemaining }`.
+      // It returns the FULL claim set (LIMIT 1000) for the batch on every
+      // call — see `apps/wiki-server/src/routes/claims/claims.ts::/status/:batchId`.
+      // If that ever becomes paginated, the merge-vs-replace assumption below
+      // (and in the per-iteration polling) will need revisiting.
+      const d = r.data as unknown as { allSettled?: unknown; claims?: unknown };
+      if (typeof d.allSettled !== "boolean" || !Array.isArray(d.claims)) return null;
+      return { allSettled: d.allSettled, claims: d.claims as ClaimVerdictRow[] };
+    });
+  const applyFn = opts.applyFn ?? applyVerdictsToEntity;
+
+  const pendingAtStart = countPending(batches);
+
+  let cur = entity;
+  let verifiedAfterDrain = 0;
+  let partialAfterDrain = 0;
+  let appliedAfterDrain = 0;
+  let timedOut = false;
+  const t0 = Date.now();
+  let pollFailureCount = 0;
+
+  // Outer loop: keep polling until no batch is unsettled or we time out.
+  // The first pass also captures any batches that finished between the
+  // per-iteration poll and now (they'll have `settled=false` but the next
+  // poll returns allSettled=true).
+  while (true) {
+    const unsettled = batches.filter((b) => !b.settled);
+    if (unsettled.length === 0) break;
+    const elapsed = Date.now() - t0;
+    if (elapsed >= maxDurationMs) {
+      timedOut = true;
+      console.warn(
+        `[drain] max duration ${(maxDurationMs / 1000).toFixed(0)}s reached; ` +
+          `${unsettled.length} batch(es) still unsettled`,
+      );
+      break;
+    }
+
+    // Cap the sleep to the remaining budget so a 30s default sleep can't
+    // overshoot a near-deadline check by up to 30s.
+    const sleepMs = Math.min(pollIntervalMs, maxDurationMs - elapsed);
+    await new Promise((r) => setTimeout(r, sleepMs));
+
+    // Re-check the deadline after the sleep so a clamped-to-zero sleep doesn't
+    // proceed to poll one more time past the cap.
+    if (Date.now() - t0 >= maxDurationMs) {
+      timedOut = true;
+      console.warn(
+        `[drain] max duration ${(maxDurationMs / 1000).toFixed(0)}s reached after sleep; ` +
+          `${unsettled.length} batch(es) still unsettled`,
+      );
+      break;
+    }
+
+    for (const b of unsettled) {
+      if (Date.now() - t0 >= maxDurationMs) {
+        timedOut = true;
+        break;
+      }
+      const sr = await pollFn(b.batchId);
+      if (!sr) {
+        pollFailureCount++;
+        // Log every transient failure at warn so debugging a stuck drain has
+        // a paper trail. The outer while-loop bound prevents indefinite spin.
+        console.warn(`[drain] pollFn returned null for batch ${b.batchId} (failure #${pollFailureCount})`);
+        continue;
+      }
+      b.lastVerdicts = sr.claims;
+      b.settled = sr.allSettled;
+
+      const built = buildVerifiedVerdictsFromBatch(b, /*onlyNew*/ true);
+      if (built.verdicts.length > 0) {
+        const result = await applyFn(cur, built.verdicts);
+        cur = result.entity;
+        verifiedAfterDrain += built.counts.verified;
+        partialAfterDrain += built.counts.partial;
+        appliedAfterDrain += result.applied.filter(
+          (a) => a.action === "added" || a.action === "updated",
+        ).length;
+        // Mark every verified/partial claim ID as applied so a subsequent
+        // poll on the same batch (e.g. when the worker is still finalizing
+        // others) doesn't re-build the same verdicts.
+        markAppliedFromLastVerdicts(b);
+      }
+    }
+  }
+
+  return { entity: cur, pendingAtStart, verifiedAfterDrain, partialAfterDrain, appliedAfterDrain, timedOut };
 }
 
 /** Zod runtime guard for {@link StakeholderPosition}. The literal list MUST
@@ -515,7 +785,7 @@ async function runIteration(
   entity: EntityWithType,
   iter: number,
   budgetRemainingUsd: number,
-): Promise<{ entity: EntityWithType; metrics: IterationMetrics }> {
+): Promise<{ entity: EntityWithType; metrics: IterationMetrics; batch: SubmittedBatchInfo | null }> {
   const t0 = Date.now();
   const m: IterationMetrics = {
     iter,
@@ -540,7 +810,7 @@ async function runIteration(
   if (gaps.length === 0) {
     console.log(`[iter ${iter}] No gaps. Done.`);
     m.duration_s = (Date.now() - t0) / 1000;
-    return { entity, metrics: m };
+    return { entity, metrics: m, batch: null };
   }
   console.log(`[iter ${iter}] gaps: ${gaps.map((g) => g.key).join(", ")}`);
 
@@ -599,7 +869,7 @@ async function runIteration(
 
   if (allClaims.length === 0) {
     m.duration_s = (Date.now() - t0) / 1000;
-    return { entity, metrics: m };
+    return { entity, metrics: m, batch: null };
   }
 
   // 4. Pre-submission token filter — key by sourceUrl (not resourceId).
@@ -634,7 +904,7 @@ async function runIteration(
 
   if (filterResult.kept.length === 0) {
     m.duration_s = (Date.now() - t0) / 1000;
-    return { entity, metrics: m };
+    return { entity, metrics: m, batch: null };
   }
 
   // 5. Submit claims (one batch). Cap at 50 to respect API limits.
@@ -657,7 +927,7 @@ async function runIteration(
   if (!proposeResult.ok) {
     console.warn(`[iter ${iter}] proposeClaims failed: ${proposeResult.error ?? proposeResult.message}`);
     m.duration_s = (Date.now() - t0) / 1000;
-    return { entity, metrics: m };
+    return { entity, metrics: m, batch: null };
   }
   const data = proposeResult.data as {
     batchId: string;
@@ -670,18 +940,12 @@ async function runIteration(
   let settled = false;
   let rounds = 0;
   const MAX_POLL_ROUNDS = 60;
-  let lastVerdicts: Array<{
-    id: number;
-    status: string;
-    verdictReasoning: string | null;
-    extractedValue: string | null;
-    claimText: string;
-  }> = [];
+  let lastVerdicts: ClaimVerdictRow[] = [];
   while (!settled && rounds < MAX_POLL_ROUNDS) {
     await new Promise((r) => setTimeout(r, 30000));
     const sr = await getClaimStatus(data.batchId);
     if (!sr.ok) break;
-    const sd = sr.data as unknown as { allSettled: boolean; claims: typeof lastVerdicts };
+    const sd = sr.data as unknown as { allSettled: boolean; claims: ClaimVerdictRow[] };
     lastVerdicts = sd.claims;
     settled = sd.allSettled;
     rounds++;
@@ -691,49 +955,37 @@ async function runIteration(
     if (settled) break;
   }
 
-  // 7. Apply verified+partial to YAML.
-  const verdictsByClaimId = new Map(lastVerdicts.map((v) => [v.id, v]));
-  const submittedByOrder = filterResult.kept;
-  const verifiedVerdicts: VerifiedVerdict[] = [];
-  for (let i = 0; i < submittedByOrder.length; i++) {
-    const insertedId = data.claims[i]?.id;
-    if (insertedId == null) continue;
-    const v = verdictsByClaimId.get(insertedId);
-    if (!v) continue;
-    const status = v.status;
-    if (status === "verified") m.claims_verified++;
-    else if (status === "partial") m.claims_partial++;
-    else if (status === "contradicted") m.claims_contradicted++;
-    else if (status === "unverifiable") m.claims_unverifiable++;
-    if (status === "verified" || status === "partial") {
-      const submitted = submittedByOrder[i] as PreFilterClaim & {
-        position?: StakeholderPosition | null;
-        positionConfidence?: number | null;
-      };
-      verifiedVerdicts.push({
-        targetField: String(submitted.targetField ?? ""),
-        claimText: v.claimText,
-        extractedValue: v.extractedValue,
-        proposedValue: submitted.proposedValue as string | null | undefined,
-        sourceUrl: String(submitted.sourceUrl),
-        status,
-        displayHint: (submitted.displayHint as string | null) ?? undefined,
-        position: submitted.position ?? null,
-        positionConfidence: submitted.positionConfidence ?? null,
-      });
-    }
-  }
+  // 7. Apply verified+partial to YAML. Build a SubmittedBatchInfo so the
+  //    outer loop can drain pending claims later if `--wait-for-settle` is set.
+  const batch: SubmittedBatchInfo = {
+    iter,
+    batchId: data.batchId,
+    submittedByOrder: filterResult.kept,
+    claimIds: data.claims.map((c) => c?.id),
+    settled,
+    appliedClaimIds: new Set<number>(),
+    lastVerdicts,
+  };
+  const built = buildVerifiedVerdictsFromBatch(batch, /*onlyNew*/ false);
+  m.claims_verified = built.counts.verified;
+  m.claims_partial = built.counts.partial;
+  m.claims_contradicted = built.counts.contradicted;
+  m.claims_unverifiable = built.counts.unverifiable;
   m.verified_rate = m.claims_proposed > 0 ? (m.claims_verified + m.claims_partial) / m.claims_proposed : 0;
 
-  const apply = await applyVerdictsToEntity(entity, verifiedVerdicts);
+  const apply = await applyVerdictsToEntity(entity, built.verdicts);
   m.applied_to_yaml = apply.applied.filter((a) => a.action === "added" || a.action === "updated").length;
   console.log(`[iter ${iter}] applied ${m.applied_to_yaml} new facts to YAML`);
   if (apply.warnings.length > 0) {
     for (const w of apply.warnings) console.warn(`[iter ${iter}] warning: ${w}`);
   }
 
+  // Mark every verified/partial claim ID as applied. The drain phase uses
+  // this set to skip already-applied verdicts and only count NEW verifieds.
+  markAppliedFromLastVerdicts(batch);
+
   m.duration_s = (Date.now() - t0) / 1000;
-  return { entity: apply.entity, metrics: m };
+  return { entity: apply.entity, metrics: m, batch };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -775,6 +1027,7 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
   let entity = found.entity;
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
+  const submittedBatches: SubmittedBatchInfo[] = [];
   let budgetRemaining = budgetUsd;
   let hitTarget = false;
   let reason = "max-iters";
@@ -787,6 +1040,7 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     const out = await runIteration(entity, i, budgetRemaining);
     entity = out.entity;
     iterations.push(out.metrics);
+    if (out.batch) submittedBatches.push(out.batch);
     budgetRemaining -= out.metrics.cost_research_usd + out.metrics.cost_extract_usd;
     const cov = coverageFor(entity);
     console.log(
@@ -803,6 +1057,30 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     }
   }
 
+  // Wait-for-settle drain (QUA-939). Only runs when the flag is set; without
+  // it, behavior matches today (exits as soon as target/iters/budget fires).
+  let pendingAtTargetHit: number | undefined;
+  let verifiedAfterDrain: number | undefined;
+  if (opts.waitForSettle && submittedBatches.length > 0) {
+    const pending = countPending(submittedBatches);
+    pendingAtTargetHit = pending;
+    if (pending > 0 || submittedBatches.some((b) => !b.settled)) {
+      console.log(
+        `[drain] ${pending} pending claim(s) across ${submittedBatches.length} batch(es); polling until settled`,
+      );
+      const drainResult = await drainPendingBatches(entity, submittedBatches);
+      entity = drainResult.entity;
+      verifiedAfterDrain = drainResult.verifiedAfterDrain + drainResult.partialAfterDrain;
+      console.log(
+        `[drain] complete: +${verifiedAfterDrain} verified, +${drainResult.appliedAfterDrain} applied to YAML` +
+          (drainResult.timedOut ? " (timed out)" : ""),
+      );
+    } else {
+      verifiedAfterDrain = 0;
+      console.log(`[drain] all ${submittedBatches.length} batch(es) already settled — no-op`);
+    }
+  }
+
   if (!noWrite) saveEntity(found.filePath, slug, entity);
   const finalCov = coverageFor(entity);
   const result: ImproveResult = {
@@ -816,6 +1094,8 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     total_duration_s: (Date.now() - t0) / 1000,
     hit_target: hitTarget,
     reason,
+    ...(pendingAtTargetHit !== undefined ? { pending_at_target_hit: pendingAtTargetHit } : {}),
+    ...(verifiedAfterDrain !== undefined ? { verified_after_drain: verifiedAfterDrain } : {}),
   };
 
   // Persist per-entity run snapshot.
@@ -833,16 +1113,17 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N]", exitCode: 1 };
+    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N] [--wait-for-settle]", exitCode: 1 };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
   const noWrite = !!options.dryRun;
+  const waitForSettle = !!options.waitForSettle;
 
   let result: ImproveResult;
   try {
-    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite });
+    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite, waitForSettle });
   } catch (err) {
     return { output: err instanceof Error ? err.message : String(err), exitCode: 1 };
   }
@@ -851,7 +1132,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N]
+    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle]
 
 Closed-loop iterative entity improver. Discovers sources via runResearch,
 extracts gap-targeted claims with Haiku, pre-filters by token presence,
@@ -861,10 +1142,15 @@ to the entity's source YAML file under data/entities/.
 Supported entity types: policy, organization.
 
 Options:
-  --target=N      Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
-  --budget=N      Max LLM spend in USD (default: 2.0)
-  --max-iters=N   Max iterations (default: 3)
-  --dry-run       Don't write YAML
+  --target=N           Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
+  --budget=N           Max LLM spend in USD (default: 2.0)
+  --max-iters=N        Max iterations (default: 3)
+  --dry-run            Don't write YAML
+  --wait-for-settle    After the main loop exits (target/iters/budget), keep
+                       polling any unsettled batches until all claims reach a
+                       terminal status, applying any newly-verified verdicts
+                       (capped at 30 min). Recommended for CI gate / suite runs
+                       so per-run results aren't sensitive to worker timing.
 `,
     exitCode: 0,
   };
