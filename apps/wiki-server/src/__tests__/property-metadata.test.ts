@@ -13,6 +13,7 @@
 import { describe, it, expect } from "vitest";
 import {
   getNonVerifiablePropertyIds,
+  parseNonVerifiablePropertyIds,
   _resetPropertyMetadataCache,
 } from "../property-metadata";
 
@@ -52,5 +53,72 @@ describe("getNonVerifiablePropertyIds", () => {
     const b = getNonVerifiablePropertyIds();
     // Identity equality, not just deep equality — second call is a cache hit.
     expect(a).toBe(b);
+  });
+});
+
+describe("parseNonVerifiablePropertyIds — adversarial inputs", () => {
+  it("returns the verifiable:false IDs for a well-formed map", () => {
+    const ids = parseNonVerifiablePropertyIds(`
+properties:
+  good-prop:
+    verifiable: true
+  bad-prop:
+    verifiable: false
+  silent-prop: {}
+`);
+    expect([...ids]).toEqual(["bad-prop"]);
+  });
+
+  it("treats an entirely empty file as zero non-verifiable properties", () => {
+    expect(parseNonVerifiablePropertyIds("")).toEqual(new Set());
+    expect(parseNonVerifiablePropertyIds("properties: {}")).toEqual(new Set());
+  });
+
+  // Scalar root → reject with a clear message. A YAML with `properties: false`
+  // at the root or a bare `42` would otherwise silently parse to garbage.
+  it("throws when the YAML root is not an object", () => {
+    expect(() => parseNonVerifiablePropertyIds("42")).toThrow(/expected an object at the root/);
+    expect(() => parseNonVerifiablePropertyIds('"a string"')).toThrow(/expected an object/);
+    expect(() => parseNonVerifiablePropertyIds("- list\n- items")).toThrow(/expected an object/);
+  });
+
+  it("throws when `properties` is present but not a map", () => {
+    expect(() => parseNonVerifiablePropertyIds("properties: oops")).toThrow(
+      /must be a map/,
+    );
+    expect(() =>
+      parseNonVerifiablePropertyIds("properties:\n  - bad\n  - shape"),
+    ).toThrow(/must be a map/);
+  });
+
+  it("ignores property entries that aren't objects (no crash)", () => {
+    // YAML where a property's value is a string/null instead of a map.
+    // Before validation this would have crashed on `def.verifiable === false`.
+    const ids = parseNonVerifiablePropertyIds(`
+properties:
+  bare-string: just a name
+  null-prop: ~
+  real-prop:
+    verifiable: false
+`);
+    expect([...ids]).toEqual(["real-prop"]);
+  });
+
+  it("requires verifiable === false (truthy/missing/null all keep the prop)", () => {
+    const ids = parseNonVerifiablePropertyIds(`
+properties:
+  verifiable-true:
+    verifiable: true
+  verifiable-missing: {}
+  verifiable-null:
+    verifiable: ~
+  verifiable-zero:
+    verifiable: 0
+  the-real-one:
+    verifiable: false
+`);
+    // Only strict false should make it into the non-verifiable set —
+    // null / missing / 0 are all kept as checkable.
+    expect([...ids]).toEqual(["the-real-one"]);
   });
 });
