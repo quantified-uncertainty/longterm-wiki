@@ -350,9 +350,12 @@ async function discoverBatch(
     return [];
   }
 
+  // Build requests + customId↔fact lookup in a single pass so we don't
+  // re-resolve property + format the value twice per fact.
+  const customIdToFact = new Map<string, { entity: Entity; fact: Fact; propertyName: string; formattedValue: string }>();
   const requests = inBudget.map(({ entity, fact }) => {
     const input = makeDiscoverInput(kb, entity, fact);
-    return buildDiscoveryBatchRequest(
+    const req = buildDiscoveryBatchRequest(
       {
         entity,
         fact,
@@ -361,19 +364,14 @@ async function discoverBatch(
       },
       { threshold: options.threshold },
     );
-  });
-
-  const customIdToFact = new Map<string, { entity: Entity; fact: Fact; propertyName: string; formattedValue: string }>();
-  for (let i = 0; i < requests.length; i++) {
-    const { entity, fact } = inBudget[i];
-    const input = makeDiscoverInput(kb, entity, fact);
-    customIdToFact.set(requests[i].customId, {
+    customIdToFact.set(req.customId, {
       entity,
       fact,
       propertyName: input.propertyName,
       formattedValue: input.formattedValue,
     });
-  }
+    return req;
+  });
 
   options.log(`Submitting batch of ${requests.length} discovery request(s) to Anthropic Batch API…`);
   const client = createLlmClient();
@@ -521,6 +519,13 @@ function applyToYaml(
       continue;
     }
 
+    // Capture the index where THIS entity's writes start so the
+    // write-failure re-classification below can scan exactly this entity's
+    // outcomes (regardless of the mix of wrote / skipped / not-found).
+    // `writes.length - changed` would mis-handle the case where some
+    // updates landed as wrote and others as skipped/not-found in the same
+    // entity loop — the last N entries would not all be wrote.
+    const entityWritesStartIdx = writes.length;
     let changed = 0;
     for (const { factId, url } of updates) {
       const status = updateFactMetaById(doc, factId, {
@@ -546,10 +551,10 @@ function applyToYaml(
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         log(`  [error] write failed for ${slug}: ${msg}`);
-        // Re-classify the would-have-succeeded writes as errors. The other
-        // outcomes (skipped, not-found) are accurate regardless of the
-        // physical write.
-        for (let i = writes.length - changed; i < writes.length; i++) {
+        // Re-classify every `wrote` outcome added during this entity's loop
+        // as an error. Other outcomes (skipped, not-found) are accurate
+        // regardless of the physical write.
+        for (let i = entityWritesStartIdx; i < writes.length; i++) {
           if (writes[i].outcome.kind === 'wrote') {
             summary.writesSucceeded--;
             summary.writeErrors++;
