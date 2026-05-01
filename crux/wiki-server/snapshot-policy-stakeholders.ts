@@ -161,7 +161,16 @@ export async function generatePolicyStakeholdersSnapshot(options?: {
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args["dry-run"] === true;
-  const minRows = typeof args.min === "number" ? args.min : undefined;
+  // parseCliArgs returns flag values as strings; coerce + validate so a typo
+  // like `--min=abc` errors loud instead of silently falling back to default.
+  let minRows: number | undefined;
+  if (args.min !== undefined) {
+    const parsed = Number(args.min);
+    if (!Number.isFinite(parsed) || parsed < 0 || !Number.isInteger(parsed)) {
+      throw new Error(`--min must be a non-negative integer, got: ${JSON.stringify(args.min)}`);
+    }
+    minRows = parsed;
+  }
   await generatePolicyStakeholdersSnapshot({ dryRun, minRows });
 }
 

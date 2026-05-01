@@ -76,7 +76,7 @@ const SCRIPTS = {
   'snapshot-policy-stakeholders': {
     script: 'wiki-server/snapshot-policy-stakeholders.ts',
     description: 'Export PG policy stakeholders to data/policy-stakeholders-snapshot.json (QUA-960)',
-    passthrough: ['dryRun', 'dry-run'],
+    passthrough: ['dryRun', 'dry-run', 'min'],
   },
 };
 
