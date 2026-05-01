@@ -78,6 +78,11 @@ const SIDEBAR_ONLY_PAGES = [
   // 404 in the CI build (LONGTERMWIKI_SERVER_URL unset → kb-pg merge skipped).
   // Validated locally with a dev server pointed at prod data.
   "/publications/nature",
+  // Events — migrated to EntityProfileShell in QUA-488. Uses YAML
+  // entity data so it's available in CI without PG access.
+  // Note: races/[id] was also migrated in QUA-488 but its records live
+  // only in PG, so it 404s in the CI build. Validated locally against prod.
+  "/events/cyber-incident-notpetya",
 ];
 
 /**
