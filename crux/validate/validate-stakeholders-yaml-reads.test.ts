@@ -18,6 +18,12 @@ describe("validate-stakeholders-yaml-reads checkLine", () => {
     expect(checkLine(" * The .stakeholders array is iterated below.")).toBeNull();
   });
 
+  it("flags bracket-notation reads", () => {
+    expect(checkLine('const xs = entity["stakeholders"];')).toBe("PROPERTY_READ");
+    expect(checkLine("const xs = entity['stakeholders'];")).toBe("PROPERTY_READ");
+    expect(checkLine("const xs = entity[ 'stakeholders' ];")).toBe("PROPERTY_READ");
+  });
+
   it("ignores string literals", () => {
     expect(checkLine("const fieldName = 'stakeholders';")).toBeNull();
     // PROPERTY_READ matches `.stakeholders` so the regex bites only on

@@ -55,6 +55,8 @@ type Kind = "PROPERTY_READ" | "YAML_KEY";
 const PATTERNS: Array<{ globalPattern: RegExp; kind: Kind }> = [
   // entity.stakeholders, e.stakeholders, policy.stakeholders, etc.
   { globalPattern: /\.stakeholders\b/g, kind: "PROPERTY_READ" },
+  // entity["stakeholders"] / entity['stakeholders'] bracket-notation reads.
+  { globalPattern: /\[\s*["']stakeholders["']\s*\]/g, kind: "PROPERTY_READ" },
   // Top-level YAML key access via parseYaml / readFileSync chains. We don't
   // try to AST-parse — flag any literal `stakeholders?:` field type or
   // `'stakeholders'` quoted key in code under the scan dirs.

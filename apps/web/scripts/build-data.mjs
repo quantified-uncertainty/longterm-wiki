@@ -313,6 +313,19 @@ async function applyStakeholdersSourceToggle(typedEntities) {
     return;
   }
 
+  // Sort: position bucket (support→oppose→mixed→neutral), then byte-stable
+  // name. Matches the ordering the rollback path uses (rebuildStakeholdersForPolicy).
+  const POSITION_ORDER = { support: 0, oppose: 1, mixed: 2, neutral: 3 };
+  const sortStakeholders = (arr) =>
+    arr.sort((a, b) => {
+      const pa = POSITION_ORDER[a.position] ?? 99;
+      const pb = POSITION_ORDER[b.position] ?? 99;
+      if (pa !== pb) return pa - pb;
+      const an = a.name ?? '';
+      const bn = b.name ?? '';
+      return an < bn ? -1 : an > bn ? 1 : 0;
+    });
+
   let replaced = 0;
   let pgEmpty = 0;
   for (const e of typedEntities) {
@@ -332,10 +345,16 @@ async function applyStakeholdersSourceToggle(typedEntities) {
         if (s.name && s.role) yamlRoleByName.set(s.name, s.role);
       }
     }
-    e.stakeholders = pgList.map((s) => {
+    // Merge: start with YAML stakeholders as base so YAML-only rows (FK-skips
+    // during sync) are preserved, then overlay PG data. PG rows take precedence.
+    const merged = new Map(
+      (Array.isArray(e.stakeholders) ? e.stakeholders : []).map((s) => [s.entityId ?? s.name, s]),
+    );
+    for (const s of pgList) {
       const role = yamlRoleByName.get(s.name);
-      return role ? { ...s, role } : s;
-    });
+      merged.set(s.entityId ?? s.name, role ? { ...s, role } : s);
+    }
+    e.stakeholders = sortStakeholders([...merged.values()]);
     replaced++;
   }
   console.log(`  STAKEHOLDERS_SOURCE=pg: replaced stakeholders on ${replaced} policies`);
