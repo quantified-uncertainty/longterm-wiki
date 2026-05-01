@@ -410,6 +410,17 @@ async function discoverBatch(
   const responses = await getBatchResults(client, submitted.id);
   const results: FactDiscovery[] = [];
 
+  // Charge the cost estimate up-front based on submission count, not on
+  // successful responses. Anthropic bills for every request that processed
+  // (including errored ones), and for our budget-tracking purposes a fact
+  // we lost (provider dropped the response) still consumed quota. Charging
+  // only on the success branch under-reported cost — operators saw
+  // `costUsd: $0.98` after a 50-fact run with 1 drop while actual billing
+  // was ~$1.00. Charging once up-front matches submission semantics and
+  // makes the budget-gate math (which is also estimate-based) consistent
+  // across runs.
+  summary.costUsd += requests.length * ESTIMATED_BATCH_COST_USD;
+
   // Track which submitted customIds we saw a response for so we can detect
   // facts Anthropic accepted but never returned a result for. Pre-fix, those
   // facts would silently disappear from `summary.scanned` — operators couldn't
@@ -451,10 +462,8 @@ async function discoverBatch(
 
     const text = extractTextFromMessage(response.result.message);
     const parsed = parseDiscoveryResponse(text, options.threshold);
-    // Batch cost is settled by the batch summary, not per-response. Track it
-    // approximately: estimated rather than precise. The engine returns
-    // costUsd: 0 for the batch path (per source-discover.ts contract).
-    summary.costUsd += ESTIMATED_BATCH_COST_USD;
+    // No per-response cost increment — already charged up-front. The engine
+    // returns costUsd: 0 for the batch path (per source-discover.ts contract).
     const discoverResult: DiscoverResult = { ...parsed, costUsd: 0 };
     results.push({
       entity: ctx.entity,

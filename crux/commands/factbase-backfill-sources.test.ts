@@ -727,6 +727,18 @@ describe('crux fb backfill-sources — --batch path', () => {
     // Post-fix, the wrapper walks customIdToFact at the end of the response
     // loop and emits an engineError + missingResponses++ + a synthetic
     // FactDiscovery so the report can name the dropped fact.
+    //
+    // CodeRabbit fix: the test previously hardcoded `expect(missingResponses).toBe(2)`,
+    // which would fail if the KB had < 2 unsourced born-year facts (e.g.,
+    // after the QUA-933 smoke test wrote a Wikipedia source for Andrej
+    // Karpathy's born-year). Resolve the actual count up-front via
+    // collectUnsourcedFacts and assert against `n`, capping at 2 to keep
+    // the test bounded.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 2 });
+    if (available.length === 0) return; // skip if no born-year facts at all
+    const n = available.length;
+
     mockSubmitBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'in_progress', request_counts: {} });
     mockPollBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'ended', request_counts: {} });
 
@@ -736,21 +748,21 @@ describe('crux fb backfill-sources — --batch path', () => {
 
     const res = await backfill([], {
       property: 'born-year',
-      limit: '2',
+      limit: String(n),
       batch: true,
       json: true,
     });
     const parsed = JSON.parse(String(res.output));
-    // Both facts must be reconciled as missing.
-    expect(parsed.summary.missingResponses).toBe(2);
-    expect(parsed.summary.engineErrors).toBe(2);
+    // All n facts must be reconciled as missing.
+    expect(parsed.summary.missingResponses).toBe(n);
+    expect(parsed.summary.engineErrors).toBe(n);
     // scanned must equal the number of facts we submitted, NOT the number
     // of responses (the pre-fix bug). Otherwise scanned < requested and the
     // operator can't reconcile the report against the input.
-    expect(parsed.summary.scanned).toBe(2);
+    expect(parsed.summary.scanned).toBe(n);
     expect(parsed.summary.unknownCustomIds).toBe(0);
-    // Per-fact results array should have 2 entries with kind=error.
-    expect(parsed.results.length).toBe(2);
+    // Per-fact results array should have n entries with kind=error.
+    expect(parsed.results.length).toBe(n);
     for (const r of parsed.results) {
       expect(r.error).toContain('did not return a response');
     }
@@ -803,9 +815,20 @@ describe('crux fb backfill-sources — --batch path', () => {
   });
 
   it('mixed: some facts dropped + some unknown customIds (QUA-963 PR-B)', async () => {
-    // Combined edge case: submit 2 facts, get back 1 valid response + 1
-    // unknown customId, leaving 1 actual fact unaccounted for. The
-    // reconciliation pass should catch the dropped fact.
+    // Combined edge case: submit n facts (n >= 2), get back 1 valid
+    // response + 1 unknown customId, leaving (n - 1) actual facts
+    // unaccounted for. The reconciliation pass should catch the dropped
+    // facts.
+    //
+    // Same KB-fragility fix as the "missing responses" test above —
+    // resolve actual count up-front and skip if KB doesn't have ≥ 2
+    // unsourced born-year facts available.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 3 });
+    if (available.length < 2) return; // skip if we can't simulate "1 of n returned"
+    const n = available.length;
+    const droppedCount = n - 1;
+
     mockSubmitBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'in_progress', request_counts: {} });
     mockPollBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'ended', request_counts: {} });
 
@@ -836,17 +859,51 @@ describe('crux fb backfill-sources — --batch path', () => {
 
     const res = await backfill([], {
       property: 'born-year',
-      limit: '2',
+      limit: String(n),
       batch: true,
       json: true,
     });
     const parsed = JSON.parse(String(res.output));
     expect(parsed.summary.unknownCustomIds).toBe(1);
-    expect(parsed.summary.missingResponses).toBe(1);
-    expect(parsed.summary.engineErrors).toBe(1);
+    expect(parsed.summary.missingResponses).toBe(droppedCount);
+    expect(parsed.summary.engineErrors).toBe(droppedCount);
     expect(parsed.summary.discovered).toBe(1);
-    // Both facts accounted for in scanned (1 succeeded + 1 reconciled-as-error).
-    expect(parsed.summary.scanned).toBe(2);
+    // All n facts accounted for in scanned (1 succeeded + droppedCount reconciled-as-error).
+    expect(parsed.summary.scanned).toBe(n);
+  });
+
+  it('charges batch cost up-front based on submission count, not on successes (QUA-963 PR-B)', async () => {
+    // CodeRabbit fix: pre-fix, summary.costUsd was incremented only inside
+    // the success-response branch. A 50-fact batch with 1 dropped response
+    // would report $0.98 even though Anthropic billed for the full
+    // submission (~$1.00). Post-fix, cost is charged once up-front based
+    // on requests.length so the report matches submission semantics.
+    const kb = await loadGraphFull();
+    const available = collectUnsourcedFacts(kb, { property: 'born-year', limit: 2 });
+    if (available.length === 0) return;
+    const n = available.length;
+
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_cost', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_cost', processing_status: 'ended', request_counts: {} });
+
+    // Drop ALL responses — the reported cost should still reflect what we
+    // submitted, not what came back.
+    mockGetBatchResults.mockResolvedValue(new Map());
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: String(n),
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+
+    // Cost should equal n * ESTIMATED_BATCH_COST_USD (0.02), even though
+    // 0 succeeded.
+    const expectedCost = Number((n * 0.02).toFixed(4));
+    expect(parsed.summary.costUsd).toBe(expectedCost);
+    // Sanity check: zero discoveries (all dropped).
+    expect(parsed.summary.discovered).toBe(0);
   });
 });
 
