@@ -58,6 +58,7 @@ import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
 import * as issuesCommands from './commands/issues.ts';
 import * as agentChecklistCommands from './commands/agent-checklist.ts';
+import * as reviewPhaseCommands from './commands/review-phase.ts';
 import * as entityCommands from './commands/entity.ts';
 import * as prCommands from './commands/pr.ts';
 import * as wikiServerCommands from './commands/wiki-server.ts';
@@ -163,6 +164,7 @@ const domains = {
   grokipedia: grokipediaCommands,
   issues: issuesCommands,
   'agent-checklist': agentChecklistCommands,
+  'review-phase': reviewPhaseCommands,
   entity: entityCommands,
   'entity-resources': entityResourcesCommands,
   pr: prCommands,
