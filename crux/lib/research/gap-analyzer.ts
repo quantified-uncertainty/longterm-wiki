@@ -444,3 +444,30 @@ export function organizationCoverageScore(
     },
   };
 }
+
+/** Entity types that have a coverage scorer registered. */
+export const SUPPORTED_COVERAGE_TYPES = ["policy", "organization"] as const;
+export type SupportedCoverageType = (typeof SUPPORTED_COVERAGE_TYPES)[number];
+
+export function isSupportedCoverageType(t: string): t is SupportedCoverageType {
+  return (SUPPORTED_COVERAGE_TYPES as readonly string[]).includes(t);
+}
+
+/**
+ * Dispatch a coverage score based on `entity.type`. Returns `null` for
+ * types without a registered scorer — callers decide whether to surface
+ * that as a hard error or a `unsupported_type` status.
+ *
+ * Input is the union of supported entity shapes; the `entity.type ===` checks
+ * narrow within each branch. Loaded-from-YAML entities are passed in here —
+ * PolicyEntity and OrganizationEntity both have all-optional fields beyond
+ * `{id, type}`, so a YAML record is structurally assignable.
+ */
+export function coverageScoreForEntity(
+  entity: PolicyEntity | OrganizationEntity,
+): CoverageScore | null {
+  if (entity.type === "policy") return policyCoverageScore(entity as PolicyEntity);
+  if (entity.type === "organization")
+    return organizationCoverageScore(entity as OrganizationEntity);
+  return null;
+}
