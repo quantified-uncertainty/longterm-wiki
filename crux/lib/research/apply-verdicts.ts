@@ -88,6 +88,40 @@ const MONTH_NAMES: Record<string, string> = {
   dec: "12", december: "12",
 };
 
+const MONTH_NAME_PATTERN =
+  "(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)";
+
+/** Year range we're willing to commit to YAML. Older orgs (founding year
+ *  pre-1800) are out of scope for the wiki; "year 4 digits" matches like 0000
+ *  or 9999 are almost certainly false positives. */
+const MIN_YEAR = 1800;
+const MAX_YEAR = 2099;
+
+function isYearInRange(year: number): boolean {
+  return year >= MIN_YEAR && year <= MAX_YEAR;
+}
+
+/** Round-trip a candidate full date through Date.UTC to reject calendar-impossible
+ *  values (e.g. Feb 31, Apr 31, Feb 30). Returns the canonical "YYYY-MM-DD" form
+ *  iff the parsed components survive the round-trip; null otherwise. */
+function validateFullDate(year: string, month: string, day: string): string | null {
+  const y = Number(year);
+  const m = Number(month);
+  const d = Number(day);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return null;
+  if (!isYearInRange(y)) return null;
+  if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const utc = new Date(Date.UTC(y, m - 1, d));
+  if (
+    utc.getUTCFullYear() !== y ||
+    utc.getUTCMonth() !== m - 1 ||
+    utc.getUTCDate() !== d
+  ) {
+    return null;
+  }
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
 /**
  * Best-effort extraction of a structured date string from prose. Returns the
  * tightest representation available — preferring full ISO `YYYY-MM-DD`,
@@ -95,6 +129,13 @@ const MONTH_NAMES: Record<string, string> = {
  * is found. Used by the keyDate applier to reject narrative prose like
  * `"Claude on Mars - The first AI-assisted drive ..."` that the extractor
  * sometimes returns in proposedValue (QUA-937).
+ *
+ * Calendar validity is enforced for full dates: "2026-02-31" falls through to
+ * the year fallback rather than being committed to YAML.
+ *
+ * Candidates are tried in order. Note that for keyDate.* claims the caller
+ * passes `proposedValue` first because the extractor prompt requires ISO format
+ * there; `extractedValue` (the verifier's free-form output) is the fallback.
  */
 export function extractStructuredDate(...candidates: Array<string | null | undefined>): string | null {
   for (const raw of candidates) {
@@ -102,44 +143,49 @@ export function extractStructuredDate(...candidates: Array<string | null | undef
     const s = raw.trim();
     if (!s) continue;
 
-    // Full ISO YYYY-MM-DD anywhere in the string.
-    const iso = s.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    // Full ISO YYYY-MM-DD anywhere in the string. The trailing `(?!\d)` (rather
+    // than `\b`) lets us match the date prefix of an ISO 8601 timestamp like
+    // "2024-06-15T10:30:00Z" — with `\b`, the word-boundary between `5` and `T`
+    // (both word chars) doesn't fire and we'd lose the day. Round-trip through
+    // Date.UTC to catch calendar-impossible values (Feb 31, Apr 31, etc.).
+    const iso = s.match(/\b(\d{4})-(\d{2})-(\d{2})(?!\d)/);
     if (iso) {
-      const [_, y, m, d] = iso;
-      if (Number(m) >= 1 && Number(m) <= 12 && Number(d) >= 1 && Number(d) <= 31) {
-        return `${y}-${m}-${d}`;
-      }
+      const valid = validateFullDate(iso[1], iso[2], iso[3]);
+      if (valid) return valid;
     }
 
     // "Month Day, Year" or "Month Day Year" — e.g. "January 30, 2026", "Feb 12 2026".
     const monthDay = s.match(
-      /\b(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)\.?\s+(\d{1,2}),?\s+(\d{4})\b/i,
+      new RegExp(String.raw`\b${MONTH_NAME_PATTERN}\.?\s+(\d{1,2}),?\s+(\d{4})\b`, "i"),
     );
     if (monthDay) {
       const month = MONTH_NAMES[monthDay[1].toLowerCase()];
-      const day = monthDay[2].padStart(2, "0");
-      if (month && Number(day) >= 1 && Number(day) <= 31) {
-        return `${monthDay[3]}-${month}-${day}`;
+      if (month) {
+        const valid = validateFullDate(monthDay[3], month, monthDay[2]);
+        if (valid) return valid;
       }
     }
 
     // "Month Year" — e.g. "January 2021", "Sept 2024".
     const monthYear = s.match(
-      /\b(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)\.?\s+(\d{4})\b/i,
+      new RegExp(String.raw`\b${MONTH_NAME_PATTERN}\.?\s+(\d{4})\b`, "i"),
     );
     if (monthYear) {
       const month = MONTH_NAMES[monthYear[1].toLowerCase()];
-      if (month) return `${monthYear[2]}-${month}`;
+      if (month && isYearInRange(Number(monthYear[2]))) {
+        return `${monthYear[2]}-${month}`;
+      }
     }
 
     // YYYY-MM (no day component).
     const ym = s.match(/\b(\d{4})-(\d{2})\b/);
-    if (ym && Number(ym[2]) >= 1 && Number(ym[2]) <= 12) {
+    if (ym && isYearInRange(Number(ym[1])) && Number(ym[2]) >= 1 && Number(ym[2]) <= 12) {
       return `${ym[1]}-${ym[2]}`;
     }
 
-    // Bare year as last resort.
-    const year = s.match(/\b(19|20)(\d{2})\b/);
+    // Bare year as last resort. Range covers founding dates back to ~1800
+    // (older orgs are out of scope) up through the 21st century.
+    const year = s.match(/\b(1[89]|20)(\d{2})\b/);
     if (year) return `${year[1]}${year[2]}`;
   }
   return null;
@@ -562,6 +608,15 @@ export function applyVerdictsToOrganization(
         if (!existing.source && v.sourceUrl) {
           existing.source = v.sourceUrl;
           updated = true;
+        }
+        // Symmetric with the new-entry branch below: if we got here without a
+        // parseable date AND the existing entry's date is still missing, that's
+        // the same prose-leaked-into-date pathology — flag it independently of
+        // whether we backfilled the source (which would set `updated`).
+        if (!existing.date && !date) {
+          warnings.push(
+            `keyDate.${slug}: no parseable date in proposedValue/extractedValue/claimText — existing entry left unfilled`,
+          );
         }
         applied.push({
           targetField: tf,
