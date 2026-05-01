@@ -10,29 +10,14 @@ import {
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { InlineSourcingSchema } from "./sourcing-schema.js";
+import {
+  SyncStakeholderItemSchema,
+  VALID_POSITIONS,
+} from "./policy-stakeholders-schema.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
-const VALID_POSITIONS = ["support", "oppose", "neutral", "mixed"] as const;
-
-// ---- Schemas ----
-
-const VALID_IMPORTANCE = ["high", "medium", "low"] as const;
-
-const SyncStakeholderItemSchema = z.object({
-  id: z.string().length(10),
-  policyEntityId: z.string().min(1).max(200),
-  stakeholderEntityId: z.string().max(200).nullable().optional(),
-  stakeholderDisplayName: z.string().min(1).max(500),
-  position: z.enum(VALID_POSITIONS),
-  importance: z.enum(VALID_IMPORTANCE).nullable().optional(),
-  reason: z.string().max(5000).nullable().optional(),
-  source: z.string().max(2000).nullable().optional(),
-  context: z.array(z.string()).nullable().optional(),
-  sourcing: InlineSourcingSchema.optional(),
-});
 
 const ByPolicyQuery = z.object({
   position: z.enum(VALID_POSITIONS).optional(),

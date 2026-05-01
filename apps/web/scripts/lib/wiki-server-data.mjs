@@ -965,6 +965,21 @@ export async function syncPolicyStakeholders(typedEntities) {
             if (r.ok) {
               synced++;
             } else {
+              // QUA-941 / QUA-964: distinguish FK-missing (legitimate skip — some
+              // YAML stakeholders reference entities not yet in PG) from Zod schema
+              // rejection (data corruption — must fail loud). FK errors from
+              // validateEntityRefs always contain the literal "Entity references
+              // not found"; any other 400 indicates real schema violation.
+              // TODO(QUA-951): switch to body.includes('"code":"fk_missing"') once
+              // the validationError discriminator lands.
+              const body = await r.text();
+              const isFkMissing = body.includes('Entity references not found');
+              if (!isFkMissing) {
+                process.stderr.write(
+                  `syncPolicyStakeholders: non-FK 400 for policy=${item.policyEntityId} stakeholder=${item.stakeholderEntityId ?? item.stakeholderDisplayName} — YAML data corruption (QUA-941).\nResponse: ${body}\n`,
+                );
+                process.exit(1);
+              }
               skipped++;
             }
           } catch {
