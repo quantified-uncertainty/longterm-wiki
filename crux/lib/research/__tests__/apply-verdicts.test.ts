@@ -243,6 +243,64 @@ describe("normalizeProductDescription", () => {
       normalizeProductDescription("A new release of the open-source toolchain for developers in industry."),
     ).toBeNull();
   });
+
+  it("strips trailing comma fragments", () => {
+    expect(
+      normalizeProductDescription("Claude is a family of large language models from Anthropic,"),
+    ).toBe("Claude is a family of large language models from Anthropic");
+    expect(
+      normalizeProductDescription("Claude is a family of large language models from Anthropic,   "),
+    ).toBe("Claude is a family of large language models from Anthropic");
+  });
+
+  it("rejects descriptions containing launch-date or revenue indicators (QUA-938 write-path enforcement)", () => {
+    // Mixed launch-date + revenue blurb — the canonical bad example from QUA-938.
+    expect(
+      normalizeProductDescription(
+        "Claude Code was made available in June 2025 with run-rate revenue of $2.5 billion.",
+      ),
+    ).toBeNull();
+    // Four-digit year alone is sufficient to reject.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models released in 2024 by Anthropic.",
+      ),
+    ).toBeNull();
+    // Dollar sign (monetary indicator).
+    expect(
+      normalizeProductDescription(
+        "Claude is a subscription assistant priced at $20 per month for individual users.",
+      ),
+    ).toBeNull();
+    // Revenue keyword.
+    expect(
+      normalizeProductDescription(
+        "Claude is Anthropic's flagship model and the primary driver of revenue for the company.",
+      ),
+    ).toBeNull();
+    // Month name (non-May).
+    expect(
+      normalizeProductDescription(
+        "Claude is a model that was launched in January by the Anthropic team for safety researchers.",
+      ),
+    ).toBeNull();
+    // Clean description — should still pass.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models tuned for helpfulness, harmlessness, and honesty.",
+      ),
+    ).toBe(
+      "Claude is a family of large language models tuned for helpfulness, harmlessness, and honesty.",
+    );
+    // "may" as a modal verb (not a month) — should NOT be rejected.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models that may be used across many enterprise workflows.",
+      ),
+    ).toBe(
+      "Claude is a family of large language models that may be used across many enterprise workflows.",
+    );
+  });
 });
 
 // ─── applyVerdictsToPolicy (smoke) ─────────────────────────────────────────

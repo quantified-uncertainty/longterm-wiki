@@ -251,6 +251,13 @@ const CONTRACTION_SUFFIX_RE = /(n['’]t|['’](?:s|re|ve|ll|d|m))$/i;
 const PRODUCT_DESC_MAX_LENGTH = 300;
 const PRODUCT_DESC_MIN_WORDS = 8;
 
+// Reject descriptions that mix in launch-date or revenue/valuation content.
+// These facts belong in keyDate.* and factbase.* respectively. "May" is
+// intentionally excluded — it is also a common modal verb ("Claude may be
+// used for...") and causes too many false positives.
+const PRODUCT_DATE_REVENUE_RE =
+  /\b(january|february|march|april|june|july|august|september|october|november|december)\b|\b(19|20)\d{2}\b|\$|\b(million|billion|run-rate|run rate|revenue|launched|made\s+available)\b/i;
+
 /**
  * Normalize a Haiku-extracted product description before writing it to YAML.
  *
@@ -282,6 +289,9 @@ export function normalizeProductDescription(input: string | null | undefined): s
   // Replacing with a single space keeps the surrounding tokens but removes
   // the visual "this was cut" tell.
   s = s.replace(/\s*\.{3,}\s*/g, " ").replace(/\s*…\s*/g, " ");
+  // Strip trailing comma/fragment punctuation (e.g. "...the leading model,").
+  s = s.replace(/,\s*$/u, "").trim();
+  if (!s) return null;
   // Normalize whitespace.
   s = s.replace(/\s+/g, " ").trim();
   if (!s) return null;
@@ -304,6 +314,10 @@ export function normalizeProductDescription(input: string | null | undefined): s
     return COMMON_VERBS.has(w);
   });
   if (!hasVerb) return null;
+  // Reject descriptions that mix in launch-date or revenue/valuation content.
+  // Aligns the write-path enforcement with the extraction-prompt guidance so
+  // a mixed blurb can never land in product.* even if the LLM ignores the prompt.
+  if (PRODUCT_DATE_REVENUE_RE.test(s)) return null;
   return s;
 }
 
