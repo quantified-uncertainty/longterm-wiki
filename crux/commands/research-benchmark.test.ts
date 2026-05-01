@@ -150,6 +150,46 @@ describe("takeSnapshot — type dispatch (QUA-936)", () => {
     }
   });
 
+  it("rejects path-traversal in --tag (red-team)", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-"));
+    try {
+      const entitiesDir = setupEntities(tmp, [
+        { file: "responses.yaml", data: [POLICY_FIXTURE] },
+      ]);
+      expect(() =>
+        takeSnapshot("fisa-702", "../../escape", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid --tag/);
+      expect(() =>
+        takeSnapshot("fisa-702", "/abs/path", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid --tag/);
+      expect(() =>
+        takeSnapshot("fisa-702", "", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid --tag/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects path-traversal / shell metacharacters in slug (red-team)", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-"));
+    try {
+      const entitiesDir = setupEntities(tmp, [
+        { file: "responses.yaml", data: [POLICY_FIXTURE] },
+      ]);
+      expect(() =>
+        takeSnapshot("../escape", "baseline", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid slug/);
+      expect(() =>
+        takeSnapshot("'; rm -rf /", "baseline", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid slug/);
+      expect(() =>
+        takeSnapshot("", "baseline", { entitiesDir, benchDir: tmp }),
+      ).toThrow(/Invalid slug/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   it("persists entity_type to the snapshot file (QUA-936)", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-"));
     try {

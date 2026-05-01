@@ -24,6 +24,18 @@ import { findEntity, type EntityWithType } from "../lib/research/entity-loader.t
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const DEFAULT_BENCH_DIR = path.join(ROOT, ".claude/snapshots/benchmark");
 
+/** Tag flows into the snapshot filename. Allowlist prevents path traversal
+ *  and shell/filesystem surprises. Mirrors the suite-side check. */
+const VALID_TAG_RE = /^[a-zA-Z0-9._-]+$/;
+function isValidTag(tag: string): boolean {
+  return tag.length > 0 && tag.length <= 80 && VALID_TAG_RE.test(tag);
+}
+
+/** Slug also flows into a directory path; same allowlist semantics. */
+function isValidSlug(slug: string): boolean {
+  return slug.length > 0 && slug.length <= 200 && VALID_TAG_RE.test(slug);
+}
+
 export interface BenchmarkSnapshot {
   entity_slug: string;
   /** Entity type (`policy`, `organization`, ...). Added in QUA-936 so diff/list
@@ -65,6 +77,7 @@ function entityDir(slug: string, benchDir: string): string {
 }
 
 export function listSnapshots(slug: string, opts: SnapshotOptions = {}): BenchmarkSnapshot[] {
+  if (!isValidSlug(slug)) return [];
   const dir = entityDir(slug, opts.benchDir ?? DEFAULT_BENCH_DIR);
   if (!fs.existsSync(dir)) return [];
   return fs
@@ -87,6 +100,12 @@ export function takeSnapshot(
   tag: string,
   opts: SnapshotOptions = {},
 ): BenchmarkSnapshot {
+  if (!isValidSlug(slug)) {
+    throw new Error(`Invalid slug "${slug}": must match ${VALID_TAG_RE} and be 1-200 chars.`);
+  }
+  if (!isValidTag(tag)) {
+    throw new Error(`Invalid --tag "${tag}": must match ${VALID_TAG_RE} and be 1-80 chars.`);
+  }
   const entity = findEntity(slug, opts.entitiesDir);
   if (!entity) throw new Error(`Entity not found: ${slug}`);
   if (!isSupportedCoverageType(entity.type)) {
