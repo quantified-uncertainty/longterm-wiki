@@ -16,7 +16,7 @@
 --
 -- No CHECK constraint on scorecard_source yet — sources are added one wave
 -- at a time and the value list is a five-element closed set today, but per
--- .claude/rules/database-migrations.md we'd need a prod enumeration before
+-- docs/agent-rules/database-migrations.md we'd need a prod enumeration before
 -- locking it. Defer to a follow-up after Phase 1 prod data exists.
 
 CREATE TABLE IF NOT EXISTS "scorecard_snapshots" (

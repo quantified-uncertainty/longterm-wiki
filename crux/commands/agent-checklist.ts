@@ -26,7 +26,7 @@ import {
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
-import { syncToMain } from '../lib/git.ts';
+import { syncToMain, safeSyncMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands, checkDedup as linearCheckDedup } from './linear.ts';
 import { getIssue as getLinearIssue } from '../lib/linear/issues.ts';
@@ -55,6 +55,10 @@ interface CommandOptions extends BaseOptions {
   /** Skip the sync-to-main step. Used by tests and by scripted callers that
    *  intentionally want to start a session on the current branch. */
   noSync?: boolean;
+  /** Opt in to the legacy behavior of force-switching off any feature branch
+   *  back to main and pulling. Without this flag, init never switches off a
+   *  feature branch — it only pulls main when already on main (QUA-403). */
+  resetToMain?: boolean;
   /** Skip the auto-call to `gh issues start <N>`. Used by tests. */
   noIssueStart?: boolean;
   /** Skip the auto-call to `linear issues start <QUA-NNN>`. Used by tests. */
@@ -135,12 +139,15 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   // ── Sync to main ──────────────────────────────────────────────────────────
   // Programmatic replacement for the old "Step 0: sync with main" instructions
-  // in /agent-init. Always runs unless explicitly opted out via --no-sync.
-  // If the working tree is dirty, this aborts BEFORE writing the checklist —
-  // the user must commit/stash/discard before retrying.
+  // in /agent-init. Default: `safeSyncMain` — pulls main when on main, but
+  // never switches off a feature branch (QUA-403). Pass `--reset-to-main` to
+  // opt in to the legacy "always switch + pull" behavior. Pass `--no-sync` to
+  // skip entirely. If the working tree is dirty, this aborts BEFORE writing
+  // the checklist — the user must commit/stash/discard before retrying.
   let syncOutput = '';
+  let syncTitle = 'Synced to main';
   if (!options.noSync) {
-    const sync = syncToMain();
+    const sync = options.resetToMain ? syncToMain() : safeSyncMain();
     if (!sync.ok) {
       return {
         output:
@@ -150,6 +157,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
         exitCode: 1,
       };
     }
+    if (sync.keptBranch) syncTitle = 'Kept feature branch';
     for (const step of sync.steps) {
       syncOutput += `  ${c.dim}↻${c.reset} ${step}\n`;
     }
@@ -386,7 +394,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   const status = parseChecklist(markdown);
   let output = '';
   if (syncOutput) {
-    output += `${c.bold}Synced to main${c.reset}\n${syncOutput}\n`;
+    output += `${c.bold}${syncTitle}${c.reset}\n${syncOutput}\n`;
   }
   output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
@@ -675,11 +683,54 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
 }
 
 // ---------------------------------------------------------------------------
+// Default handler — replaces silent fall-through to `init` (QUA-403)
+// ---------------------------------------------------------------------------
+//
+// The crux dispatcher's "unknown subcommand → fall through to default" rule
+// means `agent-checklist list` (or any typo) used to silently invoke `init`
+// with the typo as task description. That ran a destructive sync-to-main and
+// overwrote any existing checklist. This handler errors out instead — callers
+// must explicitly pick `init` for state-mutating work.
+
+async function defaultCmd(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const positional = args.filter(a => !a.startsWith('--'));
+  const first = positional[0];
+
+  if (first) {
+    // List valid subcommands derived from the registry below so they cannot
+    // drift. `default` is excluded — it's the dispatch fallback, not a name
+    // a user can type.
+    const validSubcommands = Object.keys(commands).filter(k => k !== 'default').join(', ');
+    // JSON.stringify quotes the suggestion safely even if `taskAttempt`
+    // contains `"`, `$`, or backslashes — the user can paste it without
+    // shell-quoting surprises.
+    const taskAttempt = positional.join(' ');
+    return {
+      output:
+        `${c.red}✗ Unknown subcommand: "${first}"${c.reset}\n\n` +
+        `Valid subcommands: ${validSubcommands}\n\n` +
+        `${c.dim}If you meant to create a checklist with this as the task description, use:${c.reset}\n` +
+        `  ${c.cyan}crux sys agent-checklist init ${JSON.stringify(taskAttempt)}${c.reset}\n`,
+      exitCode: 2,
+    };
+  }
+
+  return {
+    output:
+      `${c.yellow}No subcommand specified.${c.reset}\n\n` +
+      getHelp(),
+    exitCode: 1,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
 export const commands = {
-  default: init,
+  default: defaultCmd,
   init,
   check,
   verify,
@@ -694,7 +745,7 @@ export function getHelp(): string {
 Agent Checklist — simplified session workflow tracking
 
 Commands:
-  init <task>      Generate a checklist (default)
+  init <task>      Generate a checklist
   check <id>...    Check off items by ID
   verify           Auto-run verifiable items
   status           Show progress
@@ -702,9 +753,17 @@ Commands:
   snapshot         Output checks: YAML for session log
   pre-push-check   Auto-verify + warn (called by pre-push hook)
 
-Options:
+Options (init):
   --type=TYPE      content | infrastructure | bugfix | refactor | commands
   --issue=N        Auto-detect type from GitHub issue labels
+  --linear=QUA-N   Explicit Linear issue ID
+  --no-sync        Skip the main-pull step entirely
+  --reset-to-main  Force-switch off the current branch back to main + pull
+                   (legacy behavior; default is to leave feature branches alone)
+  --force          Bypass Linear dedup pre-check
+  --allow-offline  Continue when the agent_sessions DB row cannot be written
+
+Options (check):
   --na             Mark items as N/A [~] (requires --reason)
   --reason=TEXT    Explanation for N/A
   --ci             JSON output

@@ -9,7 +9,7 @@
 -- patterns that scale safely to the larger Phase B tables:
 --   1. Dynamic DROP CONSTRAINT (queries information_schema for any FK on the
 --      column pointing at resources.id) — robust to constraint names we don't know.
---   2. NOT VALID + VALIDATE CONSTRAINT pattern per .claude/rules/database-migrations.md
+--   2. NOT VALID + VALIDATE CONSTRAINT pattern per docs/agent-rules/database-migrations.md
 --      (QUA-302/QUA-156 incident note) — minimizes ACCESS EXCLUSIVE lock time.
 --   3. r.stable_id IS NOT NULL guard on the backfill UPDATE — prevents silent
 --      NULL overwrite if any resources row is missing a stable_id.

@@ -10,7 +10,7 @@
 -- frameworkDiffItems, frameworkIngestLog}.
 --
 -- CHECK constraint allowlists use `NOT VALID` + `VALIDATE CONSTRAINT` per
--- .claude/rules/database-migrations.md. All tables are new + empty, but
+-- docs/agent-rules/database-migrations.md. All tables are new + empty, but
 -- keeping the pattern so future ALTERs remain lock-cheap.
 
 -- ---------------------------------------------------------------------------

@@ -6,7 +6,7 @@
  * subagent runs `/agent-review-pr` and `/agent-ship` instead of creating PRs
  * directly via `pnpm crux gh pr create`.
  *
- * Background: see `.claude/rules/dispatched-agent-review.md`. A session on
+ * Background: see `docs/agent-rules/dispatched-agent-review.md`. A session on
  * 2026-04-11 dispatched 15 PRs where subagents bypassed the ship flow. ~53%
  * had real bugs that only adversarial review caught.
  */

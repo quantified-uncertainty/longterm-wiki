@@ -32,7 +32,7 @@ describe("migration 0198 — QUA-492 facts.fact_id CHECK constraint", () => {
   });
 
   it("uses NOT VALID + VALIDATE CONSTRAINT (avoids long ACCESS EXCLUSIVE lock)", () => {
-    // Per .claude/rules/database-migrations.md: split DDL into metadata
+    // Per docs/agent-rules/database-migrations.md: split DDL into metadata
     // registration (NOT VALID, fast) and validation (VALIDATE CONSTRAINT,
     // non-blocking) to avoid holding ACCESS EXCLUSIVE during a full row scan.
     expect(sql).toMatch(

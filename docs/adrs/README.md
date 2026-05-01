@@ -72,4 +72,4 @@ cp docs/adrs/0000-template.md docs/adrs/NNNN-<slug>.md
 ## See also
 
 - The umbrella Linear ticket for the current investigation wave (link TBD when filed)
-- `.claude/rules/linear-project-ownership.md` — for filing follow-up implementation tickets in the right execution project
+- `docs/agent-rules/linear-project-ownership.md` — for filing follow-up implementation tickets in the right execution project

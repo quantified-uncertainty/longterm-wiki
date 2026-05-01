@@ -13,7 +13,7 @@
 -- (see PR description for the enumeration query output).
 --
 -- Uses the NOT VALID + VALIDATE CONSTRAINT pattern per
--- .claude/rules/database-migrations.md. At ~3.4k rows the lock contention
+-- docs/agent-rules/database-migrations.md. At ~3.4k rows the lock contention
 -- risk is small; following the pattern keeps the migration consistent with
 -- 0169 / 0173 / 0183 and ready for re-use as the table grows.
 

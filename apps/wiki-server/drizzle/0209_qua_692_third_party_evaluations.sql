@@ -9,7 +9,7 @@
 --
 -- Greenfield tables. CHECK on `risk_domain` and `source_format` is added
 -- inline (no NOT VALID dance needed) since 0 legacy rows exist; the pattern
--- in `.claude/rules/database-migrations.md` only requires NOT VALID for
+-- in `docs/agent-rules/database-migrations.md` only requires NOT VALID for
 -- ALTERs on tables with existing data.
 
 CREATE TABLE IF NOT EXISTS "third_party_evaluations" (

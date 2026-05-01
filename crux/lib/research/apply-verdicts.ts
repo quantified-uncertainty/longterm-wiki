@@ -73,6 +73,115 @@ export function titleCase(slug: string): string {
     .join(" ");
 }
 
+const MONTH_NAMES: Record<string, string> = {
+  jan: "01", january: "01",
+  feb: "02", february: "02",
+  mar: "03", march: "03",
+  apr: "04", april: "04",
+  may: "05",
+  jun: "06", june: "06",
+  jul: "07", july: "07",
+  aug: "08", august: "08",
+  sep: "09", sept: "09", september: "09",
+  oct: "10", october: "10",
+  nov: "11", november: "11",
+  dec: "12", december: "12",
+};
+
+const MONTH_NAME_PATTERN = `(${Object.keys(MONTH_NAMES).join("|")})`;
+const ISO_DATE_RE = /\b(\d{4})-(\d{2})-(\d{2})(?!\d)/;
+const MONTH_DAY_RE = new RegExp(
+  String.raw`\b${MONTH_NAME_PATTERN}\.?\s+(\d{1,2}),?\s+(\d{4})\b`,
+  "i",
+);
+const MONTH_YEAR_RE = new RegExp(String.raw`\b${MONTH_NAME_PATTERN}\.?\s+(\d{4})\b`, "i");
+const YYYY_MM_RE = /\b(\d{4})-(\d{2})\b/;
+const BARE_YEAR_RE = /\b(1[89]|20)(\d{2})\b/;
+
+// Older orgs (pre-1800) are out of scope for the wiki; "year 4 digits"
+// matches like 0000 or 9999 are almost certainly false positives.
+const MIN_YEAR = 1800;
+const MAX_YEAR = 2099;
+
+function isYearInRange(year: number): boolean {
+  return year >= MIN_YEAR && year <= MAX_YEAR;
+}
+
+// Round-trip through Date.UTC rejects calendar-impossible values
+// (Feb 31, Apr 31, non-leap Feb 29).
+function validateFullDate(year: string, month: string, day: string): string | null {
+  const y = Number(year);
+  const m = Number(month);
+  const d = Number(day);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return null;
+  if (!isYearInRange(y)) return null;
+  if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const utc = new Date(Date.UTC(y, m - 1, d));
+  if (
+    utc.getUTCFullYear() !== y ||
+    utc.getUTCMonth() !== m - 1 ||
+    utc.getUTCDate() !== d
+  ) {
+    return null;
+  }
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+/**
+ * Best-effort extraction of a structured date from prose. Returns the
+ * tightest representation available (`YYYY-MM-DD` → `YYYY-MM` → `YYYY`),
+ * or null when nothing parseable is found.
+ *
+ * Tries `primary` first, then each fallback in order — the keyDate applier
+ * passes `proposedValue` first (where the extractor prompt requires ISO
+ * format) and falls back to `extractedValue` and `claimText`.
+ */
+export function extractStructuredDate(
+  primary: string | null | undefined,
+  ...fallbacks: Array<string | null | undefined>
+): string | null {
+  for (const raw of [primary, ...fallbacks]) {
+    if (!raw) continue;
+    const s = raw.trim();
+    if (!s) continue;
+
+    // Trailing `(?!\d)` (rather than `\b`) lets us match the date prefix of
+    // an ISO 8601 timestamp like "2024-06-15T10:30:00Z" — with `\b`, the
+    // word-boundary between `5` and `T` (both word chars) doesn't fire.
+    const iso = s.match(ISO_DATE_RE);
+    if (iso) {
+      const valid = validateFullDate(iso[1], iso[2], iso[3]);
+      if (valid) return valid;
+    }
+
+    const monthDay = s.match(MONTH_DAY_RE);
+    if (monthDay) {
+      const month = MONTH_NAMES[monthDay[1].toLowerCase()];
+      if (month) {
+        const valid = validateFullDate(monthDay[3], month, monthDay[2]);
+        if (valid) return valid;
+      }
+    }
+
+    const monthYear = s.match(MONTH_YEAR_RE);
+    if (monthYear) {
+      const month = MONTH_NAMES[monthYear[1].toLowerCase()];
+      if (month && isYearInRange(Number(monthYear[2]))) {
+        return `${monthYear[2]}-${month}`;
+      }
+    }
+
+    const ym = s.match(YYYY_MM_RE);
+    if (ym && isYearInRange(Number(ym[1])) && Number(ym[2]) >= 1 && Number(ym[2]) <= 12) {
+      return `${ym[1]}-${ym[2]}`;
+    }
+
+    const year = s.match(BARE_YEAR_RE);
+    if (year) return `${year[1]}${year[2]}`;
+  }
+  return null;
+}
+
 /**
  * Canonical comparison key for a person's display name. Strips suffixes
  * (Jr., Sr., III, PhD, MD), lowercases, and slugifies. Used for keyPerson
@@ -471,9 +580,8 @@ export function applyVerdictsToOrganization(
     // ── keyDate.<slug> ──────────────────────────────────────────────────
     if (tf.startsWith("keyDate.")) {
       const slug = tf.slice("keyDate.".length);
-      // displayHint is the human description; extractedValue/claimText carries the date.
       const description = v.displayHint ?? titleCase(slug);
-      const date = (v.extractedValue?.trim() || v.proposedValue?.trim() || "").trim();
+      const date = extractStructuredDate(v.proposedValue, v.extractedValue, v.claimText);
       next.keyDates ??= [];
       const existing = next.keyDates.find((d) => slugify(d.description) === slug);
       if (existing) {
@@ -486,6 +594,13 @@ export function applyVerdictsToOrganization(
           existing.source = v.sourceUrl;
           updated = true;
         }
+        // Symmetric with the new-entry branch: warn whenever date is still
+        // missing, independent of source backfill (which would set `updated`).
+        if (!existing.date && !date) {
+          warnings.push(
+            `keyDate.${slug}: no parseable date in proposedValue/extractedValue/claimText — existing entry left unfilled`,
+          );
+        }
         applied.push({
           targetField: tf,
           action: updated ? "updated" : "skipped",
@@ -494,7 +609,10 @@ export function applyVerdictsToOrganization(
         continue;
       }
       if (!date) {
-        applied.push({ targetField: tf, action: "skipped", reason: "no date value" });
+        warnings.push(
+          `keyDate.${slug}: no parseable date in proposedValue/extractedValue/claimText — entry dropped`,
+        );
+        applied.push({ targetField: tf, action: "skipped", reason: "no parseable date" });
         continue;
       }
       next.keyDates.push({ date, description, source: v.sourceUrl });

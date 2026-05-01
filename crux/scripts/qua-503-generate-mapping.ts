@@ -122,7 +122,7 @@ function buildSql(
 -- not the time it takes to scan the entire \`things\` table. This avoids the
 -- QUA-302 / QUA-156 outage pattern where an unsplit DDL on a hot \`things\`-
 -- adjacent table deadlocked with a concurrent MV refresh and bricked deploy
--- for ~12 hours. See \`.claude/rules/database-migrations.md\` § "ADD CONSTRAINT
+-- for ~12 hours. See \`docs/agent-rules/database-migrations.md\` § "ADD CONSTRAINT
 -- ... NOT VALID + separate VALIDATE CONSTRAINT".
 --
 -- The \`things_search\` MV refresh is intentionally OUTSIDE the transaction

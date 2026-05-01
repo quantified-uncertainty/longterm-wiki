@@ -27,6 +27,66 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
 };
 
 /**
+ * Resolve whether sourcing is required for this request, given the route's
+ * table name and the request's query params. Used by both the atomic
+ * `enforceSourcing()` path and the best-effort partitioning path (QUA-955) so
+ * the policy decision lives in one place.
+ *
+ *   - `not_required` — neither server config nor client param requests sourcing
+ *   - `skipped` — sourcing was required but `?forceSkipSourcing=true` was set
+ *   - `required` — every item must include sourcing data
+ *
+ * The `source` field on `required` discriminates server-side vs client-side
+ * enforcement so error messages can credit the right one.
+ */
+export type SourcingRequirement =
+  | { kind: "not_required" }
+  | { kind: "skipped"; reason: string }
+  | { kind: "required"; source: "server policy" | "client requireSourcing param" };
+
+export function resolveSourcingRequirement(
+  c: Context,
+  tableName: string,
+): SourcingRequirement {
+  const serverRequired = SOURCE_CHECK_REQUIRED[tableName] === true;
+  const clientRequired = c.req.query("requireSourcing") === "true";
+
+  if (!serverRequired && !clientRequired) return { kind: "not_required" };
+
+  const forceSkip = c.req.query("forceSkipSourcing");
+  if (forceSkip === "true") {
+    return { kind: "skipped", reason: c.req.query("reason") || "no reason given" };
+  }
+
+  return {
+    kind: "required",
+    source: serverRequired ? "server policy" : "client requireSourcing param",
+  };
+}
+
+/**
+ * Emit the audit-log warning for the `?forceSkipSourcing=true` escape hatch.
+ *
+ * Exported so the best-effort partition path (QUA-955) can log the bypass
+ * with the same shape the atomic path already does — without duplicating
+ * the message string and without forcing the partition path to call the
+ * full `enforceSourcing()` (which would also iterate the items).
+ *
+ * Returns silently if `req.kind !== "skipped"`.
+ */
+export function logSourcingSkipped(
+  tableName: string,
+  itemCount: number,
+  req: SourcingRequirement,
+): void {
+  if (req.kind !== "skipped") return;
+  logger.warn(
+    { table: tableName, itemCount, reason: req.reason },
+    `Source-check enforcement skipped via forceSkipSourcing`,
+  );
+}
+
+/**
  * Enforce sourcing requirements for a sync endpoint.
  *
  * Checks both the server-side config (SOURCE_CHECK_REQUIRED) and the legacy
@@ -43,29 +103,21 @@ export function enforceSourcing(
   tableName: string,
   items: Array<{ sourcing?: unknown }>,
 ): Response | null {
-  const serverRequired = SOURCE_CHECK_REQUIRED[tableName] === true;
-  const clientRequired = c.req.query("requireSourcing") === "true";
+  const req = resolveSourcingRequirement(c, tableName);
 
-  if (!serverRequired && !clientRequired) return null;
+  if (req.kind === "not_required") return null;
 
-  // Escape hatch for migrations/backfills
-  const forceSkip = c.req.query("forceSkipSourcing");
-  if (forceSkip === "true") {
-    const reason = c.req.query("reason") || "no reason given";
-    logger.warn(
-      { table: tableName, itemCount: items.length, reason },
-      `Source-check enforcement skipped via forceSkipSourcing`,
-    );
+  if (req.kind === "skipped") {
+    logSourcingSkipped(tableName, items.length, req);
     return null;
   }
 
   const unchecked = items.filter((i) => !i.sourcing);
   if (unchecked.length === 0) return null;
 
-  const source = serverRequired ? "server policy" : "client requireSourcing param";
   return validationError(
     c,
-    `Source-check required (${source}) but ${unchecked.length}/${items.length} records lack sourcing data. ` +
+    `Source-check required (${req.source}) but ${unchecked.length}/${items.length} records lack sourcing data. ` +
     `Run \`pnpm crux tb verify-orchestrate ${tableName}\` to populate source_check_verdicts before submitting, ` +
     `or use ?forceSkipSourcing=true&reason=... to bypass with audit logging.`,
   );

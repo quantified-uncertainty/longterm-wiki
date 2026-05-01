@@ -10,29 +10,14 @@ import {
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { InlineSourcingSchema } from "./sourcing-schema.js";
+import {
+  SyncStakeholderItemSchema,
+  VALID_POSITIONS,
+} from "./policy-stakeholders-schema.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
-const VALID_POSITIONS = ["support", "oppose", "neutral", "mixed"] as const;
-
-// ---- Schemas ----
-
-const VALID_IMPORTANCE = ["high", "medium", "low"] as const;
-
-const SyncStakeholderItemSchema = z.object({
-  id: z.string().length(10),
-  policyEntityId: z.string().min(1).max(200),
-  stakeholderEntityId: z.string().max(200).nullable().optional(),
-  stakeholderDisplayName: z.string().min(1).max(500),
-  position: z.enum(VALID_POSITIONS),
-  importance: z.enum(VALID_IMPORTANCE).nullable().optional(),
-  reason: z.string().max(5000).nullable().optional(),
-  source: z.string().max(2000).nullable().optional(),
-  context: z.array(z.string()).nullable().optional(),
-  sourcing: InlineSourcingSchema.optional(),
-});
 
 const ByPolicyQuery = z.object({
   position: z.enum(VALID_POSITIONS).optional(),
@@ -110,12 +95,27 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // Note: only policyEntityId is validated. stakeholderEntityId is optional and may
   // reference entities not yet synced to PG (build-data explicitly expects
   // some to be missing — wiki-server-data.mjs has fallback logic for this).
+  //
+  // Natural key: (policyEntityId, stakeholderDisplayName). Migration 0221
+  // (QUA-956) added a UNIQUE index over those columns. `conflictTarget` is
+  // the natural key — not the default `id` — so QUA-943 Phase 3
+  // retry-with-feedback (which mints a fresh `id` when re-sending a
+  // corrected payload for the same `(policy, stakeholder)` pair) resolves
+  // as an UPDATE on the existing row instead of accumulating duplicates.
   .post("/sync", createSyncHandler({
     name: "policy-stakeholders",
     table: policyStakeholders,
     syncSchema: SyncStakeholderItemSchema,
     enforceSourcing: true,
     entityRefs: ["policyEntityId"],
+    naturalKey: (item) =>
+      `${item.policyEntityId}::${item.stakeholderDisplayName}`,
+    naturalKeyError:
+      "Duplicate (policyEntityId, stakeholderDisplayName) in batch — each stakeholder must be unique per policy",
+    conflictTarget: [
+      policyStakeholders.policyEntityId,
+      policyStakeholders.stakeholderDisplayName,
+    ],
     toThing: (item) => ({
       id: item.id,
       thingType: "policy-stakeholder" as const,

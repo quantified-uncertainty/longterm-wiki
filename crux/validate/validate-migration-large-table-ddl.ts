@@ -16,7 +16,7 @@
  * manually with `NOT VALID` + separate `VALIDATE CONSTRAINT`.
  *
  * The correct pattern is documented in
- * `.claude/rules/database-migrations.md` § "ADD CONSTRAINT ... NOT VALID +
+ * `docs/agent-rules/database-migrations.md` § "ADD CONSTRAINT ... NOT VALID +
  * separate VALIDATE CONSTRAINT". This validator enforces it mechanically:
  *
  *   ALTER TABLE hot_table
@@ -223,7 +223,7 @@ export function runCheck(drizzleDir = 'apps/wiki-server/drizzle'): CheckResult {
     }
     console.log();
     console.log(
-      `${c.dim}Use NOT VALID + VALIDATE CONSTRAINT. See .claude/rules/database-migrations.md${c.reset}`,
+      `${c.dim}Use NOT VALID + VALIDATE CONSTRAINT. See docs/agent-rules/database-migrations.md${c.reset}`,
     );
     console.log(
       `${c.dim}(§ "ADD CONSTRAINT ... NOT VALID + separate VALIDATE CONSTRAINT")${c.reset}`,

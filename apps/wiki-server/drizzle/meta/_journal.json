@@ -1541,6 +1541,21 @@
       "when": 1787877100000,
       "tag": "0220_qua_764_investments_sid_leak_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 221,
+      "version": "7",
+      "when": 1787877200000,
+      "tag": "0221_qua_956_policy_stakeholders_natural_key",
+      "breakpoints": true
+    },
+    {
+      "idx": 222,
+      "version": "7",
+      "when": 1788000000000,
+      "tag": "0222_qua_954_pipeline_runs",
+      "breakpoints": true
     }
   ]
 }
+

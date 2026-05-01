@@ -5,8 +5,8 @@ One-page summary of the Linear hygiene / project / epic / description deep-audit
 Linked from:
 
 - [`docs/audits/README.md`](./README.md)
-- [`.claude/rules/linear-project-ownership.md`](../../.claude/rules/linear-project-ownership.md) (the doctrine this session produced)
-- [`.claude/rules/linear-integration.md`](../../.claude/rules/linear-integration.md) § 9 (hygiene tool reference)
+- [`docs/agent-rules/linear-project-ownership.md`](../../docs/agent-rules/linear-project-ownership.md) (the doctrine this session produced)
+- [`docs/agent-rules/linear-integration.md`](../../docs/agent-rules/linear-integration.md) § 9 (hygiene tool reference)
 
 ## What triggered it
 
@@ -86,7 +86,7 @@ A verification pass then ground-truthed the load-bearing claims against live Lin
 ## What this pass produced
 
 1. **`crux/lib/linear/hygiene.ts`** + **`crux linear hygiene`** CLI command — re-runnable metadata hygiene scan (orphans, label coverage, priority gaps, stuck tickets, per-project counts). Run quarterly to catch drift.
-2. **[`.claude/rules/linear-project-ownership.md`](../../.claude/rules/linear-project-ownership.md)** — the scope-boundary doctrine that now prevents the 3-way sourcing split from re-emerging, clarifies dashboards vs automation, and lists what doesn't belong in Coordinator.
+2. **[`docs/agent-rules/linear-project-ownership.md`](../../docs/agent-rules/linear-project-ownership.md)** — the scope-boundary doctrine that now prevents the 3-way sourcing split from re-emerging, clarifies dashboards vs automation, and lists what doesn't belong in Coordinator.
 3. **This document** — archive of the 2026-04-14 findings, linked from the README and rule docs so it's findable when someone asks "why did we do X with labels / projects / QUA-183?"
 
 ## The one takeaway for future agents
@@ -97,6 +97,6 @@ If label hygiene drifts back into "some issues have many, some have none," that'
 
 ## Cross-references
 
-- **Rule**: [`.claude/rules/linear-project-ownership.md`](../../.claude/rules/linear-project-ownership.md) — scope-boundary doctrine derived from this audit
+- **Rule**: [`docs/agent-rules/linear-project-ownership.md`](../../docs/agent-rules/linear-project-ownership.md) — scope-boundary doctrine derived from this audit
 - **Tool**: `pnpm crux linear hygiene` (source: `crux/lib/linear/hygiene.ts`, `crux/commands/linear.ts`)
 - **Related audit**: [`docs/audits/things-denormalization-audit.md`](./things-denormalization-audit.md) — adjacent-dimension audit for PG write-site inventory

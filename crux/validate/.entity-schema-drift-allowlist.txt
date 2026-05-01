@@ -1,0 +1,48 @@
+# QUA-943: Files in apps/wiki-server/src/routes/tablebase/ allowed to contain
+# entity-schema drift markers (`const VALID_*` declarations or inline `z.enum([`
+# literals) pending migration to canonical entity schemas in
+# packages/entity-schemas (per Plan v2).
+#
+# This list is the QUA-943 closure metric. As routes migrate to canonical
+# schemas, remove entries from this file. The validator fails if a route NOT
+# on this list contains drift markers — preventing new drift from accumulating
+# while migration is in progress. Goal: this file is empty when QUA-943 closes.
+#
+# Suppressing a single line (e.g., a legitimate query-string enum that should
+# not be migrated): add `// schema-drift-ok: <reason>` on the same line as the
+# marker. Reason is mandatory.
+#
+# Format: one file path per line, relative to repo root. Empty lines and
+# comments (lines starting with `#`) are ignored.
+apps/wiki-server/src/routes/tablebase/ai-incidents.ts
+apps/wiki-server/src/routes/tablebase/benchmark-results-pending.ts
+apps/wiki-server/src/routes/tablebase/benchmark-shared.ts
+apps/wiki-server/src/routes/tablebase/benchmarks.ts
+apps/wiki-server/src/routes/tablebase/data-sources.ts
+apps/wiki-server/src/routes/tablebase/divisions.ts
+apps/wiki-server/src/routes/tablebase/entities.ts
+apps/wiki-server/src/routes/tablebase/entity-assessments.ts
+apps/wiki-server/src/routes/tablebase/entity-events.ts
+apps/wiki-server/src/routes/tablebase/framework-diff-items.ts
+apps/wiki-server/src/routes/tablebase/framework-ingest-log.ts
+apps/wiki-server/src/routes/tablebase/funding-programs.ts
+apps/wiki-server/src/routes/tablebase/grants.ts
+apps/wiki-server/src/routes/tablebase/model-aliases.ts
+apps/wiki-server/src/routes/tablebase/model-system-cards.ts
+apps/wiki-server/src/routes/tablebase/personnel.ts
+apps/wiki-server/src/routes/tablebase/platform-accounts.ts
+apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts
+apps/wiki-server/src/routes/tablebase/political-offices.ts
+apps/wiki-server/src/routes/tablebase/political-races.ts
+apps/wiki-server/src/routes/tablebase/political-votes.ts
+apps/wiki-server/src/routes/tablebase/prediction-markets.ts
+apps/wiki-server/src/routes/tablebase/publications.ts
+apps/wiki-server/src/routes/tablebase/record-lookup.ts
+apps/wiki-server/src/routes/tablebase/research-areas.ts
+apps/wiki-server/src/routes/tablebase/safety-framework-versions.ts
+apps/wiki-server/src/routes/tablebase/safety-frameworks.ts
+apps/wiki-server/src/routes/tablebase/scorecard-snapshots.ts
+apps/wiki-server/src/routes/tablebase/secondary-market-prices.ts
+apps/wiki-server/src/routes/tablebase/things.ts
+apps/wiki-server/src/routes/tablebase/third-party-evaluations.ts
+apps/wiki-server/src/routes/tablebase/website-sources.ts

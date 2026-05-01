@@ -44,7 +44,7 @@ const NON_ROUTE_FILES = new Set<string>(TABLEBASE_NON_ROUTE_FILES);
 // in sync with the manual-mount list in
 // `apps/wiki-server/src/routes/tablebase/mount-registry.ts`
 // (TABLEBASE_MANUAL_MOUNTS) and the sync-factory exclusions in
-// `.claude/rules/tablebase-sync-factory.md`.
+// `docs/agent-rules/tablebase-sync-factory.md`.
 const REGISTRY_EXCLUSIONS = new Set<string>([
   // Custom ID allocation via nextval('entity_id_seq') — not a bulk-sync path.
   "ids",

@@ -131,6 +131,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'agents',
       'agent-checklist',
       'agent-session-events',
+      'review-phase',
       'jobs',
       'sessions',
       'edit-log',

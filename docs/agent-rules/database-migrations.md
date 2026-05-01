@@ -221,7 +221,7 @@ catches unplanned state changes that diverge from what the migration
 intended. The per-row overhead is ~5–10% per INSERT/UPDATE and rarely
 matters outside bulk migrations.
 
-Full docs: `.claude/rules/audit-log.md`.
+Full docs: `docs/agent-rules/audit-log.md`.
 
 ## Deploy flow for DDL migrations
 

@@ -427,6 +427,20 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'entity-schema-drift',
+    name: 'Entity-schema drift in tablebase routes (QUA-943)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-entity-schema-drift.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking. Bans new `const VALID_*` and inline `z.enum([` in
+    // apps/wiki-server/src/routes/tablebase/ outside the allowlist at
+    // crux/validate/.entity-schema-drift-allowlist.txt. The allowlist length
+    // is the QUA-943 closure metric — entries get removed as routes migrate
+    // to canonical schemas in packages/entity-schemas (Plan v2 PRs 5a/5b).
+    // Suppress per-line legitimate uses (e.g., query enums) with
+    // `// schema-drift-ok`.
+  },
+  {
     id: 'prompt-escaping',
     name: 'Prompt XML interpolation escaping',
     command: 'npx',
@@ -477,6 +491,20 @@ const PARALLEL_STEPS: Step[] = [
     // Blocking: a vocab drift between the Zod schema in the route and the
     // CHECK constraint in the migration shows up at sync time as a 500
     // error from PG. Static-checkable, so we keep it cheap and CI-blocking.
+  },
+  {
+    id: 'policy-stakeholders-strict',
+    name: 'Policy stakeholders strict Zod schema (QUA-964 / QUA-941 bridge)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-policy-stakeholders-strict.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: runs the canonical sync-route Zod schema against every
+    // policy.stakeholders[] block in data/entities/. QUA-941 shipped 10
+    // rows of `position: reform` that the route silently rejected with a
+    // 400 and the build helper swallowed; this gate catches the same class
+    // of mistake at PR-review time. Companion fix in
+    // apps/web/scripts/lib/wiki-server-data.mjs makes runtime sync 400s
+    // also fail loud.
   },
   {
     id: 'things-denorm-dead',

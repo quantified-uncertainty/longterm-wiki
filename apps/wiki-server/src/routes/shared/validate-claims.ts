@@ -51,6 +51,40 @@ export async function validateClaimRefs(
 ): Promise<string | null> {
   if (claimIds.length === 0) return null;
 
+  const status = await classifyClaims(db, claimIds);
+
+  if (status.missing.length > 0) {
+    return `Claim IDs not found: ${status.missing.join(", ")}`;
+  }
+
+  if (status.nonVerified.length > 0) {
+    const details = status.nonVerified
+      .map((r) => `${r.id} (${r.status})`)
+      .join(", ");
+    return `Claims not verified: ${details}. Only verified claims can be used to submit records.`;
+  }
+
+  return null;
+}
+
+/**
+ * Classify a batch of claim IDs into missing / non-verified / verified sets.
+ *
+ * Used by both the atomic {@link validateClaimRefs} path and the best-effort
+ * sync mode (QUA-955), where the caller wants to know *which* IDs failed so
+ * it can partition items per-claim instead of rejecting the whole batch.
+ */
+export async function classifyClaims(
+  db: RawDb,
+  claimIds: number[],
+): Promise<{
+  missing: number[];
+  nonVerified: Array<{ id: number; status: string }>;
+}> {
+  if (claimIds.length === 0) {
+    return { missing: [], nonVerified: [] };
+  }
+
   const unique = [...new Set(claimIds)];
   const rows = await db<ClaimStatusRow[]>`
     SELECT id::int, status, entity_id
@@ -58,24 +92,14 @@ export async function validateClaimRefs(
     WHERE id = ANY(${unique}::bigint[])
   `;
 
-  // Check for missing claims
   // Cast to Number because postgres.js may return bigserial as string
   const foundIds = new Set(rows.map((r) => Number(r.id)));
   const missing = unique.filter((id) => !foundIds.has(id));
-  if (missing.length > 0) {
-    return `Claim IDs not found: ${missing.join(", ")}`;
-  }
+  const nonVerified = rows
+    .filter((r) => r.status !== "verified")
+    .map((r) => ({ id: Number(r.id), status: r.status }));
 
-  // Check for non-verified claims
-  const nonVerified = rows.filter((r) => r.status !== "verified");
-  if (nonVerified.length > 0) {
-    const details = nonVerified
-      .map((r) => `${r.id} (${r.status})`)
-      .join(", ");
-    return `Claims not verified: ${details}. Only verified claims can be used to submit records.`;
-  }
-
-  return null;
+  return { missing, nonVerified };
 }
 
 // ---------------------------------------------------------------------------

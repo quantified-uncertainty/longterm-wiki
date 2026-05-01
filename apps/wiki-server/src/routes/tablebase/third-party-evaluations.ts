@@ -100,7 +100,7 @@ const ByModelQuery = z.object({
 
 // ---- Sync schemas ----
 //
-// Hand-written per `.claude/rules/tablebase-sync-factory.md` — captures
+// Hand-written per `docs/agent-rules/tablebase-sync-factory.md` — captures
 // business rules (URL caps, controlled vocab, model fan-out shape) that
 // drizzle-zod inference cannot derive.
 

@@ -45,7 +45,7 @@ const ByModelQuery = z.object({
 
 // ---- Sync schemas ----
 //
-// Hand-written Zod schema per `.claude/rules/tablebase-sync-factory.md` —
+// Hand-written Zod schema per `docs/agent-rules/tablebase-sync-factory.md` —
 // captures business rules (URL length caps, controlled vocab, shape of
 // eval_scores_cited / third_party_evals arrays) that would require
 // override surface the same size as the schema if we derived from

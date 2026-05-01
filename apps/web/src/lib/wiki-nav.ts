@@ -303,6 +303,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Changes", href: internalHref("page-changes-dashboard") },
         { label: "Update Schedule", href: internalHref("update-schedule-dashboard") },
         { label: "Groundskeeper Runs", href: internalHref("groundskeeper-runs-dashboard") },
+        { label: "Pipeline Runs", href: internalHref("pipeline-runs-dashboard") },
       ],
     },
     {

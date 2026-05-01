@@ -103,7 +103,7 @@ or `null` when no verdicts exist.
 ## When NOT to use the shell
 
 - **Dashboards** (`/internal/*`) — these have their own layout patterns,
-  described in `.claude/rules/internal-dashboards.md`.
+  described in `docs/agent-rules/internal-dashboards.md`.
 - **Wiki pages** (`/wiki/E<N>`) — MDX content uses its own article layout.
 - **Directory index pages** (`/organizations`, `/people`) — the shell is for
   the per-entity detail pages, not the list pages.

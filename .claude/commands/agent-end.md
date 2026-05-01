@@ -124,6 +124,7 @@ Remove untracked session artifacts and discard any unstaged changes (modified ho
 ```bash
 rm -f .claude/wip-checklist.md .claude/wip-context.md
 git checkout -- .claude/review-done 2>/dev/null || rm -f .claude/review-done
+git checkout -- .claude/review-phases-done 2>/dev/null || rm -f .claude/review-phases-done
 git checkout -- .claude/simplify-done 2>/dev/null || rm -f .claude/simplify-done
 git checkout -- .claude/hooks/ 2>/dev/null || true
 ```

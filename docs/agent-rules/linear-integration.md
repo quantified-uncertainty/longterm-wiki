@@ -126,7 +126,7 @@ crux linear states-list               # Show current QUA team workflow state IDs
 
 ## 6a. Stale-claim sweep — `crux linear release-stale` (QUA-815)
 
-Sometimes an agent runs `crux sys agent-checklist init --linear=QUA-NNN`, posts the `🤖 Claude Code starting work` claim comment, and then **crashes before creating `claude/qua-NNN-*` and pushing a PR** — out-of-context, kernel kill, network drop. The PG `agent_sessions` heartbeat shows the session is dead, but Linear stays "In Progress" indefinitely. This pollutes dispatch decisions: a coordinator running pre-flight (`.claude/rules/dispatched-agent-review.md` § Dispatcher pre-flight) sees "ticket already In Progress" and skips dispatch, even though no work is happening.
+Sometimes an agent runs `crux sys agent-checklist init --linear=QUA-NNN`, posts the `🤖 Claude Code starting work` claim comment, and then **crashes before creating `claude/qua-NNN-*` and pushing a PR** — out-of-context, kernel kill, network drop. The PG `agent_sessions` heartbeat shows the session is dead, but Linear stays "In Progress" indefinitely. This pollutes dispatch decisions: a coordinator running pre-flight (`docs/agent-rules/dispatched-agent-review.md` § Dispatcher pre-flight) sees "ticket already In Progress" and skips dispatch, even though no work is happening.
 
 `crux linear release-stale` finds these claims and auto-releases them. Per candidate it runs three protective checks before acting:
 
@@ -173,9 +173,9 @@ The parser in `crux/lib/linear/parse-id.ts` uses an allowlist of known team keys
 
 ## 9. Project ownership — which project does an issue belong in?
 
-See **`.claude/rules/linear-project-ownership.md`** for the decision rules on which of the 6 open QUA projects a new issue belongs in. The boundaries between Automation & Infrastructure, Source-Check & Verification, Data Integrity, Dashboards & Visibility, Content Quality & Enrichment, and Coordinator & Agent Tooling are non-obvious and get crossed repeatedly without an explicit doctrine. File new issues with a project from the start — orphans accumulate and the 2026-04-14 refactor pass had to move 22 issues between projects.
+See **`docs/agent-rules/linear-project-ownership.md`** for the decision rules on which of the 6 open QUA projects a new issue belongs in. The boundaries between Automation & Infrastructure, Source-Check & Verification, Data Integrity, Dashboards & Visibility, Content Quality & Enrichment, and Coordinator & Agent Tooling are non-obvious and get crossed repeatedly without an explicit doctrine. File new issues with a project from the start — orphans accumulate and the 2026-04-14 refactor pass had to move 22 issues between projects.
 
-**Hygiene scan**: `pnpm crux linear hygiene` reports orphan issues, label drift, priority gaps, and stuck tickets. Run quarterly (or when the backlog feels messy) to catch drift. Source: `crux/lib/linear/hygiene.ts`. Full refactor history: [`docs/audits/2026-04-14-linear-refactor.md`](../../docs/audits/2026-04-14-linear-refactor.md).
+**Hygiene scan**: `pnpm crux linear hygiene` reports orphan issues, label drift, priority gaps, and stuck tickets. Run quarterly (or when the backlog feels messy) to catch drift. Source: `crux/lib/linear/hygiene.ts`. Full refactor history: [`docs/audits/2026-04-14-linear-refactor.md`](../audits/2026-04-14-linear-refactor.md).
 
 ## 10. Key files
 

@@ -20,6 +20,8 @@ import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
 import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
 import { commands as sourceDiscoverCommands } from './factbase-source-discover.ts';
+import { commands as backfillSourcesCommands } from './factbase-backfill-sources.ts';
+import { commands as resourceUnverifiablesCommands } from './factbase-resource-unverifiables.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { commands as verdictsCommands } from './factbase-verdicts.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
@@ -1115,6 +1117,8 @@ export const commands = {
   'sourcing': sourcingCommand,
   'source-backfill': sourceBackfillCommands.default,
   'source-discover': sourceDiscoverCommands.default,
+  'backfill-sources': backfillSourcesCommands.default,
+  'resource-unverifiables': resourceUnverifiablesCommands.default,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
@@ -1146,6 +1150,8 @@ Commands:
   sourcing          Check KB facts against source URLs using LLM
   source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
   source-discover       Find canonical source URL(s) for one fact via LLM + web search (QUA-926)
+  backfill-sources      NULL→source backfill loop wrapping source-discover, with verify chain (QUA-933) [--apply] [--batch]
+  resource-unverifiables Replace weak sources for facts with verdict=unverifiable (QUA-934) [--apply] [--batch]
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
   verdicts prune-orphans        Delete orphan fact verdicts (QUA-930) [--apply]

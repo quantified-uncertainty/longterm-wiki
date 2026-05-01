@@ -11,7 +11,7 @@
 -- Phase B completion and are intentionally out of scope here, per the
 -- 2026-04-16 rescope comment on QUA-492.
 --
--- ## Prod enumeration (2026-04-18, per .claude/rules/database-migrations.md
+-- ## Prod enumeration (2026-04-18, per docs/agent-rules/database-migrations.md
 --   § "Adding CHECK constraints on enum columns")
 --
 -- Strict-regex enumeration via /api/facts/export (pulls every fact_id
@@ -57,7 +57,7 @@
 -- For a 2274-row table this is inconsequential (validation is sub-second).
 -- If `facts` grows large enough that VALIDATE becomes slow, this migration
 -- should be split into two files (0193a NOT VALID, 0193b VALIDATE) so the
--- locks release between them. This is tracked in .claude/rules/database-migrations.md
+-- locks release between them. This is tracked in docs/agent-rules/database-migrations.md
 -- § "ADD CONSTRAINT ... NOT VALID + separate VALIDATE CONSTRAINT".
 --
 -- ADD CONSTRAINT is wrapped in a DO block with duplicate_object EXCEPTION

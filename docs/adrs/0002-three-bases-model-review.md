@@ -12,7 +12,7 @@ The data architecture is conceptually organized into three layers:
 - **FactBase** — structured triples with temporal data and provenance
 - **WikiBase** — long-form prose MDX articles
 
-Documented in `content/docs/internal/data-architecture.mdx` (E1334) and `.claude/rules/three-bases-architecture.md`.
+Documented in `content/docs/internal/data-architecture.mdx` (E1334) and `docs/agent-rules/three-bases-architecture.md`.
 
 The model has evolved since it was conceived:
 

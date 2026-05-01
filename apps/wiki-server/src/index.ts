@@ -3,6 +3,7 @@ import { createApp } from "./app.js";
 import { initDb, closeDb } from "./db.js";
 import { logger } from "./logger.js";
 import { setMigrationError } from "./migration-state.js";
+import { getNonVerifiablePropertyIds } from "./property-metadata.js";
 
 const PORT = parseInt(process.env.PORT || "3100", 10);
 
@@ -31,6 +32,20 @@ async function main() {
         "Fix the migration issue and restart the pod."
       );
     }
+  }
+
+  // QUA-928: prime the property-metadata cache so a missing or malformed
+  // properties.yaml fails the boot rather than the first /api/sourcing/*
+  // request hours later. Coverage metrics depend on this set.
+  try {
+    const count = getNonVerifiablePropertyIds().size;
+    logger.info({ nonVerifiableProperties: count }, "Loaded property metadata");
+  } catch (err) {
+    logger.error(
+      { err: err instanceof Error ? err.message : String(err) },
+      "Failed to load properties.yaml — sourcing coverage metrics will be wrong",
+    );
+    throw err;
   }
 
   const app = createApp();

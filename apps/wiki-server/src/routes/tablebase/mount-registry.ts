@@ -15,7 +15,7 @@
  *
  * Five routes are deliberately mounted MANUALLY in `app.ts` rather than
  * through this registry, matching the sync-factory exclusion list in
- * `.claude/rules/tablebase-sync-factory.md`:
+ * `docs/agent-rules/tablebase-sync-factory.md`:
  *
  * - `entities` — slug displacement + statement_timeout overrides
  * - `things` — IT IS the cross-base index
@@ -193,4 +193,5 @@ export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
   "entity-profile-descriptions.ts",
   "system-card-benchmark-linker.ts",
   "benchmark-shared.ts",
+  "policy-stakeholders-schema.ts",
 ];
