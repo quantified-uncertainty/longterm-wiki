@@ -17,14 +17,17 @@
 
 set -euo pipefail
 
-# This script lives at <wiki-clone>/scripts/launchd/pr-patrol.sh, so the wiki
-# clone is two directories up.
 WIKI_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PLIST_SRC="$WIKI_ROOT/scripts/launchd/com.qu.pr-patrol.plist"
 PLIST_DST="$HOME/Library/LaunchAgents/com.qu.pr-patrol.plist"
 LABEL="com.qu.pr-patrol"
 SUPERVISOR="$WIKI_ROOT/scripts/pr-patrol-supervisor.sh"
-LOG="$HOME/.cache/pr-patrol/run.log"
+CACHE_DIR="$HOME/.cache/pr-patrol"
+LOG="$CACHE_DIR/run.log"
+# Loose pattern matches the patrol process (`node ... pr-patrol run` /
+# pnpm parent) AND the launchd supervisor in its 30s sleep window. Kept in
+# sync with inject-patrol-status.sh so liveness checks agree across files.
+PATROL_PROCESS_PATTERN='pr-patrol run|pr-patrol-supervisor\.sh'
 
 cmd="${1:-install}"
 
@@ -38,18 +41,24 @@ sed_replacement_escape() {
 
 # Render the embedded XML template, substituting placeholders via sed (so the
 # heredoc terminator stays quoted and shell expansion can't sneak in).
+# Placeholders are processed longest-first so a future short name can never
+# clobber bytes inside a longer one (e.g. `__HOME__` inside `__HOME_DIR__`).
 render_template() {
   # Args: input_file output_file [placeholder=value]...
   local input="$1" output="$2"
   shift 2
+  local pairs=("$@")
+  # Sort pairs by placeholder length descending.
+  local sorted
+  sorted=$(printf '%s\n' "${pairs[@]}" | awk '{ print length($0)"\t"$0 }' | sort -rn | cut -f2-)
   local sed_args=()
   local pair name val esc
-  for pair in "$@"; do
+  while IFS= read -r pair; do
     name="${pair%%=*}"
     val="${pair#*=}"
     esc=$(sed_replacement_escape "$val")
     sed_args+=(-e "s|$name|$esc|g")
-  done
+  done <<<"$sorted"
   sed "${sed_args[@]}" "$input" > "$output"
 }
 
@@ -67,6 +76,16 @@ tcc_self_test() {
   local probe_err="/tmp/$probe_label.err"
   local probe_target="$WIKI_ROOT/.git/HEAD"
   local probe_template="/tmp/$probe_label.template"
+
+  # Cleanup trap — if the probe is interrupted (Ctrl-C, kill, error), make
+  # sure we don't leave the probe plist in ~/Library/LaunchAgents/ where
+  # launchd would re-run it on next login.
+  local prev_int_trap prev_term_trap prev_exit_trap
+  cleanup_probe() {
+    launchctl unload "$probe_plist" 2>/dev/null || true
+    /bin/rm -f "$probe_plist" "$probe_out" "$probe_err" "$probe_template"
+  }
+  trap cleanup_probe EXIT INT TERM
 
   /bin/rm -f "$probe_out" "$probe_err" "$probe_template"
 
@@ -96,31 +115,29 @@ PROBE_PLIST_TEMPLATE
     "__PROBE_TARGET__=$probe_target" \
     "__PROBE_OUT__=$probe_out" \
     "__PROBE_ERR__=$probe_err"
-  /bin/rm -f "$probe_template"
 
   launchctl unload "$probe_plist" 2>/dev/null || true
-  # `set -e` is in effect; load failures here would abort install. Tolerate
-  # them — on failure we fall through and report TCC as blocked, which is
-  # the conservative default.
+  # `set -e` is in effect; tolerate load failure (the cleanup trap still runs).
+  # On failure we fall through and report TCC as blocked — the conservative
+  # default.
   if ! launchctl load "$probe_plist" 2>/dev/null; then
-    /bin/rm -f "$probe_plist" "$probe_out" "$probe_err"
+    trap - EXIT INT TERM
+    cleanup_probe
     return 1
   fi
 
-  # Plist is one-shot — wait briefly for it to run.
+  # One-shot plist — wait briefly for output.
   for _ in 1 2 3 4 5 6; do
     [ -s "$probe_out" ] && break
     [ -s "$probe_err" ] && break
     sleep 0.5
   done
-  launchctl unload "$probe_plist" 2>/dev/null || true
-  /bin/rm -f "$probe_plist"
 
   local result=1
-  if [ -s "$probe_out" ]; then
-    result=0
-  fi
-  /bin/rm -f "$probe_out" "$probe_err"
+  [ -s "$probe_out" ] && result=0
+
+  trap - EXIT INT TERM
+  cleanup_probe
   return $result
 }
 
@@ -155,7 +172,7 @@ case "$cmd" in
     [ -f "$SUPERVISOR" ] || { echo "✗ Missing supervisor: $SUPERVISOR" >&2; exit 1; }
 
     chmod +x "$SUPERVISOR"
-    mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.cache/pr-patrol"
+    mkdir -p "$HOME/Library/LaunchAgents" "$CACHE_DIR"
 
     # Render the plist with absolute paths. render_template escapes sed
     # replacement metachars (\, &, |) so paths with shell-special characters
@@ -185,7 +202,7 @@ case "$cmd" in
       print_tcc_help
     fi
 
-    if pgrep -fl "node.*pr-patrol run" >/dev/null 2>&1; then
+    if pgrep -f "$PATROL_PROCESS_PATTERN" >/dev/null 2>&1; then
       echo ""
       echo "ℹ Existing patrol process detected — it owns daemon.pid until it exits."
       echo "  The launchd supervisor will retry every 30s and take over once free."
@@ -239,16 +256,15 @@ case "$cmd" in
     else
       echo "✗ launchd: not loaded   (run: $0 install)"
     fi
-    # `pgrep -f` returns non-zero on no match, so check the assignment value
-    # explicitly — don't rely on the pipeline's exit code (the prior version's
-    # `if pid=$(... | awk ...)` was always true because awk exits 0 on empty).
-    pid=$(pgrep -f "node.*pr-patrol run" 2>/dev/null | head -1)
+    # Loose pattern matches the patrol process AND the launchd supervisor's
+    # 30s sleep window between cycles, aligned with inject-patrol-status.sh.
+    pid=$(pgrep -f "$PATROL_PROCESS_PATTERN" 2>/dev/null | head -1)
     if [ -n "$pid" ]; then
       echo "✓ patrol process: pid=$pid"
     else
       echo "✗ patrol process: not running"
     fi
-    pidfile="$HOME/.cache/pr-patrol/daemon.pid"
+    pidfile="$CACHE_DIR/daemon.pid"
     if [ -f "$pidfile" ]; then
       pidcontents=$(cat "$pidfile" 2>/dev/null || echo "<unreadable>")
       echo "  daemon.pid: $pidcontents ($pidfile)"
