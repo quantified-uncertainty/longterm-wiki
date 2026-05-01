@@ -14,9 +14,17 @@ on:
     - cron: "0 6 * * 1" # every Monday at 06:00 UTC
   workflow_dispatch:
 
+# Existing concurrency block already serializes runs of this workflow.
+# After QUA-970 the auto-filer is `crux linear monitor upsert` instead of
+# `gh issue create`, but the race-prevention motivation is identical.
 concurrency:
   group: server-health-monitor
   cancel-in-progress: false
+
+# Least-privilege: post-QUA-970 the workflow writes to Linear (off-GitHub),
+# so the default GITHUB_TOKEN only needs read access for actions/checkout.
+permissions:
+  contents: read
 
 jobs:
   paused-notice:
@@ -33,12 +41,6 @@ jobs:
     needs: [preflight]
     name: Verify monitoring is active
     runs-on: ubuntu-latest
-    # `issues: write` is no longer needed (Linear-first under QUA-970), but
-    # it's a default-deny scope on this token and harmless to leave; removing
-    # it costs a force-pause incident (e.g. if a future revert needs to
-    # re-enable GH filing temporarily).
-    permissions:
-      issues: write
 
     steps:
       # Checkout + pnpm setup are needed for `pnpm crux linear monitor`

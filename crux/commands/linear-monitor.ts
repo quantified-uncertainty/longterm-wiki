@@ -88,14 +88,30 @@ The title is the dedup key — pick a stable string per monitor. Vary detail
 (timestamps, status codes, run URLs) inside the body, not the title.
 `;
 
-function readBody(options: MonitorOptions): string | null {
+function readBody(options: MonitorOptions): string | { error: string } {
   if (options.bodyFile) {
-    return readFileSync(options.bodyFile, 'utf-8');
+    try {
+      return readFileSync(options.bodyFile, 'utf-8');
+    } catch (err) {
+      return { error: `Failed to read --body-file=${options.bodyFile}: ${err instanceof Error ? err.message : String(err)}` };
+    }
   }
   if (options.body) {
     return options.body;
   }
-  return null;
+  return { error: '--body or --body-file is required' };
+}
+
+/**
+ * Normalize a title for matching purposes. Trim leading/trailing whitespace
+ * and lowercase to make matches resilient to common manual edits — a human
+ * renaming "Render quality regression detected" → " Render quality
+ * regression detected " or "render quality regression detected" must not
+ * fragment the dedup. Linear titles preserve display case, so this only
+ * affects the match comparison, not what gets stored.
+ */
+function normalizeTitle(title: string): string {
+  return title.trim().toLowerCase();
 }
 
 function pickOldestOpen(matches: SearchedIssue[]): SearchedIssue | null {
@@ -112,6 +128,13 @@ function pickOldestOpen(matches: SearchedIssue[]): SearchedIssue | null {
   return open[0];
 }
 
+function preflightApiKey(): string | null {
+  if (!process.env.LINEAR_API_KEY) {
+    return 'LINEAR_API_KEY is not set in the environment. Set it before invoking `crux linear monitor`.';
+  }
+  return null;
+}
+
 async function upsertCommand(
   options: MonitorOptions,
 ): Promise<CommandResult> {
@@ -126,14 +149,27 @@ async function upsertCommand(
     return { output: `${c.red}--project is required${c.reset}\n${HELP}`, exitCode: 1 };
   }
   const body = readBody(options);
-  if (!body) {
-    return { output: `${c.red}--body or --body-file is required${c.reset}\n${HELP}`, exitCode: 1 };
+  if (typeof body !== 'string') {
+    return { output: `${c.red}${body.error}${c.reset}\n${HELP}`, exitCode: 1 };
+  }
+  // Skip preflight when deps are injected (tests). The default deps go
+  // through the real Linear client, which reads LINEAR_API_KEY at call time.
+  if (!options.__deps) {
+    const preflightError = preflightApiKey();
+    if (preflightError) {
+      return { output: `${c.red}${preflightError}${c.reset}\n`, exitCode: 1 };
+    }
   }
 
   const title = options.title;
+  const normTitle = normalizeTitle(title);
 
-  // 1. Search Linear for existing tickets with this exact title.
-  const candidates = (await deps.search(title, 20)).filter((r) => r.title === title);
+  // 1. Search Linear for existing tickets with this exact title (case-
+  //    insensitive, trimmed). Linear's search is token-based, so the post-
+  //    filter is required to avoid acting on near-matches.
+  const candidates = (await deps.search(title, 20)).filter(
+    (r) => normalizeTitle(r.title) === normTitle,
+  );
   const existing = pickOldestOpen(candidates);
 
   if (existing) {
@@ -207,10 +243,17 @@ async function resolveCommand(
   if (!options.title) {
     return { output: `${c.red}--title is required${c.reset}\n${HELP}`, exitCode: 1 };
   }
+  if (!options.__deps) {
+    const preflightError = preflightApiKey();
+    if (preflightError) {
+      return { output: `${c.red}${preflightError}${c.reset}\n`, exitCode: 1 };
+    }
+  }
 
   const title = options.title;
+  const normTitle = normalizeTitle(title);
   const candidates = (await deps.search(title, 20))
-    .filter((r) => r.title === title && isOpenStateType(r.state.type));
+    .filter((r) => normalizeTitle(r.title) === normTitle && isOpenStateType(r.state.type));
 
   if (candidates.length === 0) {
     if (options.json) {

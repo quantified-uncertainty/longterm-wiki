@@ -235,6 +235,43 @@ describe('crux linear monitor — upsert', () => {
     expect(result.exitCode).toBe(1);
     expect(deps.create).not.toHaveBeenCalled();
   });
+
+  it('refuses with exit 1 and a friendly message when --body-file does not exist', async () => {
+    // Bare readFileSync would throw and bubble a stack trace; the command
+    // catches it and surfaces a structured error.
+    const deps = makeDeps();
+    const result = await monitor(['upsert'], {
+      title: TITLE,
+      bodyFile: '/tmp/this-path-definitely-does-not-exist-12345',
+      project: PROJECT,
+      __deps: deps,
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Failed to read --body-file');
+    expect(deps.create).not.toHaveBeenCalled();
+  });
+
+  it('matches titles case-insensitively and ignores leading/trailing whitespace', async () => {
+    // A human renaming the canonical ticket to fix capitalization or
+    // accidentally adding whitespace must not fragment the dedup. The
+    // existing ticket is found and commented on, no duplicate is created.
+    const deps = makeDeps({
+      search: vi.fn().mockResolvedValue([
+        makeIssue({ identifier: 'QUA-500', title: '  RENDER QUALITY REGRESSION DETECTED  ' }),
+      ]),
+    });
+
+    const result = await monitor(['upsert'], {
+      title: TITLE,
+      body: BODY,
+      project: PROJECT,
+      __deps: deps,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(deps.comment).toHaveBeenCalledWith('QUA-500', BODY);
+    expect(deps.create).not.toHaveBeenCalled();
+  });
 });
 
 describe('crux linear monitor — resolve', () => {

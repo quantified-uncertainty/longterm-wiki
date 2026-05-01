@@ -4,8 +4,14 @@ name: Render Quality Monitor
 # Catches display regressions (raw numbers, JSON leaks) between deploys.
 # Runs every 6 hours + manual trigger.
 #
-# On failure: creates or updates a GitHub issue with label "render-monitor".
-# On success after prior failure: closes the issue with a resolution comment.
+# On failure: upserts a Linear ticket in "Dashboards & Visibility" via
+#   `crux linear monitor upsert` (QUA-970). The job step fails non-zero on
+#   transient Linear errors; the next 6h cron tick re-attempts. We trade
+#   immediate redundancy for cleaner ticket management — a single missed
+#   alert at 6h cadence is acceptable. Wellness keeps a GH fallback because
+#   it runs every few minutes.
+# On success after prior failure: `crux linear monitor resolve` closes any
+#   open ticket with the same title.
 #
 # Phase 3 of Discussion #3768 (Rendering Quality & Test Infrastructure).
 
@@ -13,6 +19,19 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch: {}
+
+# Prevent the cron tick and a manual workflow_dispatch from racing — both
+# would otherwise call upsert, miss each other's in-flight searches, and
+# create two Linear tickets. cancel-in-progress: false because the manual
+# trigger should serialize behind the cron, not abort it.
+concurrency:
+  group: render-monitor
+  cancel-in-progress: false
+
+# Least-privilege: workflow now writes to Linear (off-GitHub), so the
+# default GITHUB_TOKEN only needs read access for `actions/checkout`.
+permissions:
+  contents: read
 
 jobs:
   render-audit:
