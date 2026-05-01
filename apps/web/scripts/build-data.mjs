@@ -69,6 +69,7 @@ import {
   fetchPolicyStakeholderIds,
   syncPolicyStakeholders,
   fetchPolicyStakeholdersFromPG,
+  pgPolicyStakeholderRowToYaml,
   fetchResourcesFromPG,
   fetchEntityResourceLinks,
   fetchAllEntityStableIds,
@@ -283,6 +284,68 @@ function warnIfSnapshotStale(snapshotPath) {
 // Link graph functions (computeBacklinks, scanContentEntityLinks, buildTagIndex,
 // computeRelatedGraph, collectLinkSignals) extracted to ./lib/link-graph.mjs
 
+/** Snapshot schema version this build understands. Bump in lockstep with the
+ *  generator at crux/wiki-server/snapshot-policy-stakeholders.ts. Reading a
+ *  newer version is a hard error — the row shape may have changed. */
+const POLICY_STAKEHOLDERS_SNAPSHOT_VERSION = 1;
+
+/**
+ * Apply the `STAKEHOLDERS_SOURCE=pg|yaml` toggle to typed entities (QUA-960 step 11).
+ *
+ * `yaml` (default): no-op. The build keeps the YAML stakeholder arrays.
+ * `pg`: replaces each policy's stakeholder array with the PG load. Falls back
+ *       to snapshot, then to YAML if both are unavailable. Preserves `role`
+ *       from YAML by stakeholder name (QUA-984 workaround).
+ *
+ * Policies that have stakeholders in YAML but not in PG keep their YAML
+ * arrays — we log a warning rather than blanking them out, since the PG
+ * sync skips FK-missing rows (see syncPolicyStakeholders) and zeroing the
+ * array would silently lose data the user can still see today. The cutover
+ * PR will tighten this.
+ */
+async function applyStakeholdersSourceToggle(typedEntities) {
+  const source = (process.env.STAKEHOLDERS_SOURCE || 'yaml').toLowerCase();
+  if (source !== 'pg') return;
+
+  const pgStakeholders = await loadPolicyStakeholdersForBuild();
+  if (!pgStakeholders) {
+    console.warn(`  STAKEHOLDERS_SOURCE=pg: PG + snapshot unavailable — keeping YAML stakeholders`);
+    return;
+  }
+
+  let replaced = 0;
+  let pgEmpty = 0;
+  for (const e of typedEntities) {
+    if (e.entityType !== 'policy' || !e.stableId) continue;
+    const pgList = pgStakeholders.get(e.stableId);
+    if (!pgList || pgList.length === 0) {
+      // Don't blank a non-empty YAML array. PG-empty + YAML-empty: no-op.
+      // PG-empty + YAML-non-empty: keep YAML, warn once at end.
+      if (Array.isArray(e.stakeholders) && e.stakeholders.length > 0) pgEmpty++;
+      continue;
+    }
+    // Preserve `role` from YAML by stakeholder name (QUA-984: PG has no role
+    // column yet). Once QUA-984 closes, this merge becomes a pure PG read.
+    const yamlRoleByName = new Map();
+    if (Array.isArray(e.stakeholders)) {
+      for (const s of e.stakeholders) {
+        if (s.name && s.role) yamlRoleByName.set(s.name, s.role);
+      }
+    }
+    e.stakeholders = pgList.map((s) => {
+      const role = yamlRoleByName.get(s.name);
+      return role ? { ...s, role } : s;
+    });
+    replaced++;
+  }
+  console.log(`  STAKEHOLDERS_SOURCE=pg: replaced stakeholders on ${replaced} policies`);
+  if (pgEmpty > 0) {
+    console.warn(
+      `  STAKEHOLDERS_SOURCE=pg: ${pgEmpty} polic${pgEmpty === 1 ? 'y has' : 'ies have'} YAML stakeholders absent from PG — kept YAML (likely FK-skips during sync). Cutover PR will tighten this.`,
+    );
+  }
+}
+
 /**
  * Load policy stakeholders for build, with PG → snapshot fallback (QUA-960 step 9).
  *
@@ -305,6 +368,12 @@ async function loadPolicyStakeholdersForBuild() {
   }
   try {
     const parsed = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
+    if (parsed?.version !== POLICY_STAKEHOLDERS_SNAPSHOT_VERSION) {
+      console.warn(
+        `  policy-stakeholders: snapshot version mismatch (got ${parsed?.version}, expected ${POLICY_STAKEHOLDERS_SNAPSHOT_VERSION}) — ignoring`,
+      );
+      return null;
+    }
     const rows = Array.isArray(parsed?.stakeholders) ? parsed.stakeholders : null;
     if (!rows) {
       console.warn(`  policy-stakeholders: invalid snapshot at ${snapshotPath} (missing stakeholders[])`);
@@ -314,25 +383,17 @@ async function loadPolicyStakeholdersForBuild() {
     for (const r of rows) {
       if (!r.policyEntityId) continue;
       if (!byPolicy.has(r.policyEntityId)) byPolicy.set(r.policyEntityId, []);
-      const stakeholder = {
-        name: r.stakeholderDisplayName,
-        position: r.position,
-      };
-      if (r.stakeholderEntityId) stakeholder.entityId = r.stakeholderEntityId;
-      if (r.importance) stakeholder.importance = r.importance;
-      if (r.reason) stakeholder.reason = r.reason;
-      if (r.source) stakeholder.source = r.source;
-      if (Array.isArray(r.context) && r.context.length > 0) stakeholder.context = r.context;
-      byPolicy.get(r.policyEntityId).push(stakeholder);
+      byPolicy.get(r.policyEntityId).push(pgPolicyStakeholderRowToYaml(r));
     }
-    const total = rows.length;
-    const ageMs = parsed?.generatedAt ? Date.now() - new Date(parsed.generatedAt).getTime() : null;
+    const ageMs = parsed.generatedAt ? Date.now() - new Date(parsed.generatedAt).getTime() : null;
     const ageHours = ageMs != null ? Math.round(ageMs / (60 * 60 * 1000)) : null;
     console.log(
-      `  policy-stakeholders: ${total} loaded from snapshot (PG unavailable)` +
+      `  policy-stakeholders: ${rows.length} loaded from snapshot (PG unavailable)` +
         (ageHours != null ? `, generatedAt=${parsed.generatedAt} (~${ageHours}h old)` : ''),
     );
-    if (ageHours != null && ageHours > 6) {
+    // 24h matches SNAPSHOT_STALENESS_THRESHOLD_MS used for resources-snapshot.json
+    // (cron is daily, so anything <24h old is healthy steady-state).
+    if (ageHours != null && ageHours > 24) {
       console.warn(`  WARNING: policy-stakeholders snapshot is ${ageHours}h old. Refresh via the snapshot-policy-stakeholders workflow.`);
     }
     return byPolicy;
@@ -1310,39 +1371,14 @@ async function main() {
     // When `pg`: replace the YAML stakeholder array on each policy with PG data.
     // Fallback chain: PG → snapshot → YAML (so a wiki-server outage during
     // CI doesn't kill the build — the cutover PR will tighten this).
-    const stakeholdersSource = (process.env.STAKEHOLDERS_SOURCE || 'yaml').toLowerCase();
-    if (stakeholdersSource === 'pg') {
-      const pgStakeholders = await loadPolicyStakeholdersForBuild();
-      if (pgStakeholders) {
-        let policiesUpdated = 0;
-        for (const e of typedEntities) {
-          if (e.entityType !== 'policy' || !e.stableId) continue;
-          const pgList = pgStakeholders.get(e.stableId);
-          if (pgList) {
-            // Preserve `role` from YAML by merging on (name) — PG is missing
-            // the `role` column (QUA-984). Until QUA-984 lands, sourcing role
-            // from YAML lets the cutover ship without role regressions; once
-            // QUA-984 closes, this merge becomes a pure PG read.
-            const yamlRoleByName = new Map();
-            if (Array.isArray(e.stakeholders)) {
-              for (const s of e.stakeholders) {
-                if (s.name && s.role) yamlRoleByName.set(s.name, s.role);
-              }
-            }
-            e.stakeholders = pgList.map((s) => {
-              const role = yamlRoleByName.get(s.name);
-              return role ? { ...s, role } : s;
-            });
-            policiesUpdated++;
-          } else {
-            e.stakeholders = [];
-          }
-        }
-        console.log(`  STAKEHOLDERS_SOURCE=pg: replaced stakeholders on ${policiesUpdated} policies`);
-      } else {
-        console.warn(`  STAKEHOLDERS_SOURCE=pg: PG + snapshot unavailable — keeping YAML stakeholders`);
-      }
-    }
+    await applyStakeholdersSourceToggle(typedEntities);
+  } else if (process.env.STAKEHOLDERS_SOURCE === 'pg') {
+    // Surface mis-configuration: --scope=content skips the PG-replacement
+    // path entirely, so a developer thinking they're testing the cutover
+    // would silently get YAML behavior. Warn loudly.
+    console.warn(
+      `  STAKEHOLDERS_SOURCE=pg is set but --scope=content skips PG sync. Run a full build to test the toggle.`,
+    );
   }
 
   // =========================================================================

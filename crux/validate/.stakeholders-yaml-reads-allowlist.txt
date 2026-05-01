@@ -10,7 +10,9 @@
 #
 # Suppress a single legitimate use (rare — most reads should migrate):
 #   add `// stakeholders-yaml-ok: <reason>` on the same line.
-
+apps/web/scripts/build-data.mjs
+apps/web/scripts/lib/entity-transform.mjs
+apps/web/scripts/lib/wiki-server-data.mjs
 apps/web/src/app/legislation/[slug]/page.tsx
 apps/web/src/app/legislation/page.tsx
 apps/web/src/app/organizations/[slug]/policy-positions-section.tsx
@@ -25,3 +27,4 @@ crux/lib/research/apply-verdicts.ts
 crux/lib/research/gap-analyzer.ts
 crux/lib/research/sync-applied.ts
 crux/lib/sourcing/item-collectors.ts
+crux/scripts/export-policy-stakeholders-to-yaml.ts

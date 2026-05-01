@@ -26,12 +26,14 @@ const TEST_SUFFIXES = ['.test.ts', '.test.tsx'];
  * - Skips `*.test.ts` and `*.test.tsx` files
  * - Always includes `.ts` files
  * - Includes `.tsx` files when `includeTsx` is true
+ * - Includes `.mjs` and `.js` files when `includeMjs` is true (excludes `.test.mjs`)
  */
 export function collectTsFiles(
   dir: string,
-  options?: { includeTsx?: boolean },
+  options?: { includeTsx?: boolean; includeMjs?: boolean },
 ): string[] {
   const includeTsx = options?.includeTsx ?? false;
+  const includeMjs = options?.includeMjs ?? false;
   const results: string[] = [];
 
   function walk(current: string): void {
@@ -58,8 +60,13 @@ export function collectTsFiles(
       }
 
       if (TEST_SUFFIXES.some((s) => entry.endsWith(s))) continue;
+      if (includeMjs && (entry.endsWith('.test.mjs') || entry.endsWith('.test.js'))) continue;
 
-      if (entry.endsWith('.ts') || (includeTsx && entry.endsWith('.tsx'))) {
+      if (entry.endsWith('.ts')) {
+        results.push(fullPath);
+      } else if (includeTsx && entry.endsWith('.tsx')) {
+        results.push(fullPath);
+      } else if (includeMjs && (entry.endsWith('.mjs') || entry.endsWith('.js'))) {
         results.push(fullPath);
       }
     }

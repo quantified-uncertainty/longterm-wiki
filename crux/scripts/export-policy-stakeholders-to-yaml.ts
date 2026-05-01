@@ -22,11 +22,14 @@
  * name (so a no-op rollback is byte-identical when rolled-back data hasn't
  * changed since the last YAML write).
  *
- * Usage:
- *   pnpm crux scripts/export-policy-stakeholders-to-yaml [--dry-run] [--out=path]
+ * Usage (env vars must be exported — the standalone script does not
+ * source `.env.base`; run from a slot with `WIKI_SERVER_ENV=prod` set,
+ * or set `LONGTERMWIKI_SERVER_URL` + `LONGTERMWIKI_SERVER_API_KEY` directly):
+ *
+ *   WIKI_SERVER_ENV=prod npx tsx crux/scripts/export-policy-stakeholders-to-yaml.ts [--dry-run] [--out=path]
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, renameSync, existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
@@ -112,16 +115,20 @@ async function fetchAllStakeholders(): Promise<PGStakeholderRow[]> {
  * Convert a PG row to YAML shape, optionally inheriting a `role` from a
  * pre-existing YAML stakeholder with the same display name (round-trip
  * preservation while QUA-984 is open).
+ *
+ * Field-insertion order matches the PolicyStakeholder Zod schema in
+ * `apps/web/src/data/entity-schemas.ts`:
+ *   name, entityId, position, role, importance, reason, source, context.
+ * `yaml.stringify` preserves insertion order, so this ordering keeps the
+ * rebuilt YAML byte-stable against the canonical schema.
  */
 export function pgRowToYamlStakeholder(
   row: PGStakeholderRow,
   preservedRole: string | undefined,
 ): YamlStakeholder {
-  const out: YamlStakeholder = {
-    name: row.stakeholderDisplayName,
-    position: row.position,
-  };
+  const out: YamlStakeholder = { name: row.stakeholderDisplayName };
   if (row.stakeholderEntityId) out.entityId = row.stakeholderEntityId;
+  out.position = row.position;
   if (preservedRole) out.role = preservedRole;
   if (row.importance) out.importance = row.importance;
   if (row.reason) out.reason = row.reason;
@@ -147,9 +154,11 @@ export function rebuildStakeholdersForPolicy(
   const sorted = [...pgRows].sort((a, b) => {
     const pos = comparePosition(a.position, b.position);
     if (pos !== 0) return pos;
-    return a.stakeholderDisplayName.localeCompare(b.stakeholderDisplayName, undefined, {
-      sensitivity: "base",
-    });
+    // Byte-stable name comparison (locale-independent so rebuilds on
+    // different machines/Node ICU versions produce identical bytes).
+    const an = a.stakeholderDisplayName;
+    const bn = b.stakeholderDisplayName;
+    return an < bn ? -1 : an > bn ? 1 : 0;
   });
   return sorted.map((r) => pgRowToYamlStakeholder(r, yamlRoleByName.get(r.stakeholderDisplayName)));
 }
@@ -205,8 +214,13 @@ export async function exportPolicyStakeholdersToYaml(options?: {
     sortMapEntries: false,
   });
 
-  if (!options?.dryRun) {
-    writeFileSync(outPath, yamlAfter);
+  if (!options?.dryRun && updated > 0) {
+    // Atomic write: write to .tmp then rename. If the process dies mid-write
+    // (timeout, signal, OOM) the original YAML is preserved — critical for a
+    // disaster-recovery script.
+    const tmpPath = `${outPath}.tmp`;
+    writeFileSync(tmpPath, yamlAfter);
+    renameSync(tmpPath, outPath);
   }
 
   return {

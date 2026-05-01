@@ -1,40 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-01T18:32:45.587Z",
+  "generatedAt": "2026-05-01T19:08:16.163Z",
   "count": 243,
   "stakeholders": [
-    {
-      "id": "_hg7bihITb",
-      "policyEntityId": "sid_7rafBo4OER",
-      "stakeholderEntityId": "sid_yfAYuNTKxQ",
-      "stakeholderDisplayName": "R Street Institute",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Praised the pro-innovation, national-framework approach",
-      "source": "https://www.rstreet.org/commentary/white-house-ai-legislative-vision-stresses-need-for-a-pro-innovation-national-framework/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.140Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "_PxicfEUbp",
-      "policyEntityId": "sid_La8s84s3zg",
-      "stakeholderEntityId": "sid_A4XoubikkQ",
-      "stakeholderDisplayName": "Google DeepMind",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Supported risk-based framework in principle but lobbied for narrower GPAI definitions and raised concerns about compliance costs for foundation model research",
-      "source": "https://blog.google/around-the-globe/google-europe/google-ai-regulation-eu/",
-      "context": [
-        "Gemini models would be classified as GPAI with systemic risk under 10^25 FLOP threshold",
-        "Google's $2B investment in Anthropic and broad AI portfolio means extensive compliance obligations",
-        "DeepMind's London HQ means close proximity to UK AISI, a potential competing regulatory framework"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.869Z",
-      "createdAt": "2026-04-03T22:53:53.611Z",
-      "updatedAt": "2026-05-01T18:31:43.869Z"
-    },
     {
       "id": "-0mBAmbDnV",
       "policyEntityId": "sid_XcGTez1oFw",
@@ -44,10 +12,7 @@
       "importance": "low",
       "reason": "AI safety research lab that endorsed SB 1047 as part of the broader safety research community coalition",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
     },
     {
       "id": "12pp0pbsc5",
@@ -61,10 +26,7 @@
       "context": [
         "Part of broader a16z campaign against state-level AI regulation",
         "Targeted Bores specifically as a political pressure tactic against the bill's sponsors"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.878Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "1dgjqyqjt0",
@@ -80,10 +42,7 @@
         "29% of ASML's 2023 sales went to Chinese customers, creating strong financial disincentive to restrict exports",
         "Dutch government did not fully align with US on threshold levels — disagreed on setting the line at 16/14nm",
         "Delay between March 2023 announcement and September 2023 enforcement allowed Chinese firms to stockpile equipment"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.448Z",
-      "createdAt": "2026-03-21T01:30:47.674Z",
-      "updatedAt": "2026-05-01T18:31:44.448Z"
+      ]
     },
     {
       "id": "1eW9qRX3FV",
@@ -94,10 +53,7 @@
       "importance": "medium",
       "reason": "Supports the human rights framing but criticized the national security exemption as too broad, potentially undermining protections",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "1midtnepn6",
@@ -112,10 +68,7 @@
         "US Representative for San Francisco (tech industry heartland)",
         "Her district includes headquarters of OpenAI, multiple a16z portfolio companies",
         "Husband Paul Pelosi holds significant tech stock investments"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.197Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "21gp2q63x0",
@@ -130,10 +83,7 @@
         "Tokyo Electron is the world's third-largest semiconductor equipment maker; Nikon provides DUV lithography",
         "Japan's restrictions took effect July 2023, two months before Dutch rules",
         "Coordinated via US-Japan-Netherlands trilateral negotiations since early 2023"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.573Z",
-      "createdAt": "2026-03-21T01:30:47.709Z",
-      "updatedAt": "2026-05-01T18:31:44.573Z"
+      ]
     },
     {
       "id": "278191ws5s",
@@ -147,10 +97,7 @@
       "context": [
         "Largest US business advocacy organization; lobbied alongside state-level industry groups",
         "Advocated for strengthening existing consumer protection and civil rights laws instead"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.574Z",
-      "createdAt": "2026-03-21T04:21:16.039Z",
-      "updatedAt": "2026-05-01T18:31:42.574Z"
+      ]
     },
     {
       "id": "2am1oqzgq5",
@@ -166,10 +113,7 @@
         "Vice Minister of Science and Technology Wu Zhaohui led the Chinese delegation",
         "China had implemented its own Generative AI Interim Measures just three months earlier (Aug 2023)",
         "Did not participate in follow-up Seoul summit's voluntary company commitments"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.528Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "2lbparg7hg",
@@ -185,10 +129,7 @@
         "Co-author (with Hinton) of the foundational deep learning work; one of 'three godfathers of AI'",
         "Member of UN High-Level Advisory Body on AI",
         "Funded via Canadian government (CIFAR AI Chair) and Quebec government"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.654Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "2sjh0a5s2h",
@@ -204,10 +145,7 @@
         "a16z portfolio companies would face compliance costs under the bill",
         "Marc Andreessen and Ben Horowitz are vocal opponents of AI regulation generally",
         "Spent $39,750 on SB-1047 lobbying in Q2 2024"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.976Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "2tm75503kl",
@@ -222,10 +160,7 @@
         "Largest US business lobby; Tom Quaadman (EVP Technology Engagement Center) led criticism",
         "Disappointed in OMB's unwillingness to extend comment periods on Draft Guidance",
         "Preferred voluntary industry-led frameworks over mandatory government reporting"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:47.937Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "2xbyqvalby",
@@ -239,10 +174,7 @@
       "context": [
         "Siri, Apple Intelligence, and on-device ML features would face transparency obligations",
         "Historically secretive about product internals; disclosure requirements conflict with business model"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.624Z",
-      "createdAt": "2026-03-21T01:30:47.420Z",
-      "updatedAt": "2026-05-01T18:31:43.624Z"
+      ]
     },
     {
       "id": "31ps9d03cx",
@@ -257,10 +189,7 @@
         "111-page directive placing 150+ requirements on 50+ federal entities",
         "Commerce Secretary Gina Raimondo led implementation including AISI creation",
         "Secured voluntary commitments from 15 AI companies in July 2023 as a precursor"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:47.770Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "364w5d9qy3",
@@ -275,10 +204,18 @@
         "Also endorsed California's SB 53 — supported both major state AI safety laws",
         "Noted the legislation should 'inspire Congress to build on them' for federal action",
         "Claude models above 10^26 FLOP threshold covered by the Act's frontier model definition"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.701Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
+    },
+    {
+      "id": "3HY9jl-Lkx",
+      "policyEntityId": "sid_JCdMGaEZOj",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Trial Lawyers Association",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Support new cause of action for AI-related harms as an extension of existing product liability frameworks",
+      "source": null,
+      "context": null
     },
     {
       "id": "3fc4wq2br0",
@@ -292,10 +229,7 @@
       "context": [
         "Targeted by Leading the Future super PAC (a16z-backed) for his role in the bill",
         "Co-sponsored with Gounardes to ensure coordinated bicameral passage"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.666Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "3h4i5zgf94",
@@ -311,10 +245,7 @@
         "Former VP and Chief Scientist at Baidu; co-founded Google Brain",
         "Board member of Woebot Health; advisor to several AI startups",
         "Vocal opponent of 'AI doomerism'; frames regulation debate as large-lab rent-seeking"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.050Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "3hFKSYioKh",
@@ -325,24 +256,7 @@
       "importance": "medium",
       "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.065Z",
-      "createdAt": "2026-03-25T12:02:07.292Z",
-      "updatedAt": "2026-05-01T18:31:46.065Z"
-    },
-    {
-      "id": "3HY9jl-Lkx",
-      "policyEntityId": "sid_JCdMGaEZOj",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Trial Lawyers Association",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Support new cause of action for AI-related harms as an extension of existing product liability frameworks",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "3i07wxm8gp",
@@ -356,10 +270,7 @@
       "context": [
         "Coalition of 45 member organizations focused on civil liberties in Canada",
         "Called for fundamental rights impact assessments and stronger transparency obligations"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.635Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "41g065imru",
@@ -373,10 +284,7 @@
       "context": [
         "Colorado-based free-market think tank; study widely cited by industry opponents during special session",
         "Job loss estimate contested by act supporters as based on speculative assumptions"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.469Z",
-      "createdAt": "2026-03-21T01:30:47.107Z",
-      "updatedAt": "2026-05-01T18:31:42.469Z"
+      ]
     },
     {
       "id": "4HnIjsHl8T",
@@ -387,10 +295,7 @@
       "importance": "high",
       "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.242Z",
-      "createdAt": "2026-03-26T20:25:07.661Z",
-      "updatedAt": "2026-05-01T18:31:45.242Z"
+      "context": null
     },
     {
       "id": "4onBxvuFxp",
@@ -401,10 +306,7 @@
       "importance": "high",
       "reason": "Lead sponsor; views AI liability as essential consumer protection analogous to product liability for physical goods",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "5AxBxLU4of",
@@ -415,10 +317,7 @@
       "importance": "high",
       "reason": "Signed both bills into law as part of Arkansas's proactive approach to AI governance",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "5gp9mkuspg",
@@ -432,10 +331,7 @@
       "context": [
         "Major investor in OpenAI ($13B); both companies among original signatories",
         "Existing responsible AI governance practices predated the commitments"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:16.994Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "5n79pSBzD3",
@@ -449,10 +345,7 @@
       "context": [
         "Center-left tech industry coalition; also opposed California's SB 1047",
         "Positioned as pro-tech but supporting moderate regulation — opposed RAISE Act as overreach"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-22T15:58:09.426Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "66hx7teqa9",
@@ -467,10 +360,7 @@
         "Opposed both SB 1047 and SB 53 — consistent preference for federal-only regulation",
         "Backed by Microsoft ($13B invested); transitioning to for-profit structure",
         "Despite company opposition, 113+ employees had signed letter supporting the earlier SB 1047"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.217Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "66ospn071c",
@@ -481,10 +371,7 @@
       "importance": "low",
       "reason": "AI safety research organization that endorsed SB 1047 as part of the coalition of safety-focused labs supporting frontier model regulation",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.480Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
     },
     {
       "id": "674441exaj",
@@ -499,10 +386,7 @@
         "Stanford HAI created a detailed tracker monitoring implementation of each requirement",
         "CSET Georgetown published extensive analysis of the order's scope and implications",
         "Many researchers noted the 10^26 FLOP threshold was the same later adopted by California SB 1047"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:47.903Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "68U2nvmYpQ",
@@ -516,10 +400,7 @@
       "context": [
         "One of the few startups that could develop models covered under SB 1047",
         "Its support countered industry claims that the bill would harm startups"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "6HeFfoW5Vq",
@@ -530,10 +411,7 @@
       "importance": "medium",
       "reason": "Leading whistleblower advocacy organization supporting legal frameworks for AI safety disclosures",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "6n7ivxdvmS",
@@ -544,10 +422,7 @@
       "importance": "high",
       "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.585Z",
-      "createdAt": "2026-03-26T20:25:07.852Z",
-      "updatedAt": "2026-05-01T18:31:45.585Z"
+      "context": null
     },
     {
       "id": "6vIwaQhi7K",
@@ -561,10 +436,7 @@
       "context": [
         "Youth-led movement focused on AI governance and accountability",
         "One of three official co-sponsors of the bill"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "761m2pvksp",
@@ -578,10 +450,7 @@
       "context": [
         "New York-focused tech industry group representing 1,000+ member companies",
         "Particular concern about impact on startups lacking compliance resources of larger firms"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.835Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "77wbw51yv8",
@@ -596,38 +465,7 @@
         "Joined by Americans for Tax Reform and other anti-regulation organizations",
         "Argued compliance mandates particularly hurt small businesses lacking resources of larger tech firms",
         "Opposed any state-level AI regulation, not just TRAIGA specifically"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T04:21:17.943Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "7c_K7f47Cl",
-      "policyEntityId": "sid_Fghn4m4ekW",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "United States",
-      "position": "oppose",
-      "importance": "high",
-      "reason": "Refused to sign the declaration on inclusive and sustainable AI; prioritizes unilateral AI leadership over multilateral commitments",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "7igE6zwtmI",
-      "policyEntityId": "sid_7xjjFPltc4",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI chatbot companies",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Concerned about compliance requirements and potential restrictions on chatbot product features in Washington state",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "7UaZwmanQQ",
@@ -638,10 +476,29 @@
       "importance": "medium",
       "reason": "Signed voluntary Frontier AI Safety Commitments at the summit alongside other major AI companies",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T15:45:32.230Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
+    },
+    {
+      "id": "7c_K7f47Cl",
+      "policyEntityId": "sid_Fghn4m4ekW",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "United States",
+      "position": "oppose",
+      "importance": "high",
+      "reason": "Refused to sign the declaration on inclusive and sustainable AI; prioritizes unilateral AI leadership over multilateral commitments",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "7igE6zwtmI",
+      "policyEntityId": "sid_7xjjFPltc4",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI chatbot companies",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Concerned about compliance requirements and potential restrictions on chatbot product features in Washington state",
+      "source": null,
+      "context": null
     },
     {
       "id": "8eqyfoj2ob",
@@ -657,10 +514,7 @@
         "Board member of companies including Amgen and Twitter (pre-Musk acquisition)",
         "Co-founded World Labs (spatial AI startup) with a16z (also opposes) funding",
         "Appointed by Newsom to panel drafting alternative AI regulation after veto"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.084Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "8mAJ2iZ06s",
@@ -671,10 +525,7 @@
       "importance": "high",
       "reason": "Hosted and co-chaired the summit; championed inclusive AI development and the Current AI foundation",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "8mbxcgeo9c",
@@ -689,10 +540,7 @@
         "Met only 4 of 30 compliance indicators per Brown/Harvard/Stanford study (Dec 2024)",
         "Signed commitments just before launching Apple Intelligence — timing suggested strategic motivation",
         "Historically minimal public disclosure about AI safety testing or model evaluations"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.114Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "8w91x5sg1k",
@@ -707,10 +555,7 @@
         "127 different groups paid lobbyists during the special session — many from tech and healthcare industries",
         "Multiple attempts to repeal or substantially weaken the law failed in the legislature",
         "Compromise deal collapsed over disagreements about developer/deployer liability for algorithmic discrimination"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.207Z",
-      "createdAt": "2026-03-21T01:30:47.040Z",
-      "updatedAt": "2026-05-01T18:31:42.207Z"
+      ]
     },
     {
       "id": "8yttow1jfw",
@@ -725,10 +570,7 @@
         "Innovation, Science and Economic Development Canada (ISED) would have been both regulator and enforcer — a conflict of interest flagged by critics",
         "137 witnesses appeared before the INDU committee; 113 briefs submitted during study",
         "November 2023 amendments added specificity but were seen as insufficient by civil society"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.539Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "8zpo-ecjxU",
@@ -739,10 +581,7 @@
       "importance": "high",
       "reason": "88 researchers from 11 countries authored the consensus; represents broad scientific agreement on safety research priorities",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
     },
     {
       "id": "8zsjplmvd4",
@@ -757,10 +596,7 @@
         "Companies agreed to give UK AISI early access to frontier models for safety evaluation",
         "Commitments were voluntary and non-binding; enforcement purely reputational",
         "Seoul summit (May 2024) expanded to 16 company signatories with more specific commitments"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:17.486Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "99b1srapfu",
@@ -776,10 +612,7 @@
         "Co-founded by Max Tegmark (also listed as supporter) and Jaan Tallinn (Skype co-founder)",
         "Organized the 2023 Pause Letter (33,000+ signatories) calling for 6-month AI training moratorium",
         "Sister org FLF received $58.8M from FLI"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.613Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "9dm6is5oex",
@@ -794,10 +627,7 @@
         "Campaigned for over three years for biometric mass surveillance ban via the Reclaim Your Face initiative",
         "Successfully opposed EPP's last-minute attempt to water down facial recognition bans in June 2023 plenary vote",
         "Published practical legal guide for fighting biometric mass surveillance after the Act passed"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.123Z",
-      "createdAt": "2026-03-21T01:30:47.562Z",
-      "updatedAt": "2026-05-01T18:31:44.123Z"
+      ]
     },
     {
       "id": "9itbxls754",
@@ -812,10 +642,7 @@
         "Chief AI Scientist at Meta AI (also opposes)",
         "Turing Award with Bengio (supporter) and Hinton (supporter) — all three took different positions",
         "Strong advocate for open-source AI; bill's liability provisions threaten open model releases"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.017Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "9oefLd0Mj9",
@@ -826,27 +653,7 @@
       "importance": "high",
       "reason": "Industry broadly welcomed the deregulatory approach and revocation of Biden-era compute reporting requirements",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.248Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "a1io6sl1lc",
-      "policyEntityId": "sid_UD11PlWtlg",
-      "stakeholderEntityId": "sid_WchSgl5dux",
-      "stakeholderDisplayName": "Common Sense Media",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Backed SB 53 as a necessary consumer and child safety measure; advocated for transparency requirements",
-      "source": "https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/",
-      "context": [
-        "Leading child safety advocacy organization; Jim Steyer (founder) has long-standing relationship with Newsom",
-        "Focus on AI transparency aligns with their broader digital safety agenda"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.379Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
     },
     {
       "id": "A3duPIo1Rb",
@@ -857,24 +664,7 @@
       "importance": "high",
       "reason": "Co-authored and championed the legislation",
       "source": "https://www.congress.gov/bill/119th-congress/senate-bill/146",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.239Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "a3mB85YSVK",
-      "policyEntityId": "sid_aCEdTooCBw",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "UK Government",
-      "position": "support",
-      "importance": "high",
-      "reason": "Pioneered the first AI Safety Institute in 2023; hosts the international AISI network secretariat",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-04-03T16:44:33.005Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
     },
     {
       "id": "A5Weik0bez",
@@ -885,58 +675,7 @@
       "importance": "medium",
       "reason": "Participated as observer state in negotiations; signed the convention in September 2024 alongside the EU, UK, and Israel",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "a931eiqbod",
-      "policyEntityId": "sid_561xbhJAeQ",
-      "stakeholderEntityId": "sid_WHAEpX4KJm",
-      "stakeholderDisplayName": "Texas Public Policy Foundation",
-      "position": "support",
-      "importance": "high",
-      "reason": "Collaborated with Rep. Capriglione to convene stakeholders; TPPF director David Dunmoyer called it 'the culmination of years of work committed to securing Texas as the nationwide model for AI policy'",
-      "source": "https://www.texaspolicy.com/press/tppf-celebrates-passage-of-hb-149-out-of-the-texas-house-of-representatives",
-      "context": [
-        "Conservative think tank that helped shape the bill's light-touch regulatory approach",
-        "Frames TRAIGA as a contrast to California and New York's more prescriptive AI laws",
-        "David Dunmoyer (Director for Better Tech for Tomorrow) was lead policy advocate"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T04:21:17.885Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "abcdefghij",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Test Org",
-      "position": "support",
-      "importance": "high",
-      "reason": "Test reason",
-      "source": "https://example.com",
-      "context": [
-        "note1"
-      ],
-      "syncedAt": "2026-03-21T01:30:02.085Z",
-      "createdAt": "2026-03-21T01:30:02.084Z",
-      "updatedAt": "2026-03-21T01:30:02.085Z"
-    },
-    {
-      "id": "Ak3jiRQT5s",
-      "policyEntityId": "sid_dLGmQQU4yB",
-      "stakeholderEntityId": "sid_c3jsITFMPU",
-      "stakeholderDisplayName": "Sen. Mike Rounds",
-      "position": "support",
-      "importance": "high",
-      "reason": null,
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.849Z",
-      "createdAt": "2026-03-25T12:02:07.135Z",
-      "updatedAt": "2026-05-01T18:31:45.849Z"
+      "context": null
     },
     {
       "id": "AOxrLX-DmB",
@@ -947,52 +686,18 @@
       "importance": "medium",
       "reason": "Active participant in development; adopted AI RMF principles in its Responsible AI Standard",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.715Z",
-      "createdAt": "2026-04-03T15:45:31.983Z",
-      "updatedAt": "2026-05-01T18:31:47.715Z"
+      "context": null
     },
     {
-      "id": "b_6AmGZXwR",
-      "policyEntityId": "sid_Qz9kfJzEP7",
-      "stakeholderEntityId": "sid_enf2UNKyDx",
-      "stakeholderDisplayName": "Senator Marsha Blackburn (R-TN)",
+      "id": "Ak3jiRQT5s",
+      "policyEntityId": "sid_dLGmQQU4yB",
+      "stakeholderEntityId": "sid_c3jsITFMPU",
+      "stakeholderDisplayName": "Sen. Mike Rounds",
       "position": "support",
       "importance": "high",
-      "reason": "Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining multiple policy areas",
+      "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "Bb0S8oQP_D",
-      "policyEntityId": "sid_TNWEEemXQd",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "European Union",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T15:45:33.119Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "BeUEO7trx0",
-      "policyEntityId": "sid_ZpeTfyauLM",
-      "stakeholderEntityId": "sid_IZ04n3ZvIZ",
-      "stakeholderDisplayName": "Department of Energy",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Would gain new mandate and authority for AI evaluation but faces significant implementation burden within 90-day timeline",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "BHNm3J9KtR",
@@ -1007,10 +712,739 @@
         "Gemini models above 10^26 FLOP threshold requiring mandatory reporting to Commerce Department",
         "Published Frontier Safety Framework aligned with EO safety testing requirements",
         "One of the original seven companies to sign July 2023 voluntary commitments"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T22:53:53.611Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
+    },
+    {
+      "id": "BLxuuwYOMq",
+      "policyEntityId": "sid_ZpeTfyauLM",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI industry (frontier labs)",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Some labs support external evaluation in principle but oppose mandatory participation and the scale of penalties for non-compliance",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "BMXDh5BJLN",
+      "policyEntityId": "sid_PYEZ6G1Fbz",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "US Senate (bipartisan)",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Senate rejected AI preemption moratorium in One Big Beautiful Bill Act due to bipartisan concerns about eroding state consumer protection authority",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "BQXXfSVpzV",
+      "policyEntityId": "sid_38lWEn2OYr",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Consumer protection organizations",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Support disclosure requirements as baseline transparency for users interacting with AI companion systems",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "BVro-0x-YA",
+      "policyEntityId": "sid_XOxFEPaf90",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Victims' advocacy organizations",
+      "position": "support",
+      "importance": "high",
+      "reason": "Strongly support civil remedies for deepfake victims; the Taylor Swift deepfake incident catalyzed public support",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Bb0S8oQP_D",
+      "policyEntityId": "sid_TNWEEemXQd",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "European Union",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "BeUEO7trx0",
+      "policyEntityId": "sid_ZpeTfyauLM",
+      "stakeholderEntityId": "sid_IZ04n3ZvIZ",
+      "stakeholderDisplayName": "Department of Energy",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Would gain new mandate and authority for AI evaluation but faces significant implementation burden within 90-day timeline",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "CFMG-AseT_",
+      "policyEntityId": "sid_Qz9kfJzEP7",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI industry",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Support federal preemption over state patchwork but oppose the anti-fair-use copyright provision that would restrict AI training data",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "CcrupAQD3-",
+      "policyEntityId": "sid_A9qQJtpTCA",
+      "stakeholderEntityId": "sid_OyPBrUIpeS",
+      "stakeholderDisplayName": "Sen. Elizabeth Warren",
+      "position": "support",
+      "importance": "high",
+      "reason": null,
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "DOv7MghUux",
+      "policyEntityId": "sid_TNWEEemXQd",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Global South coalition",
+      "position": "support",
+      "importance": "high",
+      "reason": "Developing nations backed the resolution as a way to ensure their voice in AI governance, countering Western-dominated forums like the G7",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "DjfatH_6bJ",
+      "policyEntityId": "sid_NLSUTzzH5g",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI industry (major labs)",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Generally supportive of research priorities but consensus remains voluntary with no binding commitments on industry",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Dpl2P3Gtd6",
+      "policyEntityId": "sid_I8mbdJyUjs",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Indiana General Assembly",
+      "position": "support",
+      "importance": "high",
+      "reason": "Enacted the disclosure requirement as part of healthcare transparency reforms",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "EfWJb5ugtR",
+      "policyEntityId": "sid_UD11PlWtlg",
+      "stakeholderEntityId": "sid_0PNw6yTH0g",
+      "stakeholderDisplayName": "TechNet",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Coordinated tech industry opposition as a trade group representing major companies; advocated for federal regulation instead of state patchwork",
+      "source": "https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/",
+      "context": [
+        "Members include Google, Meta, OpenAI, Apple, Microsoft — all major frontier model developers",
+        "Also opposed SB 1047; consistent industry coalition against California AI bills"
+      ]
+    },
+    {
+      "id": "Ei_ZEHB9FL",
+      "policyEntityId": "sid_pz3KSt33AA",
+      "stakeholderEntityId": "sid_1LcLlMGLbw",
+      "stakeholderDisplayName": "OpenAI",
+      "position": "support",
+      "importance": "high",
+      "reason": "Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in White House commitments from July 2023; scored 83.3% compliance across 30 indicators",
+      "source": "https://www.nist.gov/aisi",
+      "context": [
+        "One of the original seven companies to sign White House voluntary commitments in July 2023",
+        "GPT-4 and subsequent models above the 10^26 FLOP threshold triggering mandatory reporting",
+        "Later quietly removed some Biden-era AI policy commitments from its website (March 2025)"
+      ]
+    },
+    {
+      "id": "EuNXB6L2tG",
+      "policyEntityId": "sid_yxyu4w3Xup",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Utah State Legislature",
+      "position": "support",
+      "importance": "high",
+      "reason": "Enacted the bill as part of Utah's pro-innovation regulatory approach to AI governance",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "FE3f9SOs_1",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Federal Bureau of Investigation (FBI)",
+      "position": "support",
+      "importance": "medium",
+      "reason": "The FBI only receives collection on Section 702 targets relevant to full FBI national security investigations, which amounts to 3.22% of the IC's total targets under 702. After the FBI implemented a series of reforms in 2021 and 2022 to address concerns about query compliance, the FBI's U.S. person queries of Section 702 information dropped over 93% from 2021 to 2022.",
+      "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
+      "context": null
+    },
+    {
+      "id": "FQOTQuFPVC",
+      "policyEntityId": "sid_NLSUTzzH5g",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Singapore government",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Hosted the SCAI conference and facilitated the consensus process as part of its AI governance leadership",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "GBt5p2ITCw",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_IEav94hygQ",
+      "stakeholderDisplayName": "Chamber of Progress",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Led tech coalition urging Newsom to veto; stated 'The California legislature is passing laws based on science fiction fantasies'; co-signed August 27, 2024 joint veto letter with Bay Area Council, Engine, NetChoice, R Street Institute, and others",
+      "source": "https://progresschamber.org/news/ca-legislature-passes-ai-bill/",
+      "context": null
+    },
+    {
+      "id": "GLEwydbmk_",
+      "policyEntityId": "sid_TVA6XJDdOO",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Kentucky state agencies",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Will need to comply with new AI policy standards; supportive of guidance but concerned about implementation costs",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "GUJtz0Z4Sq",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_HkfUxsbBLQ",
+      "stakeholderDisplayName": "Gladstone AI",
+      "position": "support",
+      "importance": "low",
+      "reason": "AI safety advisory firm that authored a RAND-commissioned report on catastrophic AI risks; supported the bill as consistent with its findings on the need for frontier AI regulation",
+      "source": "https://safesecureai.org/support",
+      "context": null
+    },
+    {
+      "id": "HUzcVBdEv4",
+      "policyEntityId": "sid_1i59OZ3q5w",
+      "stakeholderEntityId": "sid_mK9pX3rQ7n",
+      "stakeholderDisplayName": "Anthropic",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Signed voluntary Frontier AI Safety Commitments; aligned with summit's risk-based approach",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "ICpThynXQY",
+      "policyEntityId": "sid_ijQ2GcsXAQ",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Business and employer groups",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Concerned about compliance costs and legal uncertainty around proving AI systems do not discriminate in employment decisions",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "IGcuj8ja27",
+      "policyEntityId": "sid_7xjjFPltc4",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Washington State Legislature",
+      "position": "support",
+      "importance": "high",
+      "reason": "Both chambers advancing companion bills with strong bipartisan support (House 69-28)",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "IwTvSbYIcF",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_Le8eSvx8EQ",
+      "stakeholderDisplayName": "Competitive Enterprise Institute",
+      "position": "oppose",
+      "importance": "low",
+      "reason": "Free-market policy organization that joined the CalChamber-led coalition letter opposing SB 1047 on grounds that it would stifle innovation and impose impractical requirements",
+      "source": "https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf",
+      "context": null
+    },
+    {
+      "id": "J93oXA3NJG",
+      "policyEntityId": "sid_1i59OZ3q5w",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "South Korea",
+      "position": "support",
+      "importance": "high",
+      "reason": "Host country; positioned itself as bridge between Western and Asian AI governance approaches",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "JvJiLJ2ybV",
+      "policyEntityId": "sid_1i59OZ3q5w",
+      "stakeholderEntityId": "sid_A4XoubikkQ",
+      "stakeholderDisplayName": "Google DeepMind",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Signed voluntary Frontier AI Safety Commitments; supported pre-deployment safety testing commitments",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "KEAcwSWhc_",
+      "policyEntityId": "sid_A9qQJtpTCA",
+      "stakeholderEntityId": "sid_ezdMt069kA",
+      "stakeholderDisplayName": "Semiconductor Industry Association",
+      "position": "oppose",
+      "importance": "high",
+      "reason": "Cannot support \"blanket mandates for new, untested, and potentially infeasible on-chip mechanisms\"; warns of undermining global trust in American semiconductor technologies.",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "KKLAoZXZLS",
+      "policyEntityId": "sid_7xjjFPltc4",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Parents and family advocacy organizations",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Support safety and disclosure requirements for AI chatbots that children may interact with",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Ko6Pobv3Do",
+      "policyEntityId": "sid_Tt1wXsEjKw",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI companies",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "AI output ownership provisions create new legal considerations around who owns AI-generated content and liability",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "L1ycTLP8De",
+      "policyEntityId": "sid_La8s84s3zg",
+      "stakeholderEntityId": "sid_OIY5gaPpBA",
+      "stakeholderDisplayName": "Microsoft",
+      "position": "support",
+      "importance": "high",
+      "reason": "Supported risk-based approach; President Brad Smith called the EU AI Act a 'strong foundation' and pledged compliance across Microsoft's AI products",
+      "source": "https://blogs.microsoft.com/on-the-issues/2023/05/25/how-do-we-best-govern-ai/",
+      "context": [
+        "Major investor in OpenAI ($13B); both took supportive positions on the Act",
+        "Azure AI and Copilot products span multiple high-risk domains covered by the Act",
+        "Existing responsible AI governance practices largely aligned with Act requirements"
+      ]
+    },
+    {
+      "id": "LBN1MiMt9_",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Privacy and Civil Liberties Oversight Board (PCLOB)",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Najibullah Zazi is in prison for planning to attack the New York City subway system with explosives in 2009. He received explosives training in Pakistan from al Qaeda. The Privacy and Civil Liberties Oversight Board concluded in 2014: 'without the initial tip-off about Zazi and his plans, which came about by monitoring an overseas foreigner under Section 702, the subway-bombing plot might have succeeded.'",
+      "source": "https://rpc.senate.gov/policy-papers/fisa-section-702",
+      "context": null
+    },
+    {
+      "id": "LKLgbgu9z2",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_oMgy3kQqOg",
+      "stakeholderDisplayName": "Kira Center",
+      "position": "support",
+      "importance": "low",
+      "reason": "Center for AI Risks and Impacts that endorsed SB 1047 as part of the safety-focused research community",
+      "source": "https://safesecureai.org/support",
+      "context": null
+    },
+    {
+      "id": "M5DTqmiwjA",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Office of the Director of National Intelligence (ODNI)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Co-authorizes annual Section 702 collection alongside the Attorney General and publishes the Annual Statistical Transparency Report.",
+      "source": "https://crsreports.congress.gov/product/pdf/R/R44457",
+      "context": null
+    },
+    {
+      "id": "M9YT3j525z",
+      "policyEntityId": "sid_SrEFtBmBYg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "United Kingdom",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Early signatory despite Brexit; views the convention as compatible with its pro-innovation AI approach",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "MR2fEB95pv",
+      "policyEntityId": "sid_XOxFEPaf90",
+      "stakeholderEntityId": "sid_LNfQiSo5us",
+      "stakeholderDisplayName": "Senator Dick Durbin (D-IL)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Lead sponsor; champions the bill as essential protection for victims of nonconsensual intimate imagery",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "NqWqsR7mGi",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_0PNw6yTH0g",
+      "stakeholderDisplayName": "TechNet",
+      "position": "oppose",
+      "importance": "low",
+      "reason": "Bipartisan network of technology CEOs that joined the industry coalition opposing SB 1047, arguing the bill would create burdensome compliance costs and regulatory uncertainty",
+      "source": "https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf",
+      "context": null
+    },
+    {
+      "id": "NyyN4RSvvg",
+      "policyEntityId": "sid_7rafBo4OER",
+      "stakeholderEntityId": "sid_ewHH8hqYZD",
+      "stakeholderDisplayName": "Alliance for Secure AI",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "CEO Brendan Steinhauser said the proposed regulations provide \"no path to accountability\" for harms caused by AI",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "P9aIFeNHrI",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": "sid_XkqcWk46oQ",
+      "stakeholderDisplayName": "Center for Democracy and Technology (CDT)",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Pushes for stronger US-person query protections and shorter Section 702 reauthorization sunsets; led 2024 coalition push for FISA 702 reforms.",
+      "source": "https://cdt.org/area-of-focus/government-surveillance/",
+      "context": null
+    },
+    {
+      "id": "PVcsukOCNU",
+      "policyEntityId": "sid_CfUOvtha9O",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI companion chatbot companies",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Restrictions limit the scope of mental health-related features that AI companion products can offer in Tennessee",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Q0CdtfGt12",
+      "policyEntityId": "sid_aCEdTooCBw",
+      "stakeholderEntityId": "sid_Eac7pHF06Q",
+      "stakeholderDisplayName": "US Government (NIST)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Established USAISI within NIST to conduct pre-deployment evaluations of frontier AI systems",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "R6uNewHyVV",
+      "policyEntityId": "sid_Fghn4m4ekW",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "India (PM Modi)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Co-chaired the summit with France; positioned India as a bridge between developed and developing world on AI governance",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Swv8qiBl0r",
+      "policyEntityId": "sid_Qz9kfJzEP7",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Child safety advocates",
+      "position": "support",
+      "importance": "high",
+      "reason": "Support inclusion of KOSA provisions for children's safety in the comprehensive framework",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "U-1Tsg2X8t",
+      "policyEntityId": "sid_SrEFtBmBYg",
+      "stakeholderEntityId": "sid_7h0u4ulMdb",
+      "stakeholderDisplayName": "European Digital Rights (EDRi)",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Welcomed the binding nature but criticized weak enforcement mechanisms and the broad national security carve-out",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "U8hd0vaRZ9",
+      "policyEntityId": "sid_Qz9kfJzEP7",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "State legislators",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Oppose broad federal preemption of state AI laws that would override existing and emerging state-level regulations",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "UGKAE3pcYD",
+      "policyEntityId": "sid_JCdMGaEZOj",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Technology industry (TechNet, BSA)",
+      "position": "oppose",
+      "importance": "high",
+      "reason": "Oppose expanded liability standards as potentially chilling AI innovation and creating legal uncertainty for developers",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "UP8rrWNoa8",
+      "policyEntityId": "sid_yxyu4w3Xup",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI companies operating in Utah",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Safe harbor provision for AI self-disclosure provides legal certainty and a clear compliance pathway",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "V1CttVppVO",
+      "policyEntityId": "sid_Tt1wXsEjKw",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Content creators and artists",
+      "position": "support",
+      "importance": "medium",
+      "reason": "HB 1876 establishes ownership rights over AI-generated content, providing legal clarity for creators using AI tools",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "WEiTnn6n_S",
+      "policyEntityId": "sid_7rafBo4OER",
+      "stakeholderEntityId": "sid_okZhiBvBoj",
+      "stakeholderDisplayName": "Michael Kratsios",
+      "position": "support",
+      "importance": "high",
+      "reason": "Said the framework \"will unleash American ingenuity to win the global AI race, delivering breakthroughs that create jobs, lower costs, and improve lives\"",
+      "source": "https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/",
+      "context": null
+    },
+    {
+      "id": "Ww3KWhi83a",
+      "policyEntityId": "sid_38lWEn2OYr",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "AI companion chatbot companies",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Some accept disclosure requirements as reasonable while others view the regulation as potentially restricting product design and user experience",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "XMQ6ATiMLi",
+      "policyEntityId": "sid_Fghn4m4ekW",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Global South nations",
+      "position": "support",
+      "importance": "high",
+      "reason": "61 countries signed the declaration; developing nations view inclusive AI governance as essential to avoid being left behind",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "XlS2TWMdJY",
+      "policyEntityId": "sid_XOxFEPaf90",
+      "stakeholderEntityId": "sid_iSc4TztRuB",
+      "stakeholderDisplayName": "Senator Lindsey Graham (R-SC)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Co-sponsor; bipartisan support demonstrated by unanimous Senate passage",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "Y-CBzdxiQh",
+      "policyEntityId": "sid_pz3KSt33AA",
+      "stakeholderEntityId": "sid_mK9pX3rQ7n",
+      "stakeholderDisplayName": "Anthropic",
+      "position": "support",
+      "importance": "high",
+      "reason": "Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation; scored 80.0% compliance across 30 indicators",
+      "source": "https://www.nist.gov/aisi",
+      "context": [
+        "One of the original seven companies to sign White House voluntary commitments in July 2023",
+        "Claude models above 10^26 FLOP threshold; existing Responsible Scaling Policy aligned with EO requirements",
+        "Quietly removed Biden-era policy commitments from website after Trump revocation (March 2025)"
+      ]
+    },
+    {
+      "id": "Y6cCBoElZ0",
+      "policyEntityId": "sid_SrEFtBmBYg",
+      "stakeholderEntityId": "sid_18BRxYIVxX",
+      "stakeholderDisplayName": "Council of Europe",
+      "position": "support",
+      "importance": "high",
+      "reason": "Initiated and adopted the convention; represents 46 member states committed to human rights-based AI governance",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "YdqYtZoj4c",
+      "policyEntityId": "sid_TVA6XJDdOO",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Kentucky General Assembly",
+      "position": "support",
+      "importance": "high",
+      "reason": "Enacted the bill to establish standards for AI use across state government agencies",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "YsRU0zi3tu",
+      "policyEntityId": "sid_JCdMGaEZOj",
+      "stakeholderEntityId": "sid_C-3CLLkSFI",
+      "stakeholderDisplayName": "Senator Josh Hawley (R-MO)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Co-sponsor; frames the bill as holding tech companies accountable while maintaining bipartisan approach",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "ZAKYrkg5pA",
+      "policyEntityId": "sid_ZpeTfyauLM",
+      "stakeholderEntityId": "sid_C-3CLLkSFI",
+      "stakeholderDisplayName": "Senator Josh Hawley (R-MO)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Lead sponsor; frames mandatory evaluation as essential national security measure for advanced AI systems",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "ZJEb1-kwIG",
+      "policyEntityId": "sid_I8mbdJyUjs",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Patient rights groups",
+      "position": "support",
+      "importance": "high",
+      "reason": "Advocate for informed consent and patients' right to know about AI involvement in their care",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "ZMAp0OJpPp",
+      "policyEntityId": "sid_PYEZ6G1Fbz",
+      "stakeholderEntityId": "sid_lvsDuyzPcg",
+      "stakeholderDisplayName": "CSET (Georgetown)",
+      "position": "neutral",
+      "importance": "medium",
+      "reason": "Published detailed analysis of the EO's implications for AI governance",
+      "source": "https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/",
+      "context": null
+    },
+    {
+      "id": "Zo0gvuQmyS",
+      "policyEntityId": "sid_Nq8e8nItph",
+      "stakeholderEntityId": "sid_H4tplAyDRX",
+      "stakeholderDisplayName": "Electronic Frontier Foundation",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Argued the bill \"gives powerful people a new legal tool to force online platforms to remove lawful speech that they simply don't like\"",
+      "source": "https://www.eff.org/deeplinks/2025/12/politicians-rushed-through-online-speech-solution-victims-deserve-better",
+      "context": null
+    },
+    {
+      "id": "_PxicfEUbp",
+      "policyEntityId": "sid_La8s84s3zg",
+      "stakeholderEntityId": "sid_A4XoubikkQ",
+      "stakeholderDisplayName": "Google DeepMind",
+      "position": "mixed",
+      "importance": "high",
+      "reason": "Supported risk-based framework in principle but lobbied for narrower GPAI definitions and raised concerns about compliance costs for foundation model research",
+      "source": "https://blog.google/around-the-globe/google-europe/google-ai-regulation-eu/",
+      "context": [
+        "Gemini models would be classified as GPAI with systemic risk under 10^25 FLOP threshold",
+        "Google's $2B investment in Anthropic and broad AI portfolio means extensive compliance obligations",
+        "DeepMind's London HQ means close proximity to UK AISI, a potential competing regulatory framework"
+      ]
+    },
+    {
+      "id": "_hg7bihITb",
+      "policyEntityId": "sid_7rafBo4OER",
+      "stakeholderEntityId": "sid_yfAYuNTKxQ",
+      "stakeholderDisplayName": "R Street Institute",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Praised the pro-innovation, national-framework approach",
+      "source": "https://www.rstreet.org/commentary/white-house-ai-legislative-vision-stresses-need-for-a-pro-innovation-national-framework/",
+      "context": null
+    },
+    {
+      "id": "a1io6sl1lc",
+      "policyEntityId": "sid_UD11PlWtlg",
+      "stakeholderEntityId": "sid_WchSgl5dux",
+      "stakeholderDisplayName": "Common Sense Media",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Backed SB 53 as a necessary consumer and child safety measure; advocated for transparency requirements",
+      "source": "https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/",
+      "context": [
+        "Leading child safety advocacy organization; Jim Steyer (founder) has long-standing relationship with Newsom",
+        "Focus on AI transparency aligns with their broader digital safety agenda"
+      ]
+    },
+    {
+      "id": "a3mB85YSVK",
+      "policyEntityId": "sid_aCEdTooCBw",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "UK Government",
+      "position": "support",
+      "importance": "high",
+      "reason": "Pioneered the first AI Safety Institute in 2023; hosts the international AISI network secretariat",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "a931eiqbod",
+      "policyEntityId": "sid_561xbhJAeQ",
+      "stakeholderEntityId": "sid_WHAEpX4KJm",
+      "stakeholderDisplayName": "Texas Public Policy Foundation",
+      "position": "support",
+      "importance": "high",
+      "reason": "Collaborated with Rep. Capriglione to convene stakeholders; TPPF director David Dunmoyer called it 'the culmination of years of work committed to securing Texas as the nationwide model for AI policy'",
+      "source": "https://www.texaspolicy.com/press/tppf-celebrates-passage-of-hb-149-out-of-the-texas-house-of-representatives",
+      "context": [
+        "Conservative think tank that helped shape the bill's light-touch regulatory approach",
+        "Frames TRAIGA as a contrast to California and New York's more prescriptive AI laws",
+        "David Dunmoyer (Director for Better Tech for Tomorrow) was lead policy advocate"
+      ]
+    },
+    {
+      "id": "abcdefghij",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Test Org",
+      "position": "support",
+      "importance": "high",
+      "reason": "Test reason",
+      "source": "https://example.com",
+      "context": [
+        "note1"
+      ]
     },
     {
       "id": "bJHueGveTw",
@@ -1026,66 +1460,18 @@
         "Argued for regulating AI applications, not model providers — deployer-focused approach",
         "Called for a two-year delay in implementing GPAI rules alongside Airbus and BNP Paribas",
         "Raised $415M Series B during negotiations, making it Europe's most valuable AI startup"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.129Z",
-      "createdAt": "2026-04-03T22:16:23.401Z",
-      "updatedAt": "2026-05-01T18:31:43.129Z"
+      ]
     },
     {
-      "id": "BLxuuwYOMq",
-      "policyEntityId": "sid_ZpeTfyauLM",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI industry (frontier labs)",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Some labs support external evaluation in principle but oppose mandatory participation and the scale of penalties for non-compliance",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "BMXDh5BJLN",
-      "policyEntityId": "sid_PYEZ6G1Fbz",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "US Senate (bipartisan)",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Senate rejected AI preemption moratorium in One Big Beautiful Bill Act due to bipartisan concerns about eroding state consumer protection authority",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.440Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "BQXXfSVpzV",
-      "policyEntityId": "sid_38lWEn2OYr",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Consumer protection organizations",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Support disclosure requirements as baseline transparency for users interacting with AI companion systems",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "BVro-0x-YA",
-      "policyEntityId": "sid_XOxFEPaf90",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Victims' advocacy organizations",
+      "id": "b_6AmGZXwR",
+      "policyEntityId": "sid_Qz9kfJzEP7",
+      "stakeholderEntityId": "sid_enf2UNKyDx",
+      "stakeholderDisplayName": "Senator Marsha Blackburn (R-TN)",
       "position": "support",
       "importance": "high",
-      "reason": "Strongly support civil remedies for deepfake victims; the Taylor Swift deepfake incident catalyzed public support",
+      "reason": "Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining multiple policy areas",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "c64cmmjr7i",
@@ -1100,38 +1486,7 @@
         "Google invested $2B in Anthropic (which supported the bill) — divergent positions within portfolio",
         "Also opposed SB 1047 — consistent opposition to California AI regulation",
         "Member of AI Alliance (industry coalition opposing state-level AI bills)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.320Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "CcrupAQD3-",
-      "policyEntityId": "sid_A9qQJtpTCA",
-      "stakeholderEntityId": "sid_OyPBrUIpeS",
-      "stakeholderDisplayName": "Sen. Elizabeth Warren",
-      "position": "support",
-      "importance": "high",
-      "reason": null,
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.430Z",
-      "createdAt": "2026-03-26T20:25:07.765Z",
-      "updatedAt": "2026-05-01T18:31:45.430Z"
-    },
-    {
-      "id": "CFMG-AseT_",
-      "policyEntityId": "sid_Qz9kfJzEP7",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI industry",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Support federal preemption over state patchwork but oppose the anti-fair-use copyright provision that would restrict AI training data",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "d1m6b5aeyt",
@@ -1146,10 +1501,7 @@
         "Open-source AI strategy uniquely exposed to SB 53's safety framework requirements",
         "Co-founded AI Alliance with IBM to coordinate industry opposition to state AI regulation",
         "Chief AI Scientist Yann LeCun was vocal opponent of both SB 1047 and SB 53"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.256Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "dcn7s7qpru",
@@ -1165,10 +1517,7 @@
         "Geoffrey Hinton (supporter) was former VP at Google; resigned to speak about AI risks",
         "Google is a major investor in Anthropic ($2B), which took a mixed position",
         "Member of AI Alliance (also opposes)"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.868Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "dg8vlxof85",
@@ -1183,24 +1532,7 @@
         "Revocation removed mandatory compute reporting thresholds and AISI mandate",
         "US AISI continued operating within NIST but with reduced authority and uncertain funding",
         "February 2025 executive order further challenged state-level AI regulations as 'onerous'"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:47.977Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "DjfatH_6bJ",
-      "policyEntityId": "sid_NLSUTzzH5g",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI industry (major labs)",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Generally supportive of research priorities but consensus remains voluntary with no binding commitments on industry",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "dmi17wvesz",
@@ -1214,38 +1546,7 @@
       "context": [
         "Signers included employees of companies that officially opposed the bill (OpenAI, DeepMind, Meta)",
         "Highlighted tension between company positions and individual researcher views on AI safety"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.293Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "DOv7MghUux",
-      "policyEntityId": "sid_TNWEEemXQd",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Global South coalition",
-      "position": "support",
-      "importance": "high",
-      "reason": "Developing nations backed the resolution as a way to ensure their voice in AI governance, countering Western-dominated forums like the G7",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T15:45:33.119Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "Dpl2P3Gtd6",
-      "policyEntityId": "sid_I8mbdJyUjs",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Indiana General Assembly",
-      "position": "support",
-      "importance": "high",
-      "reason": "Enacted the disclosure requirement as part of healthcare transparency reforms",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "dw3zM9mGFR",
@@ -1260,41 +1561,7 @@
         "Open-source AI strategy (Llama models) most affected by GPAI transparency and documentation obligations",
         "Co-founded AI Alliance with IBM — lobbying vehicle against prescriptive GPAI rules",
         "Open-source models with open weights exempt from most GPAI Tier 1 requirements except copyright compliance"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.249Z",
-      "createdAt": "2026-04-03T22:16:23.477Z",
-      "updatedAt": "2026-05-01T18:31:43.249Z"
-    },
-    {
-      "id": "ear1dwxsxm",
-      "policyEntityId": "sid_pz3KSt33AA",
-      "stakeholderEntityId": "sid_tt0f5PYDCw",
-      "stakeholderDisplayName": "Meta",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Signed voluntary commitments in July 2023 and supported AISI engagement; scored 67% compliance across 30 indicators",
-      "source": "https://www.nist.gov/aisi",
-      "context": [
-        "One of the original seven companies to sign White House voluntary commitments",
-        "Open-source Llama models raised questions about how reporting requirements apply to open-weight releases"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:16.823Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "eb3JrdQ0mw",
-      "policyEntityId": "sid_yxyu4w3Xup",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Consumer advocacy groups",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Concerned the narrowed disclosure requirements are too weak; only requiring disclosure when consumers explicitly ask limits practical transparency",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "eBU3hDLH0F",
@@ -1309,45 +1576,7 @@
         "GPT-4 would be classified as GPAI with systemic risk under the 10^25 FLOP threshold",
         "Altman's EU exit threat drew widespread criticism and was quickly walked back",
         "Signed voluntary pre-deployment testing agreement with EU AI Office"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.516Z",
-      "createdAt": "2026-04-03T22:13:07.984Z",
-      "updatedAt": "2026-05-01T18:31:43.516Z"
-    },
-    {
-      "id": "EfWJb5ugtR",
-      "policyEntityId": "sid_UD11PlWtlg",
-      "stakeholderEntityId": "sid_0PNw6yTH0g",
-      "stakeholderDisplayName": "TechNet",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Coordinated tech industry opposition as a trade group representing major companies; advocated for federal regulation instead of state patchwork",
-      "source": "https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/",
-      "context": [
-        "Members include Google, Meta, OpenAI, Apple, Microsoft — all major frontier model developers",
-        "Also opposed SB 1047; consistent industry coalition against California AI bills"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-22T15:58:09.290Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "Ei_ZEHB9FL",
-      "policyEntityId": "sid_pz3KSt33AA",
-      "stakeholderEntityId": "sid_1LcLlMGLbw",
-      "stakeholderDisplayName": "OpenAI",
-      "position": "support",
-      "importance": "high",
-      "reason": "Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in White House commitments from July 2023; scored 83.3% compliance across 30 indicators",
-      "source": "https://www.nist.gov/aisi",
-      "context": [
-        "One of the original seven companies to sign White House voluntary commitments in July 2023",
-        "GPT-4 and subsequent models above the 10^26 FLOP threshold triggering mandatory reporting",
-        "Later quietly removed some Biden-era AI policy commitments from its website (March 2025)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T22:53:53.611Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "eMw-CRgnil",
@@ -1358,10 +1587,7 @@
       "importance": "high",
       "reason": "Public letter from former employees highlighted restrictive NDAs preventing safety disclosures; directly motivated the legislation",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
     },
     {
       "id": "eTCPzXjndp",
@@ -1372,24 +1598,32 @@
       "importance": "high",
       "reason": "Formed bipartisan coalition opposing federal preemption of state AI regulatory authority",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T13:43:16.195Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
-      "id": "EuNXB6L2tG",
+      "id": "ear1dwxsxm",
+      "policyEntityId": "sid_pz3KSt33AA",
+      "stakeholderEntityId": "sid_tt0f5PYDCw",
+      "stakeholderDisplayName": "Meta",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Signed voluntary commitments in July 2023 and supported AISI engagement; scored 67% compliance across 30 indicators",
+      "source": "https://www.nist.gov/aisi",
+      "context": [
+        "One of the original seven companies to sign White House voluntary commitments",
+        "Open-source Llama models raised questions about how reporting requirements apply to open-weight releases"
+      ]
+    },
+    {
+      "id": "eb3JrdQ0mw",
       "policyEntityId": "sid_yxyu4w3Xup",
       "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Utah State Legislature",
-      "position": "support",
-      "importance": "high",
-      "reason": "Enacted the bill as part of Utah's pro-innovation regulatory approach to AI governance",
+      "stakeholderDisplayName": "Consumer advocacy groups",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Concerned the narrowed disclosure requirements are too weak; only requiring disclosure when consumers explicitly ask limits practical transparency",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "ezqn2bh26z",
@@ -1404,24 +1638,18 @@
         "Notably supported this bill while opposing California's SB 53 and earlier SB 1047",
         "GPT-4 and subsequent models above the 10^26 FLOP threshold covered by the Act",
         "OpenAI insiders' super PAC networks poured over $125M into 2026 midterms with mixed stances on AI regulation"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.733Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
-      "id": "FE3f9SOs_1",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Federal Bureau of Investigation (FBI)",
-      "position": "support",
+      "id": "fXfYk5OT0k",
+      "policyEntityId": "sid_Nq8e8nItph",
+      "stakeholderEntityId": "sid_XkqcWk46oQ",
+      "stakeholderDisplayName": "Center for Democracy & Technology",
+      "position": "oppose",
       "importance": "medium",
-      "reason": "The FBI only receives collection on Section 702 targets relevant to full FBI national security investigations, which amounts to 3.22% of the IC's total targets under 702. After the FBI implemented a series of reforms in 2021 and 2022 to address concerns about query compliance, the FBI's U.S. person queries of Section 702 information dropped over 93% from 2021 to 2022.",
-      "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.392Z",
-      "createdAt": "2026-04-30T23:34:51.538Z",
-      "updatedAt": "2026-05-01T18:31:47.392Z"
+      "reason": "Raised First Amendment concerns over vague takedown requirements and potential for abuse of false takedown requests",
+      "source": null,
+      "context": null
     },
     {
       "id": "fhgehb3ogp",
@@ -1435,10 +1663,7 @@
       "context": [
         "Federal preemption threat creates legal uncertainty around the act's enforceability",
         "December 2025 executive order specifically targeted state-level AI regulations"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.911Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "fpeay74vxk",
@@ -1453,24 +1678,7 @@
         "Co-founded by Meta (also opposes) and IBM",
         "Members include Google DeepMind (opposes), Intel, AMD, Sony, Oracle",
         "Focuses on open-source AI; bill's liability framework seen as threat to open model releases"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.262Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "FQOTQuFPVC",
-      "policyEntityId": "sid_NLSUTzzH5g",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Singapore government",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Hosted the SCAI conference and facilitated the consensus process as part of its AI governance leadership",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "fsoej56xji",
@@ -1485,24 +1693,7 @@
         "UC Berkeley professor; director of CHAI (Center for Human-Compatible AI)",
         "CHAI funded by Open Philanthropy, Elon Musk Foundation",
         "Author of 'Human Compatible' (2019); co-author of leading AI textbook"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.735Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "fXfYk5OT0k",
-      "policyEntityId": "sid_Nq8e8nItph",
-      "stakeholderEntityId": "sid_XkqcWk46oQ",
-      "stakeholderDisplayName": "Center for Democracy & Technology",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Raised First Amendment concerns over vague takedown requirements and potential for abuse of false takedown requests",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.639Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "fzZbnuqOd5",
@@ -1513,10 +1704,7 @@
       "importance": "high",
       "reason": "Support transparency requirements so patients know when AI influences their healthcare decisions",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "g7vn48f683",
@@ -1531,24 +1719,7 @@
         "State's largest business advocacy organization",
         "Members include major tech companies opposing the bill",
         "Push poll methodology criticized; independent polls showed ~73% public support"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.227Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "GBt5p2ITCw",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_IEav94hygQ",
-      "stakeholderDisplayName": "Chamber of Progress",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Led tech coalition urging Newsom to veto; stated 'The California legislature is passing laws based on science fiction fantasies'; co-signed August 27, 2024 joint veto letter with Bay Area Council, Engine, NetChoice, R Street Institute, and others",
-      "source": "https://progresschamber.org/news/ca-legislature-passes-ai-bill/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "gc54tlobdo",
@@ -1563,10 +1734,7 @@
         "Co-founded FLI (also supports) with Jaan Tallinn (Skype co-founder)",
         "MIT Physics professor; author of 'Life 3.0'",
         "Jaan Tallinn also invested in Anthropic (mixed position)"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.132Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "gc7t2Hh_Ec",
@@ -1577,24 +1745,7 @@
       "importance": "high",
       "reason": "Enacted the bill as an amendment to the existing Human Rights Act framework",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "GLEwydbmk_",
-      "policyEntityId": "sid_TVA6XJDdOO",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Kentucky state agencies",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Will need to comply with new AI policy standards; supportive of guidance but concerned about implementation costs",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "gu9ub20yri",
@@ -1608,24 +1759,7 @@
       "context": [
         "AWS hosts many frontier model providers; compliance with commitments affects broader ecosystem",
         "Invested $4B in Anthropic (also a signatory)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:17.022Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "GUJtz0Z4Sq",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_HkfUxsbBLQ",
-      "stakeholderDisplayName": "Gladstone AI",
-      "position": "support",
-      "importance": "low",
-      "reason": "AI safety advisory firm that authored a RAND-commissioned report on catastrophic AI risks; supported the bill as consistent with its findings on the need for frontier AI regulation",
-      "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "gy77e5jswl",
@@ -1640,10 +1774,7 @@
         "Negotiated weaker penalties in chapter amendments before signing (original $10M/$30M reduced to $1M/$3M)",
         "Final signed text dialed back developer requirements compared to legislature-passed version",
         "Described by American Prospect as 'caving to Big Tech' on enforcement provisions"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.599Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "h7ikcuxgmh",
@@ -1660,10 +1791,7 @@
         "Jaan Tallinn also co-founded FLI (supporter); connection to safety-oriented funders",
         "Funded by Open Philanthropy (early investment); Open Phil also funds CAIS (supporter)",
         "Has its own Responsible Scaling Policy — bill aligned with their existing safety approach"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.835Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "h90fzx8fk5",
@@ -1678,10 +1806,7 @@
         "Signed commitments a full year after the original seven companies",
         "Brown/Harvard/Stanford study found Apple met only 4 of 30 compliance indicators",
         "Apple Intelligence launch proceeded with minimal public safety testing or disclosure"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:16.849Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "hFp8b4Do5e",
@@ -1692,10 +1817,29 @@
       "importance": "medium",
       "reason": "Testified in House hearing supporting the legislation as protection for victims",
       "source": "https://rainn.org/federal-legislation/take-it-down-act/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.442Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
+    },
+    {
+      "id": "hVKgzuMr3F",
+      "policyEntityId": "sid_O643v0TxvQ",
+      "stakeholderEntityId": "sid_Eac7pHF06Q",
+      "stakeholderDisplayName": "NIST",
+      "position": "support",
+      "importance": "high",
+      "reason": "Developed and maintains the framework; conducted extensive public consultation with 240+ organizations",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "hY02ogxwk9",
+      "policyEntityId": "sid_I8mbdJyUjs",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Health insurance companies",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Required to disclose AI use in coverage decisions; compliance adds operational burden but aligns with transparency trends",
+      "source": null,
+      "context": null
     },
     {
       "id": "hkSM0vujSy",
@@ -1706,10 +1850,7 @@
       "importance": "high",
       "reason": "Designated as the lead agency to develop and enforce AI policy standards for state government",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "hmmOEO0sv7",
@@ -1720,10 +1861,7 @@
       "importance": "medium",
       "reason": "Brad Carson said the plan echoes the lack of regulation in the social media industry and lacks substance",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.940Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "huim84fe4b",
@@ -1739,66 +1877,7 @@
         "Signed 18 other narrower AI bills simultaneously with the veto",
         "Preferred federal regulation and appointed expert panel to draft alternative approach",
         "Fei-Fei Li (opponent) was appointed to his alternative regulation panel"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:14.323Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "HUzcVBdEv4",
-      "policyEntityId": "sid_1i59OZ3q5w",
-      "stakeholderEntityId": "sid_mK9pX3rQ7n",
-      "stakeholderDisplayName": "Anthropic",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Signed voluntary Frontier AI Safety Commitments; aligned with summit's risk-based approach",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T15:45:32.333Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "hVKgzuMr3F",
-      "policyEntityId": "sid_O643v0TxvQ",
-      "stakeholderEntityId": "sid_Eac7pHF06Q",
-      "stakeholderDisplayName": "NIST",
-      "position": "support",
-      "importance": "high",
-      "reason": "Developed and maintains the framework; conducted extensive public consultation with 240+ organizations",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.496Z",
-      "createdAt": "2026-04-03T15:45:31.928Z",
-      "updatedAt": "2026-05-01T18:31:47.496Z"
-    },
-    {
-      "id": "hY02ogxwk9",
-      "policyEntityId": "sid_I8mbdJyUjs",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Health insurance companies",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Required to disclose AI use in coverage decisions; compliance adds operational burden but aligns with transparency trends",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "ICpThynXQY",
-      "policyEntityId": "sid_ijQ2GcsXAQ",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Business and employer groups",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Concerned about compliance costs and legal uncertainty around proving AI systems do not discriminate in employment decisions",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "ifjF0dJ3da",
@@ -1809,24 +1888,7 @@
       "importance": "low",
       "reason": "AI safety organization that endorsed SB 1047 as part of the broader effective altruism and AI safety community coalition supporting the bill",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "IGcuj8ja27",
-      "policyEntityId": "sid_7xjjFPltc4",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Washington State Legislature",
-      "position": "support",
-      "importance": "high",
-      "reason": "Both chambers advancing companion bills with strong bipartisan support (House 69-28)",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "iirgtw9cu9",
@@ -1842,10 +1904,7 @@
         "Near-collapse of trilogue negotiations; compromise reached after 36+ hours of marathon talks",
         "Under pressure from national AI companies: Mistral AI (France) and Aleph Alpha (Germany)",
         "Final outcome: tiered GPAI approach was a compromise — binding rules with systemic risk threshold at 10^25 FLOPs"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.988Z",
-      "createdAt": "2026-03-21T01:30:47.211Z",
-      "updatedAt": "2026-05-01T18:31:42.988Z"
+      ]
     },
     {
       "id": "iq8q04fi4b",
@@ -1861,24 +1920,7 @@
         "Co-founded OpenAI in 2015; departed board in 2018; sued OpenAI in 2024",
         "Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)",
         "Owns X (Twitter), the platform where much SB-1047 debate occurred"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.766Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "IwTvSbYIcF",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_Le8eSvx8EQ",
-      "stakeholderDisplayName": "Competitive Enterprise Institute",
-      "position": "oppose",
-      "importance": "low",
-      "reason": "Free-market policy organization that joined the CalChamber-led coalition letter opposing SB 1047 on grounds that it would stifle innovation and impose impractical requirements",
-      "source": "https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "iyhwab6hva",
@@ -1894,38 +1936,7 @@
         "2024 Nobel Prize in Physics (with John Hopfield) for neural network foundations",
         "Co-authored foundational deep learning papers with Bengio (also supporter)",
         "Former advisor to Google DeepMind (which opposes the bill)"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.698Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "j_vXKD66bk",
-      "policyEntityId": "sid_Tt1wXsEjKw",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Arkansas state government agencies",
-      "position": "support",
-      "importance": "high",
-      "reason": "HB 1958 provides clear frameworks for AI use in public entities",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "J93oXA3NJG",
-      "policyEntityId": "sid_1i59OZ3q5w",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "South Korea",
-      "position": "support",
-      "importance": "high",
-      "reason": "Host country; positioned itself as bridge between Western and Asian AI governance approaches",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T15:45:32.181Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "j9ucxwfqsb",
@@ -1941,10 +1952,18 @@
         "CAIS funded by Open Philanthropy (~$15M)",
         "Lead author of the Statement on AI Risk (2023) signed by Hinton, Bengio, and others",
         "Advisor to xAI (Elon Musk's company; Musk also supports)"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.163Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
+    },
+    {
+      "id": "j_vXKD66bk",
+      "policyEntityId": "sid_Tt1wXsEjKw",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Arkansas state government agencies",
+      "position": "support",
+      "importance": "high",
+      "reason": "HB 1958 provides clear frameworks for AI use in public entities",
+      "source": null,
+      "context": null
     },
     {
       "id": "jq3j17ipfu",
@@ -1958,24 +1977,7 @@
       "context": [
         "AWS cloud services used to train and deploy many GPAI models that would be regulated",
         "Alexa and Amazon hiring/logistics AI systems could be classified as high-risk"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.759Z",
-      "createdAt": "2026-03-21T01:30:47.450Z",
-      "updatedAt": "2026-05-01T18:31:43.759Z"
-    },
-    {
-      "id": "JvJiLJ2ybV",
-      "policyEntityId": "sid_1i59OZ3q5w",
-      "stakeholderEntityId": "sid_A4XoubikkQ",
-      "stakeholderDisplayName": "Google DeepMind",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Signed voluntary Frontier AI Safety Commitments; supported pre-deployment safety testing commitments",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T15:45:32.283Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "k1ts2nbc9i",
@@ -1990,10 +1992,7 @@
         "Near-unanimous legislative passage (House 146-3, Senate unanimous) reflected broad industry support",
         "36-month regulatory sandbox allows testing AI systems with waivers of certain laws",
         "Intent-based liability seen as lower compliance burden than risk-based approaches (Colorado) or safety protocol mandates (New York)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T01:30:48.977Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "kCuNLi1ssY",
@@ -2004,24 +2003,18 @@
       "importance": "medium",
       "reason": "DOJ reviews IC compliance with Section 702 targeting, minimization, and querying procedures. DOJ also reviews 100% of all Section 702 tasking sheets. DOJ reports all identified compliance incidents to the Foreign Intelligence Surveillance Court (FISC) and Congress.",
       "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.108Z",
-      "createdAt": "2026-04-30T23:34:50.746Z",
-      "updatedAt": "2026-05-01T18:31:47.108Z"
+      "context": null
     },
     {
-      "id": "KEAcwSWhc_",
-      "policyEntityId": "sid_A9qQJtpTCA",
-      "stakeholderEntityId": "sid_ezdMt069kA",
-      "stakeholderDisplayName": "Semiconductor Industry Association",
-      "position": "oppose",
-      "importance": "high",
-      "reason": "Cannot support \"blanket mandates for new, untested, and potentially infeasible on-chip mechanisms\"; warns of undermining global trust in American semiconductor technologies.",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.690Z",
-      "createdAt": "2026-03-26T20:25:07.937Z",
-      "updatedAt": "2026-05-01T18:31:45.690Z"
+      "id": "kNziHHActg",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "National Security Agency (NSA)",
+      "position": "support",
+      "importance": "medium",
+      "reason": "In calendar year (CY) 2022, 59% of President's Daily Brief (PDB) Articles contained Section 702 information reported by the National Security Agency (NSA).",
+      "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
+      "context": null
     },
     {
       "id": "kex91uerxw",
@@ -2036,52 +2029,7 @@
         "Trade association representing 99% of US semiconductor industry by revenue",
         "Members include Nvidia, Intel, AMD, Qualcomm — companies directly affected by revenue losses",
         "Advocated for narrower, more targeted controls rather than broad technology restrictions"
-      ],
-      "syncedAt": "2026-05-01T18:31:45.087Z",
-      "createdAt": "2026-03-21T04:21:16.607Z",
-      "updatedAt": "2026-05-01T18:31:45.087Z"
-    },
-    {
-      "id": "KKLAoZXZLS",
-      "policyEntityId": "sid_7xjjFPltc4",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Parents and family advocacy organizations",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Support safety and disclosure requirements for AI chatbots that children may interact with",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "kNziHHActg",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "National Security Agency (NSA)",
-      "position": "support",
-      "importance": "medium",
-      "reason": "In calendar year (CY) 2022, 59% of President's Daily Brief (PDB) Articles contained Section 702 information reported by the National Security Agency (NSA).",
-      "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.214Z",
-      "createdAt": "2026-04-30T23:34:50.852Z",
-      "updatedAt": "2026-05-01T18:31:47.214Z"
-    },
-    {
-      "id": "Ko6Pobv3Do",
-      "policyEntityId": "sid_Tt1wXsEjKw",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI companies",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "AI output ownership provisions create new legal considerations around who owns AI-generated content and liability",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "krzmoy2zot",
@@ -2096,10 +2044,7 @@
         "Filed original TRAIGA concept on December 23, 2024; HB 149 filed March 14, 2025",
         "Worked closely with Texas Public Policy Foundation to convene stakeholders",
         "Chose intent-based liability approach rather than comprehensive compliance requirements"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T04:21:17.851Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "ks8pzj2dnq",
@@ -2114,10 +2059,7 @@
         "Co-rapporteurs Brando Benifei (S&D) and Dragos Tudorache (Renew) led negotiations",
         "GPAI tiered approach was Parliament's addition — not in original Commission proposal",
         "Resisted last-minute EPP attempt to water down biometric surveillance bans"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.890Z",
-      "createdAt": "2026-03-21T01:30:47.179Z",
-      "updatedAt": "2026-05-01T18:31:42.890Z"
+      ]
     },
     {
       "id": "ktzduokhmr",
@@ -2131,10 +2073,7 @@
       "context": [
         "Signed alongside broader Texas tech-friendly legislative agenda",
         "Texas hosts 1,500+ tech firms and 17% of US AI startups — significant business constituency"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T01:30:48.943Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "kyr-0faX7h",
@@ -2145,10 +2084,7 @@
       "importance": "high",
       "reason": "Strongly supported the resolution; aligned with developing countries seeking multilateral AI governance through the UN system",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:33.119Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "l-gT-mFpuB",
@@ -2159,28 +2095,7 @@
       "importance": "high",
       "reason": "Passed unanimously January 13, 2026, reflecting rare complete bipartisan agreement on deepfake civil remedies",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "L1ycTLP8De",
-      "policyEntityId": "sid_La8s84s3zg",
-      "stakeholderEntityId": "sid_OIY5gaPpBA",
-      "stakeholderDisplayName": "Microsoft",
-      "position": "support",
-      "importance": "high",
-      "reason": "Supported risk-based approach; President Brad Smith called the EU AI Act a 'strong foundation' and pledged compliance across Microsoft's AI products",
-      "source": "https://blogs.microsoft.com/on-the-issues/2023/05/25/how-do-we-best-govern-ai/",
-      "context": [
-        "Major investor in OpenAI ($13B); both took supportive positions on the Act",
-        "Azure AI and Copilot products span multiple high-risk domains covered by the Act",
-        "Existing responsible AI governance practices largely aligned with Act requirements"
-      ],
-      "syncedAt": "2026-05-01T18:31:43.402Z",
-      "createdAt": "2026-04-03T22:53:53.611Z",
-      "updatedAt": "2026-05-01T18:31:43.402Z"
+      "context": null
     },
     {
       "id": "l5Vz-ja4DS",
@@ -2191,38 +2106,18 @@
       "importance": "high",
       "reason": "Sent letter in March 2026 calling state regulation efforts important for holding tech industry accountable; opposed blanket federal preemption",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.040Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
-      "id": "LBN1MiMt9_",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Privacy and Civil Liberties Oversight Board (PCLOB)",
+      "id": "lSmskSaMCI",
+      "policyEntityId": "sid_Nq8e8nItph",
+      "stakeholderEntityId": "sid_uk5EhXsfmN",
+      "stakeholderDisplayName": "Senator Amy Klobuchar",
       "position": "support",
-      "importance": "medium",
-      "reason": "Najibullah Zazi is in prison for planning to attack the New York City subway system with explosives in 2009. He received explosives training in Pakistan from al Qaeda. The Privacy and Civil Liberties Oversight Board concluded in 2014: 'without the initial tip-off about Zazi and his plans, which came about by monitoring an overseas foreigner under Section 702, the subway-bombing plot might have succeeded.'",
-      "source": "https://rpc.senate.gov/policy-papers/fisa-section-702",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.776Z",
-      "createdAt": "2026-04-30T23:34:50.961Z",
-      "updatedAt": "2026-05-01T18:31:46.776Z"
-    },
-    {
-      "id": "LKLgbgu9z2",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_oMgy3kQqOg",
-      "stakeholderDisplayName": "Kira Center",
-      "position": "support",
-      "importance": "low",
-      "reason": "Center for AI Risks and Impacts that endorsed SB 1047 as part of the safety-focused research community",
-      "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "importance": "high",
+      "reason": "Called passage \"a major victory for victims of online abuse\"",
+      "source": "https://www.klobuchar.senate.gov/public/index.cfm/2025/5/klobuchar-s-bipartisan-take-it-down-act-signed-into-law",
+      "context": null
     },
     {
       "id": "lm2b342zdm",
@@ -2237,10 +2132,7 @@
         "Companies including SenseTime, Baichuan, and Zhipu AI among first approved under the framework",
         "Industry stakeholder input played a documented role in softening final Interim Measures from the harsher draft version",
         "Compliance with framework seen as necessary for market access rather than optional"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.736Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "lqcmmt6ai5",
@@ -2255,24 +2147,7 @@
         "Had shifted from oppose to mixed on SB 1047 — SB 53's lighter approach aligned with their Responsible Scaling Policy",
         "Backed by Amazon ($4B), Google ($2B); their endorsement gave political cover for the bill",
         "Founded by ex-OpenAI researchers (Dario/Daniela Amodei) — differed from OpenAI's continued opposition"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.183Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "lSmskSaMCI",
-      "policyEntityId": "sid_Nq8e8nItph",
-      "stakeholderEntityId": "sid_uk5EhXsfmN",
-      "stakeholderDisplayName": "Senator Amy Klobuchar",
-      "position": "support",
-      "importance": "high",
-      "reason": "Called passage \"a major victory for victims of online abuse\"",
-      "source": "https://www.klobuchar.senate.gov/public/index.cfm/2025/5/klobuchar-s-bipartisan-take-it-down-act-signed-into-law",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.346Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "luPt_hVSR-",
@@ -2283,38 +2158,7 @@
       "importance": "medium",
       "reason": "Contributed to public consultation; references AI RMF in its AI governance approach",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.821Z",
-      "createdAt": "2026-04-03T15:45:32.040Z",
-      "updatedAt": "2026-05-01T18:31:47.821Z"
-    },
-    {
-      "id": "M5DTqmiwjA",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Office of the Director of National Intelligence (ODNI)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-authorizes annual Section 702 collection alongside the Attorney General and publishes the Annual Statistical Transparency Report.",
-      "source": "https://crsreports.congress.gov/product/pdf/R/R44457",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.173Z",
-      "createdAt": "2026-04-30T01:12:57.329Z",
-      "updatedAt": "2026-05-01T18:31:46.173Z"
-    },
-    {
-      "id": "M9YT3j525z",
-      "policyEntityId": "sid_SrEFtBmBYg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "United Kingdom",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Early signatory despite Brexit; views the convention as compatible with its pro-innovation AI approach",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "mAROQvT-52",
@@ -2325,10 +2169,7 @@
       "importance": "medium",
       "reason": "Every year, the FISC reviews these certifications and procedures to ensure they comply with FISA and the Fourth Amendment. Every federal court to ever review the Section 702 program has found that it is constitutional.",
       "source": "https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.982Z",
-      "createdAt": "2026-04-30T23:34:50.642Z",
-      "updatedAt": "2026-05-01T18:31:46.982Z"
+      "context": null
     },
     {
       "id": "mK9ypgqrB_",
@@ -2339,10 +2180,7 @@
       "importance": "high",
       "reason": "Primary proponents citing risks of AI companion chatbots to minors' emotional wellbeing and social development",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "mloh97gvpg",
@@ -2356,10 +2194,7 @@
       "context": [
         "Co-drafted key amendment proposals on prohibiting biometric identification with EDRi, ARTICLE19, and others",
         "Part of the Reclaim Your Face campaign (80+ organizations, 250,000+ supporters) pushing for biometric mass surveillance ban"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.017Z",
-      "createdAt": "2026-03-21T01:30:47.531Z",
-      "updatedAt": "2026-05-01T18:31:44.017Z"
+      ]
     },
     {
       "id": "mlrp1qb4m5",
@@ -2374,24 +2209,7 @@
         "US AISI established within NIST following the summit commitment",
         "Biden administration had issued EO 14110 one week before the summit (Oct 30, 2023)",
         "VP Harris used the summit to announce US AI safety commitments to multilateral audience"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.475Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "MR2fEB95pv",
-      "policyEntityId": "sid_XOxFEPaf90",
-      "stakeholderEntityId": "sid_LNfQiSo5us",
-      "stakeholderDisplayName": "Senator Dick Durbin (D-IL)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Lead sponsor; champions the bill as essential protection for victims of nonconsensual intimate imagery",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "mr63CEPJzU",
@@ -2402,10 +2220,7 @@
       "importance": "medium",
       "reason": "Co-sponsored SB 1047 through its Economic Security California Action affiliate; Director Teri Olle represented the organization in legislative hearings; commissioned YouGov poll showing 80% national support for SB 1047's provisions",
       "source": "https://economicsecurity.us/news/assembly-advances-sb1047-positioning-california-as-the-leader-in-ai-safety/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
     },
     {
       "id": "mw542iubfc",
@@ -2419,10 +2234,7 @@
       "context": [
         "Framed the RAISE Act as a successor to California's vetoed SB 1047",
         "Faced political opposition from a16z-backed super PAC targeting his legislative allies"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.632Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "n839ql3kkh",
@@ -2435,10 +2247,7 @@
       "source": "https://netchoice.org/netchoice-opposes-new-york-raise-act/",
       "context": [
         "Trade association representing major internet companies; has challenged state tech regulations in courts"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.803Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "n8UZYxSLBV",
@@ -2449,10 +2258,18 @@
       "importance": "medium",
       "reason": "Concerned about loss of compute reporting thresholds and dissolution of safety-focused mandates from EO 14110",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.344Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
+    },
+    {
+      "id": "nNsNuCVEHr",
+      "policyEntityId": "sid_n7K9yVNCtg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Senate Intelligence Committee",
+      "position": "support",
+      "importance": "medium",
+      "reason": "At a hearing of the Senate Intelligence Committee on May 11, 2017, the NSA director bluntly said, 'if we were to lose 702 authorities, we would be significantly degraded in our abilities to provide timely warning and insight as to what terrorist actors, nation-states, [and] criminal elements are doing that is of concern to our nation.'",
+      "source": "https://rpc.senate.gov/policy-papers/fisa-section-702",
+      "context": null
     },
     {
       "id": "nim7j0y450",
@@ -2467,52 +2284,7 @@
         "One of seven companies in the initial July 21, 2023 commitment ceremony at the White House",
         "Published Preparedness Framework (Dec 2023) aligning with commitment to pre-deployment testing",
         "Strong on safety testing and cybersecurity commitments; weaker on information sharing (20-35% sector average)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.013Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "nNsNuCVEHr",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Senate Intelligence Committee",
-      "position": "support",
-      "importance": "medium",
-      "reason": "At a hearing of the Senate Intelligence Committee on May 11, 2017, the NSA director bluntly said, 'if we were to lose 702 authorities, we would be significantly degraded in our abilities to provide timely warning and insight as to what terrorist actors, nation-states, [and] criminal elements are doing that is of concern to our nation.'",
-      "source": "https://rpc.senate.gov/policy-papers/fisa-section-702",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.875Z",
-      "createdAt": "2026-04-30T23:34:51.074Z",
-      "updatedAt": "2026-05-01T18:31:46.875Z"
-    },
-    {
-      "id": "NqWqsR7mGi",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_0PNw6yTH0g",
-      "stakeholderDisplayName": "TechNet",
-      "position": "oppose",
-      "importance": "low",
-      "reason": "Bipartisan network of technology CEOs that joined the industry coalition opposing SB 1047, arguing the bill would create burdensome compliance costs and regulatory uncertainty",
-      "source": "https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "NyyN4RSvvg",
-      "policyEntityId": "sid_7rafBo4OER",
-      "stakeholderEntityId": "sid_ewHH8hqYZD",
-      "stakeholderDisplayName": "Alliance for Secure AI",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "CEO Brendan Steinhauser said the proposed regulations provide \"no path to accountability\" for harms caused by AI",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.844Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "o0cdoa1da1",
@@ -2527,10 +2299,7 @@
         "In signing statement, explicitly encouraged federal legislation to preempt this state law",
         "Called an August 2025 special session partly in response to industry pressure to delay enforcement",
         "Signed SB 25B-004 delaying enforcement from February 1 to June 30, 2026"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.694Z",
-      "createdAt": "2026-03-21T01:30:46.905Z",
-      "updatedAt": "2026-05-01T18:31:41.694Z"
+      ]
     },
     {
       "id": "obl97td28p",
@@ -2545,10 +2314,7 @@
         "Released invite-only Ernie Bot in March 2023, months before draft regulations were published",
         "One of the first 11 companies approved to offer generative AI to the public (August 2023)",
         "Industry feedback from Baidu and others appeared to influence revisions between draft and final versions"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.705Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "ofjsEDWIXq",
@@ -2559,10 +2325,7 @@
       "importance": "medium",
       "reason": "Advocates for whistleblower protections as essential to accountability and transparency in AI development",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "oiu44mtkax",
@@ -2577,10 +2340,7 @@
         "Funded by Open Philanthropy (~$15M total grants)",
         "Director Dan Hendrycks (also listed as supporter) co-authored the Statement on AI Risk",
         "Open Philanthropy also funds Anthropic (mixed position) and supported MIRI"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:21.529Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "opuu0tco0v",
@@ -2595,10 +2355,7 @@
         "His SB 1047 veto directly shaped SB 53's narrower scope — transparency over liability",
         "Signed 17 other AI bills alongside SB 53, signaling preference for targeted regulation",
         "Appointed expert panel including Fei-Fei Li to draft alternative approach after SB 1047 veto"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.146Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "p3BEfjW4qS",
@@ -2609,10 +2366,7 @@
       "importance": "high",
       "reason": "Support establishing clear liability standards so consumers harmed by AI systems have legal recourse",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "p6k8yhkwhw",
@@ -2627,52 +2381,7 @@
         "Major AI deployer (Copilot, Azure AI) with products spanning all eight covered high-risk domains",
         "Invested $13B in OpenAI; supports regulation that aligns with its existing responsible AI practices",
         "Active lobbyist during August 2025 special session alongside 150+ other industry lobbyists"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.985Z",
-      "createdAt": "2026-03-21T01:30:46.972Z",
-      "updatedAt": "2026-05-01T18:31:41.985Z"
-    },
-    {
-      "id": "P9aIFeNHrI",
-      "policyEntityId": "sid_n7K9yVNCtg",
-      "stakeholderEntityId": "sid_XkqcWk46oQ",
-      "stakeholderDisplayName": "Center for Democracy and Technology (CDT)",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Pushes for stronger US-person query protections and shorter Section 702 reauthorization sunsets; led 2024 coalition push for FISA 702 reforms.",
-      "source": "https://cdt.org/area-of-focus/government-surveillance/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:46.276Z",
-      "createdAt": "2026-04-30T23:34:50.537Z",
-      "updatedAt": "2026-05-01T18:31:46.276Z"
-    },
-    {
-      "id": "PVcsukOCNU",
-      "policyEntityId": "sid_CfUOvtha9O",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI companion chatbot companies",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Restrictions limit the scope of mental health-related features that AI companion products can offer in Tennessee",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "Q0CdtfGt12",
-      "policyEntityId": "sid_aCEdTooCBw",
-      "stakeholderEntityId": "sid_Eac7pHF06Q",
-      "stakeholderDisplayName": "US Government (NIST)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Established USAISI within NIST to conduct pre-deployment evaluations of frontier AI systems",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-04-03T16:44:33.005Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "q2o23yt161",
@@ -2686,10 +2395,7 @@
       "context": [
         "Preferred Colorado's risk-based framework over California's compute-threshold approach",
         "Major AI deployer whose products (Search, Workspace, Cloud) would be covered as high-risk in multiple domains"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.863Z",
-      "createdAt": "2026-03-21T01:30:46.937Z",
-      "updatedAt": "2026-05-01T18:31:41.863Z"
+      ]
     },
     {
       "id": "q5jfcolca1",
@@ -2700,10 +2406,29 @@
       "importance": "low",
       "reason": "Research organization focused on beneficial emerging technologies that endorsed SB 1047 as part of the broad coalition supporting frontier AI safety regulation",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.684Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
+    },
+    {
+      "id": "qKNL2z_SXN",
+      "policyEntityId": "sid_1h93jgFv4l",
+      "stakeholderEntityId": "sid_7DpEvy5wQr",
+      "stakeholderDisplayName": "American Civil Liberties Union",
+      "position": "oppose",
+      "importance": "medium",
+      "reason": "Called executive order unconstitutional",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "qLApvJOtIp",
+      "policyEntityId": "sid_ZpeTfyauLM",
+      "stakeholderEntityId": "sid_33ExUKx4u_",
+      "stakeholderDisplayName": "Senator Richard Blumenthal (D-CT)",
+      "position": "support",
+      "importance": "high",
+      "reason": "Co-sponsor; advocates for government oversight of AI capabilities testing through established DOE infrastructure",
+      "source": null,
+      "context": null
     },
     {
       "id": "qb9mx7w53e",
@@ -2718,10 +2443,7 @@
         "EU AI Act was in final trilogue negotiations during the summit (December 2023 compromise)",
         "Von der Leyen used the summit to advocate for the EU's risk-based regulatory approach",
         "EU subsequently established its own AI Office as the institutional follow-up"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.560Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "qbHMTYIAy0",
@@ -2732,38 +2454,7 @@
       "importance": "high",
       "reason": "Some companies have used restrictive NDAs and non-disparagement clauses that would be curtailed by the legislation",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "qKNL2z_SXN",
-      "policyEntityId": "sid_1h93jgFv4l",
-      "stakeholderEntityId": "sid_7DpEvy5wQr",
-      "stakeholderDisplayName": "American Civil Liberties Union",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Called executive order unconstitutional",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T19:32:43.724Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "qLApvJOtIp",
-      "policyEntityId": "sid_ZpeTfyauLM",
-      "stakeholderEntityId": "sid_33ExUKx4u_",
-      "stakeholderDisplayName": "Senator Richard Blumenthal (D-CT)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-sponsor; advocates for government oversight of AI capabilities testing through established DOE infrastructure",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "qpu3441j7o",
@@ -2777,24 +2468,18 @@
       "context": [
         "Canadian think tank specializing in technology governance",
         "Argued AIDA's principles-based approach lacked concrete enforcement teeth"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.604Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
-      "id": "R6uNewHyVV",
-      "policyEntityId": "sid_Fghn4m4ekW",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "India (PM Modi)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-chaired the summit with France; positioned India as a bridge between developed and developing world on AI governance",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "id": "rVll6zUnub",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_b89p7duRrQ",
+      "stakeholderDisplayName": "Consumer Technology Association",
+      "position": "oppose",
+      "importance": "low",
+      "reason": "CEO Gary Shapiro praised the veto; CTA had sent August 30, 2024 veto letter arguing the bill would 'restrict development of AI tools designed for safety' and 'direct users to less safe foreign models'",
+      "source": "https://www.cta.tech/Resources/Newsroom/Media-Releases/2024/September/CTA-Statement-on-Governor-Newsom-Veto-of-AI-Bill",
+      "context": null
     },
     {
       "id": "rdu2p3mp7y",
@@ -2808,10 +2493,7 @@
       "context": [
         "Members include Apple, Google, Microsoft, Samsung, and major European tech firms",
         "Joined Airbus, BNP Paribas, and Mistral in calling for a two-year delay in GPAI rules implementation"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.240Z",
-      "createdAt": "2026-03-21T01:30:47.595Z",
-      "updatedAt": "2026-05-01T18:31:44.240Z"
+      ]
     },
     {
       "id": "rfdefde97y",
@@ -2825,10 +2507,7 @@
       "context": [
         "Members include Amazon, Google, Meta, and other major US tech firms",
         "Argued deployer-focused regulation would be more effective than regulating general-purpose model providers"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.341Z",
-      "createdAt": "2026-03-21T01:30:47.627Z",
-      "updatedAt": "2026-05-01T18:31:44.341Z"
+      ]
     },
     {
       "id": "rglAgHHQRj",
@@ -2839,10 +2518,7 @@
       "importance": "medium",
       "reason": "Advocated for the framework; contributed expertise during the public comment period",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:47.948Z",
-      "createdAt": "2026-04-03T15:45:32.085Z",
-      "updatedAt": "2026-05-01T18:31:47.948Z"
+      "context": null
     },
     {
       "id": "rsgmhtumv2",
@@ -2857,24 +2533,18 @@
         "Long-standing advocate for risk-based AI regulation; published AI ethics principles in 2018",
         "Co-founded the AI Alliance with Meta (took different positions on this law)",
         "IBM's Watson and watsonx products used in healthcare and HR decisions covered by the act"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.090Z",
-      "createdAt": "2026-03-21T01:30:47.005Z",
-      "updatedAt": "2026-05-01T18:31:42.090Z"
+      ]
     },
     {
-      "id": "rVll6zUnub",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_b89p7duRrQ",
-      "stakeholderDisplayName": "Consumer Technology Association",
-      "position": "oppose",
-      "importance": "low",
-      "reason": "CEO Gary Shapiro praised the veto; CTA had sent August 30, 2024 veto letter arguing the bill would 'restrict development of AI tools designed for safety' and 'direct users to less safe foreign models'",
-      "source": "https://www.cta.tech/Resources/Newsroom/Media-Releases/2024/September/CTA-Statement-on-Governor-Newsom-Veto-of-AI-Bill",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "id": "sZI3jtyyfJ",
+      "policyEntityId": "sid_XOxFEPaf90",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Technology platforms",
+      "position": "mixed",
+      "importance": "medium",
+      "reason": "Generally support combating deepfakes but concerned about potential liability exposure and content moderation obligations",
+      "source": null,
+      "context": null
     },
     {
       "id": "sn61vl0rdw",
@@ -2890,10 +2560,7 @@
         "Sam Altman (OpenAI CEO) was former YC president (2014-2019)",
         "YC-funded startups would face compliance costs under the bill",
         "Garry Tan (YC CEO) was vocal opponent on social media"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.941Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
       "id": "spTHRrV3ZL",
@@ -2904,10 +2571,7 @@
       "importance": "high",
       "reason": "Endorse the defence-in-depth framework as aligned with existing safety research agendas",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
     },
     {
       "id": "srvS5cfDm5",
@@ -2918,24 +2582,7 @@
       "importance": "high",
       "reason": "Passed unanimously in the Senate, reflecting broad bipartisan agreement on protecting mental health standards",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "Swv8qiBl0r",
-      "policyEntityId": "sid_Qz9kfJzEP7",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Child safety advocates",
-      "position": "support",
-      "importance": "high",
-      "reason": "Support inclusion of KOSA provisions for children's safety in the comprehensive framework",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "syqyf9ofho",
@@ -2950,24 +2597,7 @@
         "Commissioner Thierry Breton led the regulatory agenda; Ursula von der Leyen included AI regulation in 2019 political guidelines",
         "European AI Office established within the Commission to oversee GPAI enforcement",
         "Can impose fines up to 3% of worldwide annual turnover for GPAI violations"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.785Z",
-      "createdAt": "2026-03-21T01:30:47.142Z",
-      "updatedAt": "2026-05-01T18:31:42.785Z"
-    },
-    {
-      "id": "sZI3jtyyfJ",
-      "policyEntityId": "sid_XOxFEPaf90",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Technology platforms",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Generally support combating deepfakes but concerned about potential liability exposure and content moderation obligations",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "szuoL7nMZd",
@@ -2978,10 +2608,7 @@
       "importance": "medium",
       "reason": "Publicly championed the bill as protection for children and victims",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.736Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "t6qz8bctbe",
@@ -2996,10 +2623,29 @@
         "Tripled AI Research Resource investment to 300M pounds (up from 100M announced March 2023)",
         "UK AISI became first national institute dedicated to evaluating frontier AI models",
         "Sunak positioned AI safety as a post-Brexit UK leadership area in international policy"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.442Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
+    },
+    {
+      "id": "tJdOJ6Ib4M",
+      "policyEntityId": "sid_SrEFtBmBYg",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "European Union",
+      "position": "support",
+      "importance": "high",
+      "reason": "Signed the convention alongside individual EU member states; complements the EU AI Act with an international treaty framework",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "tVe5qFocyU",
+      "policyEntityId": "sid_CfUOvtha9O",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Mental health professionals",
+      "position": "support",
+      "importance": "high",
+      "reason": "Strongly support protecting the professional standards of mental health practice from unqualified AI systems",
+      "source": null,
+      "context": null
     },
     {
       "id": "test123456",
@@ -3010,10 +2656,7 @@
       "importance": null,
       "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-03-21T01:27:56.940Z",
-      "createdAt": "2026-03-21T01:27:56.941Z",
-      "updatedAt": "2026-03-21T01:27:56.940Z"
+      "context": null
     },
     {
       "id": "tij7e7l3k7",
@@ -3027,52 +2670,7 @@
       "context": [
         "Open-weight Llama model releases provide a form of transparency not captured by standard indicators",
         "Weaker on watermarking commitments (0% text watermarking across all signatories)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:17.048Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "tJdOJ6Ib4M",
-      "policyEntityId": "sid_SrEFtBmBYg",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "European Union",
-      "position": "support",
-      "importance": "high",
-      "reason": "Signed the convention alongside individual EU member states; complements the EU AI Act with an international treaty framework",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "tVe5qFocyU",
-      "policyEntityId": "sid_CfUOvtha9O",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Mental health professionals",
-      "position": "support",
-      "importance": "high",
-      "reason": "Strongly support protecting the professional standards of mental health practice from unqualified AI systems",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "U-1Tsg2X8t",
-      "policyEntityId": "sid_SrEFtBmBYg",
-      "stakeholderEntityId": "sid_7h0u4ulMdb",
-      "stakeholderDisplayName": "European Digital Rights (EDRi)",
-      "position": "mixed",
-      "importance": "medium",
-      "reason": "Welcomed the binding nature but criticized weak enforcement mechanisms and the broad national security carve-out",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "u656sk45n2",
@@ -3087,10 +2685,7 @@
         "Major Chinese cloud providers (Alibaba, Baidu, Tencent) stockpiled Nvidia A100/H100 chips before restrictions took effect",
         "Huawei's Ascend 910B positioned as domestic alternative but significantly underperforms Nvidia equivalents",
         "600+ Chinese entities added to BIS Entity List with presumption of denial"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.764Z",
-      "createdAt": "2026-03-21T01:30:47.739Z",
-      "updatedAt": "2026-05-01T18:31:44.764Z"
+      ]
     },
     {
       "id": "u86d7lkyev",
@@ -3105,24 +2700,18 @@
         "September 2023 letter argued shoehorning AI regulation into a privacy bill prevented adequate scrutiny",
         "Concerned about ISED's dual role as economic development body and AI regulator",
         "Criticized vague definitions of 'high-impact' AI systems and weak enforcement mechanisms"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.570Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
     },
     {
-      "id": "U8hd0vaRZ9",
-      "policyEntityId": "sid_Qz9kfJzEP7",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "State legislators",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Oppose broad federal preemption of state AI laws that would override existing and emerging state-level regulations",
+      "id": "uRRWnE5JpQ",
+      "policyEntityId": "sid_dLGmQQU4yB",
+      "stakeholderEntityId": "sid_hXFxf2aOHZ",
+      "stakeholderDisplayName": "Sen. Mark Warner",
+      "position": "support",
+      "importance": "high",
+      "reason": null,
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "uehDnDxCGt",
@@ -3133,24 +2722,7 @@
       "importance": "high",
       "reason": "Support the anti-fair-use provision for AI training on copyrighted works and the NO FAKES Act digital likeness protections",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "UGKAE3pcYD",
-      "policyEntityId": "sid_JCdMGaEZOj",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Technology industry (TechNet, BSA)",
-      "position": "oppose",
-      "importance": "high",
-      "reason": "Oppose expanded liability standards as potentially chilling AI innovation and creating legal uncertainty for developers",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "ukgoxiI7wX",
@@ -3161,10 +2733,7 @@
       "importance": "high",
       "reason": "Supports mandatory evaluation of dangerous capabilities including self-replication, scheming, and autonomous decision-making",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "ulicSPL7vF",
@@ -3175,24 +2744,7 @@
       "importance": "high",
       "reason": "Voluntarily cooperate with AISIs on pre-deployment evaluations and share model access for safety testing",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-04-03T16:44:33.005Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "UP8rrWNoa8",
-      "policyEntityId": "sid_yxyu4w3Xup",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI companies operating in Utah",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Safe harbor provision for AI self-disclosure provides legal certainty and a clear compliance pathway",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "uqd5mk5plc",
@@ -3206,24 +2758,7 @@
       "context": [
         "Bay Area nonprofit focused on tech industry accountability and equitable tech policy",
         "Supported SB 1047 as well — consistent advocate for AI regulation"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.410Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "uRRWnE5JpQ",
-      "policyEntityId": "sid_dLGmQQU4yB",
-      "stakeholderEntityId": "sid_hXFxf2aOHZ",
-      "stakeholderDisplayName": "Sen. Mark Warner",
-      "position": "support",
-      "importance": "high",
-      "reason": null,
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:45.959Z",
-      "createdAt": "2026-03-25T12:02:07.214Z",
-      "updatedAt": "2026-05-01T18:31:45.959Z"
+      ]
     },
     {
       "id": "uyd6rdjsxi",
@@ -3237,24 +2772,18 @@
       "context": [
         "Published FAQ addressing common skeptic concerns about the bill",
         "Questioned whether the Attorney General has resources to meaningfully enforce compliance"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-21T04:21:17.972Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
-      "id": "V1CttVppVO",
-      "policyEntityId": "sid_Tt1wXsEjKw",
+      "id": "vR6Mn7zsFK",
+      "policyEntityId": "sid_1i59OZ3q5w",
       "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Content creators and artists",
+      "stakeholderDisplayName": "United Kingdom",
       "position": "support",
-      "importance": "medium",
-      "reason": "HB 1876 establishes ownership rights over AI-generated content, providing legal clarity for creators using AI tools",
+      "importance": "high",
+      "reason": "Co-hosted the summit with South Korea; led the Bletchley-to-Seoul AI safety summit series",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "vbQhpOVteG",
@@ -3265,10 +2794,7 @@
       "importance": "high",
       "reason": "Bipartisan introduction signals cross-party agreement on the need for AI whistleblower protections",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.571Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "vexrdlvkal",
@@ -3283,10 +2809,7 @@
         "Part of US Department of Commerce; primary enforcement agency for export controls",
         "Added 140+ entities to China Entity List in December 2024 update alone",
         "January 2025 AI Diffusion Rule established global performance thresholds for chip exports"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.976Z",
-      "createdAt": "2026-03-21T04:21:16.567Z",
-      "updatedAt": "2026-05-01T18:31:44.976Z"
+      ]
     },
     {
       "id": "vgi1npxbkz",
@@ -3300,24 +2823,7 @@
       "context": [
         "One of the original seven signatories; published Frontier Safety Framework May 2024",
         "Strong on safety testing commitments; weaker on information sharing and watermarking"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.081Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "vR6Mn7zsFK",
-      "policyEntityId": "sid_1i59OZ3q5w",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "United Kingdom",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-hosted the summit with South Korea; led the Bletchley-to-Seoul AI safety summit series",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T15:45:32.132Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "vvi9vms23q",
@@ -3332,10 +2838,7 @@
         "Published Responsible Scaling Policy (Sep 2023), one of the most detailed safety frameworks among signatories",
         "One of the original seven signatories; strong on pre-deployment testing and cybersecurity",
         "Quietly removed Biden-era policy commitment page from website in March 2025 after Trump revocation"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T01:30:48.049Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      ]
     },
     {
       "id": "w4HRURC8Bx",
@@ -3346,10 +2849,7 @@
       "importance": "medium",
       "reason": "Pursues its own parallel AI safety evaluation approach through domestic institutions rather than joining the international AISI network",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-04-03T16:44:33.005Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      "context": null
     },
     {
       "id": "w5ne28nqgn",
@@ -3365,10 +2865,29 @@
         "Co-founded by Elon Musk (who supports the bill); acrimonious split in 2018",
         "Transitioning from nonprofit to for-profit; this bill would have increased compliance burden",
         "113+ of its employees signed letter supporting the bill despite company opposition"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.797Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
+      ]
+    },
+    {
+      "id": "wIoa2z69HN",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_yfAYuNTKxQ",
+      "stakeholderDisplayName": "R Street Institute",
+      "position": "oppose",
+      "importance": "low",
+      "reason": "Free-market think tank that co-led coalition urging Newsom to veto; argued the bill 'regulates model development instead of misuse' and that the harms it addressed were 'entirely theoretical'",
+      "source": "https://www.rstreet.org/outreach/coalition-urges-governor-newsom-to-consider-vetoing-sb-1047/",
+      "context": null
+    },
+    {
+      "id": "wJY2SN62IO",
+      "policyEntityId": "sid_TNWEEemXQd",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "UN Secretary-General",
+      "position": "support",
+      "importance": "high",
+      "reason": "Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive governance",
+      "source": null,
+      "context": null
     },
     {
       "id": "wd2l9pjw2f",
@@ -3383,24 +2902,7 @@
         "Joint issuer of Generative AI Interim Measures with six other government agencies",
         "Maintains the algorithm registry where companies must file their AI models",
         "Has approved and registered hundreds of generative AI platforms including DeepSeek and Ernie Bot"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T04:21:15.668Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "WEiTnn6n_S",
-      "policyEntityId": "sid_7rafBo4OER",
-      "stakeholderEntityId": "sid_okZhiBvBoj",
-      "stakeholderDisplayName": "Michael Kratsios",
-      "position": "support",
-      "importance": "high",
-      "reason": "Said the framework \"will unleash American ingenuity to win the global AI race, delivering breakthroughs that create jobs, lower costs, and improve lives\"",
-      "source": "https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.726Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "weiuaphi03",
@@ -3416,52 +2918,7 @@
         "China previously accounted for 20-25% of Nvidia's data center revenue; dropped to effectively 0%",
         "Lobbying spend surged from $90K (2022) to $500K+ (2023); CEO Huang met with White House officials and Trump personally",
         "H20 chip designed for Chinese market banned in April 2025, triggering $4.5B revenue impact"
-      ],
-      "syncedAt": "2026-05-01T18:31:44.874Z",
-      "createdAt": "2026-03-21T04:21:16.539Z",
-      "updatedAt": "2026-05-01T18:31:44.874Z"
-    },
-    {
-      "id": "wIoa2z69HN",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_yfAYuNTKxQ",
-      "stakeholderDisplayName": "R Street Institute",
-      "position": "oppose",
-      "importance": "low",
-      "reason": "Free-market think tank that co-led coalition urging Newsom to veto; argued the bill 'regulates model development instead of misuse' and that the harms it addressed were 'entirely theoretical'",
-      "source": "https://www.rstreet.org/outreach/coalition-urges-governor-newsom-to-consider-vetoing-sb-1047/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-22T15:58:07.663Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "wJY2SN62IO",
-      "policyEntityId": "sid_TNWEEemXQd",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "UN Secretary-General",
-      "position": "support",
-      "importance": "high",
-      "reason": "Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive governance",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:33.119Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "Ww3KWhi83a",
-      "policyEntityId": "sid_38lWEn2OYr",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "AI companion chatbot companies",
-      "position": "mixed",
-      "importance": "high",
-      "reason": "Some accept disclosure requirements as reasonable while others view the regulation as potentially restricting product design and user experience",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "xCS_UMTKjM",
@@ -3472,52 +2929,7 @@
       "importance": "high",
       "reason": "Supports the lighter-touch approach as business-friendly; narrower disclosure requirements reduce compliance burden compared to other states",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "xh5l6jy5ba",
-      "policyEntityId": "sid_XcGTez1oFw",
-      "stakeholderEntityId": "sid_dwMzc9WzPa",
-      "stakeholderDisplayName": "Redwood Research",
-      "position": "support",
-      "importance": "low",
-      "reason": "AI safety research organization that endorsed SB 1047; CEO Buck Shlegeris was publicly critical of Newsom's veto decision",
-      "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.618Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "XlS2TWMdJY",
-      "policyEntityId": "sid_XOxFEPaf90",
-      "stakeholderEntityId": "sid_iSc4TztRuB",
-      "stakeholderDisplayName": "Senator Lindsey Graham (R-SC)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-sponsor; bipartisan support demonstrated by unanimous Senate passage",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "XMQ6ATiMLi",
-      "policyEntityId": "sid_Fghn4m4ekW",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Global South nations",
-      "position": "support",
-      "importance": "high",
-      "reason": "61 countries signed the declaration; developing nations view inclusive AI governance as essential to avoid being left behind",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "xR903gAufn",
@@ -3528,10 +2940,18 @@
       "importance": "high",
       "reason": "Joined the US in refusing to sign the declaration despite having hosted the previous AI Safety Summit at Bletchley Park",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
+    },
+    {
+      "id": "xh5l6jy5ba",
+      "policyEntityId": "sid_XcGTez1oFw",
+      "stakeholderEntityId": "sid_dwMzc9WzPa",
+      "stakeholderDisplayName": "Redwood Research",
+      "position": "support",
+      "importance": "low",
+      "reason": "AI safety research organization that endorsed SB 1047; CEO Buck Shlegeris was publicly critical of Newsom's veto decision",
+      "source": "https://safesecureai.org/support",
+      "context": null
     },
     {
       "id": "xvtzvzylvm",
@@ -3542,28 +2962,7 @@
       "importance": "low",
       "reason": "AI safety research organization focused on robustness and alignment that endorsed SB 1047",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.651Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "Y-CBzdxiQh",
-      "policyEntityId": "sid_pz3KSt33AA",
-      "stakeholderEntityId": "sid_mK9pX3rQ7n",
-      "stakeholderDisplayName": "Anthropic",
-      "position": "support",
-      "importance": "high",
-      "reason": "Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation; scored 80.0% compliance across 30 indicators",
-      "source": "https://www.nist.gov/aisi",
-      "context": [
-        "One of the original seven companies to sign White House voluntary commitments in July 2023",
-        "Claude models above 10^26 FLOP threshold; existing Responsible Scaling Policy aligned with EO requirements",
-        "Quietly removed Biden-era policy commitments from website after Trump revocation (March 2025)"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-04-03T22:53:53.611Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
+      "context": null
     },
     {
       "id": "y2vmdmpced",
@@ -3574,24 +2973,7 @@
       "importance": "low",
       "reason": "AI research assistant company that endorsed SB 1047, adding to the coalition of AI companies demonstrating that safety regulation is compatible with building useful AI products",
       "source": "https://safesecureai.org/support",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:46.510Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "Y6cCBoElZ0",
-      "policyEntityId": "sid_SrEFtBmBYg",
-      "stakeholderEntityId": "sid_18BRxYIVxX",
-      "stakeholderDisplayName": "Council of Europe",
-      "position": "support",
-      "importance": "high",
-      "reason": "Initiated and adopted the convention; represents 46 member states committed to human rights-based AI governance",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T15:45:32.920Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "y998edgjxs",
@@ -3607,24 +2989,7 @@
         "Co-founded AI Alliance (also opposes) with IBM",
         "Open-source AI strategy (Llama models) most affected by bill's liability provisions",
         "Mark Zuckerberg personally lobbied Governor Newsom against the bill"
-      ],
-      "syncedAt": "2026-05-01T18:31:41.435Z",
-      "createdAt": "2026-03-21T01:30:45.904Z",
-      "updatedAt": "2026-05-01T18:31:41.435Z"
-    },
-    {
-      "id": "YdqYtZoj4c",
-      "policyEntityId": "sid_TVA6XJDdOO",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Kentucky General Assembly",
-      "position": "support",
-      "importance": "high",
-      "reason": "Enacted the bill to establish standards for AI use across state government agencies",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      ]
     },
     {
       "id": "yds6w5taer",
@@ -3638,24 +3003,7 @@
       "context": [
         "Letter argued federal inaction necessitated state-level regulation",
         "Signatories included researchers from major universities and AI labs"
-      ],
-      "syncedAt": "2026-05-01T18:31:48.057Z",
-      "createdAt": "2026-03-21T04:21:17.792Z",
-      "updatedAt": "2026-05-01T18:31:48.057Z"
-    },
-    {
-      "id": "YsRU0zi3tu",
-      "policyEntityId": "sid_JCdMGaEZOj",
-      "stakeholderEntityId": "sid_C-3CLLkSFI",
-      "stakeholderDisplayName": "Senator Josh Hawley (R-MO)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Co-sponsor; frames the bill as holding tech companies accountable while maintaining bipartisan approach",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      ]
     },
     {
       "id": "z2rke5gopw",
@@ -3669,10 +3017,7 @@
       "context": [
         "Leading digital rights nonprofit focused on civil liberties in technology policy",
         "Advocated for the consumer right to human review of adverse AI decisions"
-      ],
-      "syncedAt": "2026-05-01T18:31:42.355Z",
-      "createdAt": "2026-03-21T01:30:47.073Z",
-      "updatedAt": "2026-05-01T18:31:42.355Z"
+      ]
     },
     {
       "id": "z3O1zeVq6C",
@@ -3683,52 +3028,7 @@
       "importance": "high",
       "reason": "Primary proponents of companion chatbot safety regulations to protect minors from harmful AI interactions",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "zaKbabWxaw",
-      "policyEntityId": "sid_ijQ2GcsXAQ",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Civil rights organizations",
-      "position": "support",
-      "importance": "high",
-      "reason": "Advocate for extending anti-discrimination protections to AI-driven employment decisions under the Illinois Human Rights Act",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "ZAKYrkg5pA",
-      "policyEntityId": "sid_ZpeTfyauLM",
-      "stakeholderEntityId": "sid_C-3CLLkSFI",
-      "stakeholderDisplayName": "Senator Josh Hawley (R-MO)",
-      "position": "support",
-      "importance": "high",
-      "reason": "Lead sponsor; frames mandatory evaluation as essential national security measure for advanced AI systems",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "zg_Fnoevtl",
-      "policyEntityId": "sid_CfUOvtha9O",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Child safety advocates",
-      "position": "support",
-      "importance": "medium",
-      "reason": "Concerned about vulnerable youth relying on AI chatbots for mental health support instead of qualified professionals",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "zHk-k2eKZR",
@@ -3739,52 +3039,7 @@
       "importance": "high",
       "reason": "Support protections for workers against algorithmic bias in hiring, promotion, and termination decisions",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.749Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "ZJEb1-kwIG",
-      "policyEntityId": "sid_I8mbdJyUjs",
-      "stakeholderEntityId": null,
-      "stakeholderDisplayName": "Patient rights groups",
-      "position": "support",
-      "importance": "high",
-      "reason": "Advocate for informed consent and patients' right to know about AI involvement in their care",
-      "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
-    },
-    {
-      "id": "ZMAp0OJpPp",
-      "policyEntityId": "sid_PYEZ6G1Fbz",
-      "stakeholderEntityId": "sid_lvsDuyzPcg",
-      "stakeholderDisplayName": "CSET (Georgetown)",
-      "position": "neutral",
-      "importance": "medium",
-      "reason": "Published detailed analysis of the EO's implications for AI governance",
-      "source": "https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:31.150Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
-    },
-    {
-      "id": "Zo0gvuQmyS",
-      "policyEntityId": "sid_Nq8e8nItph",
-      "stakeholderEntityId": "sid_H4tplAyDRX",
-      "stakeholderDisplayName": "Electronic Frontier Foundation",
-      "position": "oppose",
-      "importance": "medium",
-      "reason": "Argued the bill \"gives powerful people a new legal tool to force online platforms to remove lawful speech that they simply don't like\"",
-      "source": "https://www.eff.org/deeplinks/2025/12/politicians-rushed-through-online-speech-solution-victims-deserve-better",
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.218Z",
-      "createdAt": "2026-03-23T16:13:32.541Z",
-      "updatedAt": "2026-05-01T18:31:48.218Z"
+      "context": null
     },
     {
       "id": "zWKDSh986F",
@@ -3795,10 +3050,7 @@
       "importance": "high",
       "reason": "Explicitly rejected \"centralized control and global governance\" of AI at UN Security Council; views UN governance as potentially constraining US AI leadership",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T15:45:33.119Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
     },
     {
       "id": "zXmHnXUMww",
@@ -3809,10 +3061,29 @@
       "importance": "high",
       "reason": "Enacted the bill as part of California's broader push to regulate AI systems that interact with consumers",
       "source": null,
-      "context": null,
-      "syncedAt": "2026-05-01T18:31:48.366Z",
-      "createdAt": "2026-04-03T16:44:34.927Z",
-      "updatedAt": "2026-05-01T18:31:48.366Z"
+      "context": null
+    },
+    {
+      "id": "zaKbabWxaw",
+      "policyEntityId": "sid_ijQ2GcsXAQ",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Civil rights organizations",
+      "position": "support",
+      "importance": "high",
+      "reason": "Advocate for extending anti-discrimination protections to AI-driven employment decisions under the Illinois Human Rights Act",
+      "source": null,
+      "context": null
+    },
+    {
+      "id": "zg_Fnoevtl",
+      "policyEntityId": "sid_CfUOvtha9O",
+      "stakeholderEntityId": null,
+      "stakeholderDisplayName": "Child safety advocates",
+      "position": "support",
+      "importance": "medium",
+      "reason": "Concerned about vulnerable youth relying on AI chatbots for mental health support instead of qualified professionals",
+      "source": null,
+      "context": null
     }
   ]
 }

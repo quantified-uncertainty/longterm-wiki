@@ -37,8 +37,11 @@ import { collectTsFiles } from "./lib/file-walker.ts";
 const SCAN_DIRS = [
   join(PROJECT_ROOT, "crux/commands"),
   join(PROJECT_ROOT, "crux/lib"),
+  join(PROJECT_ROOT, "crux/scripts"),
   join(PROJECT_ROOT, "apps/web/src/app"),
   join(PROJECT_ROOT, "apps/web/src/components"),
+  join(PROJECT_ROOT, "apps/web/src/data"),
+  join(PROJECT_ROOT, "apps/web/scripts"),
 ];
 const ALLOWLIST_PATH = join(
   PROJECT_ROOT,
@@ -142,7 +145,7 @@ export function runCheck(
   const allFiles: string[] = [];
   for (const dir of rootDirs) {
     if (!existsSync(dir)) continue;
-    allFiles.push(...collectTsFiles(dir, { includeTsx: true }));
+    allFiles.push(...collectTsFiles(dir, { includeTsx: true, includeMjs: true }));
   }
 
   const filesWithReads = new Map<string, Violation[]>();

@@ -174,13 +174,35 @@ describe("exportPolicyStakeholdersToYaml", () => {
     expect(result.policiesSkipped).toBe(0);
   });
 
-  it("round-trip: PG → YAML → PG produces stable PG payload (excluding ids)", async () => {
-    // The interesting invariant: re-importing the rebuilt YAML and converting
-    // back to PG payload yields the same stakeholders (same names, positions,
-    // reasons, sources). This is the rollback-fidelity test.
+  it("round-trip: PG → YAML → PG produces stable PG payload (all 7 schema fields)", async () => {
+    // Use a richer row set so importance + context are exercised.
+    const richRows = [
+      {
+        id: "row-A",
+        policyEntityId: "sid_AAAAA01",
+        stakeholderEntityId: "sid_BBBBB02",
+        stakeholderDisplayName: "Senator A",
+        position: "support",
+        importance: "high",
+        reason: "Authored the bill",
+        source: "https://congress.gov/bill",
+        context: ["Co-sponsored 2024 SB 1047"],
+      },
+      {
+        id: "row-B",
+        policyEntityId: "sid_AAAAA01",
+        stakeholderEntityId: null,
+        stakeholderDisplayName: "Senator B",
+        position: "oppose",
+        importance: "medium",
+        reason: "Civil-liberties grounds",
+        source: null,
+        context: null,
+      },
+    ];
     const result = await exportPolicyStakeholdersToYaml({
       yamlInput: FIXTURE_YAML,
-      rows: PG_ROWS_FOR_EXAMPLE,
+      rows: richRows,
       dryRun: true,
     });
     const parsed = parseYaml(result.yamlAfter) as Array<{
@@ -189,16 +211,20 @@ describe("exportPolicyStakeholdersToYaml", () => {
     }>;
     const policy = parsed.find((p) => p.stableId === "sid_AAAAA01");
     expect(policy).toBeDefined();
-    expect(policy!.stakeholders).toHaveLength(PG_ROWS_FOR_EXAMPLE.length);
+    expect(policy!.stakeholders).toHaveLength(richRows.length);
 
+    // Re-extract every schema field that PG knows about. role is excluded
+    // here because it's not a PG column (QUA-984).
     const reExtracted = (policy!.stakeholders ?? []).map((s) => ({
       name: s.name,
       entityId: s.entityId ?? null,
       position: s.position,
+      importance: s.importance ?? null,
       reason: s.reason ?? null,
       source: s.source ?? null,
+      context: (s.context as string[] | undefined) ?? null,
     }));
-    const expected = [...PG_ROWS_FOR_EXAMPLE]
+    const expected = [...richRows]
       .sort((a, b) => {
         const order: Record<string, number> = { support: 0, oppose: 1, mixed: 2, neutral: 3 };
         return (order[a.position] ?? 99) - (order[b.position] ?? 99);
@@ -207,10 +233,43 @@ describe("exportPolicyStakeholdersToYaml", () => {
         name: r.stakeholderDisplayName,
         entityId: r.stakeholderEntityId,
         position: r.position,
+        importance: r.importance,
         reason: r.reason,
         source: r.source,
+        context: r.context,
       }));
     expect(reExtracted).toEqual(expected);
+  });
+
+  it("emits fields in PolicyStakeholder schema order (name, entityId, position, role, ...)", () => {
+    // Per the PolicyStakeholder Zod schema (apps/web/src/data/entity-schemas.ts),
+    // field order is: name, entityId, position, role, importance, reason, source, context.
+    // yaml.stringify preserves insertion order — a swap (e.g. entityId after
+    // position) would change every stakeholder's byte layout in YAML.
+    const out = pgRowToYamlStakeholder(
+      {
+        id: "x",
+        policyEntityId: "p",
+        stakeholderEntityId: "sid_xy",
+        stakeholderDisplayName: "Person",
+        position: "support",
+        importance: "high",
+        reason: "Why",
+        source: "http://example.com",
+        context: ["one"],
+      },
+      "Co-sponsor",
+    );
+    expect(Object.keys(out)).toEqual([
+      "name",
+      "entityId",
+      "position",
+      "role",
+      "importance",
+      "reason",
+      "source",
+      "context",
+    ]);
   });
 
   it("skips policies with no PG rows (no destructive overwrite)", async () => {

@@ -2,12 +2,15 @@ name: Refresh Policy Stakeholders Snapshot
 run-name: "Refresh Policy Stakeholders Snapshot${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Fetches all policy stakeholders from PG and refreshes the snapshot at
-# data/policy-stakeholders-snapshot.json (committed to git, ~600KB). The
+# data/policy-stakeholders-snapshot.json (committed to git, ~180KB). The
 # snapshot is the build-data fallback when the wiki-server is unreachable
 # during a build (QUA-960 step 9 / R-B5). Without it, every CI build during
 # a wiki-server outage would fail post-cutover.
 #
-# Commits the refreshed snapshot back to main when the file changes.
+# Pushes the refresh to a `bot/snapshot-policy-stakeholders` branch and
+# opens a PR rather than committing to main directly. This keeps a review
+# surface and lets branch protection do its job — a compromised secret
+# can't stamp arbitrary JSON into main without a human merging the PR.
 #
 # To run locally: pnpm crux wiki-server snapshot-policy-stakeholders
 
@@ -22,6 +25,7 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   paused-notice:
@@ -39,6 +43,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Full clone needed for reliable git push. Shallow clones (fetch-depth: 1)
+          # cause push failures: git cannot negotiate objects with the remote,
+          # leading to 2-minute hangs and generic "failed to push some refs" errors.
+          # See issue #2093.
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
@@ -57,14 +66,29 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
-      - name: Commit refreshed snapshot
+      - name: Open PR with refreshed snapshot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           if git diff --quiet data/policy-stakeholders-snapshot.json; then
             echo "Snapshot unchanged; nothing to commit."
             exit 0
           fi
+          BRANCH="bot/snapshot-policy-stakeholders"
           git config user.name "longterm-wiki-bot"
           git config user.email "actions@github.com"
+          git checkout -B "$BRANCH"
           git add data/policy-stakeholders-snapshot.json
           git commit -m "chore: refresh policy-stakeholders snapshot (QUA-960)"
-          git push
+          git push -u --force-with-lease origin "$BRANCH"
+          # Open PR if one doesn't already exist for this branch
+          if ! gh pr view "$BRANCH" --json state --jq '.state' 2>/dev/null | grep -q '^OPEN$'; then
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "chore: refresh policy-stakeholders snapshot (QUA-960)" \
+              --body "Automated daily refresh of \`data/policy-stakeholders-snapshot.json\` from PG. Build-data uses this as the fallback source for policy stakeholders when the wiki-server is unreachable (QUA-960 step 9 / R-B5)."
+          else
+            echo "Existing PR for $BRANCH updated via force-push."
+          fi

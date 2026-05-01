@@ -1015,18 +1015,48 @@ export async function syncPolicyStakeholders(typedEntities) {
 }
 
 /**
+ * Map a PG `policy_stakeholders` row to the YAML stakeholder shape (QUA-960).
+ *
+ * Field-insertion order matches `apps/web/src/data/entity-schemas.ts::PolicyStakeholder`:
+ *   name, entityId, position, role, importance, reason, source, context.
+ * Round-trip stability (PG → YAML → PG) depends on this — `yaml.stringify`
+ * preserves insertion order, so swapping `entityId` and `position` would
+ * change the on-disk byte layout of every stakeholder block.
+ *
+ * Empty/null fields are omitted entirely (not emitted as `null` or `[]`) so
+ * the rebuilt YAML matches the convention used by the original writer
+ * (`apply-verdicts.ts`).
+ *
+ * **Known gap (QUA-984):** the PG `policy_stakeholders` table does not yet
+ * have a `role` column. Until that closes, callers must inject role from a
+ * preserved YAML source (see `loadPolicyStakeholdersForBuild` in build-data
+ * and `pgRowToYamlStakeholder` in the rollback script).
+ *
+ * @param {object} r — PG row (camelCase fields from /api/policy-stakeholders/all)
+ * @returns {object} YAML-shaped stakeholder
+ */
+export function pgPolicyStakeholderRowToYaml(r) {
+  const out = { name: r.stakeholderDisplayName };
+  if (r.stakeholderEntityId) out.entityId = r.stakeholderEntityId;
+  out.position = r.position;
+  if (r.importance) out.importance = r.importance;
+  if (r.reason) out.reason = r.reason;
+  if (r.source) out.source = r.source;
+  if (Array.isArray(r.context) && r.context.length > 0) out.context = r.context;
+  return out;
+}
+
+/**
  * Fetch all policy stakeholders from the wiki-server PG database (QUA-960 prep).
  *
  * Returns a map keyed by `policyEntityId` (entity stableId) → array of stakeholders
- * in YAML shape `{name, entityId, position, role, importance, reason, source, context}`.
- * Compatible with how `entity.stakeholders` is consumed by the legislation renderer.
+ * in YAML shape. Compatible with how `entity.stakeholders` is consumed by the
+ * legislation renderer.
  *
- * Returns `null` on wiki-server failure so callers can fall back to snapshot or YAML.
- *
- * **Known gap (QUA-984):** the PG `policy_stakeholders` table does not yet have a
- * `role` column, so the `role` field on every returned stakeholder is `undefined`.
- * The cutover PR (QUA-960 step 6) cannot ship until QUA-984 closes this — otherwise
- * rendering from PG silently drops "Co-sponsor", "Primary Author / Sponsor", etc.
+ * Returns `null` on wiki-server failure (after retry) so callers can fall back
+ * to snapshot or YAML. Uses `fetchJsonWithRetry` (3 attempts, exponential
+ * backoff) so a single transient 5xx during multi-page pagination doesn't
+ * wipe the entire result — the QUA-421 lesson applied to stakeholders.
  *
  * Currently called from build-data only when `STAKEHOLDERS_SOURCE=pg` (the
  * default is `yaml` in the prep PR, so this path is dormant until cutover).
@@ -1040,48 +1070,26 @@ export async function fetchPolicyStakeholdersFromPG() {
   const pageSize = 200;
   let offset = 0;
 
-  try {
-    while (true) {
-      const resp = await fetch(
-        `${serverUrl}/api/policy-stakeholders/all?limit=${pageSize}&offset=${offset}`,
-        { headers, signal: AbortSignal.timeout(30_000) },
-      );
-      if (!resp.ok) {
-        logWikiServerWarning('policy-stakeholders-pg', `HTTP ${resp.status}`);
-        return null;
-      }
-      const data = await resp.json();
-      const rows = data.policyStakeholders || [];
-      for (const r of rows) {
-        if (!r.policyEntityId) continue;
-        if (!byPolicy.has(r.policyEntityId)) byPolicy.set(r.policyEntityId, []);
-        // Map PG camelCase → YAML shape. `role` is intentionally absent — the
-        // PG table doesn't have a `role` column yet (QUA-984). Until that
-        // lands, callers using this reader will lose role display.
-        const stakeholder = {
-          name: r.stakeholderDisplayName,
-          position: r.position,
-        };
-        if (r.stakeholderEntityId) stakeholder.entityId = r.stakeholderEntityId;
-        if (r.importance) stakeholder.importance = r.importance;
-        if (r.reason) stakeholder.reason = r.reason;
-        if (r.source) stakeholder.source = r.source;
-        if (Array.isArray(r.context) && r.context.length > 0) {
-          stakeholder.context = r.context;
-        }
-        byPolicy.get(r.policyEntityId).push(stakeholder);
-      }
-      if (rows.length < pageSize) break;
-      offset += rows.length;
+  while (true) {
+    const url = `${serverUrl}/api/policy-stakeholders/all?limit=${pageSize}&offset=${offset}`;
+    const result = await fetchJsonWithRetry(url, { headers });
+    if (!result.ok) {
+      logWikiServerWarning('policy-stakeholders-pg', `${result.reason}${result.status ? ` (HTTP ${result.status})` : ''}`);
+      return null;
     }
-    const policyCount = byPolicy.size;
-    const total = [...byPolicy.values()].reduce((n, arr) => n + arr.length, 0);
-    console.log(`  policy-stakeholders-pg: ${total} stakeholders across ${policyCount} policies`);
-    return byPolicy;
-  } catch (err) {
-    logWikiServerWarning('policy-stakeholders-pg', err instanceof Error ? err.message : String(err));
-    return null;
+    const rows = result.data.policyStakeholders || [];
+    for (const r of rows) {
+      if (!r.policyEntityId) continue;
+      if (!byPolicy.has(r.policyEntityId)) byPolicy.set(r.policyEntityId, []);
+      byPolicy.get(r.policyEntityId).push(pgPolicyStakeholderRowToYaml(r));
+    }
+    if (rows.length < pageSize) break;
+    offset += rows.length;
   }
+  const policyCount = byPolicy.size;
+  const total = [...byPolicy.values()].reduce((n, arr) => n + arr.length, 0);
+  console.log(`  policy-stakeholders-pg: ${total} stakeholders across ${policyCount} policies`);
+  return byPolicy;
 }
 
 /**
