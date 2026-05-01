@@ -441,10 +441,10 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "13 projects addressing AI-driven power concentration. Largest $1.66M to OpenMined Foundation.",
     programType: "rfp",
-    totalBudget: 4_000_000,
+    totalBudget: 5_637_000,
     status: "awarded",
     source: "https://futureoflife.org/grant-program/mitigate-ai-driven-power-concentration/",
-    notes: "Two review rounds (July and October 2024). Up-to-$4M cap; 13 projects awarded totaling $5.64M (exceeded cap). Funds allocated.",
+    notes: "Two review rounds (July and October 2024). Source page lists 'up to $4M' cap; 13 awarded projects total $5,637,429 (Funds allocated, exceeded cap). totalBudget records actual disbursed.",
   },
   {
     idSeed: "prog|fli|global-institutions-ai",
