@@ -41,10 +41,17 @@
 
 import { createHash } from "node:crypto";
 import { canonicalSlug } from "./canonical-names.ts";
-import type { ApplyResult, VerifiedVerdict } from "./apply-verdicts.ts";
+import type { ApplyResult } from "./apply-verdicts.ts";
 import type { PolicyEntity } from "./gap-analyzer.ts";
-import type { SyncStakeholderItem } from "../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts";
-import { VALID_POSITIONS } from "../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts";
+import {
+  VALID_IMPORTANCE,
+  VALID_POSITIONS,
+  type SyncStakeholderItem,
+} from "../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts";
+
+type Stakeholder = NonNullable<PolicyEntity["stakeholders"]>[number];
+type Position = (typeof VALID_POSITIONS)[number];
+type Importance = (typeof VALID_IMPORTANCE)[number];
 
 export interface ConvertAppliedToSyncInput {
   /** Policy `stableId` — becomes `policyEntityId` on each item. */
@@ -65,28 +72,31 @@ export interface ConvertAppliedToSyncResult {
 }
 
 const VALID_POSITION_SET = new Set<string>(VALID_POSITIONS);
+const VALID_IMPORTANCE_SET = new Set<string>(VALID_IMPORTANCE);
+
+const STAKEHOLDER_TARGET_PREFIX = "stakeholder.";
 
 /**
  * Generate the same deterministic 10-char ID the build-data helper produces.
  *
  * Source-of-truth: `validate-policy-stakeholders-strict.ts::generateShortId`
  * and `apps/web/scripts/lib/wiki-server-data.mjs::generateShortId` — both
- * derive `id = sha256(policyEntityId:stakeholderName).base64url[:10]`.
- *
- * Determinism matters: if Phase 2 re-sends the same `(policyEntityId, name)`
- * pair (e.g. retry-with-feedback), the row keeps the same `id` and the
- * natural-key resolves the conflict to UPDATE rather than INSERT.
+ * derive `id = sha256(policyEntityId:stakeholderName).base64url[:10]`. All
+ * three copies must stay in lockstep so any ingestion path produces the
+ * same `id` for the same `(policyEntityId, name)` pair, otherwise the
+ * natural-key UPDATE-on-conflict semantics break (a re-send mints a new id
+ * and inserts a duplicate). QUA-957 follow-up: extract to a shared module.
  */
 function generateShortId(input: string): string {
   return createHash("sha256").update(input).digest("base64url").substring(0, 10);
 }
 
-function isStakeholderTarget(targetField: string): boolean {
-  return targetField.startsWith("stakeholder.");
+function isPosition(p: unknown): p is Position {
+  return typeof p === "string" && VALID_POSITION_SET.has(p);
 }
 
-function targetSlug(targetField: string): string {
-  return targetField.slice("stakeholder.".length);
+function isImportance(p: unknown): p is Importance {
+  return typeof p === "string" && VALID_IMPORTANCE_SET.has(p);
 }
 
 /**
@@ -103,16 +113,23 @@ export function convertAppliedToStakeholderSync(
   const warnings: string[] = [];
   const items: SyncStakeholderItem[] = [];
 
-  // Index post-apply stakeholders by canonical slug AND by name canonical
-  // form so we can resolve `stakeholder.<targetSlug>` regardless of which
-  // surface form the LLM emitted. Mirrors the matchKey logic in
-  // `applyVerdictsToPolicy::applyVerdictsToPolicy`.
-  const stakeholdersByCanonical = new Map<string, NonNullable<PolicyEntity["stakeholders"]>[number]>();
+  // Index post-apply stakeholders by canonical slug. Mirrors the matchKey
+  // logic in `applyVerdictsToPolicy::applyVerdictsToPolicy`. First-write-wins
+  // matches the applier's own dedup behavior — if the post-apply entity
+  // somehow contains two stakeholders that canonicalize to the same slug
+  // (the applier shouldn't produce this), we surface the collision via a
+  // warning so it's visible rather than silently dropping the second row.
+  const stakeholdersByCanonical = new Map<string, Stakeholder>();
   for (const s of entity.stakeholders ?? []) {
     const canon = canonicalSlug(s.name);
-    if (canon && !stakeholdersByCanonical.has(canon)) {
-      stakeholdersByCanonical.set(canon, s);
+    if (!canon) continue;
+    if (stakeholdersByCanonical.has(canon)) {
+      warnings.push(
+        `post-apply entity contains two stakeholders that canonicalize to '${canon}' — keeping first ('${stakeholdersByCanonical.get(canon)?.name}'), dropping '${s.name}'`,
+      );
+      continue;
     }
+    stakeholdersByCanonical.set(canon, s);
   }
 
   // Track stakeholders we've already emitted to handle the case where
@@ -122,10 +139,10 @@ export function convertAppliedToStakeholderSync(
   const emittedIds = new Set<string>();
 
   for (const a of applied) {
-    if (!isStakeholderTarget(a.targetField)) continue;
+    if (!a.targetField.startsWith(STAKEHOLDER_TARGET_PREFIX)) continue;
     if (a.action === "skipped") continue;
 
-    const slug = targetSlug(a.targetField);
+    const slug = a.targetField.slice(STAKEHOLDER_TARGET_PREFIX.length);
     const canon = canonicalSlug(slug);
     const stakeholder = stakeholdersByCanonical.get(canon);
 
@@ -143,7 +160,7 @@ export function convertAppliedToStakeholderSync(
       continue;
     }
 
-    if (!VALID_POSITION_SET.has(stakeholder.position)) {
+    if (!isPosition(stakeholder.position)) {
       warnings.push(
         `stakeholder.${canon}: position='${stakeholder.position}' is not in the PG enum (${VALID_POSITIONS.join(", ")}) — dropped`,
       );
@@ -154,34 +171,36 @@ export function convertAppliedToStakeholderSync(
     if (emittedIds.has(id)) continue;
     emittedIds.add(id);
 
-    // Build the item against the canonical Zod-derived shape. `position`
-    // is narrowed by the VALID_POSITION_SET check above; the cast pacifies
-    // TS since `stakeholder.position` is typed `string | undefined` upstream.
+    // `context` lives on the YAML stakeholder type only structurally — the
+    // gap-analyzer's `PolicyEntity` declaration omits it but the route
+    // schema accepts an optional `string[]`. Read defensively to mirror
+    // the canonical build-data transform (`wiki-server-data.mjs:925`).
+    const rawContext = (stakeholder as { context?: unknown }).context;
+    const context = Array.isArray(rawContext) && rawContext.every((c) => typeof c === "string")
+      ? (rawContext as string[])
+      : null;
+
     const item: SyncStakeholderItem = {
       id,
       policyEntityId,
       stakeholderEntityId: stakeholder.entityId ?? null,
       stakeholderDisplayName: stakeholder.name,
-      position: stakeholder.position as SyncStakeholderItem["position"],
+      position: stakeholder.position,
       reason: stakeholder.reason ?? null,
       source: stakeholder.source ?? null,
+      context,
     };
-    if (
-      stakeholder.importance &&
-      (stakeholder.importance === "high" ||
-        stakeholder.importance === "medium" ||
-        stakeholder.importance === "low")
-    ) {
-      item.importance = stakeholder.importance;
+    if (stakeholder.importance != null && stakeholder.importance !== "") {
+      if (isImportance(stakeholder.importance)) {
+        item.importance = stakeholder.importance;
+      } else {
+        warnings.push(
+          `stakeholder.${canon}: importance='${stakeholder.importance}' is not in the PG enum (${VALID_IMPORTANCE.join(", ")}) — field dropped, item still emitted`,
+        );
+      }
     }
     items.push(item);
   }
 
   return { items, warnings };
 }
-
-// ---------------------------------------------------------------------------
-// Re-exports for testing convenience — keeps the public surface in one place.
-// ---------------------------------------------------------------------------
-
-export type { VerifiedVerdict };

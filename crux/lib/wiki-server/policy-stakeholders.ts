@@ -14,11 +14,11 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { PolicyStakeholdersRoute } from '../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders.ts';
-import type {
-  SyncResponse,
-  BestEffortSyncResponse,
-} from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
-import type { SyncStakeholderItem } from '../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+import {
+  VALID_POSITIONS,
+  type SyncStakeholderItem,
+} from '../../../apps/wiki-server/src/routes/tablebase/policy-stakeholders-schema.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -44,7 +44,6 @@ export type PolicyStakeholdersDeleteBatchResult = InferResponseType<
 // the factory body. Alias the factory's standard response shape — the same
 // pattern grants.ts uses for its hand-rolled /sync.
 export type PolicyStakeholdersSyncResult = SyncResponse;
-export type PolicyStakeholdersBestEffortSyncResult = BestEffortSyncResponse;
 
 /** A single stakeholder row (from the `/all` endpoint). */
 export type PolicyStakeholderRow = PolicyStakeholdersAllResult['policyStakeholders'][number];
@@ -52,6 +51,9 @@ export type PolicyStakeholderRow = PolicyStakeholdersAllResult['policyStakeholde
 // Re-export the input item type so callers in crux can construct payloads
 // against the canonical Zod-derived shape.
 export type { SyncStakeholderItem };
+
+/** Position values accepted by the `/by-policy` filter and the sync route. */
+export type PolicyStakeholderPosition = (typeof VALID_POSITIONS)[number];
 
 // ---------------------------------------------------------------------------
 // Types — sync options
@@ -62,8 +64,15 @@ export interface SyncPolicyStakeholdersOptions {
   forceSkipSourcing?: boolean;
   /** Reason logged to audit when `forceSkipSourcing` is used. */
   forceSkipSourcingReason?: string;
-  /** Skip entity-ref FK validation (used when entities haven't synced yet). */
-  skipEntityValidation?: boolean;
+  /**
+   * Skip entity-ref FK validation (used when entities haven't synced yet).
+   * The server-side handler refuses the bypass unless `skipEntityValidationReason`
+   * is also supplied (epic #4017 Phase A) — this client requires both at the
+   * type level so callers can't accidentally trigger a denied bypass.
+   */
+  skipEntityValidation?: {
+    reason: string;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -88,7 +97,7 @@ export async function getAllPolicyStakeholders(options?: {
 /** Fetch stakeholders for a specific policy. */
 export async function getPolicyStakeholdersByPolicy(
   policyEntityId: string,
-  options?: { position?: 'support' | 'oppose' | 'neutral' | 'mixed'; limit?: number; offset?: number },
+  options?: { position?: PolicyStakeholderPosition; limit?: number; offset?: number },
 ): Promise<ApiResult<PolicyStakeholdersByPolicyResult>> {
   const params = new URLSearchParams();
   if (options?.position) params.set('position', options.position);
@@ -137,7 +146,10 @@ export async function syncPolicyStakeholders(
     }
   }
   if (options?.skipEntityValidation) {
+    // Reason is required at the type level — `skipEntityValidationReason` is
+    // mandatory on the server side (validate-entity-refs.ts::shouldSkipEntityValidation).
     params.set('skipEntityValidation', 'true');
+    params.set('skipEntityValidationReason', options.skipEntityValidation.reason);
   }
   const qs = params.toString();
   return apiRequest<PolicyStakeholdersSyncResult>(

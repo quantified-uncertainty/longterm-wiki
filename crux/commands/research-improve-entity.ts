@@ -68,7 +68,7 @@ const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
 
 const SUPPORTED_TYPES = new Set(["policy", "organization"]);
 
-interface EntityWithType {
+export interface EntityWithType {
   id: string;
   stableId?: string;
   type: string;
@@ -1033,12 +1033,11 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
   // Pull the active agent_session_id (primed by crux.mjs at startup) so the
   // pipeline_runs row links back to the agent that triggered the run.
   // `getCachedAuditSessionId` returns a string; agent_sessions.id is bigint
-  // — cast to number with NaN-fallback to null.
-  const cachedSid = getCachedAuditSessionId();
-  const parsedSid = cachedSid != null ? Number(cachedSid) : NaN;
-  const agentSessionId = Number.isFinite(parsedSid) ? parsedSid : null;
-
-  const runOptions = buildImproveEntityRunOptions(found.entity, agentSessionId);
+  // — coerce to number, falling back to null on missing or non-numeric.
+  const runOptions = buildImproveEntityRunOptions(
+    found.entity,
+    parseAgentSessionId(getCachedAuditSessionId()),
+  );
 
   return withPipelineRun(runOptions, async () =>
     doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
@@ -1066,6 +1065,19 @@ export function buildImproveEntityRunOptions(
     agentSessionId,
     allowOffline: true,
   };
+}
+
+/**
+ * Coerce the cached audit session id (a string from
+ * `getCachedAuditSessionId()` because that's what's shipped on every
+ * X-Agent-Session-Id header) into a number for the bigint
+ * `agent_sessions.id` foreign key on `pipeline_runs`. Returns null when
+ * the cache is unset or the value is non-numeric.
+ */
+export function parseAgentSessionId(raw: string | null): number | null {
+  if (raw == null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
 }
 
 /**

@@ -325,4 +325,122 @@ describe("convertAppliedToStakeholderSync", () => {
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]).toMatch(/no matching stakeholder/);
   });
+
+  // ─── Field preservation (parity with build-data helper) ──────────────
+
+  it("preserves a string-array context field when present", () => {
+    const seeded = basePolicy({
+      stakeholders: [
+        {
+          name: "ACLU",
+          position: "oppose",
+          importance: "high",
+          reason: "short",
+          source: "https://aclu.org",
+          // The gap-analyzer PolicyEntity type omits `context` but the
+          // route schema accepts it; YAML in the wild may carry it.
+          context: ["civil-liberties", "constitutional-law"],
+        } as unknown as NonNullable<PolicyEntity["stakeholders"]>[number],
+      ],
+    });
+    const apply = applyVerdictsToPolicy(seeded, [
+      v({
+        targetField: "stakeholder.aclu",
+        displayHint: "ACLU",
+        claimText:
+          "ACLU has issued a much-longer-than-existing detailed statement opposing this bill",
+      }),
+    ]);
+    const result = convertAppliedToStakeholderSync({
+      policyEntityId: POLICY_ID,
+      applyResult: apply,
+    });
+    expect(result.items[0].context).toEqual([
+      "civil-liberties",
+      "constitutional-law",
+    ]);
+  });
+
+  it("emits context: null when the YAML field is missing or malformed", () => {
+    const apply = applyVerdictsToPolicy(basePolicy(), [
+      v({ targetField: "stakeholder.aclu", displayHint: "ACLU" }),
+    ]);
+    const result = convertAppliedToStakeholderSync({
+      policyEntityId: POLICY_ID,
+      applyResult: apply,
+    });
+    // PolicyEntity type doesn't include context; converter should default.
+    expect(result.items[0].context).toBeNull();
+  });
+
+  // ─── Importance handling ─────────────────────────────────────────────
+
+  it("warns and drops the importance field when the YAML value is not in the PG enum", () => {
+    const seeded = basePolicy({
+      stakeholders: [
+        {
+          name: "ACLU",
+          position: "oppose",
+          importance: "critical" as unknown as "high",
+          reason: "short",
+          source: "https://aclu.org",
+        },
+      ],
+    });
+    const apply = applyVerdictsToPolicy(seeded, [
+      v({
+        targetField: "stakeholder.aclu",
+        displayHint: "ACLU",
+        claimText:
+          "ACLU has issued a much-longer-than-existing detailed statement opposing this bill",
+      }),
+    ]);
+    const result = convertAppliedToStakeholderSync({
+      policyEntityId: POLICY_ID,
+      applyResult: apply,
+    });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].importance).toBeUndefined();
+    const importanceWarning = result.warnings.find((w) =>
+      /importance='critical'/.test(w),
+    );
+    expect(importanceWarning).toBeDefined();
+  });
+
+  // ─── Stakeholder map collisions ──────────────────────────────────────
+
+  it("warns when the post-apply entity has two stakeholders that canonicalize to the same slug", () => {
+    // Hand-construct an ApplyResult to bypass the applier's own dedup.
+    const result = convertAppliedToStakeholderSync({
+      policyEntityId: POLICY_ID,
+      applyResult: {
+        entity: basePolicy({
+          stakeholders: [
+            {
+              name: "FBI",
+              position: "support",
+              importance: "high",
+              reason: "first",
+              source: "https://fbi.gov",
+            },
+            {
+              name: "Federal Bureau of Investigation",
+              position: "oppose",
+              importance: "high",
+              reason: "second",
+              source: "https://fbi.gov",
+            },
+          ],
+        }),
+        applied: [{ targetField: "stakeholder.fbi", action: "added" }],
+        warnings: [],
+      },
+    });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].stakeholderDisplayName).toBe("FBI"); // first-write-wins
+    const collisionWarning = result.warnings.find((w) =>
+      /canonicalize to/.test(w),
+    );
+    expect(collisionWarning).toBeDefined();
+  });
 });

@@ -24,10 +24,12 @@ import {
   buildImproveEntityRunOptions,
   buildVerifiedVerdictsFromBatch,
   drainPendingBatches,
+  parseAgentSessionId,
   parseExtractedClaims,
   type ClaimVerdictRow,
   type SubmittedBatchInfo,
 } from "./research-improve-entity.ts";
+import type { EntityWithType as ImportedEntityWithType } from "./research-improve-entity.ts";
 import type { PreFilterClaim } from "../lib/research/pre-filter.ts";
 import type { ApplyResult, VerifiedVerdict } from "../lib/research/apply-verdicts.ts";
 
@@ -488,7 +490,7 @@ describe("parseExtractedClaims", () => {
 // ─── pipeline-runs lifecycle wiring (QUA-957) ──────────────────────────────
 
 describe("buildImproveEntityRunOptions", () => {
-  const baseEntity: EntityWithType = {
+  const baseEntity: ImportedEntityWithType = {
     id: "fisa-702",
     type: "policy",
     title: "FISA 702",
@@ -531,5 +533,24 @@ describe("buildImproveEntityRunOptions", () => {
     // is unreachable (offline development, slot without prod creds). The
     // helper logs a warning and returns a no-op runCtx.
     expect(buildImproveEntityRunOptions(baseEntity, null).allowOffline).toBe(true);
+  });
+});
+
+describe("parseAgentSessionId", () => {
+  it("returns null when the cached id is null", () => {
+    expect(parseAgentSessionId(null)).toBeNull();
+  });
+
+  it("parses a numeric string into a number", () => {
+    expect(parseAgentSessionId("42")).toBe(42);
+    expect(parseAgentSessionId("0")).toBe(0);
+  });
+
+  it("returns null for non-numeric strings", () => {
+    // Number("") is 0 → still numeric. Number("abc") is NaN → null.
+    // We treat NaN as "not a valid id" but accept "0" — agent_sessions.id
+    // is bigserial starting at 1, so 0 won't appear in practice.
+    expect(parseAgentSessionId("abc")).toBeNull();
+    expect(parseAgentSessionId("not-a-number")).toBeNull();
   });
 });
