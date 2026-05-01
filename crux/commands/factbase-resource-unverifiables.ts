@@ -43,8 +43,9 @@
  *     review list instead of becoming a YAML write.
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { writeFileSync, mkdirSync, existsSync, realpathSync } from 'node:fs';
+import { dirname, resolve, sep } from 'node:path';
+import { tmpdir, homedir } from 'node:os';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
@@ -231,6 +232,89 @@ function parseThreshold(raw: unknown): number {
   return n;
 }
 
+/**
+ * Tracking query parameters that the LLM (and most browsers) treat as
+ * cosmetic noise. We strip them before URL equality so a search-result link
+ * with `?utm_source=...` is recognized as the same URL as the canonical one.
+ *
+ * Conservative list — only well-known marketing/click-attribution params.
+ * Don't add functional ones (e.g. `q`, `id`, `page`).
+ */
+const TRACKING_QUERY_PARAMS = new Set<string>([
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+  'fbclid',
+  'gclid',
+  'mc_cid',
+  'mc_eid',
+  'ref',
+  'ref_src',
+  'ref_url',
+]);
+
+/**
+ * Canonicalize a URL for "is this the same URL?" comparison. Drops cosmetic
+ * differences the LLM routinely re-emits:
+ *   - lowercased host
+ *   - default port stripped (80/443)
+ *   - trailing slash on the path stripped (except root "/")
+ *   - fragment dropped
+ *   - well-known tracking query params dropped
+ *
+ * Falls back to the raw string if URL parsing fails (which can happen for
+ * bare paths or malformed inputs); the caller can still compare those by
+ * strict equality and won't get worse behavior than before this helper
+ * existed.
+ *
+ * NOTE: deliberately does NOT normalize http→https or www.→non-www, because
+ * those CAN reflect a real site change (the canonical URL really did move).
+ */
+export function canonicalizeUrl(url: string): string {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    u.hostname = u.hostname.toLowerCase();
+    if (
+      (u.protocol === 'http:' && u.port === '80') ||
+      (u.protocol === 'https:' && u.port === '443')
+    ) {
+      u.port = '';
+    }
+    u.hash = '';
+    // Filter tracking params; preserve insertion order of the rest.
+    const keep: Array<[string, string]> = [];
+    for (const [k, v] of u.searchParams) {
+      if (TRACKING_QUERY_PARAMS.has(k.toLowerCase())) continue;
+      keep.push([k, v]);
+    }
+    // searchParams is mutable — reset and re-add to preserve order.
+    const params = new URLSearchParams();
+    for (const [k, v] of keep) params.append(k, v);
+    u.search = params.toString() ? `?${params.toString()}` : '';
+    // Strip a trailing slash unless the path is just "/".
+    if (u.pathname.length > 1 && u.pathname.endsWith('/')) {
+      u.pathname = u.pathname.replace(/\/+$/, '');
+    }
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Compare two URLs for "is this the same URL?" after canonicalization. Used
+ * by `classifyDiscovery` and `isActionable` to avoid overwriting a YAML
+ * source URL when the engine returns a cosmetically-different but
+ * functionally-equivalent URL.
+ */
+export function urlsEquivalent(a: string, b: string): boolean {
+  if (a === b) return true;
+  return canonicalizeUrl(a) === canonicalizeUrl(b);
+}
+
 function zeroSummary(): RunSummary {
   return {
     scanned: 0,
@@ -412,6 +496,13 @@ async function discoverRealtime(
   const tasks = facts.map(({ entity, fact }) => async () => {
     summary.scanned++;
 
+    // Budget gate: under concurrency, multiple workers can pass a naive
+    // `read; check; spend` sequence simultaneously and overshoot by
+    // `concurrency × ESTIMATED_REALTIME_COST_USD`. Eagerly debit the
+    // estimate at gate-pass time (no `await` between check and write
+    // means JS's single-threaded model gives us atomicity), then refund
+    // or charge the difference once the actual cost is known. This
+    // bounds overshoot to at most one in-flight call's worth of cost.
     if (summary.costUsd + ESTIMATED_REALTIME_COST_USD > options.budget) {
       if (!summary.budgetExhausted) {
         summary.budgetExhausted = true;
@@ -421,6 +512,7 @@ async function discoverRealtime(
       }
       return;
     }
+    summary.costUsd += ESTIMATED_REALTIME_COST_USD;
 
     const input = makeDiscoverInput(kb, entity, fact);
     const existingSourceUrl = fact.source ?? '';
@@ -435,7 +527,8 @@ async function discoverRealtime(
         },
         { threshold: options.threshold },
       );
-      summary.costUsd += result.costUsd;
+      // Reconcile: convert the eager debit to the real cost.
+      summary.costUsd += result.costUsd - ESTIMATED_REALTIME_COST_USD;
       results.push({
         entity,
         fact,
@@ -446,6 +539,9 @@ async function discoverRealtime(
       });
       classifyDiscovery(result, existingSourceUrl, summary);
     } catch (e) {
+      // Engine threw — no real cost incurred; refund the eager debit so the
+      // next worker isn't unnecessarily blocked by accounting noise.
+      summary.costUsd -= ESTIMATED_REALTIME_COST_USD;
       summary.engineErrors++;
       const msg = e instanceof Error ? e.message : String(e);
       results.push({
@@ -475,7 +571,7 @@ function classifyDiscovery(
 ): void {
   if (!result.best) {
     summary.noBest++;
-  } else if (result.best === existingSourceUrl) {
+  } else if (urlsEquivalent(result.best, existingSourceUrl)) {
     summary.bestEqualsExisting++;
   } else {
     summary.betterCandidatesFound++;
@@ -611,7 +707,11 @@ async function discoverBatch(
  * are identical between the two modes.
  */
 function isActionable(d: FactDiscovery): boolean {
-  return Boolean(d.result?.best) && d.result!.best !== d.existingSourceUrl;
+  // Defensive: never treat an errored discovery as actionable, even if a
+  // future code path produces a partial result with both `error` and `best`.
+  if (d.error) return false;
+  if (!d.result?.best) return false;
+  return !urlsEquivalent(d.result.best, d.existingSourceUrl);
 }
 
 /**
@@ -751,17 +851,58 @@ interface ManualReviewEntry {
   candidates: DiscoverCandidate[];
 }
 
-function buildManualReviewEntries(discoveries: FactDiscovery[]): ManualReviewEntry[] {
+/**
+ * Assemble the manual-review triage list. Two sources:
+ *   1. Discoveries that were never actionable (no `best`, engine confirmed
+ *      existing, or engine errored).
+ *   2. Discoveries that WERE actionable but whose YAML write failed
+ *      (`not-found`, `write-error`) — the operator needs to triage these
+ *      too, and they would otherwise only appear in the JSON `writes`
+ *      array, hidden from the human-readable triage file.
+ *
+ * `writes` is empty in dry-run, so the result reduces to just the discovery
+ * list there.
+ */
+function buildManualReviewEntries(
+  discoveries: FactDiscovery[],
+  writes: FactWriteResult[],
+): ManualReviewEntry[] {
+  // Index failed writes by factId so we can attach a failure reason to
+  // entries that would otherwise be filtered out as "actionable".
+  type WriteFailure =
+    | { kind: 'not-found' }
+    | { kind: 'write-error'; error: string };
+  const writeFailureByFactId = new Map<string, WriteFailure>();
+  for (const w of writes) {
+    if (w.outcome.kind === 'not-found' || w.outcome.kind === 'write-error') {
+      writeFailureByFactId.set(w.factId, w.outcome);
+    }
+  }
+
   const out: ManualReviewEntry[] = [];
   for (const d of discoveries) {
-    if (isActionable(d)) continue;
-    const reason = d.error
-      ? `engine error: ${d.error}`
-      : !d.result
-        ? 'engine returned no result'
-        : !d.result.best
-          ? `no candidate met threshold — ${d.result.reason}`
-          : `engine confirmed existing URL is best — ${d.result.reason}`;
+    const writeFailure = writeFailureByFactId.get(d.fact.id);
+    if (isActionable(d) && !writeFailure) continue;
+
+    let reason: string;
+    if (writeFailure) {
+      if (writeFailure.kind === 'not-found') {
+        reason = `actionable but YAML write failed: fact ID not present in entity file (slug rename, atomic-rename lag, or fact-id collision)`;
+      } else {
+        // Narrowed to write-error by the indexing above (the index map
+        // only stores not-found and write-error outcomes).
+        reason = `actionable but YAML write failed: ${writeFailure.error}`;
+      }
+    } else if (d.error) {
+      reason = `engine error: ${d.error}`;
+    } else if (!d.result) {
+      reason = 'engine returned no result';
+    } else if (!d.result.best) {
+      reason = `no candidate met threshold — ${d.result.reason}`;
+    } else {
+      reason = `engine confirmed existing URL is best — ${d.result.reason}`;
+    }
+
     out.push({
       entity: d.entity,
       fact: d.fact,
@@ -818,12 +959,75 @@ function formatManualReview(
  * triage list is durable. `dry-run` only returns a path if the user asked
  * for one explicitly.
  */
+/**
+ * Reject paths that resolve outside an allow-list of "safe" roots: the
+ * project root, the system temp dir (covers CI fixtures and ad-hoc test
+ * paths), and the user's home directory (covers `~/manual-review.txt`).
+ * Anything else (e.g. `/etc/passwd`) is refused — the threat model is "a
+ * wrapper script forwards external input"; an operator running this
+ * interactively can still write inside any of the allowed roots.
+ *
+ * Allow-list roots are themselves resolved via `realpathSync` because on
+ * macOS `os.tmpdir()` returns `/var/folders/...` but `path.resolve` returns
+ * `/private/var/folders/...` (or vice versa) — comparing the resolved
+ * forms avoids spurious false rejects.
+ */
+function safePathRoots(): string[] {
+  const roots = new Set<string>();
+  const add = (p: string) => {
+    if (!p) return;
+    roots.add(p);
+    try {
+      roots.add(realpathSync(p));
+    } catch {
+      // Non-existent path — skip; the project root and home should always
+      // exist; tmpdir might be missing in some sandboxes.
+    }
+  };
+  add(process.cwd());
+  add(tmpdir());
+  add(homedir());
+  return Array.from(roots);
+}
+
+function assertPathInsideProjectRoot(absolutePath: string, raw: string): void {
+  const candidate = (() => {
+    try {
+      // Resolve any symlinks in the parent chain so /var/folders → /private/var/folders
+      // doesn't produce a false reject. The leaf may not exist yet; resolve
+      // the deepest existing ancestor and append the missing tail.
+      let probe = absolutePath;
+      const tail: string[] = [];
+      while (!existsSync(probe) && probe !== dirname(probe)) {
+        tail.unshift(probe.slice(dirname(probe).length));
+        probe = dirname(probe);
+      }
+      const resolvedAncestor = existsSync(probe) ? realpathSync(probe) : probe;
+      return resolvedAncestor + tail.join('');
+    } catch {
+      return absolutePath;
+    }
+  })();
+  for (const root of safePathRoots()) {
+    if (candidate === root || candidate.startsWith(root + sep)) {
+      return;
+    }
+  }
+  throw new Error(
+    `--manual-review path "${raw}" resolves outside the allowed roots (project root, tmp dir, or home dir). Pass a project-relative path, or "-" for stdout.`,
+  );
+}
+
 function resolveManualReviewTarget(
   raw: string | undefined,
   apply: boolean,
 ): string | null {
   if (raw === '-') return '-';
-  if (raw && raw.length > 0) return resolve(raw);
+  if (raw && raw.length > 0) {
+    const abs = resolve(raw);
+    assertPathInsideProjectRoot(abs, raw);
+    return abs;
+  }
   if (apply) return resolve(DEFAULT_MANUAL_REVIEW_PATH);
   return null;
 }
@@ -910,7 +1114,12 @@ async function resourceUnverifiablesCommand(
     MAX_CONCURRENCY,
     'concurrency',
   );
-  const apply = Boolean(options.apply);
+  // --dry-run is the default. If the user explicitly passes --dry-run,
+  // honor it as a force-override even when --apply is also passed (this
+  // handles the "I forgot to remove --apply" foot-gun). Without this,
+  // `--apply --dry-run` would silently apply.
+  const explicitDryRun = Boolean(options['dry-run'] ?? options.dryRun);
+  const apply = !explicitDryRun && Boolean(options.apply);
   const dryRun = !apply;
   const useBatch = Boolean(options.batch);
   const skipVerifyChain = Boolean(options['no-verify-chain'] ?? options.noVerifyChain);
@@ -926,7 +1135,18 @@ async function resourceUnverifiablesCommand(
       : typeof options.manualReview === 'string'
         ? options.manualReview
         : undefined;
-  const manualReviewTarget = resolveManualReviewTarget(manualReviewArg, apply);
+  let manualReviewTarget: string | null;
+  try {
+    manualReviewTarget = resolveManualReviewTarget(manualReviewArg, apply);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return {
+      exitCode: 1,
+      output: isJson
+        ? JSON.stringify({ error: msg })
+        : `error: ${msg}`,
+    };
+  }
 
   const log = (msg: string) => {
     if (!isJson) console.log(msg);
@@ -962,6 +1182,19 @@ async function resourceUnverifiablesCommand(
   log(`  unverifiable fact ids fetched: ${unverifiableIds.size}`);
 
   const kb = await loadGraphFull();
+
+  // Validate --entity up front so a typo prints a clear warning instead of
+  // the same "no facts match" message the user gets when nothing is
+  // unverifiable. Different exit code lets scripts notice.
+  if (entityFilter && !resolveEntity(entityFilter, kb)) {
+    return {
+      exitCode: 1,
+      output: isJson
+        ? JSON.stringify({ error: `--entity "${entityFilter}" did not resolve to any FactBase entity` })
+        : `error: --entity "${entityFilter}" did not resolve to any FactBase entity. Try \`crux fb search ${entityFilter}\`.`,
+    };
+  }
+
   const facts = collectUnverifiableFacts(kb, unverifiableIds, {
     entity: entityFilter,
     property: propertyFilter,
@@ -999,7 +1232,9 @@ async function resourceUnverifiablesCommand(
 
   // Phase 4: assemble the manual-review list (always — the report is shown
   // even in dry-run so the user sees what would be triaged on --apply).
-  const manualReview = buildManualReviewEntries(discoveries);
+  // Includes failed writes (not-found / write-error) so the operator's
+  // human-readable triage file matches the JSON output.
+  const manualReview = buildManualReviewEntries(discoveries, writes);
   summary.manualReviewCount = manualReview.length;
 
   if (manualReviewTarget && manualReviewTarget !== '-') {
@@ -1116,14 +1351,14 @@ function formatReport(
         lines.push(`    \x1b[33m(no candidates discovered)\x1b[0m`);
       } else {
         for (const c of d.result.candidates) {
-          const isBest = c.url === d.result.best;
-          const isExisting = c.url === d.existingSourceUrl;
+          const isBest = d.result.best ? urlsEquivalent(c.url, d.result.best) : false;
+          const isExisting = urlsEquivalent(c.url, d.existingSourceUrl);
           const marker = isBest ? '\x1b[32m★\x1b[0m' : isExisting ? '\x1b[2m=\x1b[0m' : ' ';
           lines.push(`    ${marker} [${c.confidence.toFixed(2)}] ${c.url}`);
         }
         if (!d.result.best) {
           lines.push(`    \x1b[33m(no candidate met threshold; reason: ${d.result.reason})\x1b[0m`);
-        } else if (d.result.best === d.existingSourceUrl) {
+        } else if (urlsEquivalent(d.result.best, d.existingSourceUrl)) {
           lines.push(`    \x1b[33m(engine confirmed existing URL is best — ${d.result.reason})\x1b[0m`);
         } else {
           lines.push(`    \x1b[32m→ replace with ${d.result.best}\x1b[0m`);

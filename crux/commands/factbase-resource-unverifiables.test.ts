@@ -180,6 +180,8 @@ import {
   commands,
   fetchUnverifiableFactIds,
   collectUnverifiableFacts,
+  canonicalizeUrl,
+  urlsEquivalent,
 } from './factbase-resource-unverifiables.ts';
 import { loadGraphFull } from '../lib/factbase-loader.ts';
 
@@ -844,5 +846,251 @@ describe('crux fb resource-unverifiables — budget gating (real-time)', () => {
     const parsed = JSON.parse(String(res.output));
     expect(parsed.summary.budgetExhausted).toBe(true);
     expect(mockDiscoverSourceForFact).toHaveBeenCalledTimes(1);
+  });
+
+  it('bounds overshoot under concurrency >= 2 (eager-debit gate)', async () => {
+    // Regression: pre-fix, the budget gate was racy under concurrency —
+    // multiple workers could read costUsd=0, all pass the gate, all spend.
+    // Post-fix, the gate eagerly debits the estimate at gate-pass time so
+    // only one in-flight call's worth of overshoot is possible.
+    const kb = await loadGraphFull();
+    const idsWithSource: string[] = [];
+    for (const entity of kb.graph.getAllEntities()) {
+      for (const fact of kb.graph.getFacts(entity.id)) {
+        if (fact.id.startsWith('inv_')) continue;
+        if (!fact.source) continue;
+        idsWithSource.push(fact.id);
+        if (idsWithSource.length >= 8) break;
+      }
+      if (idsWithSource.length >= 8) break;
+    }
+    if (idsWithSource.length < 4) return;
+    fakeVerdictRows = idsWithSource.map((id) => ({ recordId: id, fieldName: null }));
+
+    // Simulate slow engine calls so multiple workers stay in-flight at once.
+    let inFlight = 0;
+    let maxInFlight = 0;
+    mockDiscoverSourceForFact.mockImplementation(async (input: unknown) => {
+      const fact = (input as { fact: { id: string } }).fact;
+      inFlight++;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((r) => setTimeout(r, 50));
+      inFlight--;
+      return {
+        candidates: [{ url: `https://x.example.com/${fact.id}`, confidence: 0.9, summary: 's' }],
+        best: `https://x.example.com/${fact.id}`,
+        reason: 'good',
+        costUsd: 0.04,
+      };
+    });
+
+    // Budget allows 2 calls' worth; with concurrency=4, the racy gate would
+    // let all 4 through. The eager-debit gate must cap calls at 2.
+    const res = await run([], {
+      limit: '8',
+      budget: '0.085', // 2 × 0.04 = 0.08; leaves 0.005 of headroom
+      concurrency: '4',
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.budgetExhausted).toBe(true);
+    // Confirm we actually exercised concurrency >= 2 (i.e. the test shape
+    // is meaningful — if maxInFlight stayed at 1, the gate could be
+    // serially safe by accident).
+    expect(maxInFlight).toBeGreaterThanOrEqual(2);
+    // No more than budget/cost calls should have fired.
+    expect(mockDiscoverSourceForFact.mock.calls.length).toBeLessThanOrEqual(2);
+  });
+});
+
+describe('canonicalizeUrl + urlsEquivalent', () => {
+  it('treats trailing-slash variants as equivalent', () => {
+    expect(urlsEquivalent('https://example.com/path', 'https://example.com/path/')).toBe(true);
+  });
+
+  it('treats fragment-only differences as equivalent', () => {
+    expect(urlsEquivalent('https://example.com/x', 'https://example.com/x#section')).toBe(true);
+  });
+
+  it('treats tracking-param-only differences as equivalent', () => {
+    expect(
+      urlsEquivalent(
+        'https://example.com/x',
+        'https://example.com/x?utm_source=foo&utm_medium=bar',
+      ),
+    ).toBe(true);
+    expect(
+      urlsEquivalent(
+        'https://example.com/x?utm_source=foo&q=keep',
+        'https://example.com/x?q=keep',
+      ),
+    ).toBe(true);
+  });
+
+  it('lower-cases the host', () => {
+    expect(urlsEquivalent('https://Example.COM/x', 'https://example.com/x')).toBe(true);
+  });
+
+  it('strips default ports (80/443)', () => {
+    expect(urlsEquivalent('https://example.com:443/x', 'https://example.com/x')).toBe(true);
+    expect(urlsEquivalent('http://example.com:80/x', 'http://example.com/x')).toBe(true);
+  });
+
+  it('preserves functional query parameters', () => {
+    // Different `q` values are real differences; not equivalent.
+    expect(
+      urlsEquivalent(
+        'https://example.com/search?q=alpha',
+        'https://example.com/search?q=beta',
+      ),
+    ).toBe(false);
+  });
+
+  it('does NOT collapse http vs https', () => {
+    // http and https can be a real site change; conservative answer is that
+    // they are different URLs.
+    expect(urlsEquivalent('http://example.com/x', 'https://example.com/x')).toBe(false);
+  });
+
+  it('does NOT collapse www vs non-www', () => {
+    expect(urlsEquivalent('https://www.example.com/x', 'https://example.com/x')).toBe(false);
+  });
+
+  it('handles malformed URLs gracefully', () => {
+    expect(canonicalizeUrl('not a url')).toBe('not a url');
+    expect(urlsEquivalent('not a url', 'not a url')).toBe(true);
+  });
+
+  it('classifies a trailing-slash-only LLM response as bestEqualsExisting (HIGH-1 fix)', async () => {
+    // Regression for the URL canonicalization HIGH finding: pre-fix, an LLM
+    // response of `https://x.com/path` would be classified as a
+    // "betterCandidate" against an existing `https://x.com/path/` and the
+    // YAML would be cosmetically overwritten. Post-fix, classifyDiscovery
+    // and isActionable use urlsEquivalent so the engine's response is
+    // recognized as the same URL.
+    const target = await seedOneSourcedFact();
+    if (!target) return;
+
+    // Force the engine to return the existing URL with a trailing slash
+    // toggled — the most common LLM canonicalization difference.
+    const flipped = target.fact.source.endsWith('/')
+      ? target.fact.source.slice(0, -1)
+      : target.fact.source + '/';
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: flipped, confidence: 0.9, summary: 'matches' }],
+      best: flipped,
+      reason: 'existing URL is fine (different formatting)',
+      costUsd: 0.04,
+    });
+
+    const res = await run([], { limit: '1', json: true });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.bestEqualsExisting).toBe(1);
+    expect(parsed.summary.betterCandidatesFound).toBe(0);
+    expect(parsed.results[0].actionable).toBe(false);
+  });
+});
+
+describe('crux fb resource-unverifiables — --dry-run honor (M4 fix)', () => {
+  it('honors --dry-run even when --apply is also passed', async () => {
+    const target = await seedOneSourcedFact();
+    if (!target) return;
+
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    fakeFiles.set(
+      `/fake/${target.slug}.yaml`,
+      `facts:\n  - id: ${target.fact.id}\n    propertyId: ${target.fact.propertyId}\n    value: 1\n    source: ${target.fact.source}\n`,
+    );
+
+    const res = await run([], {
+      limit: '1',
+      apply: true,
+      'dry-run': true, // explicit force-dry-run, should win
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    // No physical writes attempted because the explicit dry-run flag wins.
+    expect(parsed.summary.apply).toBe(false);
+    expect(parsed.summary.writesAttempted).toBe(0);
+    expect(writeEntityDocumentMock).not.toHaveBeenCalled();
+    expect(mockSourcingCommand).not.toHaveBeenCalled();
+  });
+});
+
+describe('crux fb resource-unverifiables — --entity typo warning (M5 fix)', () => {
+  it('errors clearly when --entity does not resolve', async () => {
+    fakeVerdictRows = [{ recordId: 'f_anything', fieldName: null }];
+    const res = await run([], {
+      entity: 'this-entity-truly-does-not-exist-xyzzy',
+      limit: '1',
+    });
+    expect(res.exitCode).toBe(1);
+    expect(String(res.output)).toMatch(/did not resolve/i);
+    // Engine should NOT have been called.
+    expect(mockDiscoverSourceForFact).not.toHaveBeenCalled();
+  });
+});
+
+describe('crux fb resource-unverifiables — manual-review failed-writes (M3 fix)', () => {
+  it('includes write-failed actionable facts in the manual-review file', async () => {
+    const target = await seedOneSourcedFact();
+    if (!target) return;
+
+    findEntityFilePathMock.mockImplementation((s: string) => `/fake/${s}.yaml`);
+    // Empty doc — fact ID won't be found; write fails as not-found.
+    fakeFiles.set(`/fake/${target.slug}.yaml`, `facts: []\n`);
+
+    mockDiscoverSourceForFact.mockResolvedValue({
+      candidates: [{ url: 'https://x.example.com', confidence: 0.9, summary: 's' }],
+      best: 'https://x.example.com',
+      reason: 'better',
+      costUsd: 0.04,
+    });
+
+    const tmpDir = mkdtempSync(join(tmpdir(), 'qua934-'));
+    const reviewPath = join(tmpDir, 'mr.txt');
+
+    const res = await run([], {
+      limit: '1',
+      apply: true,
+      'manual-review': reviewPath,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    // The fact was actionable but write failed; manual-review must surface it.
+    expect(parsed.summary.writesNotFound).toBe(1);
+    expect(parsed.summary.writesSucceeded).toBe(0);
+    expect(parsed.manualReview.length).toBe(1);
+    expect(parsed.manualReview[0].factId).toBe(target.fact.id);
+    expect(parsed.manualReview[0].reason).toMatch(/write failed/i);
+    // The file was actually written and contains the fact.
+    expect(existsSync(reviewPath)).toBe(true);
+    const content = readFileSync(reviewPath, 'utf-8');
+    expect(content).toContain(target.fact.id);
+    expect(content).toMatch(/write failed/i);
+  });
+});
+
+describe('crux fb resource-unverifiables — path traversal in --manual-review (HIGH-3 fix)', () => {
+  it('refuses absolute paths outside the allowed roots', async () => {
+    fakeVerdictRows = [];
+    const res = await run([], {
+      limit: '1',
+      'manual-review': '/etc/qua-934-out-of-bounds.txt',
+    });
+    expect(res.exitCode).toBe(1);
+    expect(String(res.output)).toMatch(/outside the allowed roots/i);
+  });
+
+  it('accepts paths inside the system tmp dir', async () => {
+    fakeVerdictRows = [];
+    const tmpFile = join(tmpdir(), 'qua-934-allowed.txt');
+    const res = await run([], {
+      limit: '1',
+      'manual-review': tmpFile,
+    });
+    // No facts to process → exit 0 with the friendly message; the path
+    // resolver did NOT throw.
+    expect(res.exitCode).toBe(0);
   });
 });
