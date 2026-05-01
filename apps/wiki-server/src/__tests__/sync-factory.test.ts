@@ -466,3 +466,304 @@ describe("createSyncHandler — happy path", () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// QUA-955: best-effort partial-success mode
+// ---------------------------------------------------------------------------
+
+describe("createSyncHandler — bestEffortAllowed: false (default)", () => {
+  beforeEach(resetStores);
+
+  it("ignores ?mode=best_effort when bestEffortAllowed is unset", async () => {
+    // Sending the query param to a non-opted-in route MUST behave atomically:
+    // a single Zod failure rejects the whole batch with 400, NOT a 200 with
+    // a partitioned response. This is the server-side guard that prevents
+    // a future contributor from silently re-introducing QUA-941.
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" },
+        { id: "bad-id", title: "beta" }, // wrong length, would fail Zod
+      ],
+    });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body).toMatchObject({ error: "validation_error" });
+    // Should NOT have a partitioned shape
+    expect(body.committed).toBeUndefined();
+    expect(body.rejected).toBeUndefined();
+  });
+
+  it("ignores ?mode=best_effort when bestEffortAllowed is explicitly false", async () => {
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: false,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [{ id: "bad-id", title: "x" }],
+    });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("createSyncHandler — bestEffortAllowed: true (opt-in)", () => {
+  beforeEach(resetStores);
+
+  it("still runs atomically when ?mode is not set", async () => {
+    // Opting in via config alone is not enough — the query param is also
+    // required. A request without `?mode=best_effort` keeps atomic semantics.
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" },
+        { id: "bad-id", title: "beta" },
+      ],
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("partitions Zod-invalid items, commits the rest", async () => {
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" }, // valid
+        { id: "bad-id", title: "x" }, // wrong length
+        { id: "cccccccccc", title: "" }, // empty title
+        { id: "dddddddddd", title: "delta" }, // valid
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
+    expect(body.rejected).toHaveLength(2);
+    expect(body.rejected[0]).toMatchObject({ idx: 1, code: "zod" });
+    expect(body.rejected[1]).toMatchObject({ idx: 2, code: "zod" });
+    // Standard mirrored fields
+    expect(body.verdictsWritten).toBe(0);
+    expect(body.claimsLinked).toBe(0);
+  });
+
+  it("partitions natural-key duplicates, commits first occurrence", async () => {
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      naturalKey: (item) => item.title,
+      naturalKeyError: "Duplicate title",
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" }, // first → committed
+        { id: "bbbbbbbbbb", title: "alpha" }, // dup → rejected
+        { id: "cccccccccc", title: "beta" }, // unique → committed
+        { id: "dddddddddd", title: "alpha" }, // dup → rejected
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
+    expect(body.rejected).toHaveLength(2);
+    expect(body.rejected[0]).toMatchObject({
+      idx: 1,
+      code: "natural_key",
+      value: "alpha",
+    });
+    expect(body.rejected[0].message).toContain("Duplicate title");
+    expect(body.rejected[1]).toMatchObject({ idx: 3, code: "natural_key" });
+  });
+
+  it("partitions items with missing entity FK refs", async () => {
+    entitiesStore.set("known-org", { id: "known-org", stable_id: "sidKnownOrg" });
+
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      entityRefFields: (items) => [
+        {
+          fieldName: "parentId",
+          ids: items.map((i) => i.parentId).filter((id): id is string => id != null),
+        },
+      ],
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha", parentId: "known-org" }, // committed
+        { id: "bbbbbbbbbb", title: "beta", parentId: "missing-org" }, // rejected
+        { id: "cccccccccc", title: "gamma" }, // no parentId → committed
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
+    expect(body.rejected).toHaveLength(1);
+    expect(body.rejected[0]).toMatchObject({
+      idx: 1,
+      code: "fk_missing",
+      field: "parentId",
+      value: "missing-org",
+    });
+  });
+
+  it("returns committed=[] when every item fails validation", async () => {
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "bad-1", title: "x" },
+        { id: "bad-2", title: "" },
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual([]);
+    expect(body.rejected).toHaveLength(2);
+  });
+
+  it("preserves original input indices across multiple partition phases", async () => {
+    // Mix Zod failures with natural-key duplicates so we can verify `idx`
+    // points at the original input position, not a post-Zod position.
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      naturalKey: (item) => item.title,
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" }, // idx 0 — committed
+        { id: "bad-len", title: "x" }, // idx 1 — Zod fail
+        { id: "cccccccccc", title: "alpha" }, // idx 2 — natural-key dup
+        { id: "dddddddddd", title: "delta" }, // idx 3 — committed
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
+    const idxByCode = new Map<string, number>(
+      body.rejected.map((r: { idx: number; code: string }) => [r.code, r.idx]),
+    );
+    expect(idxByCode.get("zod")).toBe(1);
+    expect(idxByCode.get("natural_key")).toBe(2);
+  });
+
+  it("partitions items missing required sourcing data", async () => {
+    // Use a tableName that's listed in SOURCE_CHECK_REQUIRED so the server-side
+    // policy fires. `personnel` is enabled there.
+    const SourcedItemSchema = z.object({
+      id: z.string().length(10),
+      title: z.string(),
+      sourcing: z.unknown().optional(),
+    });
+    type SourcedItem = z.infer<typeof SourcedItemSchema>;
+    const handler = createSyncHandler<SourcedItem, typeof entities>({
+      name: "personnel-test",
+      table: entities,
+      enforceSourcing: "personnel", // override tableName lookup
+      syncSchema: SourcedItemSchema,
+      toRow: (item, now) => ({
+        id: item.id,
+        title: item.title,
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha", sourcing: { url: "x" } }, // committed
+        { id: "bbbbbbbbbb", title: "beta" }, // rejected: no sourcing
+        { id: "cccccccccc", title: "gamma", sourcing: { url: "y" } }, // committed
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
+    expect(body.rejected).toHaveLength(1);
+    expect(body.rejected[0]).toMatchObject({
+      idx: 1,
+      code: "sourcing_required",
+      field: "sourcing",
+    });
+  });
+
+  it("falls back to atomic Zod when bestEffortAllowed is set but only batchSchema is provided", async () => {
+    // syncSchema is required to per-item-partition Zod failures. With only
+    // batchSchema (which may include batch-level refinements), we can't
+    // disaggregate item failures, so the Zod phase stays atomic. Subsequent
+    // phases (natural key, FKs) still partition.
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      batchSchema: BatchSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [{ id: "bad-id", title: "x" }],
+    });
+
+    // Atomic Zod fallback: 400 instead of 200
+    expect(res.status).toBe(400);
+  });
+});
