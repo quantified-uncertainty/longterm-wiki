@@ -21,12 +21,15 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  buildImproveEntityRunOptions,
   buildVerifiedVerdictsFromBatch,
   drainPendingBatches,
+  parseAgentSessionId,
   parseExtractedClaims,
   type ClaimVerdictRow,
   type SubmittedBatchInfo,
 } from "./research-improve-entity.ts";
+import type { EntityWithType as ImportedEntityWithType } from "./research-improve-entity.ts";
 import type { PreFilterClaim } from "../lib/research/pre-filter.ts";
 import type { ApplyResult, VerifiedVerdict } from "../lib/research/apply-verdicts.ts";
 
@@ -481,5 +484,73 @@ describe("parseExtractedClaims", () => {
     expect(parsed).toHaveLength(1);
     expect(parsed[0].position).toBeNull();
     expect(parsed[0].positionConfidence).toBeNull();
+  });
+});
+
+// ─── pipeline-runs lifecycle wiring (QUA-957) ──────────────────────────────
+
+describe("buildImproveEntityRunOptions", () => {
+  const baseEntity: ImportedEntityWithType = {
+    id: "fisa-702",
+    type: "policy",
+    title: "FISA 702",
+  };
+
+  it("uses stableId when present; falls back to id", () => {
+    const withStable = buildImproveEntityRunOptions(
+      { ...baseEntity, stableId: "sid_FisaPolicy0" },
+      null,
+    );
+    expect(withStable.entityId).toBe("sid_FisaPolicy0");
+
+    const withoutStable = buildImproveEntityRunOptions(baseEntity, null);
+    expect(withoutStable.entityId).toBe("fisa-702");
+  });
+
+  it("publishes pipelineName='improve-entity' (stable identifier for the dashboard)", () => {
+    const opts = buildImproveEntityRunOptions(baseEntity, null);
+    expect(opts.pipelineName).toBe("improve-entity");
+  });
+
+  it("propagates entity.type as shape", () => {
+    const policy = buildImproveEntityRunOptions(baseEntity, null);
+    expect(policy.shape).toBe("policy");
+
+    const org = buildImproveEntityRunOptions(
+      { ...baseEntity, type: "organization" },
+      null,
+    );
+    expect(org.shape).toBe("organization");
+  });
+
+  it("passes through agentSessionId (null and numeric)", () => {
+    expect(buildImproveEntityRunOptions(baseEntity, null).agentSessionId).toBeNull();
+    expect(buildImproveEntityRunOptions(baseEntity, 42).agentSessionId).toBe(42);
+  });
+
+  it("sets allowOffline=true so dev sessions degrade rather than throw", () => {
+    // Phase 1 wiring: improvement loop must keep working when wiki-server
+    // is unreachable (offline development, slot without prod creds). The
+    // helper logs a warning and returns a no-op runCtx.
+    expect(buildImproveEntityRunOptions(baseEntity, null).allowOffline).toBe(true);
+  });
+});
+
+describe("parseAgentSessionId", () => {
+  it("returns null when the cached id is null", () => {
+    expect(parseAgentSessionId(null)).toBeNull();
+  });
+
+  it("parses a numeric string into a number", () => {
+    expect(parseAgentSessionId("42")).toBe(42);
+    expect(parseAgentSessionId("0")).toBe(0);
+  });
+
+  it("returns null for non-numeric strings", () => {
+    // Number("") is 0 → still numeric. Number("abc") is NaN → null.
+    // We treat NaN as "not a valid id" but accept "0" — agent_sessions.id
+    // is bigserial starting at 1, so 0 won't appear in practice.
+    expect(parseAgentSessionId("abc")).toBeNull();
+    expect(parseAgentSessionId("not-a-number")).toBeNull();
   });
 });
