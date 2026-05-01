@@ -1424,6 +1424,66 @@ export const groundskeeperRuns = pgTable(
   ]
 );
 
+/**
+ * Pipeline runs (QUA-954) — per-run lifecycle tracking for generation /
+ * improve / sourcing pipelines.
+ *
+ * Phase 0d of QUA-943: additive table. Wired by `withPipelineRun()` in
+ * crux/lib/pipeline-runs/lifecycle.ts. No production caller until
+ * Phase 1 (QUA-957).
+ *
+ * `agent_session_id` joins to `agent_sessions.id` (bigserial) so
+ * dashboards can correlate pipeline lifecycle with the originating
+ * agent session.
+ *
+ * `status` is CHECK-constrained to the v1 enum (running / committed /
+ * aborted / oscillation / partial_failure). Widening requires the
+ * enum-enumeration procedure in `.claude/rules/database-migrations.md`.
+ */
+export const pipelineRuns = pgTable(
+  "pipeline_runs",
+  {
+    runId: text("run_id").primaryKey(),
+    agentSessionId: bigint("agent_session_id", { mode: "number" })
+      .references(() => agentSessions.id, { onDelete: "set null" }),
+    pipelineName: text("pipeline_name").notNull(),
+    entityId: text("entity_id"),
+    shape: text("shape"),
+    status: text("status").notNull(),
+    failureReason: text("failure_reason"),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    heartbeatAt: timestamp("heartbeat_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    snapshotPath: text("snapshot_path"),
+    errorCode: text("error_code"),
+    errorPayload: jsonb("error_payload").$type<Record<string, unknown>>(),
+    followupActions: jsonb("followup_actions")
+      .$type<Array<Record<string, unknown>>>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pipeline_runs_pipeline_name").on(table.pipelineName),
+    index("idx_pipeline_runs_status").on(table.status),
+    index("idx_pipeline_runs_started_at").on(table.startedAt),
+    index("idx_pipeline_runs_running_heartbeat")
+      .on(table.heartbeatAt)
+      .where(sql`${table.status} = 'running'`),
+    index("idx_pipeline_runs_entity_id").on(table.entityId),
+    index("idx_pipeline_runs_agent_session").on(table.agentSessionId),
+  ]
+);
+
 export const serviceHealthIncidents = pgTable(
   "service_health_incidents",
   {

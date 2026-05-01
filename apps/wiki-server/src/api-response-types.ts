@@ -30,6 +30,7 @@ import type { ArtifactsRoute } from './routes/operational/artifacts.js';
 import type { AutoUpdateRunsRoute } from './routes/operational/auto-update-runs.js';
 import type { AutoUpdateNewsRoute } from './routes/operational/auto-update-news.js';
 import type { GroundskeeperRunsRoute } from './routes/operational/groundskeeper-runs.js';
+import type { PipelineRunsRoute } from './routes/operational/pipeline-runs.js';
 import type { MonitoringRoute } from './routes/operational/monitoring.js';
 import type { GithubPullsRoute } from './routes/operational/github-pulls.js';
 import type { BuildMetricsRoute } from './routes/operational/build-metrics.js';
@@ -53,6 +54,7 @@ type FactsRpc = ReturnType<typeof hc<FactsRoute>>;
 type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
+type PipelineRunsRpc = ReturnType<typeof hc<PipelineRunsRoute>>;
 type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
 type GithubPullsRpc = ReturnType<typeof hc<GithubPullsRoute>>;
 type BuildMetricsRpc = ReturnType<typeof hc<BuildMetricsRoute>>;
@@ -262,6 +264,31 @@ export type GroundskeeperRunRow = GroundskeeperRunsListResult['runs'][number];
 
 /** Groundskeeper stats response. */
 export type GroundskeeperStatsResult = InferResponseType<GroundskeeperRunsRpc['stats']['$get'], 200>;
+
+// ---------------------------------------------------------------------------
+// Pipeline Runs (QUA-954)
+// ---------------------------------------------------------------------------
+
+/** Pipeline runs list response. */
+type PipelineRunsListResult = InferResponseType<PipelineRunsRpc['index']['$get'], 200>;
+
+/** A single pipeline run row. */
+export type PipelineRunRow = PipelineRunsListResult['runs'][number];
+
+/** Pipeline run created on POST /. */
+export type PipelineRunCreated = InferResponseType<PipelineRunsRpc['index']['$post'], 201>;
+
+/** Pipeline run heartbeat response. */
+export type PipelineRunHeartbeatResult = InferResponseType<
+  PipelineRunsRpc[':id']['heartbeat']['$patch'],
+  200
+>;
+
+/** Pipeline run end response. */
+export type PipelineRunEndResult = InferResponseType<PipelineRunsRpc[':id']['end']['$patch'], 200>;
+
+/** Pipeline run aggregate stats. */
+export type PipelineRunsStatsResult = InferResponseType<PipelineRunsRpc['stats']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Monitoring / System Health
