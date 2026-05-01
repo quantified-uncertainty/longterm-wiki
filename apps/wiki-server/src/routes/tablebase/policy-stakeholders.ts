@@ -110,12 +110,27 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // Note: only policyEntityId is validated. stakeholderEntityId is optional and may
   // reference entities not yet synced to PG (build-data explicitly expects
   // some to be missing — wiki-server-data.mjs has fallback logic for this).
+  //
+  // Natural key: (policyEntityId, stakeholderDisplayName). Migration 0221
+  // (QUA-956) added a UNIQUE index over those columns. `conflictTarget` is
+  // the natural key — not the default `id` — so QUA-943 Phase 3
+  // retry-with-feedback (which mints a fresh `id` when re-sending a
+  // corrected payload for the same `(policy, stakeholder)` pair) resolves
+  // as an UPDATE on the existing row instead of accumulating duplicates.
   .post("/sync", createSyncHandler({
     name: "policy-stakeholders",
     table: policyStakeholders,
     syncSchema: SyncStakeholderItemSchema,
     enforceSourcing: true,
     entityRefs: ["policyEntityId"],
+    naturalKey: (item) =>
+      `${item.policyEntityId}::${item.stakeholderDisplayName}`,
+    naturalKeyError:
+      "Duplicate (policyEntityId, stakeholderDisplayName) in batch — each stakeholder must be unique per policy",
+    conflictTarget: [
+      policyStakeholders.policyEntityId,
+      policyStakeholders.stakeholderDisplayName,
+    ],
     toThing: (item) => ({
       id: item.id,
       thingType: "policy-stakeholder" as const,
