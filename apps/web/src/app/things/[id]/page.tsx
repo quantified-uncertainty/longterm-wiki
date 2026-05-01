@@ -14,6 +14,7 @@ import {
   getStoredVerdictHref,
 } from "../../sourcing/sourcing-shared";
 import { isAnySid } from "@longterm-wiki/id-utils";
+import { isUrl } from "@/lib/directory-utils";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import type { EntityProfileShellHeaderLink } from "@/components/entity/EntityProfileShell";
 import { rollupVerdictFromVerdictList } from "@/components/entity/entity-sourcing";
@@ -21,12 +22,7 @@ import { rollupVerdictFromVerdictList } from "@/components/entity/entity-sourcin
 export const revalidate = 300;
 export const dynamicParams = true;
 
-/**
- * Wiki ID for the entity-profile dashboard route. The "View entity profile"
- * header link routes through `/wiki/<id>?entity=<parent-thing-id>`. Hardcoded
- * because there's no other lookup table for it; if the dashboard ever moves,
- * grep for this constant.
- */
+/** Wiki ID for the entity-profile dashboard route. No registry exists for it. */
 const ENTITY_PROFILE_WIKI_ID = "E1929";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -86,6 +82,21 @@ const VERDICT_SOURCE_TABLES = new Set(Object.keys(SOURCE_TABLE_TO_RECORD_TYPE));
 
 function sourceTableToRecordType(sourceTable: string): string {
   return SOURCE_TABLE_TO_RECORD_TYPE[sourceTable] ?? sourceTable.replace(/_/g, "-");
+}
+
+/**
+ * Unwrap a `Promise.allSettled` result wrapping a `fetchDetailed` call.
+ * Returns the data when the promise fulfilled and the response was ok;
+ * otherwise undefined (rejection, network error, non-2xx, or skipped fetch
+ * that resolved to `null`).
+ */
+function unwrapSettled<T>(
+  settled: PromiseSettledResult<{ ok: true; data: T } | { ok: false } | null>,
+): T | undefined {
+  if (settled.status !== "fulfilled" || !settled.value || !settled.value.ok) {
+    return undefined;
+  }
+  return settled.value.data;
 }
 
 // ── Metadata ───────────────────────────────────────────────────────────
@@ -190,7 +201,7 @@ function RecordValue({
     }
 
     // URL
-    if (value.startsWith("http://") || value.startsWith("https://")) {
+    if (isUrl(value)) {
       return (
         <a
           href={value}
@@ -281,7 +292,6 @@ export default async function ThingDetailPage({ params }: PageProps) {
   const rawParams = await params;
   const id = decodeURIComponent(rawParams.id);
 
-  // Fetch thing detail
   const thingResult = await fetchDetailed<ThingDetail>(
     `/api/things/${encodeURIComponent(id)}`,
     { revalidate: 300 }
@@ -309,7 +319,6 @@ export default async function ThingDetailPage({ params }: PageProps) {
 
   const thing = thingResult.data;
 
-  // Fetch sourcing verdicts and record data in parallel
   const recordType = sourceTableToRecordType(thing.sourceTable);
   const supportsVerdicts = VERDICT_SOURCE_TABLES.has(thing.sourceTable);
 
@@ -330,42 +339,24 @@ export default async function ThingDetailPage({ params }: PageProps) {
     recordPromise,
   ]);
 
-  // Distinguish "fetch failed" from "successfully fetched, no verdicts": only
-  // the latter should render an "unchecked" SourcingDot. A failed fetch leaves
-  // `verdicts === undefined` so the dot is hidden entirely.
-  let verdicts: RpcSourcingDetailResult | undefined;
-  if (
-    verdictsSettled.status === "fulfilled" &&
-    verdictsSettled.value &&
-    verdictsSettled.value.ok
-  ) {
-    verdicts = verdictsSettled.value.data;
-  }
+  // verdicts is undefined when the fetch failed, so the SourcingDot stays
+  // hidden — distinct from "fetch succeeded with empty verdicts" which renders
+  // an "unchecked" dot.
+  const verdicts = unwrapSettled(verdictsSettled);
+  const recordData = unwrapSettled(recordSettled);
 
-  let recordData: RecordLookupResult | null = null;
-  if (
-    recordSettled.status === "fulfilled" &&
-    recordSettled.value &&
-    recordSettled.value.ok
-  ) {
-    recordData = recordSettled.value.data;
-  }
-
-  const hasVerdicts = verdicts != null && verdicts.verdicts.length > 0;
-  // verdict prop semantics:
-  //   undefined → shell hides the SourcingDot entirely (record table doesn't
-  //               support verdicts, OR the verdicts fetch failed)
-  //   null      → SourcingDot renders "unchecked" (fetch succeeded with no rows)
-  //   "<verdict>" → SourcingDot renders the rollup state
+  const verdictRows = verdicts?.verdicts ?? [];
+  // verdict prop tri-state:
+  //   undefined → shell hides the dot (table unsupported OR fetch failed)
+  //   null      → "unchecked" dot (fetch ok, zero rows)
+  //   string    → rollup verdict
   const rollupVerdict =
     !supportsVerdicts || verdicts === undefined
       ? undefined
-      : rollupVerdictFromVerdictList(verdicts.verdicts);
+      : rollupVerdictFromVerdictList(verdictRows);
   const sourcingHref: string | undefined = supportsVerdicts
     ? getStoredVerdictHref(recordType, thing.sourceId)
     : undefined;
-
-  // Header pieces -----------------------------------------------------------
 
   const titlePills = (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
@@ -400,7 +391,6 @@ export default async function ThingDetailPage({ params }: PageProps) {
     headerLinks.push({ label: "Source checks", href: sourcingHref });
   }
 
-  // Metadata rows for the key-value table
   const metadataRows: { label: string; value: React.ReactNode }[] = [
     {
       label: "Source Table",
@@ -526,7 +516,6 @@ export default async function ThingDetailPage({ params }: PageProps) {
       verdictHref={sourcingHref}
     >
       <div className="space-y-8">
-        {/* Thing Metadata table */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Metadata
@@ -547,7 +536,6 @@ export default async function ThingDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Record Data */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             <span className="inline-flex items-center gap-1.5">
@@ -570,7 +558,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
                           <RecordValue
                             fieldKey={key}
                             value={value}
-                            displayNames={recordData!.displayNames}
+                            displayNames={recordData.displayNames}
                           />
                         </td>
                       </tr>
@@ -583,8 +571,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
           )}
         </section>
 
-        {/* Source Check Verdicts */}
-        {hasVerdicts ? (
+        {verdictRows.length > 0 ? (
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               <span className="inline-flex items-center gap-1.5">
@@ -593,7 +580,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
               </span>
             </h2>
             <div className="space-y-3">
-              {verdicts!.verdicts.map((v, i) => (
+              {verdictRows.map((v, i) => (
                 <div
                   key={`${v.fieldName ?? "overall"}-${i}`}
                   className="rounded-lg border border-border/60 p-4"
@@ -657,54 +644,30 @@ export default async function ThingDetailPage({ params }: PageProps) {
           </section>
         ) : null}
 
-        {/* Debug footer */}
         <details className="text-xs text-muted-foreground border-t border-border pt-4">
           <summary className="cursor-pointer hover:text-foreground transition-colors">
             Debug info
           </summary>
           <div className="mt-2 space-y-0.5">
-            <p>
-              Thing ID:{" "}
-              <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.id}
-              </code>
-            </p>
-            <p>
-              Source Table:{" "}
-              <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.sourceTable}
-              </code>
-            </p>
-            <p>
-              Source ID:{" "}
-              <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                {thing.sourceId}
-              </code>
-            </p>
-            {thing.parentThingId && (
-              <p>
-                Parent Thing ID:{" "}
-                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                  {thing.parentThingId}
-                </code>
-              </p>
-            )}
-            {thing.wikiId && (
-              <p>
-                Wiki ID:{" "}
-                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                  {thing.wikiId}
-                </code>
-              </p>
-            )}
-            {thing.entityType && (
-              <p>
-                Entity Type:{" "}
-                <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                  {thing.entityType}
-                </code>
-              </p>
-            )}
+            {(
+              [
+                ["Thing ID", thing.id],
+                ["Source Table", thing.sourceTable],
+                ["Source ID", thing.sourceId],
+                ["Parent Thing ID", thing.parentThingId],
+                ["Wiki ID", thing.wikiId],
+                ["Entity Type", thing.entityType],
+              ] satisfies Array<[string, string | null]>
+            )
+              .filter((row): row is [string, string] => row[1] != null)
+              .map(([label, value]) => (
+                <p key={label}>
+                  {label}:{" "}
+                  <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                    {value}
+                  </code>
+                </p>
+              ))}
           </div>
         </details>
       </div>

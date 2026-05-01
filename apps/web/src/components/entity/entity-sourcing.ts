@@ -63,6 +63,15 @@ function pickHighestPriorityVerdict(verdicts: readonly string[]): string | null 
   return best;
 }
 
+const SUMMARY_VERDICT_KEYS = [
+  "contradicted",
+  "outdated",
+  "partial",
+  "unverifiable",
+  "confirmed",
+  "unchecked",
+] as const;
+
 /**
  * Reduces a per-entity verdict count row to a single rollup verdict, preferring
  * the most actionable verdict present (contradicted > outdated > partial > ...).
@@ -75,18 +84,7 @@ export function rollupVerdictFromSummary(
   > | null | undefined,
 ): string | null {
   if (!summary) return null;
-  const present = (
-    [
-      ["contradicted", summary.contradicted],
-      ["outdated", summary.outdated],
-      ["partial", summary.partial],
-      ["unverifiable", summary.unverifiable],
-      ["confirmed", summary.confirmed],
-      ["unchecked", summary.unchecked],
-    ] as const
-  )
-    .filter(([, n]) => n > 0)
-    .map(([k]) => k);
+  const present = SUMMARY_VERDICT_KEYS.filter((k) => summary[k] > 0);
   return pickHighestPriorityVerdict(present);
 }
 
