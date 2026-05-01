@@ -502,10 +502,13 @@ test.describe("Render audit — filter chip labels have a separator (QUA-1009)",
       const chips = await page
         .locator('[data-testid="filter-chip"]')
         .allTextContents();
-      const concatenated = chips.filter((t) =>
-        // letter immediately followed by digit, i.e. no space/paren before count
-        /[A-Za-z][0-9]/.test(t.trim()),
-      );
+      const concatenated = chips.filter((t) => {
+        // Bug shape: chip ends in digits with the previous char being a letter
+        // (e.g. "enacted18"). A properly formatted chip ends in "(N)" because
+        // formatFacetTextContent adds parens. Anchor to the end so labels with
+        // embedded numbers like "GPT-4 Vision" don't trip a false positive.
+        return /[A-Za-z]\d+$/.test(t.trim());
+      });
       expect(
         concatenated,
         `${url} has filter chips with concatenated text: ${concatenated.slice(0, 3).join(" | ")}`,
