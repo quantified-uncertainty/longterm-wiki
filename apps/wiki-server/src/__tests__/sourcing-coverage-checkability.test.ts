@@ -384,9 +384,7 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     // sourced fact counts as checkable. Verify the query still binds as
     // a single text[] param (no row-constructor regression on empty input)
     // and the endpoint still returns 200.
-    const { _resetPropertyMetadataCache } = await import("../property-metadata.js");
     const propertyMetadata = await import("../property-metadata.js");
-    _resetPropertyMetadataCache();
     const spy = vi
       .spyOn(propertyMetadata, "getNonVerifiablePropertyIds")
       .mockReturnValue(new Set<string>());
@@ -401,14 +399,13 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
       const idx = capturedQueries.findIndex(
         (q) => /FROM\s+facts/i.test(q) && /AS\s+checkable/i.test(q),
       );
-      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx, "expected the checkable-facts query to be issued").toBeGreaterThanOrEqual(0);
       expect(capturedQueries[idx]).toMatch(/ANY\(\s*\$\d+::text\[\]\s*\)/);
       const arrayParams = capturedParams[idx].filter((p) => Array.isArray(p));
       expect(arrayParams).toHaveLength(1);
       expect(arrayParams[0]).toEqual([]);
     } finally {
       spy.mockRestore();
-      _resetPropertyMetadataCache();
     }
   });
 
@@ -428,7 +425,7 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     const idx = capturedQueries.findIndex(
       (q) => /FROM\s+facts/i.test(q) && /AS\s+checkable/i.test(q),
     );
-    expect(idx).toBeGreaterThanOrEqual(0);
+    expect(idx, "expected the checkable-facts query to be issued").toBeGreaterThanOrEqual(0);
     expect(capturedQueries[idx]).not.toMatch(/ANY\(\s*\(\s*\$\d+\s*,/);
     expect(capturedQueries[idx]).toMatch(/ANY\(\s*\$\d+::text\[\]\s*\)/);
   });
