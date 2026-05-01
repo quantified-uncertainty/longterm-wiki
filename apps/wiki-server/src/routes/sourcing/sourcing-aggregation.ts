@@ -238,6 +238,18 @@ export function aggregateEvidence(
 }
 
 /**
+ * Float-tolerance for weight equality (QUA-992). Production weights come
+ * from the `relevance_score real` PG column and end up summed across rows,
+ * so values like `0.1 + 0.2 = 0.30000000000000004` are routine. Without an
+ * epsilon, a 1-ULP gap defeats `weight !== weight` and silently bypasses
+ * the recency tie-break — exactly the QUA-979 failure mode this fix is
+ * supposed to close. 1e-9 is well below any real relevance signal (`real`
+ * is single-precision, ~7 decimal digits) and well above representation
+ * noise from typical `0.x + 0.y` sums.
+ */
+const WEIGHT_EQUALITY_EPSILON = 1e-9;
+
+/**
  * Sort contributing buckets by weight desc, ties broken by recency desc
  * (QUA-992) — a fresh re-check should supersede stale evidence at equal
  * weight. Final tie-break is `SOURCE_CHECK_VERDICT_PRIORITY` (more-actionable
@@ -246,7 +258,8 @@ export function aggregateEvidence(
  */
 function sortContributing(items: ContributingVerdict[]): ContributingVerdict[] {
   return [...items].sort((a, b) => {
-    if (a.weight !== b.weight) return b.weight - a.weight;
+    const weightDiff = b.weight - a.weight;
+    if (Math.abs(weightDiff) > WEIGHT_EQUALITY_EPSILON) return weightDiff;
     const at = a.latestCheckedAt?.getTime() ?? null;
     const bt = b.latestCheckedAt?.getTime() ?? null;
     if (at !== null && bt !== null && at !== bt) return bt - at;

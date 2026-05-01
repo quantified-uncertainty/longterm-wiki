@@ -221,6 +221,42 @@ describe("aggregateEvidence — tiebreaking by recency (QUA-992)", () => {
     expect(r.verdict).toBe("confirmed");
   });
 
+  it("treats float-epsilon weight differences as ties (QUA-992 hardening)", () => {
+    // Production relevance scores are `real` floats summed across rows, so
+    // values like 0.1 + 0.2 = 0.30000000000000004 are routine. Without an
+    // epsilon the strict `!==` would treat the 1-ULP gap as a real weight
+    // difference and silently skip the recency tie-break — which would
+    // re-introduce the QUA-979 stale-evidence-wins failure for any
+    // production records whose relevance scores don't sum bit-equal.
+    const old = new Date("2026-01-01T00:00:00Z");
+    const fresh = new Date("2026-05-01T00:00:00Z");
+    const r = aggregateEvidence([
+      // Two stale "confirmed" rows summing to 0.30000000000000004.
+      row("confirmed", 0.1, null, old),
+      row("confirmed", 0.2, null, old),
+      // One fresh "unverifiable" row at exactly 0.3 — mathematically equal
+      // but not bit-equal to 0.1 + 0.2.
+      row("unverifiable", 0.3, null, fresh),
+    ]);
+    // Without the epsilon, `confirmed` would win on a 1e-17 weight advantage
+    // and recency would never be consulted. With the epsilon, the buckets
+    // are equal-weight, so recency picks `unverifiable`.
+    expect(r.verdict).toBe("unverifiable");
+  });
+
+  it("falls back to priority when checkedAt is identical across buckets", () => {
+    // Two evidence rows written in the same checker batch (same millisecond)
+    // produce equal recency. Recency tie is silent — priority decides the
+    // winner. Documented here so a future refactor can't silently re-route
+    // same-ms writes through some new ordering rule.
+    const t = new Date("2026-05-01T12:00:00.000Z");
+    const r = aggregateEvidence([
+      row("confirmed", 1.0, 0.9, t),
+      row("contradicted", 1.0, 0.9, t),
+    ]);
+    expect(r.verdict).toBe("contradicted"); // priority 0 < 4
+  });
+
   it("ContributingVerdict.latestCheckedAt surfaces the per-bucket max", () => {
     const t1 = new Date("2026-04-01T00:00:00Z");
     const t2 = new Date("2026-04-15T00:00:00Z");
