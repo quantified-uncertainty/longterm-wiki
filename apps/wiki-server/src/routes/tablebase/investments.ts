@@ -10,6 +10,7 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
@@ -168,6 +169,23 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every investment in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select(joinedSelect)
+        .from(investments)
+        .leftJoin(investorEntity, eq(investments.investorEntityId, investorEntity.stableId))
+        .leftJoin(companyEntity, eq(investments.companyEntityId, companyEntity.stableId))
+        .orderBy(desc(investments.syncedAt), investments.id),
+      formatRow,
+      routeName: "investments/bulk",
+    });
+    return c.json({ investments: rows, total });
   })
 
   // ---- GET /by-entity/:entityId (investments in a company) ----

@@ -10,6 +10,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   fetchJsonWithRetry,
+  fetchBulkItems,
   fetchRecordVerdicts,
   fetchPaginatedItems,
   setFullBuildMode,
@@ -158,6 +159,219 @@ describe('fetchJsonWithRetry', () => {
       backoffMs: 100,
     });
     expect(sleeps).toEqual([100, 200]); // 100ms before attempt 2, 200ms before attempt 3
+  });
+});
+
+describe('fetchBulkItems — QUA-1040', () => {
+  const noSleep = async () => {};
+
+  it('returns the items array on a successful single fetch', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({
+        ok: true,
+        json: { grants: [{ id: 'g1' }, { id: 'g2' }, { id: 'g3' }] },
+      }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(3);
+    expect(result.items[0].id).toBe('g1');
+    expect(calls).toHaveLength(1);
+  });
+
+  it('makes a SINGLE round-trip — no pagination', async () => {
+    const items = Array.from({ length: 1000 }, (_, i) => ({ id: `g${i}` }));
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { grants: items } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(1000);
+    // The whole point of /bulk: one HTTP call regardless of dataset size.
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toBe('http://x/api/grants/bulk');
+  });
+
+  it('inherits retry behavior from fetchJsonWithRetry on transient 500', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 500 }),
+      mockResponse({ ok: true, json: { items: [{ id: 1 }] } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/items/bulk', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('returns structured failure when the response key is missing', async () => {
+    // /bulk handlers must put rows under the documented key — anything else
+    // is a server-side regression that the caller should surface, not silently
+    // treat as "0 rows".
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { wrongKey: [{ id: 1 }] } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
+  });
+
+  it('returns structured failure when the response key is not an array', async () => {
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { grants: 'oops' } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
+  });
+
+  it('returns structured failure after exhausting retries', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+      attempts: 3,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(503);
+    expect(calls).toHaveLength(3);
+  });
+
+  it('returns empty items array when the server returns an empty result', async () => {
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { grants: [], total: 0 } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toEqual([]);
+  });
+
+  it('falls back to paginated /all when /bulk returns 404 (deploy ordering)', async () => {
+    // Simulate older wiki-server: /bulk → 404, /all paginates normally.
+    const firstPage = Array.from({ length: 200 }, (_, i) => ({ id: `g${i}` }));
+    const lastPage = [{ id: 'g-last' }];
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 404 }),
+      mockResponse({ ok: true, json: { grants: firstPage } }),
+      mockResponse({ ok: true, json: { grants: lastPage } }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+      paginatedFallbackUrl: 'http://x/api/grants/all',
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(201);
+    expect(calls[0]).toBe('http://x/api/grants/bulk');
+    expect(calls[1]).toContain('offset=0');
+    expect(calls[2]).toContain('offset=200');
+  });
+
+  it('does NOT fall back on 5xx — surfaces the error (so a real outage is not masked)', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+      paginatedFallbackUrl: 'http://x/api/grants/all',
+    });
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(503);
+    // 3 attempts on /bulk, no fallback to /all — fallback is only for 404.
+    expect(calls).toHaveLength(3);
+    expect(calls.every((c) => c.includes('/bulk'))).toBe(true);
+  });
+
+  it('does NOT fall back on 404 when no fallback URL is configured', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 404 }),
+    ]);
+    const result = await fetchBulkItems('http://x/api/grants/bulk', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(404);
+    expect(calls).toHaveLength(1);
+  });
+});
+
+describe('fetchPaginatedItems — QUA-1040 deploy-ordering fallback', () => {
+  const noSleep = async () => {};
+
+  it('paginates with limit/offset and concatenates pages', async () => {
+    const page0 = Array.from({ length: 200 }, (_, i) => ({ id: `g${i}` }));
+    const page1 = Array.from({ length: 100 }, (_, i) => ({ id: `g${200 + i}` }));
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { grants: page0 } }),
+      mockResponse({ ok: true, json: { grants: page1 } }),
+    ]);
+    const { fetchPaginatedItems } = await import('../wiki-server-data.mjs');
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'grants', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(300);
+    // Each page got its own AbortSignal via fetchJsonWithRetry — that's the QUA-1000 fix.
+    expect(calls[0]).toBe('http://x/api/grants/all?limit=200&offset=0');
+    expect(calls[1]).toBe('http://x/api/grants/all?limit=200&offset=200');
+  });
+
+  it('stops when a page comes back short (last page)', async () => {
+    const page0 = [{ id: 'a' }, { id: 'b' }];
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: page0 } }),
+    ]);
+    const { fetchPaginatedItems } = await import('../wiki-server-data.mjs');
+    const result = await fetchPaginatedItems('http://x/api/items/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+      pageSize: 200, // page came back with 2 < 200, so we stop
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toEqual(page0);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('surfaces failure with offset context', async () => {
+    const page0 = Array.from({ length: 200 }, (_, i) => ({ id: i }));
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: page0 } }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    const { fetchPaginatedItems } = await import('../wiki-server-data.mjs');
+    const result = await fetchPaginatedItems('http://x/api/items/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/offset=200/);
   });
 });
 
@@ -353,6 +567,11 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior (QUA-448: no env-
 });
 
 describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
+  // QUA-1040 changed the return shape from `T[] | null` to
+  // `{ok: true, items: T[]} | {ok: false, reason, status}`. The QUA-1000
+  // regression contract (per-page fresh signals, no shared budget across
+  // pages or parallel callers) still applies — these tests are kept and
+  // updated to the new shape.
   const noSleep = async () => {};
 
   it('paginates correctly across multiple full pages', async () => {
@@ -367,15 +586,18 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
       fetchImpl: fetcher,
       sleepImpl: noSleep,
     });
-    expect(result).toHaveLength(407);
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(407);
     expect(calls[0]).toContain('limit=200&offset=0');
     expect(calls[1]).toContain('limit=200&offset=200');
     expect(calls[2]).toContain('limit=200&offset=400');
   });
 
-  it('returns null when a mid-pagination page exhausts retries', async () => {
-    // Matches the legacy contract: callers fall back to YAML-only data on
-    // partial pagination failures rather than ship a half-set.
+  it('returns failure when a mid-pagination page exhausts retries', async () => {
+    // QUA-1040: the legacy contract was `null` on partial failure; the new
+    // contract is `{ok: false, reason, status}` so callers can surface the
+    // reason instead of swallowing it. mergeCollection still treats this as
+    // "no data" and falls back to YAML-only — same downstream behavior.
     const { fetcher } = makeQueueFetcher([
       mockResponse({ ok: true, json: { items: Array.from({ length: 200 }, (_, i) => ({ id: i })) } }),
       mockResponse({ ok: false, status: 503 }),
@@ -386,7 +608,9 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
       fetchImpl: fetcher,
       sleepImpl: noSleep,
     });
-    expect(result).toBeNull();
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(503);
+    expect(result.reason).toMatch(/offset=200/);
   });
 
   it('retries transient 5xx within a page and continues', async () => {
@@ -399,7 +623,8 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
       fetchImpl: fetcher,
       sleepImpl: noSleep,
     });
-    expect(result).toHaveLength(201);
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(201);
     expect(calls).toHaveLength(3);
   });
 
@@ -466,10 +691,14 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
       fetchImpl: fetcher,
       sleepImpl: noSleep,
     });
-    expect(result).toEqual([]);
+    expect(result.ok).toBe(true);
+    expect(result.items).toEqual([]);
   });
 
-  it('treats missing itemsKey as empty (does not crash)', async () => {
+  it('treats a missing itemsKey as a structural failure (does not silently return [])', async () => {
+    // QUA-1040 contract change: the legacy version returned [] on a missing
+    // key, which silently masked server-side regressions. The new version
+    // surfaces the failure so callers (and `mergeCollection`) log a warning.
     const { fetcher } = makeQueueFetcher([
       mockResponse({ ok: true, json: { /* no items key */ } }),
     ]);
@@ -477,6 +706,7 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
       fetchImpl: fetcher,
       sleepImpl: noSleep,
     });
-    expect(result).toEqual([]);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
   });
 });
