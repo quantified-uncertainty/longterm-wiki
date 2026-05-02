@@ -716,6 +716,10 @@ export async function fetchBenchmarkResults() {
         unit: row.unit,
         date: row.date,
         sourceUrl: row.sourceUrl,
+        testedBy: row.testedBy,
+        testedByOrgId: row.testedByOrgId,
+        evaluationDate: row.evaluationDate,
+        methodologyNotes: row.methodologyNotes,
       });
     }
 
