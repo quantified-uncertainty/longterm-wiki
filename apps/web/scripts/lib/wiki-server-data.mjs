@@ -203,56 +203,147 @@ export async function fetchJsonWithRetry(url, opts = {}) {
 }
 
 /**
- * Fetch all pages of a paginated wiki-server endpoint.
+ * Fetch every row from a wiki-server `/bulk` endpoint in a single round-trip.
  *
- * Each page gets its own AbortSignal via {@link fetchJsonWithRetry} — there is
- * no shared signal across pages or parallel callers, and each page benefits
- * from the retry helper's exponential-backoff on transient 5xx/429/network
- * errors. Returns `null` on failure (matches the legacy contract: callers
- * usually fall back to YAML-only data).
+ * Use this for build-data (and other server-side consumers) that want the
+ * full row set. Pagination is the wrong shape for that caller (N round-trips,
+ * COUNT(*) per page, OFFSET cliff at the deepest page). UI/dashboard callers
+ * keep using the paginated `/all` endpoints.
  *
- * QUA-1000: pre-fix, the inner `fetchAllPages` helper inside
- * `mergePGRecordsIntoKB` shared a single 30s `AbortSignal.timeout` across
- * all 11 parallel paginated fetchers AND across every sequential page fetch
- * within each fetcher. The 30s timer was a wall-clock budget for the entire
- * parallel fanout — once it fired, every in-flight request aborted, including
- * the slowest endpoint (grants), which is what blocked CI.
+ * Wraps `fetchJsonWithRetry`, so each call has its own AbortSignal and gets
+ * the same exponential-backoff retry on transient 5xx/429/network errors.
  *
- * @param {string} baseUrl - full URL up to the path; no query string
- * @param {string} itemsKey - response field containing the array
+ * **Graceful deploy ordering** (QUA-1040): if the /bulk endpoint returns
+ * HTTP 404 — i.e. we're talking to an older wiki-server that doesn't have
+ * /bulk yet — and `paginatedFallbackUrl` is provided, the helper falls back
+ * to fetching all pages from the legacy `/all?limit=N&offset=M` endpoint.
+ * This lets the build-data and wiki-server changes ship in a single PR
+ * without a hard deploy ordering. Once /bulk is on prod everywhere, the
+ * fallback can be removed in a cleanup PR.
+ *
+ * Returns:
+ *   - { ok: true, items: T[] }            on success
+ *   - { ok: false, reason: string, ... }  on terminal failure
+ *
+ * @param {string} url          Full URL ending in `/bulk` (no `?limit=...`).
+ * @param {string} itemsKey     Response field containing the array, e.g. "grants".
  * @param {object} [opts]
- * @param {number} [opts.pageSize=200]
- * @param {number} [opts.timeoutMs=60_000] - per-page timeout
  * @param {HeadersInit} [opts.headers]
- * @param {typeof fetch} [opts.fetchImpl] - test override
- * @param {(ms: number) => Promise<void>} [opts.sleepImpl] - test override
- * @returns {Promise<any[] | null>}
+ * @param {number} [opts.timeoutMs]   Per-attempt timeout (default 60s — bulk
+ *                                    payloads are larger than a 200-row page).
+ * @param {number} [opts.attempts]    Total attempts (default 3).
+ * @param {string} [opts.paginatedFallbackUrl]  Full URL of the legacy
+ *                                    paginated endpoint (e.g. `.../all`). If
+ *                                    /bulk returns 404, fall back to fetching
+ *                                    pages from this URL (no query string).
+ * @param {number} [opts.fallbackPageSize]  Page size for the fallback path
+ *                                    (default 200).
+ * @param {typeof fetch} [opts.fetchImpl]   Test override.
+ * @param {(ms: number) => Promise<void>} [opts.sleepImpl]   Test override.
+ * @returns {Promise<{ok: true, items: any[]} | {ok: false, reason: string, status?: number}>}
  */
-export async function fetchPaginatedItems(baseUrl, itemsKey, opts = {}) {
+export async function fetchBulkItems(url, itemsKey, opts = {}) {
+  const timeoutMs = opts.timeoutMs ?? 60_000;
+  const attempts = opts.attempts ?? 3;
+
+  const result = await fetchJsonWithRetry(url, {
+    headers: opts.headers,
+    timeoutMs,
+    attempts,
+    fetchImpl: opts.fetchImpl,
+    sleepImpl: opts.sleepImpl,
+  });
+
+  if (result.ok) {
+    const items = result.data[itemsKey];
+    if (!Array.isArray(items)) {
+      return {
+        ok: false,
+        reason: `bulk response missing array at "${itemsKey}" (got ${typeof items})`,
+      };
+    }
+    return { ok: true, items };
+  }
+
+  // /bulk not deployed on this server yet → fall back to paginated /all.
+  // QUA-1040: lets this PR ship before the wiki-server deploys.
+  if (result.status === 404 && opts.paginatedFallbackUrl) {
+    return fetchPaginatedItems(opts.paginatedFallbackUrl, itemsKey, {
+      headers: opts.headers,
+      timeoutMs,
+      attempts,
+      pageSize: opts.fallbackPageSize ?? 200,
+      fetchImpl: opts.fetchImpl,
+      sleepImpl: opts.sleepImpl,
+    });
+  }
+
+  return { ok: false, reason: result.reason, status: result.status };
+}
+
+/**
+ * Fetch every row from a paginated `/all?limit=N&offset=M` endpoint, page by
+ * page. Each page gets its own AbortSignal via `fetchJsonWithRetry` (no
+ * shared signal across pages — that's the QUA-1000 failure mode).
+ *
+ * Used as the deploy-ordering fallback for `fetchBulkItems`. New callers
+ * should prefer /bulk; this stays around so old wiki-servers keep working.
+ *
+ * @param {string} url          Full URL of `.../all`; may include an existing
+ *                              query string — `limit` and `offset` are appended
+ *                              with the correct `&` or `?` separator.
+ * @param {string} itemsKey     Response field containing the array.
+ * @param {object} [opts]
+ * @param {HeadersInit} [opts.headers]
+ * @param {number} [opts.timeoutMs]
+ * @param {number} [opts.attempts]
+ * @param {number} [opts.pageSize]
+ * @param {typeof fetch} [opts.fetchImpl]
+ * @param {(ms: number) => Promise<void>} [opts.sleepImpl]
+ * @returns {Promise<{ok: true, items: any[]} | {ok: false, reason: string, status?: number}>}
+ */
+export async function fetchPaginatedItems(url, itemsKey, opts = {}) {
   const {
     pageSize = 200,
-    timeoutMs = 60_000,
+    timeoutMs = 30_000,
+    attempts = 3,
     headers,
     fetchImpl,
     sleepImpl,
   } = opts;
-  let allItems = [];
+  if (!Number.isInteger(pageSize) || pageSize <= 0) {
+    return { ok: false, reason: `invalid pageSize: ${pageSize}` };
+  }
+  const sep = url.includes('?') ? '&' : '?';
+  const allItems = [];
   let offset = 0;
+
   while (true) {
-    const url = `${baseUrl}?limit=${pageSize}&offset=${offset}`;
-    const result = await fetchJsonWithRetry(url, {
+    const pageUrl = `${url}${sep}limit=${pageSize}&offset=${offset}`;
+    const result = await fetchJsonWithRetry(pageUrl, {
       headers,
       timeoutMs,
+      attempts,
       fetchImpl,
       sleepImpl,
     });
-    if (!result.ok) return null;
-    const items = result.data[itemsKey] || [];
-    allItems = allItems.concat(items);
+    if (!result.ok) {
+      return { ok: false, reason: `${result.reason} at offset=${offset}`, status: result.status };
+    }
+    // Defensive: null/non-object data would NPE on plain property access.
+    const items = result.data?.[itemsKey];
+    if (!Array.isArray(items)) {
+      return {
+        ok: false,
+        reason: `paginated response missing array at "${itemsKey}" (got ${typeof items}) at offset=${offset}`,
+      };
+    }
+    allItems.push(...items);
     if (items.length < pageSize) break;
     offset += pageSize;
   }
-  return allItems;
+
+  return { ok: true, items: allItems };
 }
 
 /**
@@ -653,32 +744,26 @@ export async function fetchResearchAreas() {
 
   const headers = buildHeaders();
 
-  try {
-    const pageSize = 200;
-    let allItems = [];
-    let offset = 0;
-    while (true) {
-      // Per-page fresh AbortSignal + retries on transient failures (QUA-1000).
-      const url = `${serverUrl}/api/research-areas/enriched?limit=${pageSize}&offset=${offset}`;
-      const result = await fetchJsonWithRetry(url, { headers, timeoutMs: 60_000 });
-      if (!result.ok) {
-        logWikiServerWarning('research-areas', result.reason);
-        return [];
-      }
-      const items = result.data.researchAreas || [];
-      allItems = allItems.concat(items);
-      if (items.length < pageSize) break;
-      offset += pageSize;
-    }
+  // QUA-1040: single /enriched/bulk round-trip instead of paginating.
+  // Falls back to paginated /enriched if the server doesn't have /enriched/bulk yet.
+  const result = await fetchBulkItems(
+    `${serverUrl}/api/research-areas/enriched/bulk`,
+    'researchAreas',
+    {
+      headers,
+      paginatedFallbackUrl: `${serverUrl}/api/research-areas/enriched`,
+    },
+  );
 
-    if (allItems.length > 0) {
-      console.log(`  research-areas: ${allItems.length} enriched areas fetched from PG`);
-    }
-    return allItems;
-  } catch (err) {
-    logWikiServerWarning('research-areas', err instanceof Error ? err.message : String(err));
+  if (!result.ok) {
+    logWikiServerWarning('research-areas', result.reason);
     return [];
   }
+
+  if (result.items.length > 0) {
+    console.log(`  research-areas: ${result.items.length} enriched areas fetched from PG`);
+  }
+  return result.items;
 }
 
 /**
@@ -1512,8 +1597,22 @@ export async function mergePGRecordsIntoKB(kb) {
 
   if (!kb.records) kb.records = {};
 
-  const fetchAllPages = (endpoint, itemsKey) =>
-    fetchPaginatedItems(`${serverUrl}${endpoint}`, itemsKey, { headers });
+  // Fetch every record type via the per-table /bulk endpoints (QUA-1040).
+  // Each fetcher gets its own AbortSignal via fetchJsonWithRetry, so a slow
+  // bulk call can't share-cancel the parallel siblings (the QUA-1000 failure
+  // mode). /bulk returns all rows in a single round-trip — no pagination
+  // overhead, no OFFSET cliff at the deepest page.
+  /**
+   * @param {string} bulkPath        Path ending in /bulk (no query string).
+   * @param {string} paginatedPath   Path ending in /all (used as fallback if /bulk returns 404).
+   * @param {string} itemsKey        Response field containing the array.
+   */
+  function fetchBulk(bulkPath, paginatedPath, itemsKey) {
+    return fetchBulkItems(`${serverUrl}${bulkPath}`, itemsKey, {
+      headers,
+      paginatedFallbackUrl: `${serverUrl}${paginatedPath}`,
+    });
+  }
 
   const [
     personnelResult,
@@ -1528,17 +1627,17 @@ export async function mergePGRecordsIntoKB(kb) {
     entityAssessmentsResult,
     publicationsResult,
   ] = await Promise.allSettled([
-    fetchAllPages('/api/personnel/all', 'personnel'),
-    fetchAllPages('/api/grants/all', 'grants'),
-    fetchAllPages('/api/funding-rounds/all', 'fundingRounds'),
-    fetchAllPages('/api/investments/all', 'investments'),
-    fetchAllPages('/api/equity-positions/all', 'equityPositions'),
-    fetchAllPages('/api/divisions/all', 'divisions'),
-    fetchAllPages('/api/funding-programs/all', 'fundingPrograms'),
-    fetchAllPages('/api/division-personnel/all', 'divisionPersonnel'),
-    fetchAllPages('/api/entity-events/all', 'events'),
-    fetchAllPages('/api/entity-assessments/all', 'assessments'),
-    fetchAllPages('/api/publications/all', 'publications'),
+    fetchBulk('/api/personnel/bulk', '/api/personnel/all', 'personnel'),
+    fetchBulk('/api/grants/bulk', '/api/grants/all', 'grants'),
+    fetchBulk('/api/funding-rounds/bulk', '/api/funding-rounds/all', 'fundingRounds'),
+    fetchBulk('/api/investments/bulk', '/api/investments/all', 'investments'),
+    fetchBulk('/api/equity-positions/bulk', '/api/equity-positions/all', 'equityPositions'),
+    fetchBulk('/api/divisions/bulk', '/api/divisions/all', 'divisions'),
+    fetchBulk('/api/funding-programs/bulk', '/api/funding-programs/all', 'fundingPrograms'),
+    fetchBulk('/api/division-personnel/bulk', '/api/division-personnel/all', 'divisionPersonnel'),
+    fetchBulk('/api/entity-events/bulk', '/api/entity-events/all', 'events'),
+    fetchBulk('/api/entity-assessments/bulk', '/api/entity-assessments/all', 'assessments'),
+    fetchBulk('/api/publications/bulk', '/api/publications/all', 'publications'),
   ]);
 
   /**
@@ -1552,10 +1651,22 @@ export async function mergePGRecordsIntoKB(kb) {
    * @returns {number} count of records merged
    */
   function mergeCollection(label, result, yamlCollections, getEntityKey, getCollectionName, rowToEntry) {
-    const rows = result.status === 'fulfilled' ? result.value : null;
+    let rows = null;
+    if (result.status === 'fulfilled') {
+      const r = result.value;
+      if (r && r.ok) {
+        rows = r.items;
+      } else if (r) {
+        // Bulk fetcher returned a structured failure. Surface the reason.
+        logWikiServerWarning(`kb-pg ${label}`, r.reason || 'server unavailable');
+        return 0;
+      }
+    } else {
+      logWikiServerWarning(`kb-pg ${label}`, result.reason?.message || 'server unavailable');
+      return 0;
+    }
     if (!rows) {
-      const reason = result.status === 'rejected' ? result.reason?.message : 'no data';
-      logWikiServerWarning(`kb-pg ${label}`, reason || 'server unavailable');
+      logWikiServerWarning(`kb-pg ${label}`, 'no data');
       return 0;
     }
     if (rows.length === 0) return 0;
@@ -1626,8 +1737,12 @@ export async function mergePGRecordsIntoKB(kb) {
   // same company at different dates) are NOT duplicates — they are distinct
   // funding events that happen to share a name.
   let dedupedFundingRoundsResult = fundingRoundsResult;
-  if (fundingRoundsResult.status === 'fulfilled' && fundingRoundsResult.value) {
-    const rows = fundingRoundsResult.value;
+  if (
+    fundingRoundsResult.status === 'fulfilled' &&
+    fundingRoundsResult.value &&
+    fundingRoundsResult.value.ok
+  ) {
+    const rows = fundingRoundsResult.value.items;
     // Index: "entityKey|name" → { stableIdRows, legacyRows[] }
     const groups = new Map();
     for (const row of rows) {
@@ -1657,7 +1772,10 @@ export async function mergePGRecordsIntoKB(kb) {
     if (dropIds.size > 0) {
       const deduped = rows.filter(row => !dropIds.has(row.id));
       console.log(`  kb-pg funding-rounds: deduplicated ${dropIds.size} legacy duplicate(s)`);
-      dedupedFundingRoundsResult = { status: 'fulfilled', value: deduped };
+      dedupedFundingRoundsResult = {
+        status: 'fulfilled',
+        value: { ok: true, items: deduped },
+      };
     }
   }
   fundingRoundsCount = mergeCollection(
@@ -1966,46 +2084,32 @@ export async function fetchAllEntityStableIds() {
   if (!serverUrl) return null;
   const headers = buildHeaders();
 
-  // Dedupe at the source — offset-based pagination + concurrent inserts can
-  // return the same row twice or skip rows. The downstream Set-merge in
-  // build-data also handles dups, but doing it here keeps the function name
-  // honest and avoids surfacing duplicate counts to callers.
-  const stableIds = new Set();
-  const pageSize = 500;
-  const SAFETY_BOUND = 50_000; // hard cap — log a warning if approached
-  let offset = 0;
-  try {
-    while (true) {
-      // Per-page fresh AbortSignal + retries on transient failures (QUA-1000).
-      const url = `${serverUrl}/api/entities?limit=${pageSize}&offset=${offset}`;
-      const result = await fetchJsonWithRetry(url, { headers, timeoutMs: 60_000 });
-      if (!result.ok) {
-        // Mid-pagination failure → return null (matches the surrounding
-        // fetchAllPages pattern). Caller falls back to the YAML-only set;
-        // partial results would be worse than nothing because validators
-        // would mis-flag late-page entities as orphans.
-        logWikiServerWarning('allEntityStableIds', `${result.reason} at offset=${offset}`);
-        return null;
-      }
-      const items = result.data.entities || [];
-      for (const e of items) {
-        if (e.stableId) stableIds.add(e.stableId);
-      }
-      if (items.length < pageSize) break;
-      offset += pageSize;
-      if (offset >= SAFETY_BOUND) {
-        // Loud failure — silent truncation would let validators flag
-        // legitimate Tier 2 entities as orphans with no discoverable cause.
-        logWikiServerWarning(
-          'allEntityStableIds',
-          `safety-bound ${SAFETY_BOUND} reached — entities past offset ${offset} not loaded; raise SAFETY_BOUND in fetchAllEntityStableIds`,
-        );
-        break;
-      }
-    }
-  } catch (err) {
-    logWikiServerWarning('allEntityStableIds', err instanceof Error ? err.message : String(err));
+  // QUA-1040: single /bulk round-trip. Returns null on failure (caller
+  // falls back to YAML-only set; partial results would be worse than
+  // nothing because validators would mis-flag late entities as orphans).
+  // Falls back to paginated /api/entities if /bulk is not yet deployed.
+  const result = await fetchBulkItems(
+    `${serverUrl}/api/entities/bulk`,
+    'entities',
+    {
+      headers,
+      timeoutMs: 90_000, // entities is the largest table; allow extra time
+      paginatedFallbackUrl: `${serverUrl}/api/entities`,
+      fallbackPageSize: 500,
+    },
+  );
+
+  if (!result.ok) {
+    logWikiServerWarning('allEntityStableIds', result.reason);
     return null;
+  }
+
+  // Dedupe — concurrent writers can in theory produce duplicates and the
+  // downstream Set-merge would handle them anyway, but doing it here keeps
+  // the function name honest.
+  const stableIds = new Set();
+  for (const e of result.items) {
+    if (e.stableId) stableIds.add(e.stableId);
   }
   return [...stableIds];
 }

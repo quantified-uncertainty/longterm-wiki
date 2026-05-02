@@ -17,10 +17,21 @@ import { z } from "zod";
 
 import { type CommandResult } from "../lib/cli.ts";
 import {
+  BUDGET_EXHAUSTED_REASON,
+  BudgetExhaustedError,
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
+  parseAgentSessionId,
 } from "./research-improve-entity.ts";
+import {
+  assertNoImproveEntityMutexConflict,
+  ImproveEntityMutexError,
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+  type CheckMutexOptions,
+} from "../lib/improve-entity/mutex.ts";
+import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
@@ -223,6 +234,12 @@ export interface SuiteRunOptions {
    * Default is the real `improveSingleEntity` from research-improve-entity.ts.
    */
   improver?: (opts: ImproveOptions) => Promise<ImproveResult>;
+  /** When true, skip the QUA-1032 single-instance mutex check on the suite
+   *  and on each per-entity invocation. Default false. */
+  force?: boolean;
+  /** Test injection — passed through to {@link checkImproveEntityMutex} for
+   *  the suite-level mutex check. Production callers leave this undefined. */
+  mutexCheckOverrides?: Pick<CheckMutexOptions, "list" | "nowMs" | "freshnessMs">;
 }
 
 export interface SuiteSnapshot {
@@ -287,6 +304,45 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
     );
   }
 
+  // QUA-1032 single-instance mutex (suite-level). Refuse to start if any
+  // family-member run (single or suite) is already in flight. The
+  // `withPipelineRun` wrapper below registers this suite under
+  // `improve-entity-suite` so a sibling suite started a moment later sees
+  // *this* run as a conflict via the same check.
+  await assertNoImproveEntityMutexConflict({
+    force: opts.force,
+    mutexCheckOverrides: opts.mutexCheckOverrides,
+  });
+
+  // QUA-1032: register the suite as a `pipeline_runs` row so a second suite
+  // started seconds later (i.e. between this suite's per-entity invocations)
+  // sees the suite-family conflict via the mutex check. Without this wrapper
+  // there is no `improve-entity-suite` row anywhere, so suite-vs-suite
+  // blocking would only work coincidentally — when both happen to be inside
+  // a per-entity invocation at the same instant.
+  return withPipelineRun(
+    {
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      // Same posture as the per-entity loop: dev sessions without server
+      // creds keep iterating; the helper logs a visible warning.
+      allowOffline: true,
+    },
+    async () => runSuiteBody(opts, suitePath, snapshotDir, improver),
+  );
+}
+
+/**
+ * Inner body of {@link runSuite} — separated so it runs inside the
+ * `pipeline_runs` lifecycle. The pre-flight checks (tag validation, mutex)
+ * stay outside the wrapper so a refused start doesn't write a row.
+ */
+async function runSuiteBody(
+  opts: SuiteRunOptions,
+  suitePath: string,
+  snapshotDir: string,
+  improver: NonNullable<SuiteRunOptions["improver"]>,
+): Promise<SuiteSnapshot> {
   const startedAt = new Date().toISOString();
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
@@ -311,10 +367,9 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
-    // Per-entity soft cap: 2× the equal-share allocation. The inner loop's
-    // own budget guard runs *between* iterations, so a single iteration that
-    // overshoots the cap is allowed to complete — see `improveSingleEntity`.
-    // The post-iter warning below catches actual cap-hits.
+    // Per-entity hard cap: 2× the equal-share allocation. Enforced by the
+    // live CostTracker inside improveSingleEntity; surfaced here as
+    // result.reason === BUDGET_EXHAUSTED_REASON.
     const entityBudget = Math.min(perEntityCap, remaining);
     console.log(
       `\n=== [${records.length + 1}/${N}] improve-entity-suite: ${entry.slug} ` +
@@ -328,7 +383,25 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         maxIters: opts.maxIters,
         dryRun: opts.dryRun,
         quiet: true,
+        // The per-entity check would otherwise self-conflict on the suite's
+        // own `improve-entity-suite` running row. We already cleared the
+        // family lock at the suite level, so skip the per-entity re-check.
+        force: true,
       });
+      if (result.reason === BUDGET_EXHAUSTED_REASON) {
+        console.warn(
+          `[suite] BUDGET-EXHAUSTED: ${entry.slug} spent $${result.total_cost_usd.toFixed(4)}; stopping suite`,
+        );
+        records.push(
+          emptyRecord(
+            entry,
+            "skipped_budget",
+            `entity hit hard cap mid-iteration: spent $${result.total_cost_usd.toFixed(4)} of $${entityBudget.toFixed(2)}`,
+          ),
+        );
+        totalSpent += result.total_cost_usd;
+        break;
+      }
       const record = aggregateResult(entry.slug, entry.type, result);
       records.push(record);
       totalSpent += result.total_cost_usd;
@@ -340,8 +413,23 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // Defensive: improveSingleEntity normally surfaces budget aborts via
+      // result.reason above. This branch only fires if a future change
+      // re-throws BudgetExhaustedError out of doImproveSingleEntity.
+      if (err instanceof BudgetExhaustedError) {
+        console.warn(`[suite] BUDGET-EXHAUSTED (re-thrown): ${entry.slug}: ${msg}; stopping suite`);
+        records.push(emptyRecord(entry, "skipped_budget", msg));
+        totalSpent += err.spentUsd;
+        break;
+      }
       console.warn(`[suite] FAILED: ${entry.slug}: ${msg}`);
       records.push(emptyRecord(entry, "failed", msg));
+    }
+  }
+  // Backfill remaining entries after a mid-suite break.
+  if (records.length < supported.length) {
+    for (const entry of supported.slice(records.length)) {
+      records.push(emptyRecord(entry, "skipped_budget"));
     }
   }
 
@@ -376,7 +464,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run]",
+        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run] [--force]",
       exitCode: 1,
     };
   }
@@ -415,6 +503,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
   const dryRun = !!options.dryRun;
+  const force = !!options.force;
 
   if (!Number.isFinite(totalBudgetUsd) || totalBudgetUsd <= 0) {
     return { output: `--budget must be a positive number; got ${options.budget}`, exitCode: 1 };
@@ -428,8 +517,13 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
   let snapshot;
   try {
-    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun });
+    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun, force });
   } catch (err) {
+    // QUA-1032: mutex conflicts use exit code 2 to distinguish "another suite
+    // is running" from a generic suite failure (exit 1).
+    if (err instanceof ImproveEntityMutexError) {
+      return { output: err.message, exitCode: 2 };
+    }
     const msg = err instanceof Error ? err.message : String(err);
     return { output: `improve-entity-suite failed: ${msg}`, exitCode: 1 };
   }
@@ -462,7 +556,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run]
+    output: `crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run] [--force]
 
 Run the closed-loop improve-entity over every supported entity in
 crux/benchmarks/entity-suite.yaml. Produces a structured snapshot under
@@ -479,14 +573,19 @@ Options:
   --max-iters=N     Max iterations per entity (default 1).
   --target=N        Per-entity (provisions+stakeholders) target (passed through).
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
+  --force           Skip the QUA-1032 single-instance mutex check. By default,
+                    refuses to start (exit 2) if another improve-entity-suite
+                    or improve-entity run is already in flight. Use only for
+                    explicit takeover after a crashed run.
 
 Budget governance:
-  Per-entity soft cap = 2 × (total_budget / N) where N = supported entities.
-  This is a soft cap: a single iteration may overshoot it, since runResearch
-  spends until its own budgetCap. The suite halts mid-run when remaining
-  budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)}; remaining entities
-  are recorded as \`skipped_budget\`. \`--budget\` is therefore a target, not
-  a strict bound.
+  Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.
+  Enforced by a live CostTracker inside improveSingleEntity (QUA-1017): when
+  the tracker total reaches the per-entity cap mid-iteration, the entity
+  throws BudgetExhaustedError. The suite catches it, records the entity as
+  \`skipped_budget\`, and stops dispatching further entities. The suite also
+  short-circuits when remaining < $${MIN_USEFUL_BUDGET_USD.toFixed(2)} before
+  starting an entity. \`--budget\` is now a hard cap on total LLM spend.
 `,
     exitCode: 0,
   };

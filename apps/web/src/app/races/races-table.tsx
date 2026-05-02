@@ -9,6 +9,7 @@ import {
   AI_STANCE_LABELS,
   RACE_LEVEL_LABELS,
 } from "./races-constants";
+import { formatCompactCurrency } from "@/lib/format-compact";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
@@ -72,12 +73,6 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
       return true;
     });
   }, [rows, statusFilter, levelFilter]);
-
-  function formatCurrency(amount: number): string {
-    if (amount >= 1_000_000) return `\$${(amount / 1_000_000).toFixed(1)}M`;
-    if (amount >= 1_000) return `\$${(amount / 1_000).toFixed(0)}K`;
-    return `\$${amount.toFixed(0)}`;
-  }
 
   return (
     <div>
@@ -282,7 +277,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                 </td>
                                 <td className="py-1 pr-3 text-right">
                                   {c.pacAmount != null
-                                    ? formatCurrency(c.pacAmount)
+                                    ? formatCompactCurrency(c.pacAmount)
                                     : "—"}
                                 </td>
                                 <td className="py-1 pr-3 text-right">

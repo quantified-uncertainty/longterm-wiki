@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeBenchmarkCoverage } from "@/components/coverage/coverage-score";
 
@@ -118,37 +119,18 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
             onChange={(e) => setSearch(e.target.value)}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setCategoryFilter("all")}
-              aria-pressed={categoryFilter === "all"}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                categoryFilter === "all"
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All
-              <span className="ml-1 text-[10px] opacity-60">{categoryCounts.all}</span>
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(categoryFilter === cat ? "all" : cat)}
-                aria-pressed={categoryFilter === cat}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  categoryFilter === cat
-                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                <span className="ml-1 text-[10px] opacity-60">
-                  {categoryCounts[cat] ?? 0}
-                </span>
-              </button>
-            ))}
-          </div>
+          <FilterChips
+            items={categories.map((cat) => ({
+              key: cat,
+              label: cat.charAt(0).toUpperCase() + cat.slice(1),
+              count: categoryCounts[cat] ?? 0,
+            }))}
+            allCount={categoryCounts.all}
+            selected={categoryFilter}
+            onSelect={setCategoryFilter}
+            hideTautologyFacets
+            hideWhenTrivial
+          />
         </div>
       </div>
 

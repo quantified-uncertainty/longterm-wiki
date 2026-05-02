@@ -35,6 +35,7 @@ interface SpawnCall {
   stdoutFd: number;
   stderrFd: number;
   assignedPid: number;
+  env?: NodeJS.ProcessEnv;
 }
 
 class FakeEnv implements DispatchEnv {
@@ -84,9 +85,21 @@ class FakeEnv implements DispatchEnv {
     }
     return false;
   }
-  spawnDetached(cmd: string, args: string[], opts: { cwd: string; stdoutFd: number; stderrFd: number }) {
+  spawnDetached(
+    cmd: string,
+    args: string[],
+    opts: { cwd: string; stdoutFd: number; stderrFd: number; env?: NodeJS.ProcessEnv },
+  ) {
     const assignedPid = this.nextPid++;
-    this.spawnCalls.push({ cmd, args, cwd: opts.cwd, stdoutFd: opts.stdoutFd, stderrFd: opts.stderrFd, assignedPid });
+    this.spawnCalls.push({
+      cmd,
+      args,
+      cwd: opts.cwd,
+      stdoutFd: opts.stdoutFd,
+      stderrFd: opts.stderrFd,
+      assignedPid,
+      env: opts.env,
+    });
     this.alivePids.add(assignedPid);
     return assignedPid;
   }
@@ -526,6 +539,30 @@ describe('spawnDispatch', () => {
     expect(call.args[i('--max-budget-usd') + 1]).toBe('12');
     expect(call.args[i('--allowedTools') + 1]).toBe('Read');
     expect(call.args[i('--permission-mode') + 1]).toBe('acceptEdits');
+  });
+
+  it('does not override TMPDIR when no tmpDir is provided', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    spawnDispatch(env, paths, { slot: 3, cwd: '/lw/a3', prompt: 'x' });
+    // Without tmpDir, env should be undefined (child inherits parent's TMPDIR).
+    expect(env.spawnCalls[0].env).toBeUndefined();
+  });
+
+  it('passes tmpDir as TMPDIR on child env when provided', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    spawnDispatch(env, paths, {
+      slot: 3,
+      cwd: '/lw/a3',
+      prompt: 'x',
+      tmpDir: '/tmp/tsx-slot-a3',
+    });
+    const childEnv = env.spawnCalls[0].env;
+    expect(childEnv).toBeDefined();
+    expect(childEnv?.TMPDIR).toBe('/tmp/tsx-slot-a3');
+    // The rest of process.env should still be present (we extend, not replace).
+    expect(childEnv?.PATH).toBe(process.env.PATH);
   });
 });
 

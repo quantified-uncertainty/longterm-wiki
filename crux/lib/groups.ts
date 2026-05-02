@@ -136,6 +136,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'sessions',
       'edit-log',
       'health',
+      'health-monitor',
       'audits',
       'maintain',
       'wiki-server',

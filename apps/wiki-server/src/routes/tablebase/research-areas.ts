@@ -12,6 +12,7 @@ import {
 } from "../shared/utils.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 import {
   researchAreas,
@@ -316,6 +317,101 @@ const researchAreasApp = new Hono()
     });
 
     return c.json({ researchAreas: enriched });
+  })
+
+  // ---- GET /enriched/bulk — all enriched areas, no pagination ----
+  // For build-data / server-side consumers; UI callers stay on /enriched
+  // (paginated). QUA-1040.
+  .get("/enriched/bulk", async (c) => {
+    const db = getDrizzleDb();
+
+    // Same parallel fanout as /enriched, minus the limit/offset.
+    const [rows, orgCounts, paperCounts, grantStats, riskCounts] = await Promise.all([
+      db
+        .select()
+        .from(researchAreas)
+        .orderBy(researchAreas.cluster, researchAreas.title),
+      db
+        .select({
+          researchAreaId: researchAreaOrganizations.researchAreaId,
+          count: count(),
+        })
+        .from(researchAreaOrganizations)
+        .groupBy(researchAreaOrganizations.researchAreaId),
+      db
+        .select({
+          researchAreaId: researchAreaPapers.researchAreaId,
+          count: count(),
+        })
+        .from(researchAreaPapers)
+        .groupBy(researchAreaPapers.researchAreaId),
+      db
+        .select({
+          researchAreaId: grantResearchAreas.researchAreaId,
+          grantCount: count(),
+          totalFunding: sql<string>`COALESCE(SUM(${grants.amount}::numeric), 0)`,
+        })
+        .from(grantResearchAreas)
+        .leftJoin(grants, eq(grantResearchAreas.grantId, grants.id))
+        .groupBy(grantResearchAreas.researchAreaId),
+      db
+        .select({
+          researchAreaId: researchAreaRisks.researchAreaId,
+          count: count(),
+        })
+        .from(researchAreaRisks)
+        .groupBy(researchAreaRisks.researchAreaId),
+    ]);
+
+    const directOrgCountMap = new Map(orgCounts.map((r) => [r.researchAreaId, r.count]));
+    const directPaperCountMap = new Map(paperCounts.map((r) => [r.researchAreaId, r.count]));
+    const grantStatsMap = new Map(
+      grantStats.map((r) => [
+        r.researchAreaId,
+        { grantCount: r.grantCount, totalFunding: r.totalFunding },
+      ])
+    );
+    const riskCountMap = new Map(riskCounts.map((r) => [r.researchAreaId, r.count]));
+
+    const getEffectiveCount = (
+      directMap: Map<string, number>,
+      areaId: string,
+      parentAreaId: string | null
+    ): number => {
+      const own = directMap.get(areaId) ?? 0;
+      const inherited = parentAreaId ? (directMap.get(parentAreaId) ?? 0) : 0;
+      return own + inherited;
+    };
+
+    const enriched = rows.map((r) => {
+      const gs = grantStatsMap.get(r.id);
+      return {
+        ...formatRow(r),
+        orgCount: getEffectiveCount(directOrgCountMap, r.id, r.parentAreaId),
+        paperCount: getEffectiveCount(directPaperCountMap, r.id, r.parentAreaId),
+        grantCount: gs?.grantCount ?? 0,
+        totalFunding: gs?.totalFunding ?? "0",
+        riskCount: riskCountMap.get(r.id) ?? 0,
+      };
+    });
+
+    return c.json({ researchAreas: enriched, total: enriched.length });
+  })
+
+  // ---- GET /bulk — all areas without enrichment ----
+  // Lighter alternative to /enriched/bulk for callers that don't need
+  // computed stats. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(researchAreas)
+        .orderBy(researchAreas.cluster, researchAreas.title),
+      formatRow,
+      routeName: "research-areas/bulk",
+    });
+    return c.json({ researchAreas: rows, total });
   })
 
   // ---- GET /:id ----

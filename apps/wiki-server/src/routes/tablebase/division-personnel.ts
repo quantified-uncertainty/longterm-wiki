@@ -8,6 +8,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Query schemas ----
@@ -84,6 +85,21 @@ const divisionPersonnelApp = new Hono()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every division-personnel row in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(divisionPersonnel)
+        .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id)),
+      formatRow,
+      routeName: "division-personnel/bulk",
+    });
+    return c.json({ divisionPersonnel: rows, total });
   })
 
   // ---- GET /by-division/:divisionId ----

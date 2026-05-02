@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# Post-rewrite hook — fires after `git rebase` (and `git commit --amend`).
+#
+# Currently only used to apply deferred migration .sql renames written by
+# the drizzle-journal merge driver (QUA-988). See the helper for details.
+
+DIR="$(dirname "$0")"
+[ -x "$DIR/apply-migration-renames.sh" ] && "$DIR/apply-migration-renames.sh"
+
+exit 0

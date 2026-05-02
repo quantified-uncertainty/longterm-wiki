@@ -91,6 +91,10 @@ async function loadEvidenceRows(
       verdict: recordSources.verdict,
       relevanceScore: recordSources.relevanceScore,
       confidence: recordSources.confidence,
+      // QUA-992: aggregation tie-breaker prefers the bucket whose latest
+      // evidence is most recent. Required so a fresh re-check supersedes
+      // stale evidence at equal weight.
+      checkedAt: recordSources.checkedAt,
     })
     .from(recordSources)
     .where(
@@ -104,6 +108,7 @@ async function loadEvidenceRows(
     verdict: r.verdict as EvidenceRow["verdict"],
     relevanceScore: r.relevanceScore,
     confidence: r.confidence,
+    checkedAt: r.checkedAt,
   }));
 }
 

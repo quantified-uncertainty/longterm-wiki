@@ -78,6 +78,7 @@ import * as agentSessionEventsCommands from './commands/agent-session-events.ts'
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
+import * as healthMonitorCommands from './commands/health-monitor.ts';
 import * as factbaseCommands from './commands/factbase.ts';
 import * as factbaseImport990Commands from './commands/factbase-import-990.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
@@ -143,6 +144,7 @@ import * as auditCommands from './commands/audit.ts';
 import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
 import * as aiidCommands from './commands/ingest-aiid.ts';
 import * as oecdAimCommands from './commands/ingest-oecd-aim.ts';
+import * as migrationsCommands from './commands/migrations.ts';
 
 const domains = {
   validate: validateCommands,
@@ -185,6 +187,7 @@ const domains = {
   audits: auditsCommands,
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
+  'health-monitor': healthMonitorCommands,
   factbase: factbaseCommands,
   kb: factbaseCommands, // deprecated alias
   'import-990': factbaseImport990Commands,
@@ -249,6 +252,7 @@ const domains = {
   audit: auditCommands,
   aiid: aiidCommands,
   'oecd-aim': oecdAimCommands,
+  migrations: migrationsCommands,
 };
 
 const shortcutMap = buildShortcutMap();

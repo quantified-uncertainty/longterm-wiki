@@ -28,6 +28,7 @@ import {
   unlinkSync as fsUnlinkSync,
 } from 'fs';
 import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_process';
+import { prepareClaudeSpawnEnv } from '../claude-cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -78,6 +79,13 @@ export interface DispatchOptions {
   permissionMode?: PermissionMode;
   /** When true, ignore an existing live dispatch in the target slot. */
   force?: boolean;
+  /**
+   * Per-slot TMPDIR set on the child process to isolate tsx's compile cache
+   * from other slots. Caller must ensure the directory exists. Omit to inherit
+   * the parent's TMPDIR (test harnesses do this; the production caller passes
+   * `ensureSlotTmpDir(slot)`). See `tsx-cache-isolation.ts`.
+   */
+  tmpDir?: string;
 }
 
 /** True if `s` is a valid claude CLI permission mode. */
@@ -165,8 +173,12 @@ export interface DispatchEnv {
   /**
    * Spawn `claude` detached with stdout/stderr wired to the provided fds.
    * Returns the child pid. Does not wait.
+   *
+   * `env`, when provided, fully replaces the child's environment (mirrors
+   * Node's `child_process.spawn` semantics). Pass `{ ...process.env, ... }` to
+   * extend rather than replace.
    */
-  spawnDetached(cmd: string, args: string[], opts: { cwd: string; stdoutFd: number; stderrFd: number }): number;
+  spawnDetached(cmd: string, args: string[], opts: { cwd: string; stdoutFd: number; stderrFd: number; env?: NodeJS.ProcessEnv }): number;
   /** Generate a UUID v4 (pre-assigned session id). */
   uuid(): string;
 }
@@ -216,11 +228,15 @@ export function realDispatchEnv(): DispatchEnv {
         return false;
       }
     },
-    spawnDetached: (cmd, args, { cwd, stdoutFd, stderrFd }) => {
+    spawnDetached: (cmd, args, { cwd, stdoutFd, stderrFd, env: spawnEnv }) => {
+      // Strip CLAUDECODE + ANTHROPIC_API_KEY from the child env so the dispatched
+      // worker uses our OAuth Claude Code subscription rather than silently
+      // switching to API-direct billing. See QUA-1010 / QUA-612.
       const spawnOpts: SpawnOptions = {
         cwd,
         detached: true,
         stdio: ['ignore', stdoutFd, stderrFd],
+        env: prepareClaudeSpawnEnv(spawnEnv),
       };
       const child: ChildProcess = cpSpawn(cmd, args, spawnOpts);
       if (typeof child.pid !== 'number') {
@@ -568,12 +584,21 @@ export function spawnDispatch(env: DispatchEnv, paths: DispatchPaths, opts: Disp
     throw e;
   }
 
+  // Per-slot tsx cache (see tsx-cache-isolation.ts for context). Caller is
+  // responsible for ensuring the directory exists before invoking spawnDispatch
+  // (the real CLI path does so via ensureSlotTmpDir; tests can pass any dir or
+  // omit the override entirely).
+  const childEnv: NodeJS.ProcessEnv | undefined = opts.tmpDir
+    ? { ...process.env, TMPDIR: opts.tmpDir }
+    : undefined;
+
   let pid: number;
   try {
     pid = env.spawnDetached('claude', argv, {
       cwd: opts.cwd,
       stdoutFd,
       stderrFd,
+      ...(childEnv ? { env: childEnv } : {}),
     });
   } finally {
     // Parent closes its handles; child inherited duplicates.

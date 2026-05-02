@@ -24,6 +24,26 @@ export function isInsideClaudeCodeSession(): boolean {
 }
 
 /**
+ * Prepare env vars for spawning the `claude` CLI as a subprocess.
+ *
+ * - Deletes CLAUDECODE so nested `claude` spawns work inside a Claude Code
+ *   session (without this, nested spawning hangs reliably).
+ * - Deletes ANTHROPIC_API_KEY so the subprocess uses our OAuth Claude Code
+ *   subscription, not API-direct billing. `.env.base` carries the key for
+ *   crux's internal API-direct callers (which use ANTHROPIC_BILLING_KEY but
+ *   may also have ANTHROPIC_API_KEY set for ad-hoc tools); the `claude` CLI
+ *   silently switches to API billing if it inherits the key.
+ *
+ * See QUA-1010 / QUA-612.
+ */
+export function prepareClaudeSpawnEnv(base: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  const env = { ...base };
+  delete env.CLAUDECODE;
+  delete env.ANTHROPIC_API_KEY; // anthropic-billing-key-remap-ok
+  return env;
+}
+
+/**
  * Check if the `claude` CLI binary is available and can be spawned.
  * Result is cached after the first call.
  *
@@ -35,10 +55,8 @@ export function isClaudeCliAvailable(): boolean {
 
   try {
     // Try to run `claude --version` — quick, no side effects
-    const env = { ...process.env };
-    delete env.CLAUDECODE; // Allow nested spawning check
     execSync('claude --version', {
-      env,
+      env: prepareClaudeSpawnEnv(),
       stdio: 'pipe',
       timeout: 5000,
     });

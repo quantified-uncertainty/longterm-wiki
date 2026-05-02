@@ -18,6 +18,7 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -206,6 +207,26 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every personnel row in a single response. For build-data and
+  // server-side consumers; UI/dashboard callers stay on /all (paginated).
+  // QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select(joinedSelect)
+        .from(personnel)
+        .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+        .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+        .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
+        .orderBy(desc(personnel.syncedAt), personnel.id),
+      formatRow,
+      routeName: "personnel/bulk",
+    });
+    return c.json({ personnel: rows, total });
   })
 
   // ---- GET /by-entity/:entityId ----

@@ -1465,6 +1465,13 @@ export const pipelineRuns = pgTable(
       .$type<Array<Record<string, unknown>>>()
       .notNull()
       .default(sql`'[]'::jsonb`),
+    // QUA-1012 cost telemetry. Nullable — pipelines that don't track
+    // cost (or fail before they can attribute) land NULL.
+    costUsd: numeric("cost_usd", { precision: 10, scale: 4 }),
+    tokensInput: integer("tokens_input"),
+    tokensOutput: integer("tokens_output"),
+    tokensCacheRead: integer("tokens_cache_read"),
+    tokensCacheWrite: integer("tokens_cache_write"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

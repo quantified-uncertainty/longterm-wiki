@@ -5,7 +5,8 @@ import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
-import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
+import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS } from "./ai-model-constants";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 
@@ -333,7 +334,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Input Price */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
                   {row.inputPrice != null ? (
-                    `$${row.inputPrice}`
+                    formatCompactCurrency(row.inputPrice)
                   ) : (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
@@ -342,7 +343,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Output Price */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
                   {row.outputPrice != null ? (
-                    `$${row.outputPrice}`
+                    formatCompactCurrency(row.outputPrice)
                   ) : (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
@@ -351,7 +352,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Context Window */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.contextWindow != null ? (
-                    formatContext(row.contextWindow)
+                    formatCompactNumber(row.contextWindow)
                   ) : (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}

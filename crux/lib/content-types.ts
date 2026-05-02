@@ -5,7 +5,7 @@
  * Typed loaders for generated JSON files (apps/web/src/data/*.json).
  */
 
-import { join, dirname } from 'path';
+import { join, dirname, sep } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -183,10 +183,30 @@ export interface ExpertEntry {
 // Path constants
 // ---------------------------------------------------------------------------
 
-/** Project root directory (derived from this file's location: crux/lib/) */
+/** Project root directory.
+ *
+ * This file is loaded from one of three locations depending on whether
+ * crux is running from source (tsx) or pre-built (QUA-1053):
+ *
+ *   - tsx (source):           crux/lib/content-types.ts
+ *   - dist single bundle:     crux/dist/crux.js (lib code inlined)
+ *   - dist per-file:          crux/dist/lib/content-types.js
+ *
+ * Walk up the path until we exit the `crux/` directory; the parent of
+ * `crux/` is the project root. Falls back to two-levels-up for the
+ * tsx-source case where the path always ends in `crux/lib`.
+ */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-export const PROJECT_ROOT: string = join(__dirname, '../..');
+function deriveProjectRoot(dir: string): string {
+  const parts = dir.split(sep);
+  const cruxIdx = parts.lastIndexOf('crux');
+  if (cruxIdx > 0) {
+    return parts.slice(0, cruxIdx).join(sep);
+  }
+  return join(dir, '../..');
+}
+export const PROJECT_ROOT: string = deriveProjectRoot(__dirname);
 
 /** Base content directory (relative path from repo root) */
 export const CONTENT_DIR: string = 'content/docs';

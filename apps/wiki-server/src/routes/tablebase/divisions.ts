@@ -13,6 +13,7 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 
 // ---- Constants ----
 
@@ -151,6 +152,21 @@ const divisionsApp = new Hono()
       formatRow,
     });
     return c.json({ divisions: rows, total, limit, offset });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every division in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(divisions)
+        .orderBy(desc(divisions.syncedAt), desc(divisions.id)),
+      formatRow,
+      routeName: "divisions/bulk",
+    });
+    return c.json({ divisions: rows, total });
   })
 
   // ---- GET /by-org/:orgId ----

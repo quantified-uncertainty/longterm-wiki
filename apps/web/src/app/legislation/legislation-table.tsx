@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { STATUS_COLORS, SCOPE_COLORS, normalizeStatus } from "./legislation-constants";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { STATUS_COLORS, SCOPE_COLORS } from "./legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeLegislationCoverage } from "@/components/coverage/coverage-score";
@@ -327,10 +328,6 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
     );
   }
 
-  const pillBase = "text-xs px-3 py-1.5 rounded-lg border transition-all";
-  const pillActive = "bg-primary/10 border-primary/30 text-primary font-semibold";
-  const pillInactive = "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground";
-
   return (
     <div>
       {/* Filters */}
@@ -345,54 +342,35 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
           {/* Status filter pills */}
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setStatusFilter("all")}
-              aria-pressed={statusFilter === "all"}
-              className={`${pillBase} ${statusFilter === "all" ? pillActive : pillInactive}`}
-            >
-              All
-              <span className="ml-1 text-[10px] opacity-60">{rows.length}</span>
-            </button>
-            {statuses.map(([status, count]) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
-                aria-pressed={statusFilter === status}
-                className={`${pillBase} capitalize ${statusFilter === status ? pillActive : pillInactive}`}
-              >
-                {status}
-                <span className="ml-1 text-[10px] opacity-60">{count}</span>
-              </button>
-            ))}
-          </div>
+          <FilterChips
+            items={statuses.map(([status, count]) => ({
+              key: status,
+              label: status,
+              count,
+            }))}
+            allCount={rows.length}
+            selected={statusFilter}
+            onSelect={setStatusFilter}
+            hideTautologyFacets
+            hideWhenTrivial
+          />
         </div>
 
         {/* Scope filter + View controls */}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          {scopes.length > 1 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs text-muted-foreground/70 mr-0.5">Scope:</span>
-              <button
-                onClick={() => setScopeFilter("all")}
-                aria-pressed={scopeFilter === "all"}
-                className={`${pillBase} ${scopeFilter === "all" ? pillActive : pillInactive}`}
-              >
-                All
-              </button>
-              {scopes.map(([scope, count]) => (
-                <button
-                  key={scope}
-                  onClick={() => setScopeFilter(scopeFilter === scope ? "all" : scope)}
-                  aria-pressed={scopeFilter === scope}
-                  className={`${pillBase} capitalize ${scopeFilter === scope ? pillActive : pillInactive}`}
-                >
-                  {scope}
-                  <span className="ml-1 text-[10px] opacity-60">{count}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          <FilterChips
+            prefix="Scope:"
+            items={scopes.map(([scope, count]) => ({
+              key: scope,
+              label: scope,
+              count,
+            }))}
+            allCount={rows.length}
+            selected={scopeFilter}
+            onSelect={setScopeFilter}
+            hideTautologyFacets
+            hideWhenTrivial
+          />
 
           <div className="flex items-center gap-1.5 border-l border-border/40 pl-4">
             <span className="text-xs text-muted-foreground/70 mr-0.5">View:</span>

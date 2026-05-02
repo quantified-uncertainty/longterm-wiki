@@ -1617,6 +1617,28 @@ export const StartPipelineRunSchema = z.object({
 });
 export type StartPipelineRun = z.infer<typeof StartPipelineRunSchema>;
 
+// QUA-1012: cost-telemetry caps. costUsd is bounded well above any
+// realistic single-run spend ($10k) so a buggy CostTracker can't post
+// a billion-dollar value into prod; token counts are bounded below
+// signed-int32 max so the integer column never overflows.
+//
+// Exported so the typed client (and any other caller) can reference the
+// canonical cap rather than re-stating the literal in JSDoc, where it
+// silently drifts when the cap moves.
+export const MAX_COST_USD = 10_000;
+export const MAX_TOKENS = 2_000_000_000;
+
+// Shared chain so a refactor that drops `.int()` from one field can't
+// silently weaken validation on the other three.
+const TokenCountSchema = z
+  .number()
+  .int()
+  .nonnegative()
+  .finite()
+  .max(MAX_TOKENS)
+  .nullable()
+  .optional();
+
 export const EndPipelineRunSchema = z.object({
   status: PipelineRunEndStatusSchema,
   failureReason: z.string().max(200).nullable().optional(),
@@ -1624,6 +1646,25 @@ export const EndPipelineRunSchema = z.object({
   errorPayload: BoundedJsonObjectSchema.nullable().optional(),
   snapshotPath: z.string().max(500).nullable().optional(),
   followupActions: z.array(BoundedFollowupSchema).max(MAX_FOLLOWUPS_COUNT).optional(),
+  // `0` is a valid cost (the caller tracked spend and it really was zero).
+  // `null` / omitted means "not tracked" — distinct semantics. Aggregates in
+  // the dashboard use `SUM(cost_usd)` which treats both NULL and 0 as 0, but
+  // count-of-tracked-runs queries should filter `WHERE cost_usd IS NOT NULL`.
+  // `.multipleOf(0.0001)` rejects values with more precision than the
+  // numeric(10,4) column can store, so what the caller submits is what gets
+  // persisted (no silent PG-side rounding that returns a different value).
+  costUsd: z
+    .number()
+    .nonnegative()
+    .finite()
+    .max(MAX_COST_USD)
+    .multipleOf(0.0001)
+    .nullable()
+    .optional(),
+  tokensInput: TokenCountSchema,
+  tokensOutput: TokenCountSchema,
+  tokensCacheRead: TokenCountSchema,
+  tokensCacheWrite: TokenCountSchema,
 });
 export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
 

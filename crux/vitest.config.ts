@@ -25,6 +25,7 @@ export default defineConfig({
       'system-cards/**/*.test.ts',
       'frameworks/**/*.test.ts',
       'scripts/**/*.test.ts',
+      'git/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

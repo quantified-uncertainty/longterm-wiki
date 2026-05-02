@@ -7,10 +7,26 @@
  * SuiteRunOptions.improver — no LLM, no YAML writes, no network.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+
+// QUA-1032: the suite now wraps its body in `withPipelineRun` to register
+// itself as a `pipeline_runs` row. Mock the lifecycle helper at the module
+// level so tests don't hit the wiki-server. The real wrapper has
+// `allowOffline: true` so production survives outages, but in tests we get
+// faster, quieter runs by short-circuiting the wrapper entirely.
+vi.mock("../lib/pipeline-runs/lifecycle.ts", () => ({
+  withPipelineRun: vi.fn((_options: unknown, body: (ctx: unknown) => Promise<unknown>) =>
+    body({
+      runId: "test-run",
+      offline: true,
+      markStatus: vi.fn(),
+      markFollowup: vi.fn(),
+    }),
+  ),
+}));
 
 import {
   DEFAULT_PER_ENTITY_BUDGET_USD,
@@ -28,7 +44,36 @@ import {
   type PerEntityRecord,
   type SuiteEntry,
 } from "./research-improve-entity-suite.ts";
+import { BudgetExhaustedError } from "./research-improve-entity.ts";
 import type { ImproveResult, IterationMetrics } from "./research-improve-entity.ts";
+import {
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+  ImproveEntityMutexError,
+} from "../lib/improve-entity/mutex.ts";
+import type { CheckMutexOptions } from "../lib/improve-entity/mutex.ts";
+
+// QUA-1032: every runSuite call needs an injected mutex `list` to avoid
+// network calls to `/api/pipeline-runs`. This default returns "no running
+// rows" so the suite proceeds normally.
+function noopMutexOverrides(): Pick<CheckMutexOptions, "list" | "nowMs"> {
+  return {
+    list: vi.fn().mockResolvedValue({ ok: true, data: { runs: [], count: 0 } }),
+    nowMs: () => Date.parse("2026-05-01T20:00:00.000Z"),
+  };
+}
+
+// Wrap runSuite to inject the no-op mutex override by default. Tests that
+// want to exercise the mutex pass `mutexCheckOverrides` themselves.
+// Spread `opts` first so a caller-supplied mutexCheckOverrides wins; otherwise
+// fall back to the no-op.
+async function runSuiteForTest(
+  opts: Parameters<typeof runSuite>[0],
+): Promise<Awaited<ReturnType<typeof runSuite>>> {
+  return runSuite({
+    ...opts,
+    mutexCheckOverrides: opts.mutexCheckOverrides ?? noopMutexOverrides(),
+  });
+}
 
 // ── fixtures ───────────────────────────────────────────────────────────────
 
@@ -327,7 +372,7 @@ describe("runSuite", () => {
         iterations: [makeIter({ cost_research_usd: 0.02, cost_extract_usd: 0.01 })],
       });
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "happy",
       totalBudgetUsd: 4.0,
       maxIters: 2,
@@ -365,7 +410,7 @@ describe("runSuite", () => {
       calls.push(slug);
       return makeResult(slug);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "filter",
       totalBudgetUsd: 2.0,
       maxIters: 1,
@@ -395,7 +440,7 @@ describe("runSuite", () => {
     // Total = 0.10, per-entity cap = (0.10/3)*2 = 0.0667. spendthrift burns 0.0667.
     // Remaining after entity 1 = 0.10 - 0.0667 = 0.0333, which is below
     // MIN_USEFUL_BUDGET_USD ($0.05) → halt.
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "halt",
       totalBudgetUsd: 0.1,
       maxIters: 1,
@@ -423,7 +468,7 @@ describe("runSuite", () => {
       return makeResult(slug, { iterations: [makeIter({ cost_research_usd: 0, cost_extract_usd: 0 })] });
     };
     // Total=$2, N=2 → per-entity cap = $2.
-    await runSuite({
+    await runSuiteForTest({
       tag: "cap",
       totalBudgetUsd: 2.0,
       maxIters: 1,
@@ -437,6 +482,78 @@ describe("runSuite", () => {
     ]);
   });
 
+  it("production path: result.reason='budget-exhausted' from improveSingleEntity is recorded as skipped_budget and stops dispatch (QUA-1017)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "first", type: "policy" },
+      { slug: "burner", type: "policy" },
+      { slug: "third", type: "policy" },
+      { slug: "fourth", type: "policy" },
+    );
+    const calls: string[] = [];
+    const improver = async ({ slug }: { slug: string }) => {
+      calls.push(slug);
+      if (slug === "first") return makeResult(slug);
+      if (slug === "burner") {
+        return makeResult(slug, {
+          reason: "budget-exhausted",
+          hit_target: false,
+          iterations: [],
+          total_cost_usd: 1.85,
+        });
+      }
+      throw new Error(`improver should not have been called for ${slug}`);
+    };
+    const snap = await runSuiteForTest({
+      tag: "budget-stop",
+      totalBudgetUsd: 8.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(calls).toEqual(["first", "burner"]);
+    expect(snap.entities).toHaveLength(4);
+    expect(snap.entities[0].status).toBe("completed");
+    expect(snap.entities[1].status).toBe("skipped_budget");
+    expect(snap.entities[1].error).toMatch(/spent \$1\.8500 of \$/);
+    expect(snap.entities[2].status).toBe("skipped_budget");
+    expect(snap.entities[2].error).toBeUndefined();
+    expect(snap.entities[3].status).toBe("skipped_budget");
+    expect(snap.entities[3].error).toBeUndefined();
+    expect(snap.aggregate.entities_completed).toBe(1);
+    expect(snap.aggregate.entities_skipped_budget).toBe(3);
+    expect(snap.aggregate.entities_failed).toBe(0);
+  });
+
+  it("defensive path: BudgetExhaustedError thrown out of improveSingleEntity is also caught and treated as skipped_budget (QUA-1017)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "first", type: "policy" },
+      { slug: "burner", type: "policy" },
+      { slug: "third", type: "policy" },
+    );
+    const calls: string[] = [];
+    const improver = async ({ slug }: { slug: string }) => {
+      calls.push(slug);
+      if (slug === "first") return makeResult(slug);
+      if (slug === "burner") throw new BudgetExhaustedError(2.5, 1.0);
+      throw new Error(`improver should not have been called for ${slug}`);
+    };
+    const snap = await runSuiteForTest({
+      tag: "budget-rethrow",
+      totalBudgetUsd: 8.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(calls).toEqual(["first", "burner"]);
+    expect(snap.entities[1].status).toBe("skipped_budget");
+    expect(snap.entities[1].error).toMatch(/Spent \$2\.5000 of \$1\.00 budget/);
+    expect(snap.entities[2].status).toBe("skipped_budget");
+    expect(snap.aggregate.entities_skipped_budget).toBe(2);
+    expect(snap.aggregate.entities_failed).toBe(0);
+  });
+
   it("records failures without aborting subsequent entities", async () => {
     const { suitePath, snapshotDir } = writeFixtureSuite(
       { slug: "boom", type: "policy" },
@@ -446,7 +563,7 @@ describe("runSuite", () => {
       if (slug === "boom") throw new Error("synthetic blast");
       return makeResult(slug);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "fail",
       totalBudgetUsd: 4.0,
       maxIters: 1,
@@ -468,7 +585,7 @@ describe("runSuite", () => {
       calls++;
       return makeResult("never-called");
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "empty",
       totalBudgetUsd: 1.0,
       maxIters: 1,
@@ -491,7 +608,7 @@ describe("runSuite", () => {
       return makeResult("alpha");
     };
     await expect(
-      runSuite({
+      runSuiteForTest({
         tag: "../etc/passwd",
         totalBudgetUsd: 4.0,
         maxIters: 1,
@@ -503,6 +620,106 @@ describe("runSuite", () => {
     expect(calls).toBe(0);
     // No snapshot file written.
     expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
+  });
+
+  // ── QUA-1032 mutex wiring ────────────────────────────────────────────────
+
+  it("refuses to start when another improve-entity-suite run is in flight", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite({ slug: "alpha", type: "policy" });
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    const fakeRunningRow = {
+      runId: "other-suite",
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: 17,
+      status: "running",
+      startedAt: new Date(NOW - 60_000).toISOString(),
+      heartbeatAt: new Date(NOW - 30_000).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+    let improverCalled = 0;
+    const improver = async () => {
+      improverCalled++;
+      return makeResult("alpha");
+    };
+    await expect(
+      runSuiteForTest({
+        tag: "blocked",
+        totalBudgetUsd: 2.0,
+        maxIters: 1,
+        suitePath,
+        snapshotDir,
+        improver,
+        mutexCheckOverrides: { list, nowMs: () => NOW },
+      }),
+    ).rejects.toBeInstanceOf(ImproveEntityMutexError);
+    expect(improverCalled).toBe(0);
+    // No snapshot — refused before the loop started.
+    expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
+  });
+
+  it("--force bypasses the suite-level mutex check", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    // Fresh suite-level conflict that --force should bypass.
+    const fakeRunningRow = {
+      runId: "other-suite",
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: 1,
+      status: "running",
+      startedAt: new Date(NOW).toISOString(),
+      heartbeatAt: new Date(NOW).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+    const improver = async ({ slug }: { slug: string }) => makeResult(slug);
+    const snap = await runSuiteForTest({
+      tag: "force",
+      totalBudgetUsd: 4.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+      force: true,
+      mutexCheckOverrides: { list, nowMs: () => NOW },
+    });
+    // Both entities ran; suite-level check was short-circuited by --force.
+    expect(snap.entities.map((r) => r.status)).toEqual(["completed", "completed"]);
+    // The list mock should not have been called: --force short-circuits
+    // before the API request.
+    expect(list).not.toHaveBeenCalled();
+  });
+
+  it("forwards force=true to per-entity calls unconditionally (avoids self-conflict on suite's own running row)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const forceSeenByImprover: boolean[] = [];
+    const improver = async ({ force, slug }: { slug: string; force?: boolean }) => {
+      forceSeenByImprover.push(force === true);
+      return makeResult(slug);
+    };
+    // No --force at the suite level (the `runSuiteForTest` no-op mutex
+    // returns no conflicts so the suite proceeds).
+    await runSuiteForTest({
+      tag: "no-suite-force",
+      totalBudgetUsd: 4.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    // Even without --force at the suite level, per-entity calls still get
+    // force=true. The suite already owns the family-level lock; without
+    // this, the per-entity check would self-conflict on the suite's own
+    // `improve-entity-suite` running row.
+    expect(forceSeenByImprover).toEqual([true, true]);
   });
 });
 

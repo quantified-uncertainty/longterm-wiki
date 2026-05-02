@@ -13,6 +13,24 @@ This skill triages the current branch's changes, builds a verification plan from
 
 ---
 
+## Code review rules to enforce
+
+When reviewing the diff (Phase 3b in particular) flag any violations of these project-wide rules. Most are also caught by gate checks; review surfaces the ones gate misses.
+
+- **No `(r: any)` in wiki-server routes** — define typed row interfaces for raw SQL results (gate-enforced)
+- **No `as unknown as T` double-casts** — use runtime type narrowing or proper generics
+- **Batch endpoints must use transactions or bulk SQL** — never sequential per-row updates
+- **Migration file prefixes must be unique** — no two `.sql` files with the same numeric prefix (gate-enforced)
+- **Destructive endpoints (DELETE, bulk UPDATE) must log actions** before executing
+- **New wiki-server routes must use Hono RPC method-chaining** (`const app = new Hono().get(...).post(...)` with `export type Route = typeof app`) so client types infer via `InferResponseType<>`. Canonical pattern: `apps/wiki-server/src/routes/factbase/facts.ts`.
+- **API callers must use typed wiki-server client functions** (`crux/lib/wiki-server/*.ts`) — not raw `apiRequest<{...}>` with hand-written type parameters. If no typed client exists, create one using `InferResponseType<>`. Gate-enforced via `validate-typed-client` (QUA-770). New direct `apiRequest<T>` calls require either a typed client or a `// typed-client-ok: <reason>` marker.
+- **Batch write callers must handle partial success** — `updated < total` may mean "already processed on retry" not "failed". Treat partial success as non-fatal when the endpoint has idempotent semantics.
+- **LLM prompts must escape user content** — `escapeXml()` from `crux/lib/prompt-utils.ts` for XML-delimited prompts; `JSON.stringify()` or `---` fencing for other formats. See `docs/agent-rules/llm-prompt-safety.md`.
+- **No standalone weak assertions in tests** — `toBeDefined()` alone doesn't catch wrong values; follow with `toBe()`, `toEqual()`, or `toMatchObject()` on specific fields.
+- **No `it.skip` without issue number** — skipped tests must reference `#1234` or `QUA-NNN` in the skip reason.
+
+---
+
 ## Phase 1: Triage — Analyze the diff and build a verification plan
 
 **Prerequisite:** Verify the agent checklist exists (`.claude/wip-checklist.md`). If not, run `pnpm crux sys agent-checklist init "PR review" --type=infrastructure` before proceeding.

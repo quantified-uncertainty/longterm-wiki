@@ -16,6 +16,7 @@ import {
 import { Search, Columns3 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { formatCompactCurrency } from "@/lib/format-compact";
 import type { FactRow } from "./factbase-facts-content";
 
 function truncate(s: string, max: number): string {
@@ -274,7 +275,7 @@ const allColumns: ColumnDef<FactRow>[] = [
       const v = row.original.usdEquivalent;
       return v != null ? (
         <span className="text-xs text-muted-foreground tabular-nums">
-          ${v.toLocaleString()}
+          {formatCompactCurrency(v)}
         </span>
       ) : (
         <span className="text-muted-foreground/40 text-xs">-</span>

@@ -14,10 +14,7 @@ import {
   getCareerHistory,
   getFundingConnectionsForPerson,
 } from "../people-utils";
-import {
-  getKBFacts,
-  getKBLatest,
-} from "@/data/factbase";
+import { getKBLatest } from "@/data/factbase";
 import {
   resolveEntityRef,
   formatAmount,
@@ -26,7 +23,6 @@ import {
 } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
-  FactsPanel,
   type ProfileTab,
 } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
@@ -34,7 +30,6 @@ import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";
-import { SocialLinks } from "./social-links";
 import { CareerHistory } from "./career-history";
 import { EducationSection } from "./education-section";
 import { FundingConnections } from "./funding-connections";
@@ -188,20 +183,6 @@ export default async function PersonProfilePage({
   const netWorthFact = getKBLatest(entity.id, "net-worth");
   const educationFact = getKBLatest(entity.id, "education");
   const notableForFact = getKBLatest(entity.id, "notable-for");
-  const socialMediaFact = getKBLatest(entity.id, "social-media");
-  const websiteFact = getKBLatest(entity.id, "website");
-  const googleScholarFact = getKBLatest(entity.id, "google-scholar");
-  const githubFact = getKBLatest(entity.id, "github-profile");
-  const wikipediaFact = getKBLatest(entity.id, "wikipedia-url");
-
-  // Social links facts for the sidebar component
-  const socialLinkFacts = {
-    "website": websiteFact,
-    "social-media": socialMediaFact,
-    "github-profile": githubFact,
-    "google-scholar": googleScholarFact,
-    "wikipedia-url": wikipediaFact,
-  };
 
   // Expert positions from typed entity (consolidated from experts.yaml at build time)
   const personEntity = getPersonEntityById(slug);
@@ -233,11 +214,6 @@ export default async function PersonProfilePage({
     fetchCampaignFinance(entity.id),
     fetchPoliticalVotes(entity.id),
   ]);
-
-  // All facts for count
-  const allFacts = getKBFacts(entity.id).filter(
-    (f) => f.propertyId !== "description",
-  );
 
   // Resolve employer reference
   const employer =
@@ -416,15 +392,6 @@ export default async function PersonProfilePage({
     </div>
   );
 
-  const sidebar = (
-    <>
-      <SocialLinks facts={socialLinkFacts} />
-      {allFacts.length > 0 && (
-        <FactsPanel facts={allFacts} entityId={entity.id} />
-      )}
-    </>
-  );
-
   return (
     <EntityProfileShell
       breadcrumbs={[
@@ -444,7 +411,7 @@ export default async function PersonProfilePage({
       statCards={statCards}
       tabs={tabs}
       tabsAriaLabel="Person sections"
-      sidebar={sidebar}
+      tabsLayout="vertical"
     />
   );
 }

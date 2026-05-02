@@ -10,6 +10,7 @@ import { spawn } from 'child_process';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 import { componentImportsRule } from '../../lib/rules/component-imports.ts';
 import { ContentFile } from '../../lib/validation/validation-engine.ts';
+import { prepareClaudeSpawnEnv } from '../../lib/claude-cli.ts';
 import type { ValidationPhaseContext, CreatorContext } from './types.ts';
 
 type ValidationLoopContext = ValidationPhaseContext;
@@ -128,9 +129,7 @@ Read the draft article at: ${draftPath}
 
 Keep iterating until ALL checks pass. Run validation again after each fix.`;
 
-  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
+  const env = prepareClaudeSpawnEnv();
 
   return new Promise((resolve, reject) => {
     const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes

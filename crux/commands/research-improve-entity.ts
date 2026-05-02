@@ -31,6 +31,7 @@ import { proposeClaims, getClaimStatus } from "../lib/wiki-server/claims.ts";
 import { suggestResourcesApi } from "../lib/wiki-server/resources.ts";
 import { searchEntities } from "../lib/wiki-server/entities.ts";
 import { createLlmClient, streamingCreate, extractText, MODELS } from "../lib/llm.ts";
+import { CostTracker } from "../lib/cost-tracker.ts";
 import { escapeXml } from "../lib/prompt-utils.ts";
 
 import {
@@ -61,12 +62,51 @@ import {
   type WithPipelineRunOptions,
 } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import {
+  assertNoImproveEntityMutexConflict,
+  ImproveEntityMutexError,
+  IMPROVE_ENTITY_PIPELINE_NAME,
+  type CheckMutexOptions,
+} from "../lib/improve-entity/mutex.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const ENTITIES_DIR = path.join(ROOT, "data/entities");
 const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
 
 const SUPPORTED_TYPES = new Set(["policy", "organization"]);
+
+/**
+ * Possible exit reasons reported on {@link ImproveResult.reason}. The suite
+ * runner switches on this string, so it MUST be a typed union — a typo on
+ * either side silently misroutes the result.
+ */
+export type ImproveReason = "target-hit" | "max-iters" | "no-progress" | "budget-exhausted";
+
+/** The single source of truth for the budget-exhausted reason token. Used as
+ *  `result.reason`, the suite's `=== check`, and the pipeline-runs
+ *  `markStatus({ reason, errorCode })` arguments — all kebab-case so a query
+ *  on either field returns the same set of runs. */
+export const BUDGET_EXHAUSTED_REASON = "budget-exhausted" as const;
+
+/** Thrown when the live CostTracker total has reached the configured budget. */
+export class BudgetExhaustedError extends Error {
+  readonly spentUsd: number;
+  readonly budgetUsd: number;
+  constructor(spentUsd: number, budgetUsd: number) {
+    super(`Spent $${spentUsd.toFixed(4)} of $${budgetUsd.toFixed(2)} budget`);
+    this.name = "BudgetExhaustedError";
+    this.spentUsd = spentUsd;
+    this.budgetUsd = budgetUsd;
+  }
+}
+
+/** Throws {@link BudgetExhaustedError} when the live tracker total has reached
+ *  or exceeded `budgetUsd`. */
+export function checkBudgetOrThrow(tracker: CostTracker, budgetUsd: number): void {
+  if (tracker.totalCost >= budgetUsd) {
+    throw new BudgetExhaustedError(tracker.totalCost, budgetUsd);
+  }
+}
 
 export interface EntityWithType {
   id: string;
@@ -104,7 +144,7 @@ export interface ImproveResult {
   total_cost_usd: number;
   total_duration_s: number;
   hit_target: boolean;
-  reason: string;
+  reason: ImproveReason;
   /** When `--wait-for-settle` is set: count of submitted claims still in
    *  pending/verifying status when the main loop exited (target/iters/budget).
    *  Omitted when the flag is off. */
@@ -132,6 +172,12 @@ export interface ImproveOptions {
    *  fast-exit behavior). Recommended for CI gate suite runs (QUA-871) so
    *  per-run results aren't sensitive to worker-queue timing. */
   waitForSettle?: boolean;
+  /** When true, skip the QUA-1032 single-instance mutex check. Use only for
+   *  explicit takeover after a crashed run. Default false. */
+  force?: boolean;
+  /** Test injection — passed through to {@link checkImproveEntityMutex}.
+   *  Production callers leave this undefined. */
+  mutexCheckOverrides?: Pick<CheckMutexOptions, "list" | "nowMs" | "freshnessMs">;
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -722,6 +768,7 @@ async function extractGapClaims(
   gaps: Gap[],
   sourceUrl: string,
   sourceContent: string,
+  tracker: CostTracker,
 ): Promise<{ claims: ExtractedClaim[]; cost: number }> {
   if (sourceContent.trim().length < 200) return { claims: [], cost: 0 };
   const prompt = buildExtractPrompt(entity, gaps, sourceUrl, sourceContent);
@@ -729,11 +776,15 @@ async function extractGapClaims(
   let inT = 0;
   let outT = 0;
   try {
-    const resp = await streamingCreate(llm(), {
-      model: MODELS.haiku,
-      max_tokens: 2000,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const resp = await streamingCreate(
+      llm(),
+      {
+        model: MODELS.haiku,
+        max_tokens: 2000,
+        messages: [{ role: "user", content: prompt }],
+      },
+      { tracker, label: "improve-entity:extract-claims" },
+    );
     raw = extractText(resp);
     inT = resp.usage?.input_tokens ?? 0;
     outT = resp.usage?.output_tokens ?? 0;
@@ -795,8 +846,12 @@ export { POSITION_STEM_PATTERNS };
 async function runIteration(
   entity: EntityWithType,
   iter: number,
-  budgetRemainingUsd: number,
+  budgetUsd: number,
+  tracker: CostTracker,
 ): Promise<{ entity: EntityWithType; metrics: IterationMetrics; batch: SubmittedBatchInfo | null }> {
+  // Floor at 0: callers throw on overage via checkBudgetOrThrow before
+  // reaching the runResearch call, so a negative remaining is defensive only.
+  const budgetRemainingUsd = Math.max(0, budgetUsd - tracker.totalCost);
   const t0 = Date.now();
   const m: IterationMetrics = {
     iter,
@@ -815,6 +870,9 @@ async function runIteration(
     cost_extract_usd: 0,
     duration_s: 0,
   };
+
+  // Guard before gapsFor so an aborted iter contributes no log noise.
+  checkBudgetOrThrow(tracker, budgetUsd);
 
   const gaps = gapsFor(entity);
   m.gaps_identified = gaps.length;
@@ -844,6 +902,7 @@ async function runIteration(
       extractFacts: false,
     },
     budgetCap: researchBudget,
+    tracker,
   });
   m.sources_found = research.sources.length;
   m.cost_research_usd = research.metadata.totalCost ?? 0;
@@ -869,7 +928,10 @@ async function runIteration(
     if (!content || content.length < 200) continue;
     const resourceId = resourceIdByUrl.get(src.url) ?? "";
     contentByKey.set(src.url, content);
-    const ex = await extractGapClaims(entity, gaps, src.url, content);
+    // If runResearch overshot its own budgetCap above, stop further
+    // per-source extract spending.
+    checkBudgetOrThrow(tracker, budgetUsd);
+    const ex = await extractGapClaims(entity, gaps, src.url, content, tracker);
     m.cost_extract_usd += ex.cost;
     for (const c of ex.claims) {
       allClaims.push({ ...c, resourceId, sourceUrl: src.url });
@@ -1035,6 +1097,16 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     );
   }
 
+  // QUA-1032 single-instance mutex: refuse to start if any family-member run
+  // (single or suite) is already in flight. Runs *before* `withPipelineRun`
+  // so this run's own `improve-entity` row hasn't been inserted yet, avoiding
+  // self-detection. Suite per-entity calls pass `force: true` because the
+  // suite's outer `withPipelineRun` already owns the family lock.
+  await assertNoImproveEntityMutexConflict({
+    force: opts.force,
+    mutexCheckOverrides: opts.mutexCheckOverrides,
+  });
+
   // Pull the active agent_session_id (primed by crux.mjs at startup) so the
   // pipeline_runs row links back to the agent that triggered the run.
   // `getCachedAuditSessionId` returns a string; agent_sessions.id is bigint
@@ -1044,9 +1116,27 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     parseAgentSessionId(getCachedAuditSessionId()),
   );
 
-  return withPipelineRun(runOptions, async () =>
-    doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
-  );
+  return withPipelineRun(runOptions, async (ctx) => {
+    const result = await doImproveSingleEntity({
+      found,
+      slug,
+      target,
+      maxIters,
+      budgetUsd,
+      noWrite,
+      opts,
+    });
+    // Budget-exhausted runs persist any applied facts to YAML (saveEntity
+    // runs unconditionally) but the pipeline_runs row records the truncation
+    // so dashboards can distinguish budget-aborts from successful runs.
+    if (result.reason === BUDGET_EXHAUSTED_REASON) {
+      ctx.markStatus("aborted", {
+        reason: BUDGET_EXHAUSTED_REASON,
+        errorCode: BUDGET_EXHAUSTED_REASON,
+      });
+    }
+    return result;
+  });
 }
 
 /**
@@ -1064,7 +1154,7 @@ export function buildImproveEntityRunOptions(
   agentSessionId: number | null,
 ): WithPipelineRunOptions {
   return {
-    pipelineName: "improve-entity",
+    pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
     entityId: entity.stableId ?? entity.id,
     shape: entity.type,
     agentSessionId,
@@ -1105,23 +1195,34 @@ async function doImproveSingleEntity(args: {
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
   const submittedBatches: SubmittedBatchInfo[] = [];
-  let budgetRemaining = budgetUsd;
+  const tracker = new CostTracker();
   let hitTarget = false;
-  let reason = "max-iters";
+  let reason: ImproveReason = "max-iters";
 
   for (let i = 1; i <= maxIters; i++) {
-    if (budgetRemaining <= 0.05) {
-      reason = "budget-exhausted";
-      break;
+    // No pre-iter short-circuit: runIteration's first action is
+    // checkBudgetOrThrow, so a guard here would race the same condition.
+    let out: Awaited<ReturnType<typeof runIteration>>;
+    try {
+      out = await runIteration(entity, i, budgetUsd, tracker);
+    } catch (err) {
+      if (err instanceof BudgetExhaustedError) {
+        console.warn(
+          `[iter ${i}] budget exhausted: ${err.message}. Stopping after this iteration's partial work.`,
+        );
+        reason = BUDGET_EXHAUSTED_REASON;
+        break;
+      }
+      throw err;
     }
-    const out = await runIteration(entity, i, budgetRemaining);
     entity = out.entity;
     iterations.push(out.metrics);
     if (out.batch) submittedBatches.push(out.batch);
-    budgetRemaining -= out.metrics.cost_research_usd + out.metrics.cost_extract_usd;
+    const budgetRemaining = Math.max(0, budgetUsd - tracker.totalCost);
     const cov = coverageFor(entity);
     console.log(
-      `[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, budget=$${budgetRemaining.toFixed(2)}`,
+      `[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, ` +
+        `spent=$${tracker.totalCost.toFixed(4)}, remaining=$${budgetRemaining.toFixed(2)}`,
     );
     if (out.metrics.applied_to_yaml === 0 && i > 1) {
       reason = "no-progress";
@@ -1167,7 +1268,11 @@ async function doImproveSingleEntity(args: {
     iterations,
     final_coverage: finalCov.score,
     final_facts: finalCov.facts_in_yaml,
-    total_cost_usd: iterations.reduce((s, m) => s + m.cost_research_usd + m.cost_extract_usd, 0),
+    // Source from the live CostTracker rather than summing per-iteration
+    // metrics: an iter aborting via BudgetExhaustedError never reaches
+    // `iterations.push(out.metrics)`, so the per-iter sum would undercount
+    // pre-throw spend.
+    total_cost_usd: tracker.totalCost,
     total_duration_s: (Date.now() - t0) / 1000,
     hit_target: hitTarget,
     reason,
@@ -1190,18 +1295,25 @@ async function doImproveSingleEntity(args: {
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle]", exitCode: 1 };
+    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]", exitCode: 1 };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
   const noWrite = !!options.dryRun;
   const waitForSettle = !!options.waitForSettle;
+  const force = !!options.force;
 
   let result: ImproveResult;
   try {
-    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite, waitForSettle });
+    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite, waitForSettle, force });
   } catch (err) {
+    // QUA-1032: mutex conflicts use exit code 2 to distinguish "another run
+    // is in flight" from a generic failure (exit 1). The message is already
+    // formatted by `formatMutexError` — surface it as-is.
+    if (err instanceof ImproveEntityMutexError) {
+      return { output: err.message, exitCode: 2 };
+    }
     return { output: err instanceof Error ? err.message : String(err), exitCode: 1 };
   }
   return { output: "", exitCode: result.hit_target ? 0 : 2 };
@@ -1209,7 +1321,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle]
+    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]
 
 Closed-loop iterative entity improver. Discovers sources via runResearch,
 extracts gap-targeted claims with Haiku, pre-filters by token presence,
@@ -1220,7 +1332,12 @@ Supported entity types: policy, organization.
 
 Options:
   --target=N           Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
-  --budget=N           Max LLM spend in USD (default: 2.0)
+  --budget=N           Max LLM spend in USD — HARD cap, enforced by a live
+                       CostTracker before every streamingCreate call. When the
+                       tracker reaches this number mid-iteration, the loop
+                       throws BudgetExhaustedError, exits with reason
+                       "budget-exhausted", and the pipeline_runs row is marked
+                       aborted with errorCode=budget_exhausted (default: 2.0).
   --max-iters=N        Max iterations (default: 1)
   --dry-run            Don't write YAML
   --wait-for-settle    After the main loop exits (target/iters/budget), keep
@@ -1228,6 +1345,10 @@ Options:
                        terminal status, applying any newly-verified verdicts
                        (capped at 30 min). Recommended for CI gate / suite runs
                        so per-run results aren't sensitive to worker timing.
+  --force              Skip the QUA-1032 single-instance mutex check. By
+                       default, refuses to start (exit 2) if another
+                       improve-entity run is already in flight. Use only for
+                       explicit takeover after a crashed run.
 `,
     exitCode: 0,
   };
