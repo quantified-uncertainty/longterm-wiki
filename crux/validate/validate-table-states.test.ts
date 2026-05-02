@@ -150,5 +150,49 @@ describe("validate-table-states", () => {
       const result = runCheck({ roots: [scanRoot], quiet: true });
       expect(result.passed).toBe(true);
     });
+
+    it("does not flag banned literals inside JSX block comments ({/* ... */})", () => {
+      // `{/* historical Loading... */}` should not trigger the validator.
+      writeTargetFile(
+        "block-comment-table.tsx",
+        `function Foo() {\n  return (\n    <div>\n      {/* historical Loading... before QUA-1008 */}\n      <TableSkeleton rows={10} columns={5} />\n    </div>\n  );\n}\n`,
+      );
+      const result = runCheck({ roots: [scanRoot], quiet: true });
+      expect(result.passed).toBe(true);
+    });
+
+    it("does not flag banned literals inside multi-line JSX block comments", () => {
+      // A `{/* ... */}` block comment that spans multiple lines, with the banned
+      // literal on a continuation line, must also be ignored.
+      writeTargetFile(
+        "multi-block-comment-table.tsx",
+        `function Foo() {\n  return (\n    <div>\n      {/*\n        old code: <div>Loading...</div>\n        retained for context\n      */}\n      <TableSkeleton rows={10} columns={5} />\n    </div>\n  );\n}\n`,
+      );
+      const result = runCheck({ roots: [scanRoot], quiet: true });
+      expect(result.passed).toBe(true);
+    });
+
+    it("does not flag attribute lines inside a multi-line canonical JSX element", () => {
+      // `<TableSkeleton` opens on one line, `label="Loading users..."` follows on
+      // the next, then `/>` closes. The continuation line carries the banned literal
+      // as a prop value of the canonical component — not a violation.
+      writeTargetFile(
+        "multiline-jsx-table.tsx",
+        `function Foo() {\n  return (\n    <TableSkeleton\n      rows={10}\n      columns={5}\n      label="Loading users..."\n    />\n  );\n}\n`,
+      );
+      const result = runCheck({ roots: [scanRoot], quiet: true });
+      expect(result.passed).toBe(true);
+    });
+
+    it("still flags banned literals in non-canonical multi-line JSX", () => {
+      // After a multi-line non-canonical element ends, subsequent banned literals
+      // must still flag (proves we're not stuck in skip-everything mode).
+      writeTargetFile(
+        "still-flags-table.tsx",
+        `function Foo() {\n  return (\n    <SomethingElse\n      foo="bar"\n    />\n    /* not a real one */\n    <div>Loading...</div>\n  );\n}\n`,
+      );
+      const result = runCheck({ roots: [scanRoot], quiet: true });
+      expect(result.passed).toBe(false);
+    });
   });
 });

@@ -87,7 +87,13 @@ export function TableErrorRow({
   error,
   className,
 }: TableRowStateProps & { error: string | Error }) {
-  const message = error instanceof Error ? error.message : error;
+  // Only render caller-supplied non-empty strings verbatim. `Error` instances
+  // collapse to the canonical fallback to avoid surfacing internal details
+  // (transport stacks, schema names, etc.) to end-users from a generic primitive.
+  const message =
+    typeof error === "string" && error.trim()
+      ? error
+      : DEFAULT_ERROR_LABEL;
   return (
     <tr>
       <td
@@ -97,7 +103,7 @@ export function TableErrorRow({
       >
         <span className="inline-flex items-center gap-2 text-destructive">
           <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-          <span>{message || DEFAULT_ERROR_LABEL}</span>
+          <span>{message}</span>
         </span>
       </td>
     </tr>
@@ -204,7 +210,11 @@ export function TableErrorBlock({
   error: string | Error;
   retry?: () => void;
 }) {
-  const message = error instanceof Error ? error.message : error;
+  // Only render caller-supplied non-empty strings verbatim. See TableErrorRow.
+  const message =
+    typeof error === "string" && error.trim()
+      ? error
+      : DEFAULT_ERROR_LABEL;
   return (
     <div
       role="alert"
@@ -217,9 +227,7 @@ export function TableErrorBlock({
         className="mx-auto mb-2 h-6 w-6 text-destructive"
         aria-hidden="true"
       />
-      <p className="text-sm font-medium text-destructive">
-        {message || DEFAULT_ERROR_LABEL}
-      </p>
+      <p className="text-sm font-medium text-destructive">{message}</p>
       {retry && (
         <button
           type="button"
