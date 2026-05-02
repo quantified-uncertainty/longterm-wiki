@@ -17,6 +17,10 @@ import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
 import { stripMdxEscapes } from "@/lib/inline-markdown";
+import {
+  TableLoadingRow,
+  DEFAULT_LOADING_LABEL,
+} from "@/components/ui/table-states";
 
 export interface OrgRow {
   id: string;
@@ -339,6 +343,12 @@ export function OrganizationsTable({
   const hasClientFilters = typeFilter !== "all" || statFilter !== "all";
   // Fall back to static rows when: client-side filters active, OR server errored out,
   // OR server returned no data after finishing load (empty result from unreachable API)
+  //
+  // Why no `<TableErrorRow>` like sister tables (people, interactive-grants):
+  // a public directory should never bottom out at an error — the static
+  // fallback below ALWAYS has data (the SSR-provided `rows`), so on serverFailed
+  // we silently degrade to the cached/static dataset. The `(showing cached data)`
+  // suffix in `statusText` is the only user-visible signal. Intentional asymmetry.
   const serverFailed = serverMode && !server.isLoading && server.error !== null;
   const useStaticFallback = serverMode && (hasClientFilters || serverFailed);
 
@@ -388,7 +398,7 @@ export function OrganizationsTable({
   // ── Status text ──
   const statusText = (() => {
     if (serverMode) {
-      if (isLoading) return "Loading...";
+      if (isLoading) return DEFAULT_LOADING_LABEL;
       const fallbackNote = serverFailed && hasFallbackRows ? " (showing cached data)" : "";
       if (typeFilter !== "all" || statFilter !== "all") {
         return `${filteredTotal} of ${displayTotal} organizations (filtered)${fallbackNote}`;
@@ -563,16 +573,7 @@ export function OrganizationsTable({
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
-              <tr>
-                <td
-                  colSpan={activeColCount}
-                  role="status"
-                  aria-live="polite"
-                  className="py-8 text-center text-muted-foreground text-sm"
-                >
-                  Loading organizations...
-                </td>
-              </tr>
+              <TableLoadingRow colSpan={activeColCount} label="Loading organizations…" />
             ) : (
               <>
                 {displayRows.map((row) => (

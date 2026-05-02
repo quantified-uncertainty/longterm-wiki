@@ -9,6 +9,7 @@ import { fetchDetailed } from "@lib/wiki-server";
 import { partitionPersonRows } from "./people-filter";
 import { isAnySid } from "@/lib/stable-id";
 import { titleToSlug } from "@/lib/slug-utils";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export const metadata: Metadata = {
   title: "People",
@@ -344,7 +345,7 @@ export default async function PeoplePage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={8} />}>
         <PeopleTable rows={rows} />
       </Suspense>
     </div>

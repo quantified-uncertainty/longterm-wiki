@@ -17,6 +17,11 @@ import type { PeopleSortKey } from "./people-sort";
 import { isPersonMeaningful } from "./people-filter";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computePersonCoverage } from "@/components/coverage/coverage-score";
+import {
+  TableLoadingRow,
+  TableErrorRow,
+  DEFAULT_LOADING_LABEL,
+} from "@/components/ui/table-states";
 
 export interface PersonRow {
   id: string;
@@ -364,7 +369,7 @@ export function PeopleTable({
   // ── Status text ──
   const statusText = (() => {
     if (serverMode) {
-      if (isLoading) return "Loading...";
+      if (isLoading) return DEFAULT_LOADING_LABEL;
       return `${displayTotal} people`;
     }
     if (!showAll && stubCount > 0) {
@@ -535,25 +540,9 @@ export function PeopleTable({
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
-              <tr>
-                <td
-                  colSpan={colSpan}
-                  role="status"
-                  aria-live="polite"
-                  className="py-8 text-center text-muted-foreground text-sm"
-                >
-                  Loading people...
-                </td>
-              </tr>
+              <TableLoadingRow colSpan={colSpan} label="Loading people…" />
             ) : serverError && rows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={colSpan}
-                  className="py-8 text-center text-sm"
-                >
-                  <span className="text-destructive">{serverError}</span>
-                </td>
-              </tr>
+              <TableErrorRow colSpan={colSpan} error={serverError} />
             ) : (
               <>
                 {rows.map((row) => (

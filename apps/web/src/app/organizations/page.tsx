@@ -8,6 +8,7 @@ import type { Fact, Property } from "@longterm-wiki/factbase";
 import type { OrgRow, OrgStatDef } from "@/app/organizations/organizations-table";
 import { OrganizationsView } from "@/app/organizations/organizations-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
+import { TableSkeleton } from "@/components/ui/table-states";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { DirectoryIndexShell } from "@/components/directory";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
@@ -412,7 +413,7 @@ export default async function OrganizationsPage() {
       description="Directory of AI safety organizations, frontier labs, research groups, and funders tracked in the knowledge base."
       banner={<DataSourceBanner source={source} apiError={apiError} />}
     >
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={8} />}>
         <OrganizationsView
           rows={data.rows}
           stats={data.stats}

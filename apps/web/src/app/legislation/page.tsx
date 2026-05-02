@@ -4,6 +4,7 @@ import { getTypedEntities, isPolicy } from "@/data";
 import { aggregateRecordVerdicts, getPolicyStakeholderId } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
+import { TableSkeleton } from "@/components/ui/table-states";
 import { normalizeStatus } from "./legislation-constants";
 import { deriveStatus, getCustomField, getPolicyScope, inferScope } from "./legislation-utils";
 import type { PolicyEntity } from "@/data";
@@ -299,7 +300,7 @@ export default async function LegislationPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={6} />}>
         <LegislationTable rows={data.rows} />
       </Suspense>
     </div>

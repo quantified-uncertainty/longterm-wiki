@@ -2,6 +2,12 @@
 
 import { useState, useMemo, useCallback, type ReactNode } from "react";
 import { useServerTable } from "@/hooks/use-server-table";
+import {
+  TableLoadingRow,
+  TableEmptyRow,
+  TableErrorRow,
+  DEFAULT_LOADING_LABEL,
+} from "@/components/ui/table-states";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -56,7 +62,7 @@ export function ServerPaginatedTable<T>({
   defaultSortId, defaultSortDir = "desc",
   searchPlaceholder = "Search...", itemLabel = "items",
   showColumnPicker = true, emptyMessage = "No results.",
-  loadingMessage = "Loading...", staticSort,
+  loadingMessage = DEFAULT_LOADING_LABEL, staticSort,
 }: ServerPaginatedTableProps<T>) {
   const serverMode = !!endpoint;
 
@@ -279,17 +285,9 @@ export function ServerPaginatedTable<T>({
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
-              <tr>
-                <td colSpan={activeCols.length} className="py-8 text-center text-muted-foreground text-sm">
-                  {loadingMessage}
-                </td>
-              </tr>
+              <TableLoadingRow colSpan={activeCols.length} label={loadingMessage} />
             ) : serverError && rows.length === 0 ? (
-              <tr>
-                <td colSpan={activeCols.length} className="py-8 text-center text-sm">
-                  <span className="text-destructive">{serverError}</span>
-                </td>
-              </tr>
+              <TableErrorRow colSpan={activeCols.length} error={serverError} />
             ) : (
               <>
                 {rows.map((row) => (
@@ -302,11 +300,10 @@ export function ServerPaginatedTable<T>({
                   </tr>
                 ))}
                 {rows.length === 0 && (
-                  <tr>
-                    <td colSpan={activeCols.length} className="py-8 text-center text-muted-foreground text-sm">
-                      {search ? `No ${itemLabel} match your search.` : emptyMessage}
-                    </td>
-                  </tr>
+                  <TableEmptyRow
+                    colSpan={activeCols.length}
+                    message={search ? `No ${itemLabel} match your search.` : emptyMessage}
+                  />
                 )}
               </>
             )}
