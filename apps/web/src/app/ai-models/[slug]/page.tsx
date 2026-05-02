@@ -20,6 +20,10 @@ import {
 } from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
+import {
   OverviewTab,
   PricingTab,
   BenchmarksTab,
@@ -65,16 +69,20 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Fetch system cards (QUA-702). Best-effort: a wiki-server outage shouldn't
-  // break the whole page, just hide the tab.
-  let systemCards: RpcModelSystemCardRow[] = [];
-  if (entity.stableId) {
-    const result = await fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
-      `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
-      { revalidate: 300 },
-    );
-    if (result?.items) systemCards = result.items;
-  }
+  // Fetch system cards (QUA-702) + sourcing rollup in parallel. Both are
+  // best-effort: a wiki-server outage shouldn't break the page.
+  const systemCardsPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
+        `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
+        { revalidate: 300 },
+      )
+    : Promise.resolve(null);
+  const [systemCardsResult, sourcingSummary] = await Promise.all([
+    systemCardsPromise,
+    fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
+  ]);
+  const systemCards: RpcModelSystemCardRow[] = systemCardsResult?.items ?? [];
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
   const developerEntity = entity.developer
@@ -252,6 +260,7 @@ export default async function AiModelDetailPage({
       title={entity.title}
       titlePills={titlePills}
       coverage={{ score: coverageScore, signals: coverageSignals }}
+      verdict={rollupVerdict}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}
