@@ -185,32 +185,26 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- model_aliases JOIN entities JOIN wiki_pages: alias-based search (QUA-745) ---
-  // Mirrors the Phase 3 SQL in apps/wiki-server/src/routes/wikibase/pages.ts:
-  //   DISTINCT ON (wp.slug) ... ORDER BY wp.slug, rank DESC
-  //   WHERE wp.entity_type = 'ai-model' AND wp.wiki_id IS NOT NULL
-  //         AND (ma.alias = $1 OR ma.alias LIKE $2)
-  //         AND wp.slug NOT IN excludeIds
+  // Mirrors the Phase 3 alias-search SQL in routes/wikibase/pages.ts.
   if (q.includes("model_aliases") && q.includes("join entities") && q.includes("join wiki_pages")) {
     const aliasLower = params[0] as string;
-    const aliasPrefix = params[1] as string; // "alias%" form
+    const aliasPrefix = params[1] as string;
     const limit = (params[2] as number) || 20;
     const excludeIds = (params[3] as string[]) || [];
     const prefixCore = aliasPrefix.endsWith("%") ? aliasPrefix.slice(0, -1) : aliasPrefix;
+    const useLike = q.includes("or ma.alias like");
 
-    // Step 1: collect all candidate (slug, rank) pairs that match the WHERE.
     type Candidate = { slug: string; row: Record<string, unknown>; rank: number };
-    const candidates: Candidate[] = [];
+    const bySlug = new Map<string, Candidate>();
     for (const a of modelAliasesStore) {
       const isExact = a.alias === aliasLower;
-      const isPrefix = a.alias.startsWith(prefixCore);
+      const isPrefix = useLike && a.alias.startsWith(prefixCore);
       if (!isExact && !isPrefix) continue;
 
       const ent = Array.from(entitiesStore.values()).find(
         (e) => e.stable_id === a.model_stable_id,
       );
       if (!ent) continue;
-
       const page = pagesStore.get(ent.id);
       if (!page) continue;
       if (excludeIds.includes(page.slug as string)) continue;
@@ -218,8 +212,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (page.wiki_id == null) continue;
 
       const rank = isExact ? 100.0 : 50.0;
-      candidates.push({
-        slug: page.slug as string,
+      const slug = page.slug as string;
+      const existing = bySlug.get(slug);
+      if (existing && existing.rank >= rank) continue;
+      bySlug.set(slug, {
+        slug,
         rank,
         row: {
           id: page.slug,
@@ -236,16 +233,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       });
     }
 
-    // Step 2: DISTINCT ON (slug) — keep the highest-rank candidate per slug.
-    const bySlug = new Map<string, Candidate>();
-    for (const c of candidates) {
-      const existing = bySlug.get(c.slug);
-      if (!existing || c.rank > existing.rank) bySlug.set(c.slug, c);
-    }
-
-    // Step 3: sort by rank DESC (mimics the post-DISTINCT resort).
-    const hits = Array.from(bySlug.values()).sort((a, b) => b.rank - a.rank);
-    return hits.slice(0, limit).map((h) => h.row);
+    return Array.from(bySlug.values())
+      .sort((a, b) => b.rank - a.rank)
+      .slice(0, limit)
+      .map((h) => h.row);
   }
 
   // --- wiki_pages: SELECT with WHERE + OR (get by slug or wiki_id) ---
@@ -588,7 +579,6 @@ describe("Pages API", () => {
       expect(body.results).toHaveLength(0);
     });
 
-    // QUA-745 — alias-based search resolves external naming to canonical pages.
     it("resolves a model alias to the canonical wiki page", async () => {
       await seedPage(app, "gpt-4-turbo", "GPT-4 Turbo", {
         description: "OpenAI flagship turbo model",
@@ -635,8 +625,6 @@ describe("Pages API", () => {
       expect(body.results).toHaveLength(0);
     });
 
-    // Prefix match: a partial query like "claude-3-5" should still resolve
-    // to the canonical page via an alias starting with that prefix.
     it("resolves an alias via prefix match", async () => {
       await seedPage(app, "claude-3-5-sonnet", "Claude 3.5 Sonnet", {
         entityType: "ai-model",
@@ -660,8 +648,6 @@ describe("Pages API", () => {
       );
     });
 
-    // Dedup: when multiple aliases (one exact, one prefix-only) point at the
-    // same model, the canonical page should appear exactly once.
     it("dedupes when multiple aliases point at the same model", async () => {
       await seedPage(app, "gpt-4-turbo", "GPT-4 Turbo", {
         entityType: "ai-model",
@@ -691,9 +677,7 @@ describe("Pages API", () => {
       expect(matches).toHaveLength(1);
     });
 
-    // Adversarial: a `%` in the user query must not act as a LIKE wildcard.
-    // Without escapeIlike(), "%" would match every alias. The mock dispatch
-    // uses startsWith for prefix matching which mirrors the escaped form.
+    // Without escapeIlike, "%" in user input would match every alias.
     it("does not treat user input '%' as a LIKE wildcard", async () => {
       await seedPage(app, "claude-3-haiku", "Claude 3 Haiku", {
         entityType: "ai-model",
@@ -718,8 +702,6 @@ describe("Pages API", () => {
       ).toBeUndefined();
     });
 
-    // Defense in depth: even if an alias points at a non-ai-model entity
-    // (corruption / future schema drift), it must NOT leak into search.
     it("rejects an alias whose target page is not entity_type=ai-model", async () => {
       await seedPage(app, "openai", "OpenAI", {
         // Wrong type — alias should not resolve here.

@@ -66,9 +66,8 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Fetch system cards (QUA-702) and model aliases (QUA-745) in parallel.
-  // Best-effort: a wiki-server outage shouldn't break the whole page, just
-  // hide the tab / drop the "Also known as" line.
+  // Best-effort: a wiki-server outage shouldn't break the page, just hide
+  // the system-card tab and drop the "Also known as" line.
   let systemCards: RpcModelSystemCardRow[] = [];
   let aliases: string[] = [];
   if (entity.stableId) {
@@ -78,14 +77,14 @@ export default async function AiModelDetailPage({
         { revalidate: 300 },
       ),
       fetchFromWikiServer<RpcModelAliasesAllResult>(
-        `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=200`,
+        `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=20`,
         { revalidate: 300 },
       ),
     ]);
     if (cardsResult?.items) systemCards = cardsResult.items;
     if (aliasesResult?.items) {
-      // Skip aliases that are already the entity title (case-insensitive) —
-      // showing "Also known as: gpt-4 turbo" on the GPT-4 Turbo page is noise.
+      // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
+      // on the GPT-4 Turbo page is noise.
       const titleLower = entity.title.toLowerCase();
       aliases = aliasesResult.items
         .map((r) => r.alias)
@@ -268,7 +267,7 @@ export default async function AiModelDetailPage({
       entityId={entity.id}
       title={entity.title}
       titlePills={titlePills}
-      aliases={aliases.length > 0 ? aliases : undefined}
+      aliases={aliases}
       coverage={{ score: coverageScore, signals: coverageSignals }}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}

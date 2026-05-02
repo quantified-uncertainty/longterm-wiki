@@ -145,27 +145,27 @@ const pagesApp = new Hono()
       results = [...results, ...trigramResults];
     }
 
-    // Phase 3 — model alias lookup (QUA-745). Tokenized FTS won't match
-    // hyphenated identifiers like "gpt-4-turbo-2024-04-09" cleanly, and
-    // aliases aren't part of wiki_pages.search_vector. Look the raw query
-    // up in model_aliases and join to the canonical wiki page for the model.
-    // Within this phase, exact alias matches sort before prefix matches.
-    // Phase 1/2 results are kept ahead of alias hits — content matches are
-    // usually what the user wants when both fire.
-    if (results.length < limit) {
-      const aliasLower = rawQ.trim().toLowerCase();
-      // Reject empty / overlong queries to keep the LIKE/trgm path bounded.
-      if (aliasLower.length > 0 && aliasLower.length <= MAX_ALIAS_QUERY_LEN) {
-        // DISTINCT ON dedupes the result when multiple aliases point at the
-        // same model (e.g. both "gpt-4-turbo" and "gpt-4-turbo-2024-04-09"
-        // resolve to GPT-4 Turbo) — without it, the same wiki page would
-        // appear in `results` once per matching alias.
-        // entity_type filter: defense in depth. The FK only enforces that
-        // model_stable_id resolves to *some* entity; the business rule that
-        // it's an ai-model lives in the ingester. A future bad ingester or
-        // data migration could route an alias to a person/concept entity.
-        const aliasResults = await rawDb.unsafe<PageSearchRow[]>(
-          `SELECT DISTINCT ON (wp.slug)
+    // Phase 3 — model alias lookup (QUA-745). Tokenized FTS won't tokenize
+    // hyphenated identifiers like "gpt-4-turbo-2024-04-09" the way model
+    // aliases are stored, so we match against `model_aliases.alias` directly.
+    // Skip when the query has whitespace — aliases are always single-token
+    // identifiers, so multi-word queries can never resolve via this phase.
+    const aliasLower = rawQ.trim().toLowerCase();
+    if (
+      results.length < limit &&
+      aliasLower.length > 0 &&
+      aliasLower.length <= MAX_ALIAS_QUERY_LEN &&
+      !/\s/.test(aliasLower)
+    ) {
+      // DISTINCT ON dedupes when multiple aliases resolve to the same model.
+      // entity_type filter is defense in depth: the FK only enforces that
+      // `model_stable_id` resolves to some entity, not that it's an ai-model.
+      // Prefix LIKE requires ≥3 chars to avoid scanning a wide alias set on
+      // 1-2 char queries; exact match still resolves at any length.
+      const useLike = aliasLower.length >= 3;
+      const aliasResults = await rawDb.unsafe<PageSearchRow[]>(
+        `SELECT * FROM (
+          SELECT DISTINCT ON (wp.slug)
             wp.slug AS id,
             wp.wiki_id,
             wp.title,
@@ -179,25 +179,24 @@ const pagesApp = new Hono()
           FROM model_aliases ma
           JOIN entities e ON e.stable_id = ma.model_stable_id
           JOIN wiki_pages wp ON wp.slug = e.id
-          WHERE (ma.alias = $1 OR ma.alias LIKE $2)
+          WHERE (ma.alias = $1${useLike ? " OR ma.alias LIKE $2" : ""})
             AND wp.wiki_id IS NOT NULL
             AND wp.entity_type = 'ai-model'
             AND wp.slug NOT IN (SELECT unnest($4::text[]))
           ORDER BY wp.slug, rank DESC, wp.reader_importance DESC NULLS LAST
-          LIMIT $3`,
-          [
-            aliasLower,
-            // escapeIlike: a literal `%` or `_` in user input would otherwise
-            // act as a LIKE wildcard and explode the match set.
-            `${escapeIlike(aliasLower)}%`,
-            limit - results.length,
-            results.map((r) => r.id),
-          ],
-        );
-        // DISTINCT ON ordered by slug for dedup; resort by rank for output.
-        aliasResults.sort((a, b) => Number(b.rank) - Number(a.rank));
-        results = [...results, ...aliasResults];
-      }
+        ) deduped
+        ORDER BY rank DESC, reader_importance DESC NULLS LAST
+        LIMIT $3`,
+        [
+          aliasLower,
+          // escapeIlike: a literal `%` in user input would otherwise act as
+          // a LIKE wildcard and explode the match set.
+          useLike ? `${escapeIlike(aliasLower)}%` : aliasLower,
+          limit - results.length,
+          results.map((r) => r.id),
+        ],
+      );
+      results = [...results, ...aliasResults];
     }
 
     return c.json({

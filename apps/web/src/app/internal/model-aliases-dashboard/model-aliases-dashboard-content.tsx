@@ -2,8 +2,6 @@
  * Model Aliases Dashboard — exposes the model_aliases table that maps raw
  * external model names (e.g. "gpt-4-turbo-2024-04-09") to canonical AI-model
  * entity stable_ids. Used by Phase 2 benchmark ingesters at resolution time.
- *
- * QUA-745 — surfaces existing data; no new ingest path.
  */
 import {
   fetchDetailed,
@@ -53,17 +51,15 @@ function emptyFallback(): DashboardData {
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
-function confidenceColor(c: string): string {
-  switch (c) {
-    case "exact":
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
-    case "fuzzy":
-      return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
-    case "manual":
-      return "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300";
-    default:
-      return "bg-muted/40 text-muted-foreground";
-  }
+const CONFIDENCE_COLORS: Record<RpcModelAliasRow["confidence"], string> = {
+  exact: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+  fuzzy: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  manual: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+};
+
+function breakdownSub<T>(rows: T[], format: (r: T) => string): string | undefined {
+  if (rows.length === 0) return undefined;
+  return rows.map(format).join(", ");
 }
 
 // ── Content Component ────────────────────────────────────────────────────
@@ -75,9 +71,8 @@ export async function ModelAliasesDashboardContent() {
   );
 
   const { stats, aliases } = data;
+  const truncated = stats.total > aliases.length;
 
-  // Group aliases by their target model (modelStableId) — the dashboard's
-  // primary view is "for each canonical model, what aliases point at it?".
   const byModel = new Map<string, RpcModelAliasRow[]>();
   for (const a of aliases) {
     const arr = byModel.get(a.modelStableId);
@@ -107,39 +102,28 @@ export async function ModelAliasesDashboardContent() {
         by the <code className="text-xs">model_aliases</code> table.
       </p>
 
-      {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
         <StatCard label="Total Aliases" value={stats.total.toString()} />
         <StatCard
           label="Canonical Models"
-          value={byModel.size.toString()}
-          sub="with ≥1 alias"
+          value={truncated ? `${byModel.size}+` : byModel.size.toString()}
+          sub={truncated ? "of loaded aliases" : "with ≥1 alias"}
         />
         <StatCard
           label="Sources"
           value={stats.bySource.length.toString()}
-          sub={
-            stats.bySource.length > 0
-              ? stats.bySource
-                  .map((s) => `${s.source} (${s.total})`)
-                  .join(", ")
-              : undefined
-          }
+          sub={breakdownSub(stats.bySource, (r) => `${r.source} (${r.total})`)}
         />
         <StatCard
           label="By Confidence"
-          value={stats.byConfidence.reduce((s, x) => s + x.total, 0).toString()}
-          sub={
-            stats.byConfidence.length > 0
-              ? stats.byConfidence
-                  .map((c) => `${c.confidence} (${c.total})`)
-                  .join(", ")
-              : undefined
-          }
+          value={stats.byConfidence.length.toString()}
+          sub={breakdownSub(
+            stats.byConfidence,
+            (r) => `${r.confidence} (${r.total})`,
+          )}
         />
       </div>
 
-      {/* Grouped table — one row per (model, alias) — model rowspans across its aliases */}
       {groupedRows.length > 0 && (
         <div className="my-6 rounded-lg border border-border/60 overflow-hidden">
           <table className="w-full text-sm">
@@ -176,9 +160,7 @@ export async function ModelAliasesDashboardContent() {
                     </td>
                     <td className="py-2 px-3">
                       <span
-                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${confidenceColor(
-                          row.confidence,
-                        )}`}
+                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${CONFIDENCE_COLORS[row.confidence] ?? "bg-muted/40 text-muted-foreground"}`}
                       >
                         {row.confidence}
                       </span>
