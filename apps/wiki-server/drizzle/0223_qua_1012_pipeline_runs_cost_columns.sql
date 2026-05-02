@@ -8,9 +8,12 @@
 -- improve pipeline, #3 = wire the source-check pipeline) start
 -- populating these.
 --
--- - `cost_usd numeric(10,4)` — dollars-and-tenths-of-a-cent precision.
---   Wide enough for a single $999,999.9999 run; aggregating across runs
---   uses SUM() into a wider numeric in the dashboard query.
+-- - `cost_usd numeric(10,4)` — 4 decimal places (hundredths-of-a-cent
+--   precision). Max storable value is $999,999.9999, but the API caps
+--   single-run cost at $10,000 (`MAX_COST_USD` in api-types.ts) — the
+--   column is intentionally over-provisioned vs the cap so the cap can
+--   move without a column-widening migration. Aggregates across runs
+--   use SUM() into a wider numeric in the dashboard query.
 -- - `tokens_*` are integer (signed 32-bit, max ~2.1B). Single-run token
 --   counts are far below that ceiling — Anthropic's 200k context cap
 --   bounds a single call's input tokens, and even a long multi-call

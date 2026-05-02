@@ -609,19 +609,152 @@ describe("PATCH /api/pipeline-runs/:id/end", () => {
     expect(res.status).toBe(400);
   });
 
-  it("rejects non-integer token counts", async () => {
+  it("rejects non-integer token counts on every token field", async () => {
+    const app = buildApp();
+    const fields = [
+      "tokensInput",
+      "tokensOutput",
+      "tokensCacheRead",
+      "tokensCacheWrite",
+    ] as const;
+    for (const field of fields) {
+      const runId = `frac-${field}`;
+      await postJson(app, "/api/pipeline-runs", {
+        runId,
+        pipelineName: "improve-page",
+      });
+      const res = await app.request(`/api/pipeline-runs/${runId}/end`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "committed", [field]: 1.5 }),
+      });
+      expect(res.status, `${field} should reject 1.5`).toBe(400);
+    }
+  });
+
+  it("rejects negative values on every token field", async () => {
+    const app = buildApp();
+    const fields = [
+      "tokensInput",
+      "tokensOutput",
+      "tokensCacheRead",
+      "tokensCacheWrite",
+    ] as const;
+    for (const field of fields) {
+      const runId = `neg-${field}`;
+      await postJson(app, "/api/pipeline-runs", {
+        runId,
+        pipelineName: "improve-page",
+      });
+      const res = await app.request(`/api/pipeline-runs/${runId}/end`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "committed", [field]: -1 }),
+      });
+      expect(res.status, `${field} should reject -1`).toBe(400);
+    }
+  });
+
+  it("rejects token counts above MAX_TOKENS cap (overflow guard)", async () => {
     const app = buildApp();
     await postJson(app, "/api/pipeline-runs", {
-      runId: "frac-001",
+      runId: "huge-tokens-001",
+      pipelineName: "improve-page",
+    });
+    const res = await app.request("/api/pipeline-runs/huge-tokens-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      // 2_000_000_001 — one over the documented cap.
+      body: JSON.stringify({ status: "committed", tokensInput: 2_000_000_001 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects costUsd with more than 4 decimal places (column is numeric(10,4))", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "precision-001",
+      pipelineName: "improve-page",
+    });
+    const res = await app.request("/api/pipeline-runs/precision-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: 1.23456 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("preserves prior cost telemetry on retry that omits the fields (idempotent /end)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "retry-001",
       pipelineName: "improve-page",
     });
 
-    const res = await app.request("/api/pipeline-runs/frac-001/end", {
+    // First end — record cost + tokens. Use partial_failure so a retry
+    // is semantically motivated.
+    const r1 = await app.request("/api/pipeline-runs/retry-001/end", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "committed", tokensInput: 1.5 }),
+      body: JSON.stringify({
+        status: "partial_failure",
+        costUsd: 2.5,
+        tokensInput: 100,
+        tokensOutput: 50,
+      }),
     });
-    expect(res.status).toBe(400);
+    expect(r1.status).toBe(200);
+    expect(runStore[0].costUsd).toBe("2.5");
+    expect(runStore[0].tokensInput).toBe(100);
+    expect(runStore[0].tokensOutput).toBe(50);
+
+    // Second end — caller retried, succeeded, but didn't re-send cost.
+    // The conditional spread must NOT clobber the previously-recorded
+    // values with NULL.
+    const r2 = await app.request("/api/pipeline-runs/retry-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed" }),
+    });
+    expect(r2.status).toBe(200);
+    expect(runStore[0].status).toBe("committed");
+    expect(runStore[0].costUsd).toBe("2.5");
+    expect(runStore[0].tokensInput).toBe(100);
+    expect(runStore[0].tokensOutput).toBe(50);
+  });
+
+  it("explicit null overwrites prior cost telemetry (caller actively cleared)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "clear-001",
+      pipelineName: "improve-page",
+    });
+
+    await app.request("/api/pipeline-runs/clear-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "partial_failure",
+        costUsd: 1.5,
+        tokensInput: 200,
+      }),
+    });
+    expect(runStore[0].costUsd).toBe("1.5");
+
+    // Caller explicitly nulls cost on the second /end — distinct from
+    // omitting (which would preserve).
+    const r2 = await app.request("/api/pipeline-runs/clear-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "committed",
+        costUsd: null,
+        tokensInput: null,
+      }),
+    });
+    expect(r2.status).toBe(200);
+    expect(runStore[0].costUsd).toBeNull();
+    expect(runStore[0].tokensInput).toBeNull();
   });
 });
 
