@@ -275,7 +275,7 @@ const pagesApp = new Hono()
     const db = getDrizzleDb();
 
     // Fetch the page before deleting so we can log identifying info.
-    // Per code-review-guidelines: destructive endpoints must log before executing.
+    // Per /agent-review-pr code-review rules: destructive endpoints must log before executing.
     // We need the integer PK (wikiPages.id) for FK cleanup of related tables.
     const existing = await db
       .select({

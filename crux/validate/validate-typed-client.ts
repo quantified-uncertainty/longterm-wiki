@@ -4,7 +4,7 @@
  * Validate that the codebase uses typed wiki-server client functions instead
  * of raw `apiRequest<T>` calls with hand-written type parameters.
  *
- * Per `.claude/rules/code-review-guidelines.md`:
+ * Per the `/agent-review-pr` skill body ("Code review rules to enforce"):
  * "API callers must use typed wiki-server client functions
  *  (`crux/lib/wiki-server/*.ts`) — not raw `apiRequest<{...}>` with
  *  hand-written type parameters. If no typed client exists for the endpoint,

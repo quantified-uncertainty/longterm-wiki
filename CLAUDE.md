@@ -185,7 +185,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
   - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only (`sid_` prefix). NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
   - All stableIds use the `sid_` prefix format. Use `isSid()` from `@longterm-wiki/id-utils` to detect them.
   - **Never manually invent IDs** — use the functions above.
-- **Hono RPC**: Mandatory for new wiki-server routes — use method-chaining (`const app = new Hono().get(...).post(...)` + `export type Route = typeof app`). See `.claude/rules/code-review-guidelines.md`.
+- **Hono RPC**: Mandatory for new wiki-server routes — use method-chaining (`const app = new Hono().get(...).post(...)` + `export type Route = typeof app`). See the `/agent-review-pr` skill ("Code review rules to enforce") for the full code-review rule set.
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_BILLING_KEY`, `OPENROUTER_API_KEY`. Named `BILLING` (not `API_KEY`) so the `claude` CLI — which auto-reads `ANTHROPIC_API_KEY` — can never silently pick up the billing key and bypass OAuth. See [QUA-612](https://linear.app/quantifieduncertainty/issue/QUA-612).
 - **Wiki-server from agent slots (auto-prod, QUA-616)**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. Crux now **auto-detects that CWD is inside a slot and forces `WIKI_SERVER_ENV=prod`** — you no longer need to prefix every command with `WIKI_SERVER_ENV=prod`. The manual prefix still works and takes precedence; set `WIKI_SERVER_ENV=local` to force local from inside a slot (e.g. when testing against a locally-run wiki-server). The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available.
@@ -197,17 +197,20 @@ These cover the session lifecycle and the always-applicable conventions. They au
 
 - `.claude/rules/agent-session-workflow.md` — Session start/end workflow
 - `.claude/rules/environment-setup.md` — Worktree, LSP, slot ports, wiki-server auto-prod
-- `.claude/rules/page-authoring.md` — Content pipeline, self-review checklist
-- `.claude/rules/code-review-guidelines.md` — Code review rules
 - `.claude/rules/github-issue-tracking.md` — Issue tracking (Linear primary, GitHub legacy)
 - `.claude/rules/proactive-github-filing.md` — When/how to file issues (in Linear)
-- `.claude/rules/pr-review-guidelines.md` — PR review and ship process
-- `.claude/rules/pre-pr-verification.md` — Build/test/gate checks before PRs
 - `.claude/rules/session-logging.md` — Session log format and storage
 - `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/slot-isolation.md` — Don't touch other agent slots
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+
+Phase-loaded guidance (only fires when the corresponding skill runs):
+
+- `/agent-ship` — Pre-PR build/test/gate/Playwright verification, PR-body shell safety, GitHub auto-close syntax, post-merge audit entries, the "do not offer /schedule" rule (was: `pr-review-guidelines.md`, `pre-pr-verification.md`)
+- `/agent-push-and-verify` — CodeRabbit "Addressed in commit X" markers — DO NOT TRUST; push-failure detection
+- `/agent-review-pr` — Code review rules (no `(r: any)`, Hono RPC, typed clients, batch endpoints, etc.)
+- `/page-authoring` — Crux content pipeline, post-edit fixes, page self-review checklist
 
 ## Tier 2 — Subsystem maps (read on-demand, NOT auto-loaded)
 

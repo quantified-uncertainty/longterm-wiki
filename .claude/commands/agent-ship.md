@@ -21,11 +21,17 @@ If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux sy
 
 Run these before anything else — a PR that doesn't build is not worth reviewing:
 
-1. **`pnpm build`** — must exit 0. If it fails, fix the issue before proceeding.
-2. **`pnpm test`** — existing tests must pass. If you added new logic (helpers, utilities, transformations), write tests for it.
-3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux w validate gate --fix`
+1. **`pnpm build`** — must exit 0. Catches TypeScript errors, SSR rendering issues (missing `"use client"`, server/client boundary violations), import resolution failures, and MDX compilation errors across all 600+ pages. If too slow for the change scope, `pnpm build-data:content` + `npx tsc --noEmit` is acceptable for content-only or type-only changes.
+2. **`pnpm test`** — existing tests must pass. Always write tests for new utility/helper functions, data transformation logic, validation rules, and CLI commands. Tests are optional for pure JSX layout, configuration, and CSS/styling changes.
+3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux w validate gate --fix`. If it fails with thousands of `resource-ref-integrity` errors on a branch you haven't touched resources on, build-data is seeing an incomplete resource set — refresh the snapshot via `WIKI_SERVER_ENV=prod pnpm crux sys wiki-server snapshot-resources`, or force the snapshot path with `LONGTERMWIKI_SERVER_URL= git push`.
+4. **Playwright verification** (if `.tsx` pages or components changed): run e2e tests against prod before opening the PR, don't ask the user to manually check pages:
+   ```bash
+   cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test e2e/render-audit.spec.ts
+   ```
+   For specific tests, swap `e2e/render-audit.spec.ts` for the relevant spec (17 specs in `apps/web/e2e/`: directory-pages, entity-detail-pages, homepage, factbase, mobile-nav, header-dropdowns, etc.). For ad-hoc page checks, use `DEV_PORT=<slot-port> npx playwright test`. Display bug fixes should add a regression check to `e2e/render-audit.spec.ts`.
+5. **Completeness check** — re-read the original issue and verify every acceptance criterion is met. Cite a specific file+line or test for each one. A PR that needs a follow-up PR to be functional is **incomplete** — split into independently-shippable pieces *before* starting work, not after. No "Part 1 of 3" PRs that break without Part 2.
 
-See `.claude/rules/pre-pr-verification.md` for full details on when tests are required.
+If any verification fails: fix it before opening the PR. If you can't fix it, note the failure in the PR description and ask the user — do NOT open the PR claiming it works when it doesn't.
 
 ## Step 2b: PR size check (MANDATORY — runs before completing checklist)
 
@@ -129,6 +135,39 @@ Pay special attention to:
 
 Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/agent-push-and-verify` will create one using `crux gh pr create`.
 
+### Shell safety when writing PR bodies
+
+**Never use `>` to write temp files** — zsh `noclobber` prevents overwriting and the heredoc fails silently with stale content. Use `>|` (force overwrite), `mktemp`, or pipe directly via heredoc stdin:
+
+```bash
+# GOOD: pipe directly
+pnpm crux gh pr create --title="..." <<'PRBODY'
+body here
+PRBODY
+
+# GOOD: force overwrite
+cat >| /tmp/pr-body.md <<'PRBODY'
+body here
+PRBODY
+
+# BAD: silently fails with noclobber, uses stale file content
+cat > /tmp/pr-body.md <<'PRBODY'
+body here
+PRBODY
+```
+
+### GitHub issue auto-close syntax
+
+Use **one `Closes #N` per line** in the PR body. A comma-separated list (`Closes #1, #2, #3`) is **not** reliably recognized — only the first issue closes.
+
+```
+Closes #529
+Closes #530
+Closes #533
+```
+
+For Linear, the PR auto-closes the issue if the branch contains `qua-NNN` OR the body contains `Fixes QUA-NNN` (auto-injected by `crux gh pr create`).
+
 ### Step 4a: Surface skipped review phases (QUA-950)
 
 If `/agent-review-pr` ran with any phases skipped via `reason=...`, surface that in the PR body so reviewers can see the coverage trail without trusting the agent's summary alone.
@@ -182,6 +221,20 @@ Common gaps the auto-detector misses (add manual lines for these — there is no
 - Includes the exact command to run if applicable, after the em-dash, in backticks
 
 For infrastructure changes that the detector does **not** cover (DNS changes, external service configuration, manual database operations), also add a `post_merge` entry to `.claude/audits.yaml` with the PR number, what to verify, and a deadline.
+
+## Step 4c: Post-merge verification — file Linear ticket or audits.yaml entry
+
+When a PR changes infrastructure, CI config, Vercel settings, GitHub Actions, DNS, or any behavior that **cannot be verified by `pnpm build` + `pnpm test`**, decide where the post-merge verification lives:
+
+- **One-time verification of infra/CI/DNS behavior** ("after this merges, check that X actually happened") → add a `post_merge` entry to `.claude/audits.yaml` with PR number, what to verify, and a deadline.
+- **Ongoing property to monitor** (e.g. "scheduled workflows keep running") → add to `.claude/audits.yaml` `audits` section.
+- **Flag/gate cleanup with a date, post-deploy verification needed, or anything "do this in N weeks"** → file a Linear ticket via `pnpm crux linear create`. PR patrol and the maintenance sweep surface it.
+
+Run `pnpm crux sys audits list` to see current items.
+
+### Do NOT offer to `/schedule` verification agents
+
+The default Claude Code session-end behavior offers a `/schedule` of a background agent for natural follow-ups (post-merge verification, soak windows, flag cleanup, gate ramps). **In this project, do not make that offer.** A `/schedule` agent fires once into the void and produces no audit trail; a Linear ticket is visible to humans, dedup-able, prioritizable, and discoverable by the next coordinator session. Use Linear or `audits.yaml` instead. This rule overrides the generic Claude Code session-end guidance regardless of how natural the follow-up seems.
 
 ## Step 5: Update Linear issue (primary — if applicable)
 
