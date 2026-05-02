@@ -10,6 +10,7 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
@@ -165,6 +166,23 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every funding round in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select(joinedSelect)
+        .from(fundingRounds)
+        .leftJoin(companyEntity, eq(fundingRounds.companyEntityId, companyEntity.stableId))
+        .leftJoin(leadInvestorEntity, eq(fundingRounds.leadInvestorEntityId, leadInvestorEntity.stableId))
+        .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id),
+      formatRow,
+      routeName: "funding-rounds/bulk",
+    });
+    return c.json({ fundingRounds: rows, total });
   })
 
   // ---- GET /by-entity/:entityId ----

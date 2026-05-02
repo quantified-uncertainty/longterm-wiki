@@ -9,6 +9,7 @@ import {
   parseRange,
   clampedLimit,
 } from "../shared/utils.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
@@ -148,6 +149,23 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every equity position in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select(joinedSelect)
+        .from(equityPositions)
+        .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+        .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
+        .orderBy(desc(equityPositions.syncedAt), equityPositions.id),
+      formatRow,
+      routeName: "equity-positions/bulk",
+    });
+    return c.json({ equityPositions: rows, total });
   })
 
   // ---- GET /by-entity/:entityId (positions in a company) ----
