@@ -25,6 +25,12 @@ vi.mock('../wiki-server/pipeline-runs.ts', () => ({
   endPipelineRun: (...args: unknown[]) => mockEnd(...args),
 }));
 
+const mockGetCachedAuditSessionId = vi.fn<() => string | null>(() => null);
+
+vi.mock('../wiki-server/audit-context.ts', () => ({
+  getCachedAuditSessionId: () => mockGetCachedAuditSessionId(),
+}));
+
 // Suppress console output during tests — withPipelineRun warn()/error()
 // helpers go through console directly. We assert on mock call counts.
 const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -35,6 +41,7 @@ describe('withPipelineRun', () => {
     mockStart.mockReset();
     mockHeartbeat.mockReset();
     mockEnd.mockReset();
+    mockGetCachedAuditSessionId.mockReset().mockReturnValue(null);
     consoleWarnSpy.mockClear();
     consoleErrorSpy.mockClear();
   });
@@ -422,11 +429,9 @@ describe('withPipelineRun', () => {
     });
 
     it('records only the body-added delta, not pre-existing tracker entries', async () => {
-      // Nested withPipelineRun calls (e.g. improve-entity → research-agent)
-      // commonly share one CostTracker. Each pipeline_run row should
-      // record only what its body added, not entries the outer scope
-      // had already accumulated. Otherwise the inner row double-counts
-      // parent spend and "by-pipeline" dashboards inflate.
+      // Each pipeline_run row should record only what its body added,
+      // not entries the outer scope had already accumulated. Otherwise
+      // a nested row would double-count parent spend.
       mockStart.mockResolvedValue({ ok: true, data: {} });
       mockEnd.mockResolvedValue({ ok: true, data: {} });
 
@@ -434,8 +439,6 @@ describe('withPipelineRun', () => {
       const { CostTracker } = await import('../cost-tracker.ts');
 
       const tracker = new CostTracker();
-      // Caller has already accumulated some spend before entering
-      // withPipelineRun — this is the parent pipeline's cost.
       tracker.recordExternalCost('parent-search', 1.23, 'parent-phase');
 
       await withPipelineRun(
@@ -446,9 +449,6 @@ describe('withPipelineRun', () => {
         },
       );
 
-      // The inner pipeline_run row records only its own 0.05 — not the
-      // parent's 1.23. The parent's row, when it ends, will record the
-      // full 1.28 because its own startIndex was 0.
       expect(mockEnd).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
@@ -456,6 +456,47 @@ describe('withPipelineRun', () => {
           costUsd: 0.05,
         }),
       );
+    });
+
+    it('nested wrap: inner records its delta, outer records the full sum', async () => {
+      // The real-world scenario: improveSingleEntity (outer) calls
+      // runResearch (inner) sharing one CostTracker. Outer's row should
+      // see all spend; inner's row should see only its own contribution.
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+
+      await withPipelineRun(
+        { pipelineName: 'outer', tracker, heartbeatIntervalMs: 1_000_000_000 },
+        async () => {
+          tracker.recordExternalCost('outer-pre', 0.10, 'outer-phase');
+          await withPipelineRun(
+            { pipelineName: 'inner', tracker, heartbeatIntervalMs: 1_000_000_000 },
+            async () => {
+              tracker.recordExternalCost('inner-call', 0.05, 'inner-phase');
+              return 'inner-done';
+            },
+          );
+          tracker.recordExternalCost('outer-post', 0.20, 'outer-phase');
+          return 'outer-done';
+        },
+      );
+
+      // mockEnd is called twice: once for inner (delta = 0.05), once
+      // for outer (full spend = 0.10 + 0.05 + 0.20 = 0.35).
+      expect(mockEnd).toHaveBeenCalledTimes(2);
+      const innerCall = mockEnd.mock.calls.find(
+        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.05,
+      );
+      const outerCall = mockEnd.mock.calls.find(
+        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.35,
+      );
+      expect(innerCall).toBeDefined();
+      expect(outerCall).toBeDefined();
     });
 
     it('sends zero totals when tracker exists but recorded nothing', async () => {
@@ -587,6 +628,94 @@ describe('withPipelineRun', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('finalize threw after body abort'),
+      );
+    });
+  });
+
+  describe('agentSessionId default resolution', () => {
+    it('resolves from getCachedAuditSessionId when caller omits the field', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+      mockGetCachedAuditSessionId.mockReturnValue('42');
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'p', heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockStart).toHaveBeenCalledWith(
+        expect.objectContaining({ agentSessionId: 42 }),
+      );
+    });
+
+    it('explicit null bypasses the default and propagates as null', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+      // Cache returns a value — but caller passing null should still win.
+      mockGetCachedAuditSessionId.mockReturnValue('42');
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'p', agentSessionId: null, heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockStart).toHaveBeenCalledWith(
+        expect.objectContaining({ agentSessionId: null }),
+      );
+    });
+
+    it('explicit number bypasses the default', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+      mockGetCachedAuditSessionId.mockReturnValue('42');
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'p', agentSessionId: 99, heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockStart).toHaveBeenCalledWith(
+        expect.objectContaining({ agentSessionId: 99 }),
+      );
+    });
+
+    it('omitted field with empty cache resolves to null (no agent session)', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+      mockGetCachedAuditSessionId.mockReturnValue(null);
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'p', heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockStart).toHaveBeenCalledWith(
+        expect.objectContaining({ agentSessionId: null }),
+      );
+    });
+
+    it('omitted field with non-numeric cache value resolves to null (parse fail)', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+      mockGetCachedAuditSessionId.mockReturnValue('not-a-number');
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'p', heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockStart).toHaveBeenCalledWith(
+        expect.objectContaining({ agentSessionId: null }),
       );
     });
   });
