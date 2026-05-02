@@ -4,21 +4,11 @@
  * Usage: node crux/auto-fix.ts [--dry-run]
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT } from './lib/content-types.ts';
 import { resolveCruxScriptArgs } from './lib/cli.ts';
-
-/**
- * Build a shell command for a crux script (QUA-1053). Picks the prebuilt
- * dist path when this module was loaded from dist/, else falls back to
- * the legacy `node --import tsx/esm` invocation.
- */
-function cruxCmd(scriptRelPath: string, ...extra: string[]): string {
-  const { args } = resolveCruxScriptArgs(scriptRelPath);
-  return ['node', ...args, ...extra].join(' ');
-}
 
 const args: string[] = process.argv.slice(2);
 const DRY_RUN: boolean = args.includes('--dry-run');
@@ -37,7 +27,10 @@ if (DRY_RUN) {
 interface Fixer {
   name: string;
   description: string;
-  command: string;
+  /** Crux-relative source path of the script to spawn (e.g. `validate/validate-unified.ts`). */
+  scriptRel: string;
+  /** Args to forward to the script. Each is its own argv entry — never a shell-joined string. */
+  args: string[];
 }
 
 interface FixerResult {
@@ -49,47 +42,64 @@ interface FixerResult {
   skipped?: boolean;
 }
 
-// Define fixable validators with their commands
+// Define fixable validators. Each entry produces a `node ... args` spawn
+// (no shell), so paths with spaces/quotes can't be misinterpreted and
+// no metacharacters need escaping.
 const fixers: Fixer[] = [
   {
     name: 'Escaping (dollars, comparisons, tildes)',
     description: 'Escape special characters for LaTeX/JSX',
-    command: cruxCmd('validate/validate-unified.ts', '--rules=dollar-signs,comparison-operators,tilde-dollar', '--fix'),
+    scriptRel: 'validate/validate-unified.ts',
+    args: ['--rules=dollar-signs,comparison-operators,tilde-dollar', '--fix'],
   },
   {
     name: 'Markdown Formatting',
     description: 'Fix markdown lists and bold labels',
-    command: cruxCmd('validate/validate-unified.ts', '--rules=markdown-lists,consecutive-bold-labels', '--fix'),
+    scriptRel: 'validate/validate-unified.ts',
+    args: ['--rules=markdown-lists,consecutive-bold-labels', '--fix'],
   },
   {
     name: 'Frontmatter Field Order',
     description: 'Reorder frontmatter fields to canonical order (identity first, volatile last)',
-    command: cruxCmd('fix/fix-frontmatter-order.ts', '--apply'),
+    scriptRel: 'fix/fix-frontmatter-order.ts',
+    args: ['--apply'],
   },
 ];
 
+function describeFixer(fixer: Fixer): string {
+  const { args } = resolveCruxScriptArgs(fixer.scriptRel);
+  return ['node', ...args, ...fixer.args].join(' ');
+}
+
 function runFixer(fixer: Fixer): FixerResult {
   if (DRY_RUN) {
-    console.log(`${colors.dim}[DRY RUN] Would run: ${fixer.command}${colors.reset}`);
+    console.log(`${colors.dim}[DRY RUN] Would run: ${describeFixer(fixer)}${colors.reset}`);
     return { name: fixer.name, success: true, dryRun: true };
   }
 
   const startTime = Date.now();
-  try {
-    const output = execSync(fixer.command, {
-      encoding: 'utf8',
-      cwd: PROJECT_ROOT,
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
+  const { args: scriptInvocation } = resolveCruxScriptArgs(fixer.scriptRel);
+  const result = spawnSync('node', [...scriptInvocation, ...fixer.args], {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
 
-    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
-    return { name: fixer.name, success: true, output };
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
-    return { name: fixer.name, success: false, error: error.message };
+  const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+
+  if (result.error) {
+    console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${result.error.message.split('\n')[0]}`);
+    return { name: fixer.name, success: false, error: result.error.message };
   }
+  if (result.status !== 0) {
+    const stderr = result.stderr || '';
+    const firstLine = (result.stdout || stderr).split('\n')[0] || `exit ${result.status}`;
+    console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${firstLine}`);
+    return { name: fixer.name, success: false, error: stderr || `exit ${result.status}` };
+  }
+
+  console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
+  return { name: fixer.name, success: true, output: result.stdout };
 }
 
 function main(): void {

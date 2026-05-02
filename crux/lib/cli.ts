@@ -6,32 +6,32 @@
 
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-import { basename, dirname, join, sep } from 'path';
+import { dirname, isAbsolute, join, normalize } from 'path';
 import { PROJECT_ROOT } from './content-types.ts';
+
+// `__CRUX_DIST_DIR__` is replaced by esbuild at build time with the
+// absolute path of crux/dist/. In tsx (source) mode the identifier stays
+// undeclared; the `typeof` guard below handles both shapes safely.
+declare const __CRUX_DIST_DIR__: string;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// SCRIPTS_DIR resolution depends on how this module was loaded:
+// SCRIPTS_DIR resolution:
 //
-//   - tsx (legacy): __dirname = `<repo>/crux/lib`
-//                   → SCRIPTS_DIR = `<repo>/crux`
-//   - dist per-file: __dirname = `<repo>/crux/dist/lib`
-//                    → SCRIPTS_DIR = `<repo>/crux/dist`
-//   - dist single bundle: __dirname = `<repo>/crux/dist`
-//                         (lib/cli.ts is bundled into crux.js, so its
-//                         module URL is the bundle's URL)
-//                         → SCRIPTS_DIR = `<repo>/crux/dist`
-//
-// Detect the bundled-main case by checking whether __dirname's basename
-// is "dist"; in that case SCRIPTS_DIR IS __dirname, otherwise it's the
-// parent.
-const RUNNING_FROM_DIST =
-  basename(__dirname) === 'dist' ||
-  __dirname.includes(`${sep}dist${sep}`);
+//   - In dist mode: `__CRUX_DIST_DIR__` was replaced with the dist path
+//     at build time. We trust it absolutely — no runtime path-substring
+//     guesswork (which had a false-positive vector for any user with
+//     "dist" anywhere in their workspace path).
+//   - In tsx (source) mode: derive from this file's location at
+//     `<repo>/crux/lib/`, parent is `<repo>/crux/`.
+const DIST_DIR_FROM_BUILD: string | undefined =
+  typeof __CRUX_DIST_DIR__ !== 'undefined' ? __CRUX_DIST_DIR__ : undefined;
+
+const RUNNING_FROM_DIST = DIST_DIR_FROM_BUILD !== undefined;
 
 export const SCRIPTS_DIR: string =
-  basename(__dirname) === 'dist' ? __dirname : join(__dirname, '..');
+  DIST_DIR_FROM_BUILD ?? join(__dirname, '..');
 
 /**
  * Resolve a crux script path (e.g. `validate/validate-unified.ts`) to the
@@ -39,18 +39,31 @@ export const SCRIPTS_DIR: string =
  *
  * In dist mode (post-build), paths point at `crux/dist/<rel>.js` and are
  * invoked with plain `node` — no tsx, no per-process compile cost,
- * eliminating the cache-contention class entirely.
+ * eliminating the cache-contention class entirely (QUA-1053).
  *
  * Otherwise we fall back to the legacy tsx invocation so dev iteration
  * (editing crux/*.ts without rebuilding) still works.
+ *
+ * Throws on inputs that would resolve outside SCRIPTS_DIR (absolute
+ * paths, parent-traversal segments) — those are bugs in the caller,
+ * not user input we need to gracefully accept.
  */
 export function resolveCruxScriptArgs(scriptRelPath: string): { args: string[]; absPath: string } {
+  if (!scriptRelPath || isAbsolute(scriptRelPath)) {
+    throw new Error(`resolveCruxScriptArgs: scriptRelPath must be a non-empty relative path, got: ${JSON.stringify(scriptRelPath)}`);
+  }
+  const normalized = normalize(scriptRelPath);
+  // After normalize, any path that escapes its starting dir begins with '..'
+  // — both '..' alone and '../foo' qualify, plus the Windows form '..\\foo'.
+  if (normalized === '..' || normalized.startsWith('..\\') || normalized.startsWith('../')) {
+    throw new Error(`resolveCruxScriptArgs: scriptRelPath must not traverse out of SCRIPTS_DIR: ${JSON.stringify(scriptRelPath)}`);
+  }
   if (RUNNING_FROM_DIST) {
-    const distRel = scriptRelPath.replace(/\.ts$/, '.js').replace(/\.mjs$/, '.js');
+    const distRel = normalized.replace(/\.(ts|mjs)$/, '.js');
     const absPath = join(SCRIPTS_DIR, distRel);
     return { args: [absPath], absPath };
   }
-  const absPath = join(SCRIPTS_DIR, scriptRelPath);
+  const absPath = join(SCRIPTS_DIR, normalized);
   return { args: ['--import', 'tsx/esm', '--no-warnings', absPath], absPath };
 }
 

@@ -28,7 +28,7 @@ import { glob } from 'tinyglobby';
 import { rmSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve, resolve as pathResolve, sep } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
@@ -63,7 +63,7 @@ const cruxResolver = {
   setup(b) {
     b.onResolve({ filter: /^\.\.?\// }, (args) => {
       if (args.kind === 'entry-point') return null;
-      const abs = pathResolve(dirname(args.importer), args.path);
+      const abs = resolve(dirname(args.importer), args.path);
       const insideCrux = abs === CRUX_SRC || abs.startsWith(CRUX_SRC + sep);
       if (!insideCrux) {
         // Cross-workspace relative import — let esbuild bundle.
@@ -121,26 +121,6 @@ async function gatherEntries() {
   return files.map((f) => join(ROOT, f));
 }
 
-const buildOptions = {
-  outdir: DIST,
-  outbase: CRUX_SRC,
-  bundle: true,
-  format: 'esm',
-  platform: 'node',
-  target: 'node20',
-  // cruxResolver decides per-import whether to externalize or bundle.
-  sourcemap: 'linked',
-  logLevel: WATCH ? 'info' : 'warning',
-  plugins: [cruxResolver],
-  legalComments: 'none',
-  // Required for ESM bundles that pull in CJS deps (e.g. yaml). esbuild's
-  // CJS interop emits `require()` calls; without this banner the runtime
-  // raises "Dynamic require of X is not supported".
-  banner: {
-    js: "import { createRequire as _crux_createRequire } from 'module';const require = _crux_createRequire(import.meta.url);",
-  },
-};
-
 /**
  * Main-entry resolver — bundles ALL relative imports inline (whether
  * inside crux/ or cross-workspace). Used only for the single-bundle
@@ -167,19 +147,26 @@ const mainBundleResolver = {
 };
 
 /**
- * Neutralize self-invocation guards inside the single bundle.
+ * Bake source paths AND neutralize self-invocation guards at load time.
  *
- * ~83 crux source files end with a guard like
- *   if (process.argv[1] === fileURLToPath(import.meta.url)) main();
- * so they can be invoked directly with `node crux/foo.ts`. After bundling,
- * every module shares the bundle's `import.meta.url`, so every guard
- * matches and tries to run main() — wrong: the only real entry is
- * crux.mjs's `main()` call.
+ * Two transforms in one plugin so we read each source file only once:
  *
- * This plugin rewrites the exact comparison expression to `false` at load
- * time, but only for files other than crux.mjs (the actual entry). The
- * per-file build does not use this plugin, so direct `node dist/foo.js`
- * invocation still works.
+ *   1. Rewrite `import.meta.dirname` and `import.meta.url` to literal
+ *      strings of the SOURCE file's location. Many files compute
+ *      PROJECT_ROOT via `join(import.meta.dirname, '../..')` (47 callsites
+ *      across crux/) which assumes the source-tree depth. From dist/,
+ *      that math goes one level wrong. Baking source paths makes the
+ *      computations behave as if running from source.
+ *
+ *      Skip lib/cli.ts — it deliberately uses `import.meta.url` to detect
+ *      whether it's running from dist/ vs source. Its dist-mode answer is
+ *      injected separately via `define: __CRUX_DIST_DIR__`.
+ *
+ *   2. In the single-bundle main, rewrite `process.argv[1] === fileURLToPath(import.meta.url)`
+ *      to `false` for non-entry modules. Without this, all 83 guards fire
+ *      because the bundle shares one `import.meta.url`. Per-file builds
+ *      do NOT need this rewrite (each .ts gets its own .js sibling, so
+ *      the runtime URL still maps 1:1 to the source).
  *
  * Accepts both `fileURLToPath` and aliased identifiers like
  * `_fileURLToPath` (`import { fileURLToPath as _fileURLToPath }` shows up
@@ -188,25 +175,89 @@ const mainBundleResolver = {
 const SELF_INVOKE_RE =
   /process\.argv\[1\]\s*===\s*[A-Za-z_$][A-Za-z0-9_$]*\(\s*import\.meta\.url\s*\)/g;
 const ENTRY_BASENAME = 'crux.mjs';
+const CLI_LIB_BASENAME = 'cli.ts';
 
-const stripSelfInvokeGuards = {
-  name: 'strip-self-invoke-guards',
-  setup(b) {
-    b.onLoad({ filter: /\.(ts|mjs|js)$/ }, async (args) => {
-      // Skip the actual entry — its top-level main() call IS the
-      // intended invocation.
-      if (args.path.endsWith(sep + ENTRY_BASENAME)) return null;
-      const source = await readFile(args.path, 'utf8');
-      if (!SELF_INVOKE_RE.test(source)) {
-        SELF_INVOKE_RE.lastIndex = 0;
-        return null;
-      }
-      SELF_INVOKE_RE.lastIndex = 0;
-      const rewritten = source.replace(SELF_INVOKE_RE, 'false');
-      const ext = args.path.endsWith('.ts') ? 'ts'
-        : args.path.endsWith('.mjs') ? 'js' : 'js';
-      return { contents: rewritten, loader: ext };
-    });
+// Match `dirname(fileURLToPath(import.meta.url))` and the `path.dirname(...)`
+// variant. Used to recover the source dir in files that didn't migrate to
+// `import.meta.dirname` (~13 callsites). Aliased fileURLToPath imports are
+// permitted (see SELF_INVOKE_RE for the same idiom).
+const DIRNAME_FROM_URL_RE =
+  /(?:[A-Za-z_$][A-Za-z0-9_$]*\.)?dirname\(\s*[A-Za-z_$][A-Za-z0-9_$]*\(\s*import\.meta\.url\s*\)\s*\)/g;
+
+function makeSourceTransform({ stripGuards }) {
+  return {
+    name: stripGuards ? 'bake-paths-and-strip-guards' : 'bake-source-paths',
+    setup(b) {
+      b.onLoad({ filter: /\.(ts|mjs|js)$/ }, async (args) => {
+        const source = await readFile(args.path, 'utf8');
+        let modified = source;
+
+        // Skip path-baking for lib/cli.ts. It uses `import.meta.url` to
+        // probe its own runtime location for dist detection; baking
+        // source paths here would defeat that. SCRIPTS_DIR in dist mode
+        // is supplied via the `__CRUX_DIST_DIR__` define instead.
+        const isCliLib = args.path.endsWith(`${sep}lib${sep}${CLI_LIB_BASENAME}`);
+        if (!isCliLib) {
+          const sourceDir = JSON.stringify(dirname(args.path));
+          // Bake `import.meta.dirname` and the equivalent
+          // `dirname(fileURLToPath(import.meta.url))` idiom to a literal
+          // string of the SOURCE file's dirname. This makes
+          // `join(import.meta.dirname, '../..')` (47 callsites) and
+          // `path.join(__dirname, '../../..')` (~13 callsites where
+          // __dirname comes from fileURLToPath) compute the project
+          // root correctly even when the file is loaded from dist/.
+          //
+          // We deliberately do NOT bake bare `import.meta.url` —
+          // self-invocation guards (`process.argv[1] === fileURLToPath(import.meta.url)`)
+          // must compare against the runtime URL of the dist file so
+          // direct `node dist/foo.js` invocation still triggers main().
+          modified = modified
+            .replace(/\bimport\.meta\.dirname\b/g, sourceDir)
+            .replace(DIRNAME_FROM_URL_RE, sourceDir);
+        }
+
+        if (stripGuards && !args.path.endsWith(sep + ENTRY_BASENAME)) {
+          // In single-bundle mode every module shares the bundle's
+          // `import.meta.url`, so every guard would match. Replace the
+          // comparison with `false` for non-entry modules.
+          modified = modified.replace(SELF_INVOKE_RE, 'false');
+        }
+
+        if (modified === source) return null;
+        const ext = args.path.endsWith('.ts') ? 'ts' : 'js';
+        return { contents: modified, loader: ext };
+      });
+    },
+  };
+}
+
+const bakeSourcePathsPerFile = makeSourceTransform({ stripGuards: false });
+const bakePathsAndStripGuardsBundle = makeSourceTransform({ stripGuards: true });
+
+const buildOptions = {
+  outdir: DIST,
+  outbase: CRUX_SRC,
+  bundle: true,
+  format: 'esm',
+  platform: 'node',
+  target: 'node20',
+  sourcemap: 'linked',
+  logLevel: WATCH ? 'info' : 'warning',
+  plugins: [cruxResolver, bakeSourcePathsPerFile],
+  legalComments: 'none',
+  // `__CRUX_DIST_DIR__` lets lib/cli.ts know it's running from a dist
+  // build (and where dist lives). Source/tsx mode leaves the identifier
+  // undefined — the cli.ts code uses `typeof` to branch safely.
+  define: {
+    __CRUX_DIST_DIR__: JSON.stringify(DIST),
+  },
+  // Required for ESM bundles that pull in CJS deps (e.g. yaml). esbuild's
+  // CJS interop emits `require()` calls; without this banner the runtime
+  // raises "Dynamic require of X is not supported". We assign through
+  // globalThis only if `require` isn't already in scope so we don't
+  // shadow a legitimate per-file `require` declared in source.
+  banner: {
+    js: "import { createRequire as _crux_createRequire } from 'module'; const __cruxRequire = _crux_createRequire(import.meta.url); if (typeof require === 'undefined') { globalThis.require = __cruxRequire; }",
   },
 };
 
@@ -219,7 +270,7 @@ const mainBundleOptions = {
   outdir: undefined,
   outfile: join(DIST, 'crux.js'),
   entryPoints: [join(CRUX_SRC, 'crux.mjs')],
-  plugins: [mainBundleResolver, stripSelfInvokeGuards],
+  plugins: [mainBundleResolver, bakePathsAndStripGuardsBundle],
 };
 
 async function run() {
@@ -235,6 +286,11 @@ async function run() {
     const ctx = await context({ ...buildOptions, entryPoints });
     await ctx.watch();
     console.log(`[crux:build] watching ${entryPoints.length} files… (single-bundle main not built — run 'pnpm crux:build' for that)`);
+    process.on('SIGINT', () => { ctx.dispose().then(() => process.exit(0)); });
+    process.on('SIGTERM', () => { ctx.dispose().then(() => process.exit(0)); });
+    // ctx.watch() resolves once watching starts; we have no other handles
+    // keeping the event loop alive, so block here forever.
+    await new Promise(() => {});
     return;
   }
 

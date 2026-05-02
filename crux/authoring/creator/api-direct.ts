@@ -118,12 +118,14 @@ export async function runValidationLoopApiDirect(
     // Write content to draft for validation tools to check
     fs.writeFileSync(draftPath, content);
 
-    // Run auto-fixes
+    // Run auto-fixes via the run.mjs shim — picks dist/ when built, tsx
+    // as a fallback (QUA-1053).
     try {
-      execSync('node --import tsx/esm --no-warnings crux/crux.mjs fix escaping 2>&1', {
+      const cruxRunner = `node ${path.join(ROOT, 'crux/run.mjs')}`;
+      execSync(`${cruxRunner} fix escaping 2>&1`, {
         cwd: ROOT, stdio: 'pipe', timeout: 60000
       });
-      execSync('node --import tsx/esm --no-warnings crux/crux.mjs fix markdown 2>&1', {
+      execSync(`${cruxRunner} fix markdown 2>&1`, {
         cwd: ROOT, stdio: 'pipe', timeout: 60000
       });
       content = fs.readFileSync(draftPath, 'utf-8');
@@ -189,13 +191,15 @@ function collectValidationIssues(
 ): string[] {
   const issues: string[] = [];
   const topicSlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const NODE_TSX = 'node --import tsx/esm --no-warnings';
+  // Use the run.mjs shim so we pick up dist/ when built, tsx as fallback
+  // (QUA-1053 — eliminates tsx-cache contention).
+  const CRUX_BIN = `node ${path.join(ROOT, 'crux/run.mjs')}`;
 
   // Check critical rules
   for (const rule of CRITICAL_RULES) {
     try {
       const result = execSync(
-        `${NODE_TSX} crux/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
+        `${CRUX_BIN} validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
         { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
       );
       const errorCount = (result.match(/error/gi) || []).length;
@@ -214,7 +218,7 @@ function collectValidationIssues(
   for (const rule of QUALITY_RULES.slice(0, 5)) { // Check most important quality rules
     try {
       const result = execSync(
-        `${NODE_TSX} crux/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
+        `${CRUX_BIN} validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
         { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
       );
       const warningCount = (result.match(/warning/gi) || []).length;
