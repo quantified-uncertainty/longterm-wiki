@@ -26,6 +26,7 @@ import {
 import {
   checkImproveEntityMutex,
   ImproveEntityMutexError,
+  IMPROVE_ENTITY_PIPELINE_NAME,
   IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
   type CheckMutexOptions,
 } from "../lib/improve-entity/mutex.ts";
@@ -272,19 +273,28 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
     );
   }
 
-  // QUA-1032 single-instance mutex (suite-level). Refuse to start if another
-  // suite run is already in flight (status=running, fresh heartbeat). The
-  // per-entity loop also relies on `improveSingleEntity`'s own mutex, but the
-  // suite-level check here gives the operator the more useful "another suite
-  // is running" message rather than reporting a per-entity conflict on the
-  // first row. --force skips both layers (forwarded to improver below).
+  // QUA-1032 single-instance mutex (suite-level). Refuse to start if any
+  // improve-entity family run (single or suite) is already in flight. We
+  // check BOTH pipeline names so a stand-alone improve-entity blocks the
+  // suite at this level — otherwise the suite would proceed past the
+  // suite-only check, then collide on the first per-entity invocation
+  // and abort mid-flight with a partial snapshot.
+  //
+  // --force skips this check. Per-entity invocations below always pass
+  // force=true (regardless of whether the operator passed --force) because
+  // the suite already owns the family-level lock — without that, the very
+  // first per-entity check would self-conflict on the suite's own
+  // `improve-entity-suite` running row.
   const conflict = await checkImproveEntityMutex({
-    pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+    pipelineNames: [
+      IMPROVE_ENTITY_PIPELINE_NAME,
+      IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+    ],
     force: opts.force,
     ...(opts.mutexCheckOverrides ?? {}),
   });
   if (conflict) {
-    throw new ImproveEntityMutexError(conflict, IMPROVE_ENTITY_SUITE_PIPELINE_NAME);
+    throw new ImproveEntityMutexError(conflict);
   }
 
   const startedAt = new Date().toISOString();
@@ -327,15 +337,12 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         maxIters: opts.maxIters,
         dryRun: opts.dryRun,
         quiet: true,
-        // Forward --force from the suite level. The suite's mutex query is
-        // `pipelineName='improve-entity-suite'` and the per-entity query is
-        // `pipelineName='improve-entity'` — different filters, so the suite's
-        // own running row will NOT show up as a per-entity conflict. The
-        // sequential per-entity rows also don't conflict (each ends before
-        // the next starts). The only reason to force per-entity here is when
-        // the operator passed --force to the suite intending to override
-        // both layers.
-        force: opts.force,
+        // The per-entity mutex check looks for any running `improve-entity`
+        // OR `improve-entity-suite` row — including this suite's own row.
+        // Pass force=true unconditionally so the suite's per-entity calls
+        // don't self-conflict. The suite-level check above already
+        // enforced the family-wide lock; we don't need it twice.
+        force: true,
       });
       if (result.reason === BUDGET_EXHAUSTED_REASON) {
         console.warn(

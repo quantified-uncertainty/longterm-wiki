@@ -66,6 +66,7 @@ import {
   checkImproveEntityMutex,
   ImproveEntityMutexError,
   IMPROVE_ENTITY_PIPELINE_NAME,
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
   type CheckMutexOptions,
 } from "../lib/improve-entity/mutex.ts";
 
@@ -1098,16 +1099,30 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
   }
 
   // QUA-1032 single-instance mutex: refuse to start if another improve-entity
-  // run is already in flight (status=running, fresh heartbeat). Skipped when
-  // --force is set. The check runs *before* `withPipelineRun` so the new run's
-  // own pipeline_runs row hasn't been inserted yet — no risk of self-detection.
+  // family run (single or suite) is already in flight (status=running, fresh
+  // heartbeat). Checks BOTH pipeline names because: (a) a running suite's
+  // per-entity invocation will collide with a stand-alone start anyway, so
+  // catching the suite at this level fails fast with a clear error; (b)
+  // symmetrically, a stand-alone in flight would block a suite that's about
+  // to start a per-entity invocation on the same family.
+  //
+  // Skipped when --force is set, OR when the caller is the suite (which
+  // already passed its own family-level check and forwards force=true to
+  // each per-entity invocation to avoid a self-detection conflict on the
+  // suite's own running row).
+  //
+  // Runs *before* `withPipelineRun` so this run's own pipeline_runs row
+  // hasn't been inserted yet — no risk of self-detection.
   const conflict = await checkImproveEntityMutex({
-    pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
+    pipelineNames: [
+      IMPROVE_ENTITY_PIPELINE_NAME,
+      IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+    ],
     force: opts.force,
     ...(opts.mutexCheckOverrides ?? {}),
   });
   if (conflict) {
-    throw new ImproveEntityMutexError(conflict, IMPROVE_ENTITY_PIPELINE_NAME);
+    throw new ImproveEntityMutexError(conflict);
   }
 
   // Pull the active agent_session_id (primed by crux.mjs at startup) so the

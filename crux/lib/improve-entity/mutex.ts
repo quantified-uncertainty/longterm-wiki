@@ -60,8 +60,14 @@ export interface MutexConflict {
 }
 
 export interface CheckMutexOptions {
-  pipelineName: ImproveEntityPipelineName;
-  /** When true, skip the check entirely. Wired to the CLI `--force` flag. */
+  /** Pipeline names to consider as conflicts. Pass both family members
+   *  (`["improve-entity", "improve-entity-suite"]`) so an external suite
+   *  blocks a stand-alone run and vice versa. The list endpoint is queried
+   *  once without a server-side filter — names are filtered client-side. */
+  pipelineNames: ImproveEntityPipelineName[];
+  /** When true, skip the check entirely. Wired to the CLI `--force` flag,
+   *  and used by the suite to short-circuit per-entity re-checks (the suite
+   *  already owns the global lock). */
   force?: boolean;
   /** ms threshold for considering a running row "fresh". Default 30 min. */
   freshnessMs?: number;
@@ -82,18 +88,20 @@ export async function checkImproveEntityMutex(
   options: CheckMutexOptions,
 ): Promise<MutexConflict | null> {
   if (options.force) return null;
+  if (options.pipelineNames.length === 0) return null;
 
   const list = options.list ?? listPipelineRuns;
   const freshnessMs = options.freshnessMs ?? DEFAULT_FRESHNESS_MS;
   const now = (options.nowMs ?? Date.now)();
+  const wanted = new Set<string>(options.pipelineNames);
 
   let result: ApiResult<{ runs: PipelineRunRow[]; count: number }>;
   try {
+    // No `pipelineName` filter — we may want either name, and post-filtering
+    // client-side avoids a second API round-trip. 50 is well above any
+    // realistic concurrency; the list endpoint caps at 500.
     result = await list({
       status: 'running',
-      pipelineName: options.pipelineName,
-      // 50 is well above any realistic concurrency. The list endpoint caps
-      // at 500; we don't need close to that.
       limit: 50,
     });
   } catch (e) {
@@ -113,22 +121,19 @@ export async function checkImproveEntityMutex(
     return null;
   }
 
-  // Filter to "fresh" running rows. heartbeatAt is the authoritative
-  // freshness signal; if it's null (route was hit before any heartbeat
-  // landed), fall back to startedAt — both are populated on insert.
+  // Filter to "fresh" running rows in any of the requested pipelines.
+  // heartbeatAt is the authoritative freshness signal; if it's null (route
+  // was hit before any heartbeat landed), fall back to startedAt — both
+  // are populated on insert. `age < 0` (server clock ahead of ours) is
+  // floored at 0 in the conflict record so the message reads sensibly.
   const conflicts: MutexConflict[] = [];
   for (const row of result.data.runs) {
+    if (!wanted.has(row.pipelineName)) continue;
     const beat = row.heartbeatAt ?? row.startedAt;
     const beatMs = parseToMs(beat);
     if (beatMs == null) continue;
     const age = now - beatMs;
     if (age > freshnessMs) continue;
-    if (age < 0) {
-      // Row's heartbeat is in the future — clock skew between server and
-      // client. Don't block; treat as fresh and let the operator see it.
-      // (This is a fail-open within fail-open: skew shouldn't strand the
-      // user, but a future-heartbeat IS a live row so we still report it.)
-    }
     conflicts.push({
       runId: row.runId,
       pipelineName: row.pipelineName,
@@ -147,37 +152,36 @@ export async function checkImproveEntityMutex(
 }
 
 /**
- * Render the user-facing refusal message for a mutex conflict. Exported so
- * tests can assert on the format, and so callers can choose between
- * throwing and printing.
+ * Render the user-facing refusal message for a mutex conflict. The pipeline
+ * name in the message comes from the conflict itself — important when the
+ * suite blocks on a stand-alone improve-entity (or vice versa), so the
+ * operator knows which kind of run to wait for.
+ *
+ * Exported so tests can assert on the format and so callers can choose
+ * between throwing and printing.
  */
-export function formatMutexError(
-  conflict: MutexConflict,
-  pipelineName: ImproveEntityPipelineName,
-): string {
+export function formatMutexError(conflict: MutexConflict): string {
   const ageStr = formatAge(conflict.ageSeconds);
   const sessionStr =
     conflict.agentSessionId != null
       ? `, agent_session_id=${conflict.agentSessionId}`
       : '';
   return (
-    `✗ Another ${pipelineName} run is in progress ` +
+    `✗ Another ${conflict.pipelineName} run is in progress ` +
     `(run_id=${conflict.runId}, started ${ageStr} ago${sessionStr}).\n` +
     `  Wait for it to complete, or pass --force to start anyway.`
   );
 }
 
 /** Thrown by `improveSingleEntity` and `runSuite` when the mutex check
- *  finds a conflicting run. Exit code 2 (matches the parent ticket spec).
- *  The CLI catches this and prints `formatMutexError(conflict)`. */
+ *  finds a conflicting run. The CLI catches this and exits with code 2
+ *  (matches the parent ticket spec). */
 export class ImproveEntityMutexError extends Error {
   readonly conflict: MutexConflict;
-  readonly pipelineName: ImproveEntityPipelineName;
-  constructor(conflict: MutexConflict, pipelineName: ImproveEntityPipelineName) {
-    super(formatMutexError(conflict, pipelineName));
+  constructor(conflict: MutexConflict) {
+    super(formatMutexError(conflict));
     this.name = 'ImproveEntityMutexError';
     this.conflict = conflict;
-    this.pipelineName = pipelineName;
   }
 }
 

@@ -641,7 +641,7 @@ describe("runSuite", () => {
     expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
   });
 
-  it("--force bypasses the mutex check (and forwards force to per-entity calls)", async () => {
+  it("--force bypasses the suite-level mutex check", async () => {
     const { suitePath, snapshotDir } = writeFixtureSuite(
       { slug: "alpha", type: "policy" },
       { slug: "beta", type: "policy" },
@@ -659,11 +659,7 @@ describe("runSuite", () => {
     const list = vi
       .fn()
       .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
-    const forceSeenByImprover: boolean[] = [];
-    const improver = async ({ force, slug }: { slug: string; force?: boolean }) => {
-      forceSeenByImprover.push(force === true);
-      return makeResult(slug);
-    };
+    const improver = async ({ slug }: { slug: string }) => makeResult(slug);
     const snap = await runSuiteForTest({
       tag: "force",
       totalBudgetUsd: 4.0,
@@ -676,12 +672,36 @@ describe("runSuite", () => {
     });
     // Both entities ran; suite-level check was short-circuited by --force.
     expect(snap.entities.map((r) => r.status)).toEqual(["completed", "completed"]);
-    // Per-entity calls also received force=true so they don't re-check (and
-    // would have hit the same conflict if they did).
-    expect(forceSeenByImprover).toEqual([true, true]);
     // The list mock should not have been called: --force short-circuits
     // before the API request.
     expect(list).not.toHaveBeenCalled();
+  });
+
+  it("forwards force=true to per-entity calls unconditionally (avoids self-conflict on suite's own running row)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const forceSeenByImprover: boolean[] = [];
+    const improver = async ({ force, slug }: { slug: string; force?: boolean }) => {
+      forceSeenByImprover.push(force === true);
+      return makeResult(slug);
+    };
+    // No --force at the suite level (the `runSuiteForTest` no-op mutex
+    // returns no conflicts so the suite proceeds).
+    await runSuiteForTest({
+      tag: "no-suite-force",
+      totalBudgetUsd: 4.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    // Even without --force at the suite level, per-entity calls still get
+    // force=true. The suite already owns the family-level lock; without
+    // this, the per-entity check would self-conflict on the suite's own
+    // `improve-entity-suite` running row.
+    expect(forceSeenByImprover).toEqual([true, true]);
   });
 });
 

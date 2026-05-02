@@ -69,14 +69,13 @@ describe('checkImproveEntityMutex', () => {
   it('returns null when no running rows match', async () => {
     const list = makeList([]);
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list,
       nowMs: NOW,
     });
     expect(result).toBeNull();
     expect(list).toHaveBeenCalledWith({
       status: 'running',
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
       limit: 50,
     });
   });
@@ -84,7 +83,7 @@ describe('checkImproveEntityMutex', () => {
   it('returns the conflict when one fresh running row exists', async () => {
     const row = makeRow({ runId: 'run-A', agentSessionId: 7 });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list: makeList([row]),
       nowMs: NOW,
     });
@@ -101,7 +100,7 @@ describe('checkImproveEntityMutex', () => {
       heartbeatAt: new Date(T0 - 31 * 60_000).toISOString(),
     });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list: makeList([stale]),
       nowMs: NOW,
     });
@@ -117,7 +116,7 @@ describe('checkImproveEntityMutex', () => {
       startedAt: new Date(T0 - 60_000).toISOString(),
     });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list: makeList([row]),
       nowMs: NOW,
     });
@@ -139,7 +138,7 @@ describe('checkImproveEntityMutex', () => {
       heartbeatAt: new Date(T0 - 60_000).toISOString(),
     });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list: makeList([older, newer, middle]),
       nowMs: NOW,
     });
@@ -151,7 +150,7 @@ describe('checkImproveEntityMutex', () => {
     const fresh = makeRow({ runId: 'should-be-bypassed' });
     const list = makeList([fresh]);
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       force: true,
       list,
       nowMs: NOW,
@@ -169,7 +168,7 @@ describe('checkImproveEntityMutex', () => {
       heartbeatAt: new Date(T0 - 5 * 60_000).toISOString(),
     });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       freshnessMs: 60_000,
       list: makeList([row]),
       nowMs: NOW,
@@ -177,18 +176,54 @@ describe('checkImproveEntityMutex', () => {
     expect(result).toBeNull();
   });
 
-  it('forwards the pipelineName filter to the API', async () => {
-    const list = makeList([]);
-    await checkImproveEntityMutex({
+  it('filters returned rows to the requested pipeline names (drops unrelated families)', async () => {
+    const matching = makeRow({
+      runId: 'matching',
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      heartbeatAt: new Date(T0 - 30_000).toISOString(),
+    });
+    const otherFamily = makeRow({
+      runId: 'unrelated',
+      // Hypothetical other pipeline running concurrently — shouldn't conflict.
+      pipelineName: 'some-other-pipeline' as never,
+      heartbeatAt: new Date(T0 - 10_000).toISOString(),
+    });
+    const result = await checkImproveEntityMutex({
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
+      list: makeList([otherFamily, matching]),
+      nowMs: NOW,
+    });
+    expect(result?.runId).toBe('matching');
+  });
+
+  it('blocks when pipelineNames includes both — a stand-alone improve-entity row blocks a suite check', async () => {
+    // The cross-family case: the suite is about to start, but a stand-alone
+    // improve-entity is already in flight. Pre-MEDIUM-1-fix the suite would
+    // proceed and only collide on the first per-entity invocation.
+    const standalone = makeRow({
+      runId: 'standalone',
       pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
+      heartbeatAt: new Date(T0 - 10_000).toISOString(),
+    });
+    const result = await checkImproveEntityMutex({
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
+      list: makeList([standalone]),
+      nowMs: NOW,
+    });
+    expect(result?.runId).toBe('standalone');
+    expect(result?.pipelineName).toBe(IMPROVE_ENTITY_PIPELINE_NAME);
+  });
+
+  it('returns null when pipelineNames is empty', async () => {
+    const list = makeList([makeRow({ runId: 'fresh' })]);
+    const result = await checkImproveEntityMutex({
+      pipelineNames: [],
       list,
       nowMs: NOW,
     });
-    expect(list).toHaveBeenCalledWith({
-      status: 'running',
-      pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
-      limit: 50,
-    });
+    expect(result).toBeNull();
+    // Empty pipelineNames short-circuits before the API call.
+    expect(list).not.toHaveBeenCalled();
   });
 });
 
@@ -202,7 +237,7 @@ describe('checkImproveEntityMutex — fail-open', () => {
       message: 'wiki-server down',
     });
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list,
       nowMs: NOW,
     });
@@ -212,7 +247,7 @@ describe('checkImproveEntityMutex — fail-open', () => {
   it('returns null (allows run) when listPipelineRuns throws', async () => {
     const list = vi.fn().mockRejectedValue(new Error('network exploded'));
     const result = await checkImproveEntityMutex({
-      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      pipelineNames: [IMPROVE_ENTITY_SUITE_PIPELINE_NAME, IMPROVE_ENTITY_PIPELINE_NAME],
       list,
       nowMs: NOW,
     });
@@ -232,7 +267,7 @@ describe('formatMutexError', () => {
       heartbeatAt: new Date(T0 - 45_000),
       ageSeconds: 45,
     };
-    const msg = formatMutexError(conflict, IMPROVE_ENTITY_SUITE_PIPELINE_NAME);
+    const msg = formatMutexError(conflict);
     expect(msg).toContain('run_id=run-XYZ');
     expect(msg).toContain('agent_session_id=99');
     expect(msg).toContain('45s ago');
@@ -249,9 +284,27 @@ describe('formatMutexError', () => {
       heartbeatAt: new Date(T0),
       ageSeconds: 5,
     };
-    const msg = formatMutexError(conflict, IMPROVE_ENTITY_PIPELINE_NAME);
+    const msg = formatMutexError(conflict);
     expect(msg).not.toContain('agent_session_id');
     expect(msg).toContain('5s ago');
+    expect(msg).toContain('Another improve-entity run');
+  });
+
+  it('uses the conflict.pipelineName in the message (so suite-vs-standalone is visible)', () => {
+    // Cross-family case: a stand-alone run blocked a suite. The message
+    // should say "improve-entity" (the conflict's actual pipeline), not
+    // "improve-entity-suite" (the caller's pipeline).
+    const conflict = {
+      runId: 'standalone-1',
+      pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
+      agentSessionId: 7,
+      startedAt: new Date(T0),
+      heartbeatAt: new Date(T0),
+      ageSeconds: 30,
+    };
+    const msg = formatMutexError(conflict);
+    expect(msg).toContain('Another improve-entity run');
+    expect(msg).not.toContain('improve-entity-suite');
   });
 
   it('formats minute-scale ages as Xm', () => {
@@ -263,7 +316,7 @@ describe('formatMutexError', () => {
       heartbeatAt: new Date(T0),
       ageSeconds: 7 * 60 + 12, // 7m 12s — drops the seconds at minute scale
     };
-    expect(formatMutexError(conflict, IMPROVE_ENTITY_SUITE_PIPELINE_NAME)).toContain('7m ago');
+    expect(formatMutexError(conflict)).toContain('7m ago');
   });
 
   it('formats hour-scale ages as Xh Ym', () => {
@@ -275,12 +328,12 @@ describe('formatMutexError', () => {
       heartbeatAt: new Date(T0),
       ageSeconds: 3600 + 5 * 60,
     };
-    expect(formatMutexError(conflict, IMPROVE_ENTITY_SUITE_PIPELINE_NAME)).toContain('1h 5m ago');
+    expect(formatMutexError(conflict)).toContain('1h 5m ago');
   });
 });
 
 describe('ImproveEntityMutexError', () => {
-  it('exposes conflict + pipelineName and produces a useful message', () => {
+  it('exposes conflict and produces a useful message', () => {
     const conflict = {
       runId: 'run-1',
       pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
@@ -289,9 +342,9 @@ describe('ImproveEntityMutexError', () => {
       heartbeatAt: new Date(T0),
       ageSeconds: 12,
     };
-    const err = new ImproveEntityMutexError(conflict, IMPROVE_ENTITY_PIPELINE_NAME);
+    const err = new ImproveEntityMutexError(conflict);
     expect(err.conflict.runId).toBe('run-1');
-    expect(err.pipelineName).toBe(IMPROVE_ENTITY_PIPELINE_NAME);
+    expect(err.conflict.pipelineName).toBe(IMPROVE_ENTITY_PIPELINE_NAME);
     expect(err.message).toContain('run_id=run-1');
     expect(err.message).toContain('Another improve-entity run');
     expect(err.name).toBe('ImproveEntityMutexError');
