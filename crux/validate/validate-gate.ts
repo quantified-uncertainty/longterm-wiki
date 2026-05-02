@@ -439,15 +439,16 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'entity-schema-drift',
-    name: 'Entity-schema drift in tablebase routes (QUA-943)',
+    name: 'Entity-schema drift in tablebase routes',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-entity-schema-drift.ts'],
     cwd: PROJECT_ROOT,
     // Blocking. Bans new `const VALID_*` and inline `z.enum([` in
     // apps/wiki-server/src/routes/tablebase/ outside the allowlist at
-    // crux/validate/.entity-schema-drift-allowlist.txt. The allowlist length
-    // is the QUA-943 closure metric — entries get removed as routes migrate
-    // to canonical schemas in packages/entity-schemas (Plan v2 PRs 5a/5b).
+    // crux/validate/.entity-schema-drift-allowlist.txt. Existing entries can
+    // be removed when a route is migrated to a shared canonical schema, but
+    // there is no active plan driving the allowlist to zero (the QUA-943 v5
+    // plan that originally drove this was rejected — see QUA-1043).
     // Suppress per-line legitimate uses (e.g., query enums) with
     // `// schema-drift-ok`.
   },
