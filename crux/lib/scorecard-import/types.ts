@@ -15,6 +15,19 @@ import type { ScorecardSourceKey } from "../../../apps/web/src/app/scorecards/sc
 export type { ScorecardSourceKey };
 
 /**
+ * Canonical license token for sources that publish no explicit reuse
+ * terms (verified 2026-05-02 for FLI, AI Lab Watch, Seoul Tracker — none
+ * declares Creative Commons / MIT). Surfacing this as a constant keeps
+ * the parsers, scrapers, fixtures, and the LLM extractor prompt in
+ * lockstep — a typo would land as a new token in `scorecard_snapshots.license`
+ * and the methodology / detail-page UI would silently render it.
+ *
+ * SaferAI declares its own `CC BY-SA 4.0` and FMTI declares `CC-BY-4.0`;
+ * those stay as-is rather than going through this constant.
+ */
+export const FAIR_USE_CITATION_LICENSE = "fair-use-citation";
+
+/**
  * One snapshot row (a wave of a scorecard). Maps 1:1 to
  * `scorecard_snapshots` / the `/api/scorecard-snapshots/sync` payload.
  *

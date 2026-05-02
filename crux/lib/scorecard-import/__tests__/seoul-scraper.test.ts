@@ -16,6 +16,7 @@ import {
   numericToVerdict,
   scrapeSeoul,
 } from "../sources/seoul-scraper.ts";
+import { FAIR_USE_CITATION_LICENSE } from "../types.ts";
 
 const COMPANIES = [
   { id: "amazon", name: "Amazon" },
@@ -228,7 +229,7 @@ describe("scrapeSeoul", () => {
     // /scorecards/seoul_tracker snapshot history table shows an actual term
     // instead of the em-dash placeholder it had before QUA-867.
     const wave = scrapeSeoul(buildHtml(), buildChunk(), {});
-    expect(wave.license).toBe("fair-use-citation");
+    expect(wave.license).toBe(FAIR_USE_CITATION_LICENSE);
   });
 
   it("respects publishedAt + waveLabel overrides", () => {

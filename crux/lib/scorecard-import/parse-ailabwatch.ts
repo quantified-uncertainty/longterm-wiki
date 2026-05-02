@@ -20,6 +20,7 @@
  */
 
 import { load, type CheerioAPI } from "cheerio";
+import { FAIR_USE_CITATION_LICENSE } from "./types.ts";
 
 /**
  * The 7 AI Lab Watch dimensions. The slugs match the URL paths
@@ -163,7 +164,7 @@ export function buildAILabWatchGradesFile(
     // the about page and footer have no Creative Commons / MIT statement).
     // We display the grades for educational/fair-use purposes; QUA-867
     // backfilled this label across the existing snapshots.
-    license: "fair-use-citation",
+    license: FAIR_USE_CITATION_LICENSE,
     notes: opts.notes,
     isLatest: true,
     dimensions: dims,

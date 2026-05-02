@@ -13,6 +13,7 @@ import {
   AILW_DIMENSIONS,
   AILW_ORGS,
 } from "../parse-ailabwatch.ts";
+import { FAIR_USE_CITATION_LICENSE } from "../types.ts";
 
 /**
  * Build a minimal fixture HTML covering all 7 orgs × 7 dimensions plus
@@ -293,7 +294,7 @@ describe("buildAILabWatchGradesFile", () => {
     // /scorecards/ailabwatch snapshot table renders an actual reuse term
     // instead of an em-dash.
     const out = buildAILabWatchGradesFile(freshParsed(), opts);
-    expect(out.license).toBe("fair-use-citation");
+    expect(out.license).toBe(FAIR_USE_CITATION_LICENSE);
     expect(out.isLatest).toBe(true);
   });
 

@@ -27,11 +27,12 @@ export interface OrgCoverageInput {
   peopleCount?: number | null;
   wikiPageId?: string | null;
   /**
-   * Number of distinct external scorecards (FLI, SaferAI, AI Lab Watch,
-   * FMTI, Seoul Tracker) that have rated this org. QUA-867 item D: an org
-   * rated by every scorecard but missing the financial fields above used to
-   * score 1 ("stub") despite being one of the most-evaluated frontier labs.
-   * One signal at ≥1 scorecards, a second at ≥3.
+   * Number of distinct external scorecards from `SCORECARD_SOURCES` that
+   * have rated this org (counted in the latest wave per source). QUA-867
+   * item D: an org rated by every scorecard but missing the financial
+   * fields above used to score 1 ("stub") despite being one of the
+   * most-evaluated frontier labs. One signal at ≥1 scorecards, a second
+   * at ≥3.
    */
   externalScorecardCount?: number | null;
 }
@@ -49,10 +50,17 @@ export function computeOrgCoverage(row: OrgCoverageInput): number {
   if (row.foundedDate) signals++;
   if (row.peopleCount != null && row.peopleCount >= 10) signals++;
   if (row.wikiPageId) signals++;
-  if ((row.externalScorecardCount ?? 0) >= 1) signals++;
-  if ((row.externalScorecardCount ?? 0) >= 3) signals++;
+  const ec = row.externalScorecardCount ?? 0;
+  if (ec >= 1) signals++;
+  if (ec >= 3) signals++;
 
-  // 9 possible. Typical org has foundedDate + maybe 1 financial = 2.
+  // 9 possible (was 7 before QUA-867 added the two scorecard tiers).
+  // Tier thresholds (5 → 4, 3 → 3, 2 → 2) were intentionally left at the
+  // pre-QUA-867 levels: the new pathway is for orgs heavily evaluated by
+  // external scorecards but missing financial metadata, which previously
+  // scored 1. Lowering the bar by 2 was the explicit goal — see the
+  // "rescues a frontier lab" test case for the calibration.
+  // Typical org has foundedDate + maybe 1 financial = 2.
   if (signals >= 5) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
@@ -420,14 +428,9 @@ export function getOrgSignals(row: OrgCoverageInput): string[] {
   if (row.foundedDate) signals.push("Founded date");
   if (row.peopleCount != null && row.peopleCount >= 10) signals.push("10+ people tracked");
   if (row.wikiPageId) signals.push("Wiki page");
-  if ((row.externalScorecardCount ?? 0) >= 3) {
-    signals.push(`${row.externalScorecardCount} external scorecards`);
-  } else if ((row.externalScorecardCount ?? 0) >= 1) {
-    signals.push(
-      row.externalScorecardCount === 1
-        ? "1 external scorecard"
-        : `${row.externalScorecardCount} external scorecards`,
-    );
+  const ec = row.externalScorecardCount ?? 0;
+  if (ec >= 1) {
+    signals.push(ec === 1 ? "1 external scorecard" : `${ec} external scorecards`);
   }
   return signals;
 }

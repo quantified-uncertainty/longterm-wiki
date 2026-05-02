@@ -1,7 +1,16 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ScorecardsSection } from "./scorecards-section";
+
+// Mock getEntityHref so the publisher-link tests don't depend on the
+// live tablebase being loaded into vitest. The real getEntityHref reads
+// `database.json` and routes to `/people/<slug>` for person entities and
+// `/organizations/<slug>` for orgs; we mirror that contract here.
+vi.mock("@/data/entity-nav", () => ({
+  getEntityHref: (id: string) =>
+    id === "zach-stein-perlman" ? `/people/${id}` : `/organizations/${id}`,
+}));
 
 /**
  * QUA-838: panel headers on the org-tab scorecards section must link to

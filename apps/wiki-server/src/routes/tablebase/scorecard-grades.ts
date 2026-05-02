@@ -247,9 +247,10 @@ const scorecardGradesApp = new Hono()
         .where(and(...conditions))
         .orderBy(
           scorecardSnapshots.scorecardSource,
-          // Newest wave first within a source so consumers can take the
-          // first row per source without sorting again. The history
-          // mini-table renders chronological top-to-bottom by re-sorting.
+          // Newest wave first within a source. Default (latest-only) is
+          // unaffected — there's exactly one publishedAt per source. With
+          // includeHistory=true, the history mini-table consumes rows in
+          // receive order and renders newest-on-top, which matches.
           desc(scorecardSnapshots.publishedAt),
           scorecardGrades.dimensionSlug,
         );
