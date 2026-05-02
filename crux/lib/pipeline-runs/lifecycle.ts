@@ -71,10 +71,14 @@ export interface WithPipelineRunOptions {
   /** Override the heartbeat interval (ms). Test-only. */
   heartbeatIntervalMs?: number;
   /**
-   * Optional CostTracker. When provided, totals are written to the
-   * pipeline_runs row on end-of-run (success or throw) — see QUA-1013 /
-   * QUA-1038. The tracker is read once in `finalize`; callers that mutate
-   * it after the body returns will not affect the persisted totals.
+   * Optional CostTracker. When provided, totals are snapshotted after
+   * the body returns/throws and forwarded to the /end call so the
+   * pipeline_runs row records cost + token spend (QUA-1013 / QUA-1038).
+   *
+   * `allowOffline + tracker`: if `/start` fails and `allowOffline=true`,
+   * the body runs in no-op mode and the tracker is NOT persisted (no
+   * run row exists to attach the totals to). A warning is logged when
+   * a tracker is dropped this way so the silent loss is visible.
    */
   tracker?: CostTracker;
 }
@@ -120,6 +124,12 @@ export async function withPipelineRun<T>(
         pipelineName: options.pipelineName,
         err: startResult.message,
       });
+      if (options.tracker) {
+        warn(
+          'withPipelineRun: tracker totals will NOT be persisted — no run row exists in offline mode',
+          { runId, pipelineName: options.pipelineName },
+        );
+      }
       return body(makeOfflineCtx(runId));
     }
 
@@ -265,21 +275,30 @@ interface CostTotals {
  * configured so `finalize` can omit the cost fields entirely (preserving
  * the typed-client semantic that omitted ≠ null — see QUA-1012 comment in
  * `EndPipelineRunInput`).
+ *
+ * `costUsd` is rounded to 4 decimal places. The pricing module produces
+ * costs like `0.006196500000000001` from per-token math + FP imprecision,
+ * which fail the server's `.multipleOf(0.0001)` Zod validator and would
+ * cause /end to 422 mid-flight. The numeric(10,4) PG column would also
+ * silently truncate, so rounding client-side keeps caller-side and
+ * persisted values equal.
  */
 function trackerTotals(tracker: CostTracker | undefined): CostTotals | null {
   if (!tracker) return null;
+  let costUsd = 0;
   let tokensInput = 0;
   let tokensOutput = 0;
   let tokensCacheRead = 0;
   let tokensCacheWrite = 0;
   for (const entry of tracker.entries) {
+    costUsd += entry.cost;
     tokensInput += entry.inputTokens;
     tokensOutput += entry.outputTokens;
     tokensCacheRead += entry.cacheReadInputTokens;
     tokensCacheWrite += entry.cacheCreationInputTokens;
   }
   return {
-    costUsd: tracker.totalCost,
+    costUsd: Math.round(costUsd * 10000) / 10000,
     tokensInput,
     tokensOutput,
     tokensCacheRead,

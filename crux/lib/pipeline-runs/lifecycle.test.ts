@@ -317,29 +317,36 @@ describe('withPipelineRun', () => {
   });
 
   describe('CostTracker integration (QUA-1013)', () => {
-    it('writes tracker totals to /end on success', async () => {
+    it('writes tracker totals to /end on success and the payload satisfies EndPipelineRunSchema', async () => {
       mockStart.mockResolvedValue({ ok: true, data: {} });
       mockEnd.mockResolvedValue({ ok: true, data: {} });
 
       const { withPipelineRun } = await import('./lifecycle.ts');
       const { CostTracker } = await import('../cost-tracker.ts');
+      const { EndPipelineRunSchema } = await import('../../../apps/wiki-server/src/api-types.ts');
 
       const tracker = new CostTracker();
-      // Two recorded LLM calls — pricing module computes the cost; we
-      // only assert that totals match what the tracker reports rather
-      // than hardcoding a price (decoupled from pricing-table churn).
-      tracker.record('claude-sonnet-4-5', {
+      // Use a real model from the pricing table so calculateCost does
+      // NOT silently fall through to 0 — that masking is what made the
+      // pre-review version of this test a tautology.
+      tracker.record('claude-sonnet-4-6', {
         input_tokens: 1000,
         output_tokens: 200,
         cache_creation_input_tokens: 50,
         cache_read_input_tokens: 30,
       }, 'phase-1');
-      tracker.record('claude-sonnet-4-5', {
+      tracker.record('claude-sonnet-4-6', {
         input_tokens: 500,
         output_tokens: 100,
         cache_creation_input_tokens: 0,
         cache_read_input_tokens: 80,
       }, 'phase-2');
+
+      // Sanity guard: this combination must produce an FP-imprecise
+      // total — that's what proves the rounding is exercised. If
+      // pricing math ever lands on a clean 4-dp value, swap to inputs
+      // that don't (e.g. add a cache-read token).
+      expect((tracker.totalCost * 10000) % 1).not.toBe(0);
 
       await withPipelineRun(
         {
@@ -354,13 +361,20 @@ describe('withPipelineRun', () => {
         expect.any(String),
         expect.objectContaining({
           status: 'committed',
-          costUsd: tracker.totalCost,
+          costUsd: Math.round(tracker.totalCost * 10000) / 10000,
           tokensInput: 1500,
           tokensOutput: 300,
           tokensCacheRead: 110,
           tokensCacheWrite: 50,
         }),
       );
+
+      // Server-side regression guard: the payload must satisfy the
+      // exact Zod schema the wiki-server uses. Catches FP precision
+      // drift, integer-coercion bugs, and accidental field renames.
+      const [, endPayload] = mockEnd.mock.calls[0];
+      const parsed = EndPipelineRunSchema.safeParse(endPayload);
+      expect(parsed.success).toBe(true);
     });
 
     it('writes tracker totals to /end when the body throws', async () => {
@@ -397,6 +411,35 @@ describe('withPipelineRun', () => {
       );
     });
 
+    it('sends zero totals when tracker exists but recorded nothing', async () => {
+      // An empty tracker reports `costUsd: 0` rather than omitting the
+      // field, matching the api-types.ts convention that 0 means
+      // "tracked spend was zero" and null/omitted means "not tracked".
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+
+      await withPipelineRun(
+        { pipelineName: 'improve-page', tracker, heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      expect(mockEnd).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          costUsd: 0,
+          tokensInput: 0,
+          tokensOutput: 0,
+          tokensCacheRead: 0,
+          tokensCacheWrite: 0,
+        }),
+      );
+    });
+
     it('omits cost fields entirely when no tracker is configured', async () => {
       mockStart.mockResolvedValue({ ok: true, data: {} });
       mockEnd.mockResolvedValue({ ok: true, data: {} });
@@ -417,6 +460,37 @@ describe('withPipelineRun', () => {
       expect(endPayload).not.toHaveProperty('tokensOutput');
       expect(endPayload).not.toHaveProperty('tokensCacheRead');
       expect(endPayload).not.toHaveProperty('tokensCacheWrite');
+    });
+
+    it('warns and skips tracker persistence when allowOffline=true and /start fails', async () => {
+      mockStart.mockResolvedValue({
+        ok: false,
+        error: 'unavailable',
+        message: 'connection refused',
+      });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+      tracker.recordExternalCost('perplexity/sonar', 0.10, 'phase');
+
+      await withPipelineRun(
+        {
+          pipelineName: 'improve-page',
+          allowOffline: true,
+          tracker,
+          heartbeatIntervalMs: 1_000_000_000,
+        },
+        async () => 'done',
+      );
+
+      expect(mockEnd).not.toHaveBeenCalled();
+      // Surface the silent drop in logs — caller has no run row to
+      // attach the totals to, so they need to know they were lost.
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('tracker totals will NOT be persisted'),
+      );
     });
   });
 
