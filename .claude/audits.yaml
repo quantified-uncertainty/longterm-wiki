@@ -543,7 +543,21 @@ audits:
       - date: "2026-05-01"
         result: pass
         checked_by: "manual"
-post_merge: []
+post_merge:
+  - id: qua-978-recheck-after-credits
+    pr: 4823
+    description: |
+      QUA-978 ships a domain-aware excerpt fix for scorecard_grade source-checks
+      that should flip ~29 of 30 contradicted FLI Winter 2025 verdicts to
+      confirmed. Live LLM recheck was blocked at ship time by Anthropic API
+      credit exhaustion. After credits restored, run:
+
+        pnpm crux sourcing-recheck --type=scorecard_grade --verdict=contradicted --limit=30 --budget=0.50
+
+      Then post final numbers on QUA-978 and QUA-544. Expected green rate
+      54/56 ≈ 96% (or 54/55 ≈ 98% excluding QUA-1059's known bug).
+    deadline: "2026-05-16"
+    added: "2026-05-02"
 
 # ---------------------------------------------------------------------------
 # Archived post-merge items (all verified — kept for historical record)
