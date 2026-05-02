@@ -9,6 +9,7 @@ import type { OrgRow, OrgStatDef } from "@/app/organizations/organizations-table
 import { OrganizationsView } from "@/app/organizations/organizations-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { DirectoryIndexShell } from "@/components/directory";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 
 export const metadata: Metadata = {
@@ -406,19 +407,11 @@ export default async function OrganizationsPage() {
   );
 
   return (
-    <div className="max-w-[90rem] mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-          Organizations
-        </h1>
-        <p className="text-muted-foreground text-sm max-w-2xl">
-          Directory of AI safety organizations, frontier labs,
-          research groups, and funders tracked in the knowledge base.
-        </p>
-      </div>
-
-      <DataSourceBanner source={source} apiError={apiError} />
-
+    <DirectoryIndexShell
+      title="Organizations"
+      description="Directory of AI safety organizations, frontier labs, research groups, and funders tracked in the knowledge base."
+      banner={<DataSourceBanner source={source} apiError={apiError} />}
+    >
       <Suspense fallback={<div>Loading...</div>}>
         <OrganizationsView
           rows={data.rows}
@@ -427,6 +420,6 @@ export default async function OrganizationsPage() {
           orgTypeMap={data.orgTypeMap}
         />
       </Suspense>
-    </div>
+    </DirectoryIndexShell>
   );
 }

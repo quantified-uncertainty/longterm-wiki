@@ -9,6 +9,8 @@ import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
+import { formatDateDeterministic } from "@/lib/format";
+import { formatCount } from "@/lib/format-compact";
 import { formatType } from "./types";
 import type { ThingRow, ThingsStatsResponse } from "./types";
 
@@ -18,20 +20,6 @@ interface ThingsTableProps {
   totalPages: number;
   stats: ThingsStatsResponse;
   pageSize: number;
-}
-
-/** Format an ISO date string to a short date. */
-function formatDate(iso: string | null): string {
-  if (!iso) return "\u2014";
-  try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return iso;
-  }
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -125,7 +113,7 @@ export function ThingsTable({
           </select>
         )}
         <span className="text-sm text-muted-foreground whitespace-nowrap tabular-nums">
-          {total.toLocaleString()} results
+          {formatCount(total)} results
         </span>
       </div>
 
@@ -234,7 +222,7 @@ export function ThingsTable({
                   )}
                 </td>
                 <td className="py-2.5 px-3 text-muted-foreground text-xs tabular-nums">
-                  {formatDate(row.updatedAt)}
+                  {row.updatedAt ? formatDateDeterministic(row.updatedAt) : "—"}
                 </td>
                 <td className="py-2.5 px-2 text-right">
                   <RecordStatusDots

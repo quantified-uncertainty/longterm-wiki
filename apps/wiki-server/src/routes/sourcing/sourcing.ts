@@ -825,6 +825,9 @@ const sourcingApp = new Hono()
         verdict: e.verdict as EvidenceRow["verdict"],
         relevanceScore: e.relevanceScore,
         confidence: e.confidence,
+        // QUA-992: aggregation tie-breaker prefers the bucket whose latest
+        // evidence is most recent.
+        checkedAt: e.checkedAt,
       });
     }
     for (const [key, rows] of evidenceByFieldKey) {

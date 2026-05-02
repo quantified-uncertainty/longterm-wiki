@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
+import { formatCount } from "@/lib/format-compact";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
@@ -93,7 +94,7 @@ export function DivisionsTable({
       label: "With Data",
       value: String(divisionsWithData),
     },
-    { label: "Total", value: totalDivisions.toLocaleString() },
+    { label: "Total", value: formatCount(totalDivisions) },
     { label: "Organizations", value: String(uniqueOrgs) },
     { label: "Types", value: String(filteredTypeSummary.length) },
   ];

@@ -152,9 +152,10 @@ print_tcc_help() {
 
   To grant access (one-time per machine):
     1. Open  System Settings → Privacy & Security → Full Disk Access
-    2. Click  ＋  and add  /bin/bash  (Cmd-Shift-G to type the path)
-       — or, more narrowly, add the supervisor script:
-       $SUPERVISOR
+    2. Click  ＋ , press  Cmd-Shift-G , type  /bin , and select  bash .
+       (Adding the supervisor script directly does NOT work: macOS attributes
+       shell-script execution to the interpreter, and the FDA picker filters
+       out .sh files anyway. See QUA-1004 for the full root-cause writeup.)
     3. Toggle the new entry ON.
     4. Re-run:  ./pr-patrol.sh install
 

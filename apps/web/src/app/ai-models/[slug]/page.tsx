@@ -11,8 +11,8 @@ import { resolveSlugAlias } from "@/data/factbase";
 import {
   DEVELOPER_COLORS,
   SAFETY_LEVEL_COLORS,
-  formatContext,
 } from "../ai-model-constants";
+import { formatCompactNumber } from "@/lib/format-compact";
 import { ProfileStatCard, type ProfileTab } from "@/components/directory";
 import {
   computeAiModelCoverage,
@@ -115,7 +115,7 @@ export default async function AiModelDetailPage({
   if (entity.contextWindow != null) {
     stats.push({
       label: "Context Window",
-      value: `${formatContext(entity.contextWindow)} tokens`,
+      value: `${formatCompactNumber(entity.contextWindow)} tokens`,
     });
   }
 

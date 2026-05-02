@@ -54,6 +54,11 @@ function rowToSql(r: Row): Record<string, unknown> {
     error_code: r.errorCode,
     error_payload: r.errorPayload,
     followup_actions: r.followupActions,
+    cost_usd: r.costUsd,
+    tokens_input: r.tokensInput,
+    tokens_output: r.tokensOutput,
+    tokens_cache_read: r.tokensCacheRead,
+    tokens_cache_write: r.tokensCacheWrite,
     created_at: r.createdAt,
     updated_at: r.updatedAt,
   };
@@ -107,6 +112,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       error_code: "errorCode",
       error_payload: "errorPayload",
       followup_actions: "followupActions",
+      cost_usd: "costUsd",
+      tokens_input: "tokensInput",
+      tokens_output: "tokensOutput",
+      tokens_cache_read: "tokensCacheRead",
+      tokens_cache_write: "tokensCacheWrite",
       created_at: "createdAt",
       updated_at: "updatedAt",
     };
@@ -127,6 +137,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       errorCode: null,
       errorPayload: null,
       followupActions: [],
+      costUsd: null,
+      tokensInput: null,
+      tokensOutput: null,
+      tokensCacheRead: null,
+      tokensCacheWrite: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -201,6 +216,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       error_code: "errorCode",
       error_payload: "errorPayload",
       followup_actions: "followupActions",
+      cost_usd: "costUsd",
+      tokens_input: "tokensInput",
+      tokens_output: "tokensOutput",
+      tokens_cache_read: "tokensCacheRead",
+      tokens_cache_write: "tokensCacheWrite",
       created_at: "createdAt",
       updated_at: "updatedAt",
     };
@@ -497,6 +517,244 @@ describe("PATCH /api/pipeline-runs/:id/end", () => {
       body: JSON.stringify({ status: "committed" }),
     });
     expect(res.status).toBe(404);
+  });
+
+  it("persists costUsd + token counts when supplied (QUA-1012)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "committed",
+        costUsd: 1.2345,
+        tokensInput: 1000,
+        tokensOutput: 500,
+        tokensCacheRead: 800,
+        tokensCacheWrite: 200,
+      }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    // numeric() returns the value as a string (Drizzle convention).
+    expect(body.costUsd).toBe("1.2345");
+    expect(body.tokensInput).toBe(1000);
+    expect(body.tokensOutput).toBe(500);
+    expect(body.tokensCacheRead).toBe(800);
+    expect(body.tokensCacheWrite).toBe(200);
+    // Verify the row was actually mutated (defends against the test
+    // dispatcher silently ignoring an unknown SET column).
+    expect(runStore[0].costUsd).toBe("1.2345");
+    expect(runStore[0].tokensInput).toBe(1000);
+  });
+
+  it("leaves cost telemetry NULL when omitted from end body", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "no-cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/no-cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed" }),
+    });
+    expect(res.status).toBe(200);
+    expect(runStore[0].costUsd).toBeNull();
+    expect(runStore[0].tokensInput).toBeNull();
+    expect(runStore[0].tokensOutput).toBeNull();
+    expect(runStore[0].tokensCacheRead).toBeNull();
+    expect(runStore[0].tokensCacheWrite).toBeNull();
+  });
+
+  it("rejects negative costUsd / token counts", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "neg-001",
+      pipelineName: "improve-page",
+    });
+
+    const r1 = await app.request("/api/pipeline-runs/neg-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: -0.01 }),
+    });
+    expect(r1.status).toBe(400);
+
+    const r2 = await app.request("/api/pipeline-runs/neg-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", tokensInput: -1 }),
+    });
+    expect(r2.status).toBe(400);
+  });
+
+  it("rejects costUsd over the 10k cap (overflow guard)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "huge-cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/huge-cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: 10_001 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects non-integer token counts on every token field", async () => {
+    const app = buildApp();
+    const fields = [
+      "tokensInput",
+      "tokensOutput",
+      "tokensCacheRead",
+      "tokensCacheWrite",
+    ] as const;
+    for (const field of fields) {
+      const runId = `frac-${field}`;
+      await postJson(app, "/api/pipeline-runs", {
+        runId,
+        pipelineName: "improve-page",
+      });
+      const res = await app.request(`/api/pipeline-runs/${runId}/end`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "committed", [field]: 1.5 }),
+      });
+      expect(res.status, `${field} should reject 1.5`).toBe(400);
+    }
+  });
+
+  it("rejects negative values on every token field", async () => {
+    const app = buildApp();
+    const fields = [
+      "tokensInput",
+      "tokensOutput",
+      "tokensCacheRead",
+      "tokensCacheWrite",
+    ] as const;
+    for (const field of fields) {
+      const runId = `neg-${field}`;
+      await postJson(app, "/api/pipeline-runs", {
+        runId,
+        pipelineName: "improve-page",
+      });
+      const res = await app.request(`/api/pipeline-runs/${runId}/end`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "committed", [field]: -1 }),
+      });
+      expect(res.status, `${field} should reject -1`).toBe(400);
+    }
+  });
+
+  it("rejects token counts above MAX_TOKENS cap (overflow guard)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "huge-tokens-001",
+      pipelineName: "improve-page",
+    });
+    const res = await app.request("/api/pipeline-runs/huge-tokens-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      // 2_000_000_001 — one over the documented cap.
+      body: JSON.stringify({ status: "committed", tokensInput: 2_000_000_001 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects costUsd with more than 4 decimal places (column is numeric(10,4))", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "precision-001",
+      pipelineName: "improve-page",
+    });
+    const res = await app.request("/api/pipeline-runs/precision-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: 1.23456 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("preserves prior cost telemetry on retry that omits the fields (idempotent /end)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "retry-001",
+      pipelineName: "improve-page",
+    });
+
+    // First end — record cost + tokens. Use partial_failure so a retry
+    // is semantically motivated.
+    const r1 = await app.request("/api/pipeline-runs/retry-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "partial_failure",
+        costUsd: 2.5,
+        tokensInput: 100,
+        tokensOutput: 50,
+      }),
+    });
+    expect(r1.status).toBe(200);
+    expect(runStore[0].costUsd).toBe("2.5");
+    expect(runStore[0].tokensInput).toBe(100);
+    expect(runStore[0].tokensOutput).toBe(50);
+
+    // Second end — caller retried, succeeded, but didn't re-send cost.
+    // The conditional spread must NOT clobber the previously-recorded
+    // values with NULL.
+    const r2 = await app.request("/api/pipeline-runs/retry-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed" }),
+    });
+    expect(r2.status).toBe(200);
+    expect(runStore[0].status).toBe("committed");
+    expect(runStore[0].costUsd).toBe("2.5");
+    expect(runStore[0].tokensInput).toBe(100);
+    expect(runStore[0].tokensOutput).toBe(50);
+  });
+
+  it("explicit null overwrites prior cost telemetry (caller actively cleared)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "clear-001",
+      pipelineName: "improve-page",
+    });
+
+    await app.request("/api/pipeline-runs/clear-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "partial_failure",
+        costUsd: 1.5,
+        tokensInput: 200,
+      }),
+    });
+    expect(runStore[0].costUsd).toBe("1.5");
+
+    // Caller explicitly nulls cost on the second /end — distinct from
+    // omitting (which would preserve).
+    const r2 = await app.request("/api/pipeline-runs/clear-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "committed",
+        costUsd: null,
+        tokensInput: null,
+      }),
+    });
+    expect(r2.status).toBe(200);
+    expect(runStore[0].costUsd).toBeNull();
+    expect(runStore[0].tokensInput).toBeNull();
   });
 });
 

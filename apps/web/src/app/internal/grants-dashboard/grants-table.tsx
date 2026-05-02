@@ -14,7 +14,7 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import { safeHref } from "@/lib/format-compact";
+import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,12 +44,7 @@ export interface GrantRow {
 
 function formatAmount(amount: number | null, currency: string): string {
   if (amount == null) return "-";
-  if (currency === "USD") {
-    if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-    if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-    return `$${amount.toLocaleString()}`;
-  }
-  return `${amount.toLocaleString()} ${currency}`;
+  return formatCompactCurrency(amount, currency);
 }
 
 // ---------------------------------------------------------------------------

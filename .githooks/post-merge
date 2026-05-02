@@ -6,6 +6,11 @@
 # This prevents stale-data bugs after git pull.
 #
 
+# Apply any deferred migration .sql renames recorded by the drizzle-journal
+# merge driver (QUA-988). No-op if no marker file is present.
+DIR="$(dirname "$0")"
+[ -x "$DIR/apply-migration-renames.sh" ] && "$DIR/apply-migration-renames.sh"
+
 # Check if any data-relevant files changed in the merge
 CHANGED_FILES=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || echo "")
 

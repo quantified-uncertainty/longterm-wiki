@@ -17,6 +17,8 @@ import { z } from "zod";
 
 import { type CommandResult } from "../lib/cli.ts";
 import {
+  BUDGET_EXHAUSTED_REASON,
+  BudgetExhaustedError,
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
@@ -282,10 +284,9 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
-    // Per-entity soft cap: 2× the equal-share allocation. The inner loop's
-    // own budget guard runs *between* iterations, so a single iteration that
-    // overshoots the cap is allowed to complete — see `improveSingleEntity`.
-    // The post-iter warning below catches actual cap-hits.
+    // Per-entity hard cap: 2× the equal-share allocation. Enforced by the
+    // live CostTracker inside improveSingleEntity; surfaced here as
+    // result.reason === BUDGET_EXHAUSTED_REASON.
     const entityBudget = Math.min(perEntityCap, remaining);
     console.log(
       `\n=== [${records.length + 1}/${N}] improve-entity-suite: ${entry.slug} ` +
@@ -300,6 +301,20 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         dryRun: opts.dryRun,
         quiet: true,
       });
+      if (result.reason === BUDGET_EXHAUSTED_REASON) {
+        console.warn(
+          `[suite] BUDGET-EXHAUSTED: ${entry.slug} spent $${result.total_cost_usd.toFixed(4)}; stopping suite`,
+        );
+        records.push(
+          emptyRecord(
+            entry,
+            "skipped_budget",
+            `entity hit hard cap mid-iteration: spent $${result.total_cost_usd.toFixed(4)} of $${entityBudget.toFixed(2)}`,
+          ),
+        );
+        totalSpent += result.total_cost_usd;
+        break;
+      }
       const record = aggregateResult(entry.slug, entry.type, result);
       records.push(record);
       totalSpent += result.total_cost_usd;
@@ -311,8 +326,23 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // Defensive: improveSingleEntity normally surfaces budget aborts via
+      // result.reason above. This branch only fires if a future change
+      // re-throws BudgetExhaustedError out of doImproveSingleEntity.
+      if (err instanceof BudgetExhaustedError) {
+        console.warn(`[suite] BUDGET-EXHAUSTED (re-thrown): ${entry.slug}: ${msg}; stopping suite`);
+        records.push(emptyRecord(entry, "skipped_budget", msg));
+        totalSpent += err.spentUsd;
+        break;
+      }
       console.warn(`[suite] FAILED: ${entry.slug}: ${msg}`);
       records.push(emptyRecord(entry, "failed", msg));
+    }
+  }
+  // Backfill remaining entries after a mid-suite break.
+  if (records.length < supported.length) {
+    for (const entry of supported.slice(records.length)) {
+      records.push(emptyRecord(entry, "skipped_budget"));
     }
   }
 
@@ -427,12 +457,13 @@ Options:
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
 
 Budget governance:
-  Per-entity soft cap = 2 × (total_budget / N) where N = supported entities.
-  This is a soft cap: a single iteration may overshoot it, since runResearch
-  spends until its own budgetCap. The suite halts mid-run when remaining
-  budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)}; remaining entities
-  are recorded as \`skipped_budget\`. \`--budget\` is therefore a target, not
-  a strict bound.
+  Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.
+  Enforced by a live CostTracker inside improveSingleEntity (QUA-1017): when
+  the tracker total reaches the per-entity cap mid-iteration, the entity
+  throws BudgetExhaustedError. The suite catches it, records the entity as
+  \`skipped_budget\`, and stops dispatching further entities. The suite also
+  short-circuits when remaining < $${MIN_USEFUL_BUDGET_USD.toFixed(2)} before
+  starting an entity. \`--budget\` is now a hard cap on total LLM spend.
 `,
     exitCode: 0,
   };

@@ -17,7 +17,7 @@
     "setup": "bash scripts/setup.sh",
     "setup:quick": "bash scripts/setup.sh --quick",
     "setup:check": "bash scripts/setup.sh --check",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true; git config merge.drizzle-journal.driver 'node crux/git/drizzle-journal-merge.mjs %O %A %B %P' || true"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
