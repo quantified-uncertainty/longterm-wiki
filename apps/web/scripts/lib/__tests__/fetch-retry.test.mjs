@@ -678,8 +678,9 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
     ]);
     expect(callerASignals).toHaveLength(1);
     expect(callerBSignals).toHaveLength(1);
-    // The two calls must have completely disjoint signals; pre-fix they would
-    // have shared the single fetchOpts.signal from line 1464.
+    // The two calls must have completely disjoint signals; pre-fix the
+    // shared `fetchOpts.signal` in mergePGRecordsIntoKB's inner fetchAllPages
+    // would have made all 11 parallel callers receive the same instance.
     expect(callerASignals[0]).not.toBe(callerBSignals[0]);
   });
 
@@ -708,5 +709,111 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
     });
     expect(result.ok).toBe(false);
     expect(result.reason).toMatch(/missing array/i);
+  });
+
+  it('does NOT infinite-loop when items field is a non-array object', async () => {
+    // Phase 4 red-team finding: a malformed server response with `items` as
+    // an object (not an array) would otherwise loop forever — `concat` treats
+    // the object as a single element and `items.length` is `undefined`, so
+    // `undefined < pageSize` is false and the loop never breaks. The
+    // Array.isArray check returns { ok: false } instead of looping forever.
+    let calls = 0;
+    const fetcher = async () => {
+      calls++;
+      if (calls > 5) throw new Error('infinite-loop guard tripped — function did not terminate');
+      return mockResponse({ ok: true, json: { items: { 0: 'a', 1: 'b' } } });
+    };
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
+    expect(calls).toBe(1); // must terminate after the first malformed page
+  });
+
+  it('does NOT infinite-loop when items field is a string', async () => {
+    let calls = 0;
+    const fetcher = async () => {
+      calls++;
+      if (calls > 5) throw new Error('infinite-loop guard tripped');
+      return mockResponse({ ok: true, json: { items: 'unexpected' } });
+    };
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
+    expect(calls).toBe(1);
+  });
+
+  it('handles JSON `null` body without throwing (defensive optional chaining)', async () => {
+    // A misconfigured server returning the literal JSON `null` would NPE on
+    // `result.data[itemsKey]` without optional chaining. With `?.`, it
+    // returns { ok: false } instead of throwing.
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: null }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/missing array/i);
+  });
+
+  it('appends limit/offset with `&` when baseUrl already has a query string', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: [{ id: 1 }] } }),
+    ]);
+    await fetchPaginatedItems('http://x/api/grants/all?status=active', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    // Critical: must produce ?status=active&limit=200&offset=0, NOT
+    // ?status=active?limit=200&offset=0 (which is malformed).
+    expect(calls[0]).toBe('http://x/api/grants/all?status=active&limit=200&offset=0');
+    expect(calls[0]).not.toMatch(/\?[^&]*\?/);
+  });
+
+  it('respects custom pageSize option', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: Array.from({ length: 50 }, (_, i) => ({ id: i })) } }),
+      mockResponse({ ok: true, json: { items: [{ id: 50 }] } }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/things', 'items', {
+      pageSize: 50,
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.items).toHaveLength(51);
+    expect(calls[0]).toContain('limit=50&offset=0');
+    expect(calls[1]).toContain('limit=50&offset=50');
+  });
+
+  it('forwards headers to fetchJsonWithRetry on every page', async () => {
+    const seenHeaders = [];
+    const fetcher = async (_url, init) => {
+      seenHeaders.push(init.headers);
+      return mockResponse({
+        ok: true,
+        json: { items: seenHeaders.length === 1
+          ? Array.from({ length: 200 }, (_, i) => ({ id: i }))
+          : [{ id: 999 }] },
+      });
+    };
+    const customHeaders = { Authorization: 'Bearer test-token-xyz' };
+    await fetchPaginatedItems('http://x/api/secure/all', 'items', {
+      headers: customHeaders,
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(seenHeaders).toHaveLength(2);
+    // Both pages must carry the auth header — a header drop on subsequent
+    // pages would produce 401s mid-pagination.
+    expect(seenHeaders[0]).toEqual(customHeaders);
+    expect(seenHeaders[1]).toEqual(customHeaders);
   });
 });
