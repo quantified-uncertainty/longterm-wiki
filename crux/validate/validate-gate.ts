@@ -347,6 +347,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-1006: directory tables must use shared formatters from
+    // @/lib/format-compact + @/lib/format. Prevents new ad-hoc
+    // .toLocaleString / Intl.NumberFormat / .toLocaleDateString calls
+    // from drifting back into *-table.tsx components.
+    id: 'table-formatting',
+    name: 'Directory tables use shared formatters (QUA-1006)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-table-formatting.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-897: block the non-word "sourcinged" — a mass-rename artifact
     // from QUA-237 that surfaced on /divisions and 4 other pages.
     id: 'no-sourcinged',

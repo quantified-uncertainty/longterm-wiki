@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { formatCompactCurrency } from "@/lib/format-compact";
 import { PoliticianScoresCell } from "@/components/political/politician-scores-cell";
 import type { PoliticalScore } from "@/components/political/types";
 import {
@@ -253,11 +254,7 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                   <td className="py-2.5 px-3 text-right">
                     {row.totalRaised != null ? (
                       <span className="text-xs tabular-nums text-muted-foreground font-medium">
-                        ${row.totalRaised >= 1_000_000
-                          ? `${(row.totalRaised / 1_000_000).toFixed(1)}M`
-                          : row.totalRaised >= 1_000
-                            ? `${(row.totalRaised / 1_000).toFixed(0)}K`
-                            : row.totalRaised.toLocaleString()}
+                        {formatCompactCurrency(row.totalRaised)}
                       </span>
                     ) : (
                       <span className="text-muted-foreground/40">&mdash;</span>

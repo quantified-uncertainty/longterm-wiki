@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { formatCompactCurrency, formatCompactNumber, formatIntroducedDate } from "../format-compact";
+import {
+  formatCompactCurrency,
+  formatCompactNumber,
+  formatCount,
+  formatIntroducedDate,
+} from "../format-compact";
 
 describe("formatCompactCurrency", () => {
   it("formats trillions", () => {
@@ -64,6 +69,23 @@ describe("formatCompactCurrency", () => {
 
   it("handles negative values", () => {
     expect(formatCompactCurrency(-5e6)).toBe("$-5M");
+  });
+});
+
+describe("formatCount", () => {
+  it("returns empty for null/undefined/NaN/Infinity", () => {
+    expect(formatCount(null)).toBe("");
+    expect(formatCount(undefined)).toBe("");
+    expect(formatCount(NaN)).toBe("");
+    expect(formatCount(Infinity)).toBe("");
+  });
+
+  it("groups locale digits without compacting (status-line precision)", () => {
+    expect(formatCount(0)).toBe("0");
+    expect(formatCount(42)).toBe("42");
+    expect(formatCount(1500)).toBe("1,500");
+    expect(formatCount(12345)).toBe("12,345");
+    expect(formatCount(1000000)).toBe("1,000,000");
   });
 });
 
