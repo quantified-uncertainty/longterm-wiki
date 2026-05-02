@@ -12,7 +12,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import {
   createLlmClient, streamLlmCall, extractMdxContent,
@@ -121,11 +121,11 @@ export async function runValidationLoopApiDirect(
     // Run auto-fixes via the run.mjs shim — picks dist/ when built, tsx
     // as a fallback (QUA-1053).
     try {
-      const cruxRunner = `node ${path.join(ROOT, 'crux/run.mjs')}`;
-      execSync(`${cruxRunner} fix escaping 2>&1`, {
+      const runMjs = path.join(ROOT, 'crux/run.mjs');
+      spawnSync('node', [runMjs, 'fix', 'escaping'], {
         cwd: ROOT, stdio: 'pipe', timeout: 60000
       });
-      execSync(`${cruxRunner} fix markdown 2>&1`, {
+      spawnSync('node', [runMjs, 'fix', 'markdown'], {
         cwd: ROOT, stdio: 'pipe', timeout: 60000
       });
       content = fs.readFileSync(draftPath, 'utf-8');
@@ -193,15 +193,16 @@ function collectValidationIssues(
   const topicSlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   // Use the run.mjs shim so we pick up dist/ when built, tsx as fallback
   // (QUA-1053 — eliminates tsx-cache contention).
-  const CRUX_BIN = `node ${path.join(ROOT, 'crux/run.mjs')}`;
+  const runMjs = path.join(ROOT, 'crux/run.mjs');
 
   // Check critical rules
   for (const rule of CRITICAL_RULES) {
     try {
-      const result = execSync(
-        `${CRUX_BIN} validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
-      );
+      const proc = spawnSync('node', [runMjs, 'validate', 'unified', `--rules=${rule}`, '--ci'], {
+        cwd: ROOT, encoding: 'utf-8', timeout: 30000, stdio: 'pipe'
+      });
+      const combined = (proc.stdout || '') + (proc.stderr || '');
+      const result = combined.split('\n').filter(l => l.toLowerCase().includes(topicSlug)).join('\n');
       const errorCount = (result.match(/error/gi) || []).length;
       if (errorCount > 0) {
         issues.push(`[CRITICAL] ${rule}: ${errorCount} error(s)\n${result.trim()}`);
@@ -217,10 +218,11 @@ function collectValidationIssues(
   // Check quality rules
   for (const rule of QUALITY_RULES.slice(0, 5)) { // Check most important quality rules
     try {
-      const result = execSync(
-        `${CRUX_BIN} validate unified --rules=${rule} --ci 2>&1 | grep -i "${topicSlug}" || true`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
-      );
+      const proc = spawnSync('node', [runMjs, 'validate', 'unified', `--rules=${rule}`, '--ci'], {
+        cwd: ROOT, encoding: 'utf-8', timeout: 30000, stdio: 'pipe'
+      });
+      const combined = (proc.stdout || '') + (proc.stderr || '');
+      const result = combined.split('\n').filter(l => l.toLowerCase().includes(topicSlug)).join('\n');
       const warningCount = (result.match(/warning/gi) || []).length;
       if (warningCount > 0) {
         issues.push(`[QUALITY] ${rule}: ${warningCount} warning(s)\n${result.trim()}`);

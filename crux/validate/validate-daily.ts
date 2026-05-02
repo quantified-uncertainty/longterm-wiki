@@ -155,7 +155,25 @@ function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
       return;
     }
 
-    const { args: scriptInvocation } = resolveCruxScriptArgs(cruxRel);
+    let scriptInvocation: string[];
+    try {
+      ({ args: scriptInvocation } = resolveCruxScriptArgs(cruxRel));
+    } catch (err) {
+      resolve({
+        id: validator.id,
+        name: validator.name,
+        blocking: validator.blocking,
+        requiresServer: validator.requiresServer,
+        passed: false,
+        skipped: false,
+        exitCode: 1,
+        stdout: "",
+        stderr: "",
+        durationMs: Date.now() - startTime,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return;
+    }
     const childArgs = [...scriptInvocation, "--ci"];
     if (validator.extraArgs) {
       childArgs.push(...validator.extraArgs);
