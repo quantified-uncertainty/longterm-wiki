@@ -6,13 +6,66 @@
 
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, isAbsolute, join, normalize } from 'path';
 import { PROJECT_ROOT } from './content-types.ts';
+
+// `__CRUX_DIST_DIR__` is replaced by esbuild at build time with the
+// absolute path of crux/dist/. In tsx (source) mode the identifier stays
+// undeclared; the `typeof` guard below handles both shapes safely.
+declare const __CRUX_DIST_DIR__: string;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const SCRIPTS_DIR: string = join(__dirname, '..');
+// SCRIPTS_DIR resolution:
+//
+//   - In dist mode: `__CRUX_DIST_DIR__` was replaced with the dist path
+//     at build time. We trust it absolutely — no runtime path-substring
+//     guesswork (which had a false-positive vector for any user with
+//     "dist" anywhere in their workspace path).
+//   - In tsx (source) mode: derive from this file's location at
+//     `<repo>/crux/lib/`, parent is `<repo>/crux/`.
+const DIST_DIR_FROM_BUILD: string | undefined =
+  typeof __CRUX_DIST_DIR__ !== 'undefined' ? __CRUX_DIST_DIR__ : undefined;
+
+const RUNNING_FROM_DIST = DIST_DIR_FROM_BUILD !== undefined;
+
+export const SCRIPTS_DIR: string =
+  DIST_DIR_FROM_BUILD ?? join(__dirname, '..');
+
+/**
+ * Resolve a crux script path (e.g. `validate/validate-unified.ts`) to the
+ * concrete `[node, ...args]` invocation we should spawn.
+ *
+ * In dist mode (post-build), paths point at `crux/dist/<rel>.js` and are
+ * invoked with plain `node` — no tsx, no per-process compile cost,
+ * eliminating the cache-contention class entirely (QUA-1053).
+ *
+ * Otherwise we fall back to the legacy tsx invocation so dev iteration
+ * (editing crux/*.ts without rebuilding) still works.
+ *
+ * Throws on inputs that would resolve outside SCRIPTS_DIR (absolute
+ * paths, parent-traversal segments) — those are bugs in the caller,
+ * not user input we need to gracefully accept.
+ */
+export function resolveCruxScriptArgs(scriptRelPath: string): { args: string[]; absPath: string } {
+  if (!scriptRelPath || isAbsolute(scriptRelPath)) {
+    throw new Error(`resolveCruxScriptArgs: scriptRelPath must be a non-empty relative path, got: ${JSON.stringify(scriptRelPath)}`);
+  }
+  const normalized = normalize(scriptRelPath);
+  // After normalize, any path that escapes its starting dir begins with '..'
+  // — both '..' alone and '../foo' qualify, plus the Windows form '..\\foo'.
+  if (normalized === '..' || normalized.startsWith('..\\') || normalized.startsWith('../')) {
+    throw new Error(`resolveCruxScriptArgs: scriptRelPath must not traverse out of SCRIPTS_DIR: ${JSON.stringify(scriptRelPath)}`);
+  }
+  if (RUNNING_FROM_DIST) {
+    const distRel = normalized.replace(/\.(ts|mjs)$/, '.js');
+    const absPath = join(SCRIPTS_DIR, distRel);
+    return { args: [absPath], absPath };
+  }
+  const absPath = join(SCRIPTS_DIR, normalized);
+  return { args: ['--import', 'tsx/esm', '--no-warnings', absPath], absPath };
+}
 
 export interface RunScriptResult {
   stdout: string;
@@ -34,12 +87,11 @@ export async function runScript(
   args: string[] = [],
   options: RunScriptOptions = {},
 ): Promise<RunScriptResult> {
-  const fullPath = join(SCRIPTS_DIR, scriptPath);
   const { streamOutput = false, cwd = PROJECT_ROOT } = options;
+  const { args: spawnArgs } = resolveCruxScriptArgs(scriptPath);
 
   return new Promise((resolve) => {
-    // Always register tsx/esm so scripts can use .ts imports
-    const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', fullPath, ...args];
+    const runnerArgs = [...spawnArgs, ...args];
 
     const proc = spawn('node', runnerArgs, {
       cwd,

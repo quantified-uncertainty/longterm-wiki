@@ -14,7 +14,7 @@
 import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
 import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { readFileSync } from 'fs';
-import { join, relative } from 'path';
+import { join, relative, sep } from 'path';
 import { PROJECT_ROOT } from '../content-types.ts';
 import { findFiles } from '../file-utils.ts';
 
@@ -37,8 +37,9 @@ export const noExecSyncRule = createRule({
     const files = findFiles(CRUX_DIR, extensions);
 
     for (const filePath of files) {
-      // Skip test files and node_modules
+      // Skip test files, node_modules, and generated dist/ (source scan is sufficient)
       if (filePath.includes('node_modules') || filePath.includes('.test.')) continue;
+      if (filePath.startsWith(join(CRUX_DIR, 'dist') + sep)) continue;
 
       const content = readFileSync(filePath, 'utf-8');
       const lines = content.split('\n');

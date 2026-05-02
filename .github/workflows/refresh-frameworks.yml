@@ -92,5 +92,6 @@ jobs:
           if [ "${{ inputs.skip_discord }}" = "true" ]; then
             ARGS="$ARGS --skip-discord"
           fi
-          echo "Running: node --import tsx/esm crux/scripts/refresh-frameworks.ts $ARGS"
-          node --import tsx/esm crux/scripts/refresh-frameworks.ts $ARGS
+          # Use prebuilt dist (QUA-1053). postinstall builds dist/.
+          echo "Running: node crux/dist/scripts/refresh-frameworks.js $ARGS"
+          node crux/dist/scripts/refresh-frameworks.js $ARGS
