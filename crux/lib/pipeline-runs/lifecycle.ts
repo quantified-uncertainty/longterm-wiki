@@ -46,6 +46,7 @@ import {
   endPipelineRun,
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
+import type { CostTracker } from '../cost-tracker.ts';
 
 // Crux libs log via console (validate-no-console-log only blocks server
 // code under apps/wiki-server). Structured fields are stringified into
@@ -69,6 +70,17 @@ export interface WithPipelineRunOptions {
   allowOffline?: boolean;
   /** Override the heartbeat interval (ms). Test-only. */
   heartbeatIntervalMs?: number;
+  /**
+   * Optional CostTracker. When provided, totals are snapshotted after
+   * the body returns/throws and forwarded to the /end call so the
+   * pipeline_runs row records cost + token spend (QUA-1013 / QUA-1038).
+   *
+   * `allowOffline + tracker`: if `/start` fails and `allowOffline=true`,
+   * the body runs in no-op mode and the tracker is NOT persisted (no
+   * run row exists to attach the totals to). A warning is logged when
+   * a tracker is dropped this way so the silent loss is visible.
+   */
+  tracker?: CostTracker;
 }
 
 export interface PipelineRunCtx {
@@ -112,6 +124,12 @@ export async function withPipelineRun<T>(
         pipelineName: options.pipelineName,
         err: startResult.message,
       });
+      if (options.tracker) {
+        warn(
+          'withPipelineRun: tracker totals will NOT be persisted — no run row exists in offline mode',
+          { runId, pipelineName: options.pipelineName },
+        );
+      }
       return body(makeOfflineCtx(runId));
     }
 
@@ -191,6 +209,7 @@ export async function withPipelineRun<T>(
       errorCode: overrideErrorCode,
       errorPayload: null,
       followups,
+      costTotals: trackerTotals(options.tracker),
     });
     return result;
   } catch (err: unknown) {
@@ -210,6 +229,7 @@ export async function withPipelineRun<T>(
         errorCode: overrideErrorCode ?? errorCodeFor(err),
         errorPayload: errorPayload(err),
         followups,
+        costTotals: trackerTotals(options.tracker),
       });
     } catch (finalizeErr: unknown) {
       error(
@@ -242,6 +262,50 @@ function makeOfflineCtx(runId: string): PipelineRunCtx {
   };
 }
 
+interface CostTotals {
+  costUsd: number;
+  tokensInput: number;
+  tokensOutput: number;
+  tokensCacheRead: number;
+  tokensCacheWrite: number;
+}
+
+/**
+ * Snapshot the tracker's current totals. Returns null when no tracker is
+ * configured so `finalize` can omit the cost fields entirely (preserving
+ * the typed-client semantic that omitted ≠ null — see QUA-1012 comment in
+ * `EndPipelineRunInput`).
+ *
+ * `costUsd` is rounded to 4 decimal places. The pricing module produces
+ * costs like `0.006196500000000001` from per-token math + FP imprecision,
+ * which fail the server's `.multipleOf(0.0001)` Zod validator and would
+ * cause /end to 422 mid-flight. The numeric(10,4) PG column would also
+ * silently truncate, so rounding client-side keeps caller-side and
+ * persisted values equal.
+ */
+function trackerTotals(tracker: CostTracker | undefined): CostTotals | null {
+  if (!tracker) return null;
+  let costUsd = 0;
+  let tokensInput = 0;
+  let tokensOutput = 0;
+  let tokensCacheRead = 0;
+  let tokensCacheWrite = 0;
+  for (const entry of tracker.entries) {
+    costUsd += entry.cost;
+    tokensInput += entry.inputTokens;
+    tokensOutput += entry.outputTokens;
+    tokensCacheRead += entry.cacheReadInputTokens;
+    tokensCacheWrite += entry.cacheCreationInputTokens;
+  }
+  return {
+    costUsd: Math.round(costUsd * 10000) / 10000,
+    tokensInput,
+    tokensOutput,
+    tokensCacheRead,
+    tokensCacheWrite,
+  };
+}
+
 interface FinalizeArgs {
   runId: string;
   pipelineName: string;
@@ -250,6 +314,7 @@ interface FinalizeArgs {
   errorCode: string | null;
   errorPayload: Record<string, unknown> | null;
   followups: Array<Record<string, unknown>>;
+  costTotals: CostTotals | null;
 }
 
 async function finalize(args: FinalizeArgs): Promise<void> {
@@ -259,6 +324,7 @@ async function finalize(args: FinalizeArgs): Promise<void> {
     errorCode: args.errorCode,
     errorPayload: args.errorPayload,
     followupActions: args.followups,
+    ...(args.costTotals ?? {}),
   });
   if (!result.ok) {
     // End-call failure is non-fatal: we already swallowed the body's
