@@ -9672,10 +9672,12 @@
     - Writer AI
   website: https://writer.com
   description: >-
-    San Francisco-based enterprise generative-AI startup founded in 2020
-    by May Habib and Waseem AlShikh. Develops the Palmyra family of
-    domain-specific large language models and a B2B platform for
-    AI-assisted writing, knowledge work, and agent workflows.
+    San Francisco-based enterprise generative-AI startup founded by May
+    Habib and Waseem AlShikh, who previously co-founded Qordoba (2015)
+    and rebranded to Writer in 2020 around their own large language
+    models. Develops the Palmyra family of domain-specific LLMs and a
+    B2B platform for AI-assisted writing, knowledge work, and agent
+    workflows.
   lastUpdated: 2026-05
 
 - id: adept
@@ -9688,11 +9690,12 @@
     - Adept AI Labs
   website: https://www.adept.ai
   description: >-
-    San Francisco AI lab founded in 2022 by David Luan and former
-    Transformer co-authors to build agent models that drive software
-    interfaces. Best known for the ACT-1 and Fuyu model families. In
-    2024 most of its leadership and a non-exclusive technology licence
-    were acquired by Amazon, leaving a residual research team.
+    San Francisco AI lab founded in 2022 by David Luan together with
+    Transformer co-authors Ashish Vaswani and Niki Parmar (among others)
+    to build agent models that drive software interfaces. Best known
+    for the ACT-1 and Fuyu model families. In 2024 most of its
+    leadership and a non-exclusive technology licence were acquired by
+    Amazon, leaving a residual research team.
   lastUpdated: 2026-05
 
 - id: bigcode
