@@ -6,10 +6,14 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 let pagesStore: Map<string, Record<string, unknown>>;
 let entityIdsStore: Map<number, { slug: string; description: string | null; created_at: Date }>;
+let modelAliasesStore: Array<{ alias: string; model_stable_id: string }>;
+let entitiesStore: Map<string, { id: string; stable_id: string }>; // slug → row
 
 function resetStores() {
   pagesStore = new Map();
   entityIdsStore = new Map();
+  modelAliasesStore = [];
+  entitiesStore = new Map();
 }
 
 /**
@@ -179,6 +183,55 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
     }
     return results.slice(0, limit);
+  }
+
+  // --- model_aliases JOIN entities JOIN wiki_pages: alias-based search (QUA-745) ---
+  if (q.includes("model_aliases") && q.includes("join entities") && q.includes("join wiki_pages")) {
+    const aliasLower = params[0] as string;
+    const aliasPrefix = params[1] as string; // "alias%" form
+    const limit = (params[2] as number) || 20;
+    const excludeIds = (params[3] as string[]) || [];
+    const prefixCore = aliasPrefix.endsWith("%") ? aliasPrefix.slice(0, -1) : aliasPrefix;
+
+    type Hit = { row: Record<string, unknown>; rank: number };
+    const hits: Hit[] = [];
+    const seen = new Set<string>();
+    for (const a of modelAliasesStore) {
+      const isExact = a.alias === aliasLower;
+      const isPrefix = a.alias.startsWith(prefixCore);
+      if (!isExact && !isPrefix) continue;
+
+      const ent = Array.from(entitiesStore.values()).find(
+        (e) => e.stable_id === a.model_stable_id,
+      );
+      if (!ent) continue;
+
+      const page = pagesStore.get(ent.id);
+      if (!page) continue;
+      if (excludeIds.includes(page.slug as string)) continue;
+      if (page.entity_type === "internal") continue;
+      if (page.wiki_id == null) continue;
+      if (seen.has(page.slug as string)) continue;
+      seen.add(page.slug as string);
+
+      hits.push({
+        row: {
+          id: page.slug,
+          wiki_id: page.wiki_id,
+          title: page.title,
+          description: page.description,
+          entity_type: page.entity_type,
+          category: page.category,
+          reader_importance: page.reader_importance,
+          quality: page.quality,
+          rank: isExact ? 100.0 : 50.0,
+          snippet: page.description || null,
+        },
+        rank: isExact ? 100.0 : 50.0,
+      });
+    }
+    hits.sort((a, b) => b.rank - a.rank);
+    return hits.slice(0, limit).map((h) => h.row);
   }
 
   // --- wiki_pages: SELECT with WHERE + OR (get by slug or wiki_id) ---
@@ -515,6 +568,53 @@ describe("Pages API", () => {
     it("returns empty results for no match", async () => {
       const res = await app.request(
         "/api/pages/search?q=nonexistentxyz"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(0);
+    });
+
+    // QUA-745 — alias-based search resolves external naming to canonical pages.
+    it("resolves a model alias to the canonical wiki page", async () => {
+      await seedPage(app, "gpt-4-turbo", "GPT-4 Turbo", {
+        description: "OpenAI flagship turbo model",
+        entityType: "ai-model",
+      });
+      // Seed the entity row + alias row that the alias-search SQL JOINs against.
+      entitiesStore.set("gpt-4-turbo", {
+        id: "gpt-4-turbo",
+        stable_id: "sid_gpt4turbo",
+      });
+      modelAliasesStore.push({
+        alias: "gpt-4-turbo-2024-04-09",
+        model_stable_id: "sid_gpt4turbo",
+      });
+
+      const res = await app.request(
+        "/api/pages/search?q=gpt-4-turbo-2024-04-09"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results.length).toBeGreaterThan(0);
+      expect(body.results[0].id).toBe("gpt-4-turbo");
+    });
+
+    it("does not match an alias whose target page has no wiki_id", async () => {
+      await seedPage(app, "phantom-model", "Phantom Model", {
+        wikiId: null,
+        entityType: "ai-model",
+      });
+      entitiesStore.set("phantom-model", {
+        id: "phantom-model",
+        stable_id: "sid_phantom",
+      });
+      modelAliasesStore.push({
+        alias: "phantom-2024-01-01",
+        model_stable_id: "sid_phantom",
+      });
+
+      const res = await app.request(
+        "/api/pages/search?q=phantom-2024-01-01"
       );
       expect(res.status).toBe(200);
       const body = await res.json();

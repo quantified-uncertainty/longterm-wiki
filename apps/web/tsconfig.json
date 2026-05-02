@@ -43,7 +43,8 @@
       "@wiki-server/resources-route": ["../wiki-server/src/routes/wikibase/resources.ts"],
       "@wiki-server/model-system-cards-route": ["../wiki-server/src/routes/tablebase/model-system-cards.ts"],
       "@wiki-server/framework-review-route": ["../wiki-server/src/routes/operational/framework-review.ts"],
-      "@wiki-server/benchmark-results-pending-route": ["../wiki-server/src/routes/tablebase/benchmark-results-pending.ts"]
+      "@wiki-server/benchmark-results-pending-route": ["../wiki-server/src/routes/tablebase/benchmark-results-pending.ts"],
+      "@wiki-server/model-aliases-route": ["../wiki-server/src/routes/tablebase/model-aliases.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

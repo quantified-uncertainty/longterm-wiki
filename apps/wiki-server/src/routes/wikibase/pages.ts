@@ -25,6 +25,7 @@ import {
   paginationQuery,
   zv,
   clampedLimit,
+  escapeIlike,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import {
@@ -136,6 +137,51 @@ const pagesApp = new Hono()
         [q, limit - results.length, results.map((r) => r.id)],
       );
       results = [...results, ...trigramResults];
+    }
+
+    // Phase 3 — model alias lookup (QUA-745). Tokenized FTS won't match
+    // hyphenated identifiers like "gpt-4-turbo-2024-04-09" cleanly, and
+    // aliases aren't part of wiki_pages.search_vector. Look the raw query
+    // up in model_aliases and join to the canonical wiki page for the model.
+    // Within this phase, exact alias matches sort before prefix matches.
+    // Phase 1/2 results are kept ahead of alias hits — content matches are
+    // usually what the user wants when both fire.
+    if (results.length < limit) {
+      const aliasLower = rawQ.trim().toLowerCase();
+      // Reject empty / overlong queries to keep the LIKE/trgm path bounded.
+      if (aliasLower.length > 0 && aliasLower.length <= 200) {
+        const aliasResults = await rawDb.unsafe<PageSearchRow[]>(
+          `SELECT
+            wp.slug AS id,
+            wp.wiki_id,
+            wp.title,
+            wp.description,
+            wp.entity_type,
+            wp.category,
+            wp.reader_importance,
+            wp.quality,
+            CASE WHEN ma.alias = $1 THEN 100.0 ELSE 50.0 END AS rank,
+            wp.description AS snippet
+          FROM model_aliases ma
+          JOIN entities e ON e.stable_id = ma.model_stable_id
+          JOIN wiki_pages wp ON wp.slug = e.id
+          WHERE (ma.alias = $1 OR ma.alias LIKE $2)
+            AND wp.wiki_id IS NOT NULL
+            AND (wp.entity_type IS NULL OR wp.entity_type != 'internal')
+            AND wp.slug NOT IN (SELECT unnest($4::text[]))
+          ORDER BY rank DESC, wp.reader_importance DESC NULLS LAST
+          LIMIT $3`,
+          [
+            aliasLower,
+            // escapeIlike: a literal `%` or `_` in user input would otherwise
+            // act as a LIKE wildcard and explode the match set.
+            `${escapeIlike(aliasLower)}%`,
+            limit - results.length,
+            results.map((r) => r.id),
+          ],
+        );
+        results = [...results, ...aliasResults];
+      }
     }
 
     return c.json({
