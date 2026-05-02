@@ -3,6 +3,7 @@
 // type-aware coverage scorer (policy + organization, QUA-936), persists
 // JSON, supports --tag, --diff, --list.
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -253,46 +254,52 @@ export function snapshotPath(snapshotDir: string, snap: SuiteSnapshot): string {
 /**
  * Write `snap` atomically to a uniquely-named JSON file in `snapshotDir`.
  *
- * Atomic-write protocol (QUA-890): write the body to a per-PID `.tmp` file
- * and `fs.linkSync()` it to the final path, then unlink the tmp. POSIX
- * `link` is atomic within a filesystem, so a SIGINT (or `kill -9`) between
- * open() and the final flush leaves either no destination file or a
- * fully-formed one — never a half-JSON artifact that would wedge `--list`
- * for everyone. The pre-QUA-890 implementation used
- * `writeFileSync(..., {flag: "wx"})` which could leave a truncated file
+ * Atomic-write protocol (QUA-890): pick a non-colliding final path, write
+ * the body to a per-PID `.tmp` file in the same directory, then
+ * `fs.renameSync()` to the final path. Same-filesystem rename is atomic on
+ * every OS Node supports, so an interrupt (SIGINT or `kill -9`) leaves
+ * either no destination file or a fully-formed one — never a half-JSON
+ * artifact that would wedge `--list`. The pre-QUA-890 implementation used
+ * `writeFileSync(..., {flag: "wx"})`, which could leave a truncated file
  * on interrupt.
  *
- * Why `link` instead of `rename`: POSIX `rename` silently overwrites the
- * destination, so we'd lose the same-millisecond + same-tag collision
- * detection the old `wx` flag gave us. `link` fails with EEXIST in that
- * case, letting the suffix loop step to `__1.json`, `__2.json`, etc.
+ * The `.tmp` extension keeps any leaked-on-crash tmp files invisible to
+ * `listSnapshotsInDir` (which filters for `.json`), so a hard kill between
+ * `writeFileSync` and `renameSync` is harmless aside from a small disk
+ * leak. Cleaned up explicitly on the error path.
+ *
+ * Collision detection is best-effort via `existsSync` rather than the old
+ * `wx`/`linkSync` exclusivity primitive: this caller is invoked from a CLI
+ * tool with a single writer per process, so the existsSync-then-rename race
+ * window doesn't matter in practice. Picking portability over the stronger
+ * primitive avoids EXDEV/EPERM/ENOSYS failures on FAT/SMB/NFS mounts that
+ * `linkSync` would hit.
  */
 export function writeSnapshot(snapshotDir: string, snap: SuiteSnapshot): string {
   fs.mkdirSync(snapshotDir, { recursive: true });
   const base = snapshotPath(snapshotDir, snap).replace(/\.json$/, "");
   const body = JSON.stringify(snap, null, 2) + "\n";
-  // Per-PID tmp suffix avoids cross-process collisions on a shared dir.
-  // Including a random component too, so a single process writing back-to-back
-  // snapshots in the same tick can't reuse the same tmp path.
-  const tmpFile = `${base}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`;
+
+  let file = `${base}.json`;
+  for (let i = 1; fs.existsSync(file); i++) {
+    file = `${base}__${i}.json`;
+  }
+
+  // Tmp file lives next to the final destination so renameSync is
+  // same-filesystem (atomic). Per-PID + crypto-random suffix prevents tmp
+  // collisions even if two processes pick the same final path.
+  const tmpFile = `${file}.${process.pid}.${crypto.randomBytes(4).toString("hex")}.tmp`;
   fs.writeFileSync(tmpFile, body);
-  for (let i = 0; ; i++) {
-    const file = i === 0 ? `${base}.json` : `${base}__${i}.json`;
+  try {
+    fs.renameSync(tmpFile, file);
+    return file;
+  } catch (e) {
     try {
-      fs.linkSync(tmpFile, file);
       fs.unlinkSync(tmpFile);
-      return file;
-    } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === "EEXIST") continue;
-      // Non-collision error: clean the tmp file so we don't leak `.tmp`
-      // artifacts into the snapshot dir, then propagate.
-      try {
-        fs.unlinkSync(tmpFile);
-      } catch {
-        /* ignore — original error is the interesting one */
-      }
-      throw e;
+    } catch {
+      /* ignore — original error is the interesting one */
     }
+    throw e;
   }
 }
 

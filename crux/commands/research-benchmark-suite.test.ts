@@ -403,18 +403,43 @@ describe("snapshot persistence", () => {
   });
 
   it("writeSnapshot leaves no .tmp artifacts when the suffix loop retries", () => {
-    // Pre-create a directory at the un-suffixed destination filename. The
-    // first linkSync fails with EEXIST, the loop retries at `__1.json`, and
-    // the per-PID tmp file must be unlinked exactly once on success.
+    // Pre-existing file at the un-suffixed destination → existsSync probe
+    // skips it and the loop steps to `__1.json`. The per-PID tmp must be
+    // gone after rename succeeds.
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
     try {
       const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
       const baseFile = path.join(tmp, snap.timestamp.replace(/[:.]/g, "-") + "__baseline.json");
-      fs.mkdirSync(baseFile);
+      fs.writeFileSync(baseFile, "{}");
       const written = writeSnapshot(tmp, snap);
       expect(written).toMatch(/__1\.json$/);
       const tmpFiles = fs.readdirSync(tmp).filter((f) => f.endsWith(".tmp"));
       expect(tmpFiles).toEqual([]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot cleans up tmp + propagates on renameSync failure", () => {
+    // QUA-890: the catch branch must (a) unlink the tmp file so we don't
+    // leak `.tmp` artifacts into the snapshot dir, and (b) propagate the
+    // original error (not a secondary failure from the cleanup itself).
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const renameSpy = vi.spyOn(fs, "renameSync").mockImplementationOnce(() => {
+        const err = new Error("simulated EPERM") as NodeJS.ErrnoException;
+        err.code = "EPERM";
+        throw err;
+      });
+      try {
+        expect(() => writeSnapshot(tmp, snap)).toThrow(/simulated EPERM/);
+        // No `.tmp` artifacts left behind despite the failure.
+        const remaining = fs.readdirSync(tmp);
+        expect(remaining).toEqual([]);
+      } finally {
+        renameSpy.mockRestore();
+      }
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
