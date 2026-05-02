@@ -159,7 +159,11 @@ export function buildAILabWatchGradesFile(
     waveLabel: opts.waveLabel,
     sourceUrl: opts.sourceUrl,
     methodologyUrl: opts.methodologyUrl ?? null,
-    license: null,
+    // ailabwatch.org publishes no explicit license (verified 2026-05-02 —
+    // the about page and footer have no Creative Commons / MIT statement).
+    // We display the grades for educational/fair-use purposes; QUA-867
+    // backfilled this label across the existing snapshots.
+    license: "fair-use-citation",
     notes: opts.notes,
     isLatest: true,
     dimensions: dims,

@@ -222,6 +222,15 @@ describe("scrapeSeoul", () => {
     expect(counts).toEqual({ Fulfilled: 6, Partial: 4, Unfulfilled: 6 });
   });
 
+  it("hardcodes license=fair-use-citation (no explicit license on seoul-tracker.org) — QUA-867", () => {
+    // Seoul Commitment Tracker pages publish no Creative Commons or other
+    // explicit license. We display verdicts under fair-use citation so the
+    // /scorecards/seoul_tracker snapshot history table shows an actual term
+    // instead of the em-dash placeholder it had before QUA-867.
+    const wave = scrapeSeoul(buildHtml(), buildChunk(), {});
+    expect(wave.license).toBe("fair-use-citation");
+  });
+
   it("respects publishedAt + waveLabel overrides", () => {
     const wave = scrapeSeoul(buildHtml(), buildChunk(), {
       publishedAt: "2026-01-15",

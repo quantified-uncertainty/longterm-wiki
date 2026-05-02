@@ -26,11 +26,20 @@ export interface OrgCoverageInput {
   foundedDate?: string | null;
   peopleCount?: number | null;
   wikiPageId?: string | null;
+  /**
+   * Number of distinct external scorecards (FLI, SaferAI, AI Lab Watch,
+   * FMTI, Seoul Tracker) that have rated this org. QUA-867 item D: an org
+   * rated by every scorecard but missing the financial fields above used to
+   * score 1 ("stub") despite being one of the most-evaluated frontier labs.
+   * One signal at ≥1 scorecards, a second at ≥3.
+   */
+  externalScorecardCount?: number | null;
 }
 
 export function computeOrgCoverage(row: OrgCoverageInput): number {
   // Baseline: name + type (always present, not counted)
-  // Enrichment signals: financial metrics, people tracking, wiki page
+  // Enrichment signals: financial metrics, people tracking, wiki page,
+  //   external-scorecard presence (QUA-867 item D)
   let signals = 0;
 
   if (row.revenueNum != null) signals++;
@@ -40,8 +49,10 @@ export function computeOrgCoverage(row: OrgCoverageInput): number {
   if (row.foundedDate) signals++;
   if (row.peopleCount != null && row.peopleCount >= 10) signals++;
   if (row.wikiPageId) signals++;
+  if ((row.externalScorecardCount ?? 0) >= 1) signals++;
+  if ((row.externalScorecardCount ?? 0) >= 3) signals++;
 
-  // 7 possible. Typical org has foundedDate + maybe 1 financial = 2.
+  // 9 possible. Typical org has foundedDate + maybe 1 financial = 2.
   if (signals >= 5) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
@@ -409,6 +420,15 @@ export function getOrgSignals(row: OrgCoverageInput): string[] {
   if (row.foundedDate) signals.push("Founded date");
   if (row.peopleCount != null && row.peopleCount >= 10) signals.push("10+ people tracked");
   if (row.wikiPageId) signals.push("Wiki page");
+  if ((row.externalScorecardCount ?? 0) >= 3) {
+    signals.push(`${row.externalScorecardCount} external scorecards`);
+  } else if ((row.externalScorecardCount ?? 0) >= 1) {
+    signals.push(
+      row.externalScorecardCount === 1
+        ? "1 external scorecard"
+        : `${row.externalScorecardCount} external scorecards`,
+    );
+  }
   return signals;
 }
 

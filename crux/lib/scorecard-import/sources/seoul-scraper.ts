@@ -310,7 +310,11 @@ export function scrapeSeoul(
     waveLabel,
     sourceUrl: opts.sourceUrl ?? "https://www.seoul-tracker.org",
     methodologyUrl: "https://www.seoul-tracker.org",
-    license: null,
+    // The Seoul Commitment Tracker publishes no explicit license (verified
+    // 2026-05-02 — only social share links + a Midas Project privacy policy
+    // pointer, no CC / terms-of-use statement). We display verdicts under
+    // fair-use citation; QUA-867 backfilled this label on existing snapshots.
+    license: "fair-use-citation",
     notes: null,
     isLatest: opts.isLatest ?? true,
     dimensions: dimensions.map((d) => ({ slug: d.id, label: d.name })),

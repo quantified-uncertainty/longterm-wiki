@@ -311,4 +311,54 @@ describe("computeOrgCoverage", () => {
     // 10 people = 1 signal, foundedDate = 1 signal → 2 signals → score 2
     expect(computeOrgCoverage({ peopleCount: 10, foundedDate: "2020" })).toBe(2);
   });
+
+  // QUA-867 item D — orgs evaluated by external scorecards earn coverage
+  // signals even when their financial metadata is sparse. A frontier lab
+  // rated by every scorecard but missing revenue/valuation/headcount used
+  // to score 1 ("stub") despite being one of the most-evaluated entities
+  // in the wiki.
+  describe("externalScorecardCount signal (QUA-867)", () => {
+    it("does not credit zero scorecards", () => {
+      expect(computeOrgCoverage({ externalScorecardCount: 0 })).toBe(1);
+      expect(computeOrgCoverage({ externalScorecardCount: null })).toBe(1);
+    });
+
+    it("1 scorecard adds one signal", () => {
+      // Alone it's just 1 signal — score stays 1.
+      expect(computeOrgCoverage({ externalScorecardCount: 1 })).toBe(1);
+      // With foundedDate (1 signal) + 1 scorecard = 2 signals → score 2.
+      expect(
+        computeOrgCoverage({
+          externalScorecardCount: 1,
+          foundedDate: "2020",
+        }),
+      ).toBe(2);
+    });
+
+    it("3+ scorecards adds two signals (frontier-lab tier)", () => {
+      // 3 scorecards = 2 signals (≥1 + ≥3) → score 2.
+      expect(computeOrgCoverage({ externalScorecardCount: 3 })).toBe(2);
+      // 5 scorecards = 2 signals + foundedDate = 3 → score 3.
+      expect(
+        computeOrgCoverage({
+          externalScorecardCount: 5,
+          foundedDate: "2020",
+        }),
+      ).toBe(3);
+    });
+
+    it("rescues a frontier lab with no financial metadata", () => {
+      // Exactly the case the audit flagged: no revenue / valuation /
+      // headcount / total-funding, but rated by all 5 scorecards. Used to
+      // score 1 (stub). Now scores 3 (5 scorecards = 2, foundedDate = 1,
+      // wikiPageId = 1 → 4 signals).
+      expect(
+        computeOrgCoverage({
+          externalScorecardCount: 5,
+          foundedDate: "2021",
+          wikiPageId: "E1234",
+        }),
+      ).toBe(3);
+    });
+  });
 });

@@ -79,6 +79,13 @@ interface GradeRow extends VerdictJoinFields {
   publishedAt: string | null;
   isLatest: boolean | null;
   snapshotSourceUrl: string | null;
+  /**
+   * Wave label from the parent snapshot (e.g. "Summer 2025"). Optional
+   * because not every callsite selects it (the /all endpoint omits it to
+   * keep the matrix payload small); nullable because a snapshot may have
+   * no human label set.
+   */
+  waveLabel?: string | null;
 }
 
 function formatRow(r: GradeRow) {
@@ -108,6 +115,7 @@ function formatRow(r: GradeRow) {
     // Most grades inherit evidence from the wave's PDF/page rather than
     // having a unique deep-link.
     snapshotSourceUrl: r.snapshotSourceUrl,
+    waveLabel: r.waveLabel ?? null,
     syncedAt: g.syncedAt,
     sourcing: formatSourcing(r),
   };
@@ -184,48 +192,71 @@ const scorecardGradesApp = new Hono()
     });
   })
 
-  // GET /by-entity/:entityId — every grade for one org, latest snapshot per source
-  .get("/by-entity/:entityId", async (c) => {
-    const entityId = c.req.param("entityId");
-    const db = getDrizzleDb();
+  // GET /by-entity/:entityId — every grade for one org. Defaults to the
+  // latest wave per source; pass `?includeHistory=true` to return all
+  // historical waves (used by the per-org grade-trajectory mini-table from
+  // QUA-867 item E). Pass `?dimension=overall` to bound the response when
+  // history is needed but per-dimension rows are not.
+  .get(
+    "/by-entity/:entityId",
+    zv(
+      "query",
+      z.object({
+        includeHistory: qBool.optional(),
+        dimension: z.string().max(200).optional(),
+      }),
+    ),
+    async (c) => {
+      const entityId = c.req.param("entityId");
+      const { includeHistory, dimension } = c.req.valid("query");
+      const db = getDrizzleDb();
 
-    const rows = await db
-      .select({
-        grade: scorecardGrades,
-        entityTitle: entities.title,
-        entitySlug: entities.id,
-        scorecardSource: scorecardSnapshots.scorecardSource,
-        publishedAt: scorecardSnapshots.publishedAt,
-        isLatest: scorecardSnapshots.isLatest,
-        snapshotSourceUrl: scorecardSnapshots.sourceUrl,
-        ...verdictSelectFields,
-      })
-      .from(scorecardGrades)
-      .leftJoin(
-        scorecardSnapshots,
-        eq(scorecardGrades.snapshotId, scorecardSnapshots.id),
-      )
-      .leftJoin(entities, eq(scorecardGrades.entityId, entities.stableId))
-      .leftJoin(
-        sourceVerdicts,
-        verdictJoinCondition(
-          SCORECARD_GRADE_RECORD_TYPE,
-          scorecardGrades.id,
-        ),
-      )
-      .where(
-        and(
-          eq(scorecardGrades.entityId, entityId),
-          eq(scorecardSnapshots.isLatest, true),
-        ),
-      )
-      .orderBy(
-        scorecardSnapshots.scorecardSource,
-        scorecardGrades.dimensionSlug,
-      );
+      const conditions: SQL[] = [eq(scorecardGrades.entityId, entityId)];
+      if (!includeHistory) {
+        conditions.push(eq(scorecardSnapshots.isLatest, true));
+      }
+      if (dimension) {
+        conditions.push(eq(scorecardGrades.dimensionSlug, dimension));
+      }
 
-    return c.json({ items: rows.map(formatRow), total: rows.length });
-  })
+      const rows = await db
+        .select({
+          grade: scorecardGrades,
+          entityTitle: entities.title,
+          entitySlug: entities.id,
+          scorecardSource: scorecardSnapshots.scorecardSource,
+          publishedAt: scorecardSnapshots.publishedAt,
+          isLatest: scorecardSnapshots.isLatest,
+          snapshotSourceUrl: scorecardSnapshots.sourceUrl,
+          waveLabel: scorecardSnapshots.waveLabel,
+          ...verdictSelectFields,
+        })
+        .from(scorecardGrades)
+        .leftJoin(
+          scorecardSnapshots,
+          eq(scorecardGrades.snapshotId, scorecardSnapshots.id),
+        )
+        .leftJoin(entities, eq(scorecardGrades.entityId, entities.stableId))
+        .leftJoin(
+          sourceVerdicts,
+          verdictJoinCondition(
+            SCORECARD_GRADE_RECORD_TYPE,
+            scorecardGrades.id,
+          ),
+        )
+        .where(and(...conditions))
+        .orderBy(
+          scorecardSnapshots.scorecardSource,
+          // Newest wave first within a source so consumers can take the
+          // first row per source without sorting again. The history
+          // mini-table renders chronological top-to-bottom by re-sorting.
+          desc(scorecardSnapshots.publishedAt),
+          scorecardGrades.dimensionSlug,
+        );
+
+      return c.json({ items: rows.map(formatRow), total: rows.length });
+    },
+  )
 
   // POST /sync
   .post(

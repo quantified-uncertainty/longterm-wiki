@@ -3,7 +3,7 @@
   "waveLabel": "Winter 2025",
   "sourceUrl": "https://futureoflife.org/ai-safety-index-winter-2025/",
   "methodologyUrl": "https://futureoflife.org/document/ai-safety-index-winter-2025-2-page-summary/",
-  "license": null,
+  "license": "fair-use-citation",
   "notes": "Evidence collected up until November 8, 2025. Survey responses submitted by Anthropic, OpenAI, Google DeepMind, xAI, and Z.ai. Meta, DeepSeek, and Alibaba Cloud did not submit survey responses. The 'Survey Responses' dimension is not a scored domain but tracks participation.",
   "dimensions": [
     {

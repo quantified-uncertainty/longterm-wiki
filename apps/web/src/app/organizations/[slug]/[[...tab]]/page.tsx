@@ -953,6 +953,15 @@ export default async function OrgProfilePage({
     foundedDate: data.foundedDateStr,
     peopleCount: data.sortedPersons.length,
     wikiPageId: entity.wikiPageId,
+    // QUA-867 item D — credit orgs evaluated by external scorecards. Count
+    // distinct sources (one panel per source) rather than total grade rows
+    // (which would double-count multi-dimension scorecards). `fetchError`
+    // is treated as 0 so a transient wiki-server outage doesn't pessimize
+    // the score.
+    externalScorecardCount:
+      scorecardsData && !("fetchError" in scorecardsData)
+        ? scorecardsData.groups.length
+        : 0,
   };
 
   const shellSlots = buildOrgShellSlots(
