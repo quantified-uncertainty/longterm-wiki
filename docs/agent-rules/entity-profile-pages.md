@@ -39,7 +39,7 @@ Adding a new "show on all entity pages" item is a one-line change inside
   sourcing rollup badge
 - Reference implementations:
   - `apps/web/src/app/organizations/[slug]/[[...tab]]/page.tsx` (canonical:
-    vertical tabs with `tabGroups`, path-based `tabRouting`, no sidebar)
+    vertical tabs with `tabGroups`, path-based `tabRouting`)
   - `apps/web/src/app/organizations/[slug]/data/page.tsx` (uses the shell with
     `children` — the long-form data table — and the same slot-builder helper)
   - `apps/web/src/app/people/[slug]/page.tsx` (vertical tabs, no `tabGroups`)
@@ -78,10 +78,13 @@ Adding a new "show on all entity pages" item is a one-line change inside
 - **Multi-tab pages must use `tabsLayout="vertical"`.** Any page that passes
   `tabs={...}` with more than one selectable tab is required to also pass
   `tabsLayout="vertical"` so the tab nav renders on the left rail (the
-  `/organizations` look). Single-tab pages and pages that render their body
-  through `children` instead of `tabs` are exempt — `ProfileTabs` short-circuits
-  the layout choice in the single-tab case. The horizontal default is kept on
-  `EntityProfileShell` only as the fallback for the short-circuit path.
+  `/organizations` look). Pages with a single selectable tab don't need it —
+  `ProfileTabs` short-circuits to bare content (no tab chrome at all) before
+  the layout choice matters. Pages that render their body through `children`
+  instead of `tabs` are likewise exempt because `tabsLayout` is unused there.
+  The horizontal default on `EntityProfileShell` is retained for those cases
+  and for any future single-tab page that grows a second tab — at which point
+  the `tabsLayout="vertical"` requirement kicks in.
 - When `sidebar` is provided, the main column renders in a `lg:grid-cols-3`
   2-column layout with the sidebar on the right. **In vertical-tabs mode the
   `sidebar` slot is ignored** — the left nav takes the sidebar slot. If a page

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
   fetchEntitySourcingSummary,
@@ -257,32 +256,6 @@ export default async function FrameworkDetailPage({
     </p>
   );
 
-  const sidebar = (
-    <section>
-      <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-        About this tracker
-      </h2>
-      <div className="text-xs text-muted-foreground space-y-2 leading-relaxed">
-        <p>
-          Each framework version is fetched, hashed, and archived. Capability
-          thresholds are LLM-extracted with mandatory source quotes; diffs
-          between consecutive versions are classified before any directional
-          summary is shown publicly.
-        </p>
-        <p>
-          See the{" "}
-          <Link
-            href="/frontier-safety-frameworks/methodology"
-            className="underline hover:text-primary"
-          >
-            methodology page
-          </Link>{" "}
-          for extraction, classification, and review-state details.
-        </p>
-      </div>
-    </section>
-  );
-
   return (
     <EntityProfileShell
       breadcrumbs={[
@@ -299,7 +272,6 @@ export default async function FrameworkDetailPage({
       tabs={tabs}
       tabsAriaLabel="Framework sections"
       tabsLayout="vertical"
-      sidebar={sidebar}
     />
   );
 }
