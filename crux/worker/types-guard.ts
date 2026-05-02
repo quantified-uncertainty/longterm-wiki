@@ -14,19 +14,16 @@
 
 export class WorkerTypesGuardError extends Error {
   readonly unknown: string[];
-  readonly registered: string[];
 
-  constructor(unknown: string[], registered: string[]) {
+  constructor(unknown: string[]) {
     super(
       `[worker] Configured --types includes ${unknown.length} unknown ` +
         `type(s) with no registered handler: ${unknown.join(', ')}. ` +
         `This usually means a job-type rename in code that wasn't mirrored ` +
-        `in ops/k8s/apps/longterm-wiki-worker/values.yaml (--types arg). ` +
-        `Known handler types: ${registered.join(', ')}`,
+        `in ops/k8s/apps/longterm-wiki-worker/values.yaml (--types arg).`,
     );
     this.name = 'WorkerTypesGuardError';
     this.unknown = unknown;
-    this.registered = registered;
   }
 }
 
@@ -41,8 +38,8 @@ export function assertConfiguredTypesAreRegistered(
 ): void {
   if (configured.length === 0) return;
   const registeredSet = new Set(registered);
-  const unknown = configured.filter((t) => !registeredSet.has(t));
+  const unknown = [...new Set(configured.filter((t) => !registeredSet.has(t)))];
   if (unknown.length > 0) {
-    throw new WorkerTypesGuardError(unknown, registered);
+    throw new WorkerTypesGuardError(unknown);
   }
 }

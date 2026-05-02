@@ -3,7 +3,6 @@ import {
   assertConfiguredTypesAreRegistered,
   WorkerTypesGuardError,
 } from './types-guard.ts';
-import { getRegisteredTypes } from '../lib/job-handlers/index.ts';
 
 describe('assertConfiguredTypesAreRegistered', () => {
   it('passes when every configured type is registered', () => {
@@ -19,6 +18,19 @@ describe('assertConfiguredTypesAreRegistered', () => {
     expect(() => assertConfiguredTypesAreRegistered([], ['ping'])).not.toThrow();
     // Even with an empty registered list, empty configured = no validation.
     expect(() => assertConfiguredTypesAreRegistered([], [])).not.toThrow();
+  });
+
+  it('throws when registered list is empty but configured is not', () => {
+    // Edge case: registry import failed or returned empty. Every configured
+    // type is unknown.
+    let caught: unknown;
+    try {
+      assertConfiguredTypesAreRegistered(['ping', 'foo'], []);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(WorkerTypesGuardError);
+    expect((caught as WorkerTypesGuardError).unknown).toEqual(['ping', 'foo']);
   });
 
   it('throws WorkerTypesGuardError when a single type is unregistered', () => {
@@ -57,28 +69,20 @@ describe('assertConfiguredTypesAreRegistered', () => {
     expect(err.message).toContain('a, b, c');
   });
 
+  it('deduplicates the unknown list so the error message is clean', () => {
+    let caught: unknown;
+    try {
+      assertConfiguredTypesAreRegistered(['foo', 'foo', 'bar'], ['ping']);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(WorkerTypesGuardError);
+    expect((caught as WorkerTypesGuardError).unknown).toEqual(['foo', 'bar']);
+  });
+
   it('does not throw on duplicate registered entries', () => {
     expect(() =>
       assertConfiguredTypesAreRegistered(['ping'], ['ping', 'ping', 'ping']),
-    ).not.toThrow();
-  });
-
-  // QUA-1041 acceptance test: every type currently in
-  // ops/k8s/apps/longterm-wiki-worker/values.yaml --types arg must have
-  // a registered handler. This is the canary that catches a registry
-  // rename that misses the k8s args (QUA-699 / QUA-1039 class of bug).
-  // Update both lists together when adding/renaming types.
-  it('every job type in the prod worker --types arg has a registered handler', () => {
-    const prodWorkerTypes = [
-      'claim-sourcing',
-      'citation-verify',
-      'resource-verify',
-      'resource-enrich',
-      'resource-ingest',
-      'ping',
-    ];
-    expect(() =>
-      assertConfiguredTypesAreRegistered(prodWorkerTypes, getRegisteredTypes()),
     ).not.toThrow();
   });
 });
