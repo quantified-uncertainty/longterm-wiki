@@ -437,10 +437,6 @@ describe("runSuite", () => {
   });
 
   it("production path: result.reason='budget-exhausted' from improveSingleEntity is recorded as skipped_budget and stops dispatch (QUA-1017)", async () => {
-    // The real path: improveSingleEntity catches BudgetExhaustedError
-    // internally (via doImproveSingleEntity's catch) and converts it into
-    // a graceful return with reason="budget-exhausted". The suite reads
-    // that reason and stops dispatching. This test mirrors that contract.
     const { suitePath, snapshotDir } = writeFixtureSuite(
       { slug: "first", type: "policy" },
       { slug: "burner", type: "policy" },
@@ -452,10 +448,6 @@ describe("runSuite", () => {
       calls.push(slug);
       if (slug === "first") return makeResult(slug);
       if (slug === "burner") {
-        // Mirror what doImproveSingleEntity returns after catching
-        // BudgetExhaustedError: reason="budget-exhausted", hit_target=false,
-        // total_cost_usd reflects partial-iteration spend from the live
-        // CostTracker (not the per-iter sum, which would undercount).
         return makeResult(slug, {
           reason: "budget-exhausted",
           hit_target: false,
@@ -488,10 +480,6 @@ describe("runSuite", () => {
   });
 
   it("defensive path: BudgetExhaustedError thrown out of improveSingleEntity is also caught and treated as skipped_budget (QUA-1017)", async () => {
-    // The defensive catch in runSuite — for any future code that re-throws
-    // BudgetExhaustedError after the inner catch (e.g. abort during the
-    // YAML write path). Should produce the same outcome as the production
-    // path above.
     const { suitePath, snapshotDir } = writeFixtureSuite(
       { slug: "first", type: "policy" },
       { slug: "burner", type: "policy" },

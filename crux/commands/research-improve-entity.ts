@@ -70,14 +70,19 @@ const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
 const SUPPORTED_TYPES = new Set(["policy", "organization"]);
 
 /**
- * Thrown when the live CostTracker total has reached the configured `--budget`
- * cap. Always caught by `doImproveSingleEntity`, which converts it to a
- * graceful `reason: "budget-exhausted"` return so the snapshot/YAML write
- * still happens for partial work. The suite runner reads that reason from
- * the result, records the entity as `skipped_budget`, and stops dispatching
- * further entities. The suite ALSO has a defensive catch for this error in
- * case a future change re-throws after the inner catch. QUA-1017.
+ * Possible exit reasons reported on {@link ImproveResult.reason}. The suite
+ * runner switches on this string, so it MUST be a typed union — a typo on
+ * either side silently misroutes the result.
  */
+export type ImproveReason = "target-hit" | "max-iters" | "no-progress" | "budget-exhausted";
+
+/** The single source of truth for the budget-exhausted reason token. Used as
+ *  `result.reason`, the suite's `=== check`, and the pipeline-runs
+ *  `markStatus({ reason, errorCode })` arguments — all kebab-case so a query
+ *  on either field returns the same set of runs. */
+export const BUDGET_EXHAUSTED_REASON = "budget-exhausted" as const;
+
+/** Thrown when the live CostTracker total has reached the configured budget. */
 export class BudgetExhaustedError extends Error {
   readonly spentUsd: number;
   readonly budgetUsd: number;
@@ -89,13 +94,8 @@ export class BudgetExhaustedError extends Error {
   }
 }
 
-/**
- * Hard-cap guard: throws {@link BudgetExhaustedError} when the live tracker
- * total has reached or exceeded `budgetUsd`. Called before every
- * `streamingCreate`-bearing call inside the inner loop, and before every
- * outer-loop iteration. Pure / synchronous so it's cheap to call repeatedly.
- * Exported for testing. QUA-1017.
- */
+/** Throws {@link BudgetExhaustedError} when the live tracker total has reached
+ *  or exceeded `budgetUsd`. */
 export function checkBudgetOrThrow(tracker: CostTracker, budgetUsd: number): void {
   if (tracker.totalCost >= budgetUsd) {
     throw new BudgetExhaustedError(tracker.totalCost, budgetUsd);
@@ -138,7 +138,7 @@ export interface ImproveResult {
   total_cost_usd: number;
   total_duration_s: number;
   hit_target: boolean;
-  reason: string;
+  reason: ImproveReason;
   /** When `--wait-for-settle` is set: count of submitted claims still in
    *  pending/verifying status when the main loop exited (target/iters/budget).
    *  Omitted when the flag is off. */
@@ -837,9 +837,8 @@ async function runIteration(
   budgetUsd: number,
   tracker: CostTracker,
 ): Promise<{ entity: EntityWithType; metrics: IterationMetrics; batch: SubmittedBatchInfo | null }> {
-  // Live remaining budget for this iteration's research-agent budgetCap. Floor
-  // at 0 so a tracker that is already over budget still produces a non-negative
-  // value (callers throw before reaching this point — see checkBudgetOrThrow).
+  // Floor at 0: callers throw on overage via checkBudgetOrThrow before
+  // reaching the runResearch call, so a negative remaining is defensive only.
   const budgetRemainingUsd = Math.max(0, budgetUsd - tracker.totalCost);
   const t0 = Date.now();
   const m: IterationMetrics = {
@@ -860,11 +859,7 @@ async function runIteration(
     duration_s: 0,
   };
 
-  // Hard-cap guard at the top of the iteration. Throws
-  // BudgetExhaustedError if the live tracker has already reached the
-  // configured budget (caught one frame up by doImproveSingleEntity, which
-  // converts it to a graceful budget-exhausted exit). Doing this before
-  // gapsFor so an aborted iter contributes no log noise. QUA-1017.
+  // Guard before gapsFor so an aborted iter contributes no log noise.
   checkBudgetOrThrow(tracker, budgetUsd);
 
   const gaps = gapsFor(entity);
@@ -921,9 +916,8 @@ async function runIteration(
     if (!content || content.length < 200) continue;
     const resourceId = resourceIdByUrl.get(src.url) ?? "";
     contentByKey.set(src.url, content);
-    // Hard-cap guard before each streamingCreate inside the inner loop. If
-    // runResearch overshot its own budgetCap above, this stops further per-
-    // source extract spending. QUA-1017.
+    // If runResearch overshot its own budgetCap above, stop further
+    // per-source extract spending.
     checkBudgetOrThrow(tracker, budgetUsd);
     const ex = await extractGapClaims(entity, gaps, src.url, content, tracker);
     m.cost_extract_usd += ex.cost;
@@ -1110,15 +1104,13 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
       noWrite,
       opts,
     });
-    // Hard-cap exits aren't "committed" at the run level — the loop stopped
-    // before completing its planned iterations. Any partial work *is* still
-    // written to YAML (saveEntity runs unconditionally), but the pipeline_runs
-    // row reflects the truncation so dashboards can distinguish budget-aborts
-    // from successful runs. QUA-1017.
-    if (result.reason === "budget-exhausted") {
+    // Budget-exhausted runs persist any applied facts to YAML (saveEntity
+    // runs unconditionally) but the pipeline_runs row records the truncation
+    // so dashboards can distinguish budget-aborts from successful runs.
+    if (result.reason === BUDGET_EXHAUSTED_REASON) {
       ctx.markStatus("aborted", {
-        reason: "budget_exhausted",
-        errorCode: "budget_exhausted",
+        reason: BUDGET_EXHAUSTED_REASON,
+        errorCode: BUDGET_EXHAUSTED_REASON,
       });
     }
     return result;
@@ -1181,32 +1173,22 @@ async function doImproveSingleEntity(args: {
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
   const submittedBatches: SubmittedBatchInfo[] = [];
-  // Live cost tracker — every streamingCreate (claim extraction, research-agent
-  // internals via the `tracker` param) auto-records into this. tracker.totalCost
-  // is the canonical "spent so far" used for hard-cap enforcement. QUA-1014/1017.
   const tracker = new CostTracker();
   let hitTarget = false;
-  let reason = "max-iters";
+  let reason: ImproveReason = "max-iters";
 
   for (let i = 1; i <= maxIters; i++) {
-    // Single budget enforcement path: runIteration's first action is
-    // checkBudgetOrThrow, so a pre-iter short-circuit here is redundant —
-    // we'd just be racing the same condition. Let the throw propagate up
-    // and the catch below handle it uniformly with mid-iteration aborts.
-    // QUA-1017.
+    // No pre-iter short-circuit: runIteration's first action is
+    // checkBudgetOrThrow, so a guard here would race the same condition.
     let out: Awaited<ReturnType<typeof runIteration>>;
     try {
       out = await runIteration(entity, i, budgetUsd, tracker);
     } catch (err) {
       if (err instanceof BudgetExhaustedError) {
-        // The inner loop hit the hard cap (either at iteration start or
-        // mid-flight after runResearch overshot). Treat as a clean exit so
-        // we still write the snapshot/YAML for whatever was applied in
-        // earlier iterations.
         console.warn(
           `[iter ${i}] budget exhausted: ${err.message}. Stopping after this iteration's partial work.`,
         );
-        reason = "budget-exhausted";
+        reason = BUDGET_EXHAUSTED_REASON;
         break;
       }
       throw err;
@@ -1265,11 +1247,9 @@ async function doImproveSingleEntity(args: {
     final_coverage: finalCov.score,
     final_facts: finalCov.facts_in_yaml,
     // Source from the live CostTracker rather than summing per-iteration
-    // metrics: an iteration that aborts mid-flight via BudgetExhaustedError
-    // never reaches `iterations.push(out.metrics)`, so the per-iter sum would
-    // undercount any spend incurred before the throw. tracker.totalCost
-    // captures every streamingCreate-recorded cost plus the perplexity
-    // recordExternalCost calls inside research-agent. QUA-1017.
+    // metrics: an iter aborting via BudgetExhaustedError never reaches
+    // `iterations.push(out.metrics)`, so the per-iter sum would undercount
+    // pre-throw spend.
     total_cost_usd: tracker.totalCost,
     total_duration_s: (Date.now() - t0) / 1000,
     hit_target: hitTarget,

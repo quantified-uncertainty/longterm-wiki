@@ -561,16 +561,8 @@ describe("parseAgentSessionId", () => {
 // ── checkBudgetOrThrow + BudgetExhaustedError (QUA-1017) ───────────────────
 
 describe("checkBudgetOrThrow", () => {
-  /**
-   * Seed a CostTracker without going through streamingCreate by writing a
-   * record directly. Used to simulate a tracker that has already accumulated
-   * `usd` of LLM spend.
-   */
   function trackerWithCost(usd: number): CostTracker {
     const t = new CostTracker();
-    // recordExternalCost is the public API for entries that don't come from a
-    // streamingCreate response (used in production for Perplexity calls). Keeps
-    // the test inside the tracker's typed surface — no readonly bypasses.
     if (usd > 0) t.recordExternalCost("test-model", usd, "test");
     return t;
   }
