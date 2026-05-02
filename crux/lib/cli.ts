@@ -6,13 +6,53 @@
 
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { basename, dirname, join, sep } from 'path';
 import { PROJECT_ROOT } from './content-types.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const SCRIPTS_DIR: string = join(__dirname, '..');
+// SCRIPTS_DIR resolution depends on how this module was loaded:
+//
+//   - tsx (legacy): __dirname = `<repo>/crux/lib`
+//                   → SCRIPTS_DIR = `<repo>/crux`
+//   - dist per-file: __dirname = `<repo>/crux/dist/lib`
+//                    → SCRIPTS_DIR = `<repo>/crux/dist`
+//   - dist single bundle: __dirname = `<repo>/crux/dist`
+//                         (lib/cli.ts is bundled into crux.js, so its
+//                         module URL is the bundle's URL)
+//                         → SCRIPTS_DIR = `<repo>/crux/dist`
+//
+// Detect the bundled-main case by checking whether __dirname's basename
+// is "dist"; in that case SCRIPTS_DIR IS __dirname, otherwise it's the
+// parent.
+const RUNNING_FROM_DIST =
+  basename(__dirname) === 'dist' ||
+  __dirname.includes(`${sep}dist${sep}`);
+
+export const SCRIPTS_DIR: string =
+  basename(__dirname) === 'dist' ? __dirname : join(__dirname, '..');
+
+/**
+ * Resolve a crux script path (e.g. `validate/validate-unified.ts`) to the
+ * concrete `[node, ...args]` invocation we should spawn.
+ *
+ * In dist mode (post-build), paths point at `crux/dist/<rel>.js` and are
+ * invoked with plain `node` — no tsx, no per-process compile cost,
+ * eliminating the cache-contention class entirely.
+ *
+ * Otherwise we fall back to the legacy tsx invocation so dev iteration
+ * (editing crux/*.ts without rebuilding) still works.
+ */
+export function resolveCruxScriptArgs(scriptRelPath: string): { args: string[]; absPath: string } {
+  if (RUNNING_FROM_DIST) {
+    const distRel = scriptRelPath.replace(/\.ts$/, '.js').replace(/\.mjs$/, '.js');
+    const absPath = join(SCRIPTS_DIR, distRel);
+    return { args: [absPath], absPath };
+  }
+  const absPath = join(SCRIPTS_DIR, scriptRelPath);
+  return { args: ['--import', 'tsx/esm', '--no-warnings', absPath], absPath };
+}
 
 export interface RunScriptResult {
   stdout: string;
@@ -34,12 +74,11 @@ export async function runScript(
   args: string[] = [],
   options: RunScriptOptions = {},
 ): Promise<RunScriptResult> {
-  const fullPath = join(SCRIPTS_DIR, scriptPath);
   const { streamOutput = false, cwd = PROJECT_ROOT } = options;
+  const { args: spawnArgs } = resolveCruxScriptArgs(scriptPath);
 
   return new Promise((resolve) => {
-    // Always register tsx/esm so scripts can use .ts imports
-    const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', fullPath, ...args];
+    const runnerArgs = [...spawnArgs, ...args];
 
     const proc = spawn('node', runnerArgs, {
       cwd,

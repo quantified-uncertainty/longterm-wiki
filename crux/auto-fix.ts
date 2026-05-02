@@ -8,6 +8,17 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT } from './lib/content-types.ts';
+import { resolveCruxScriptArgs } from './lib/cli.ts';
+
+/**
+ * Build a shell command for a crux script (QUA-1053). Picks the prebuilt
+ * dist path when this module was loaded from dist/, else falls back to
+ * the legacy `node --import tsx/esm` invocation.
+ */
+function cruxCmd(scriptRelPath: string, ...extra: string[]): string {
+  const { args } = resolveCruxScriptArgs(scriptRelPath);
+  return ['node', ...args, ...extra].join(' ');
+}
 
 const args: string[] = process.argv.slice(2);
 const DRY_RUN: boolean = args.includes('--dry-run');
@@ -43,17 +54,17 @@ const fixers: Fixer[] = [
   {
     name: 'Escaping (dollars, comparisons, tildes)',
     description: 'Escape special characters for LaTeX/JSX',
-    command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=dollar-signs,comparison-operators,tilde-dollar --fix',
+    command: cruxCmd('validate/validate-unified.ts', '--rules=dollar-signs,comparison-operators,tilde-dollar', '--fix'),
   },
   {
     name: 'Markdown Formatting',
     description: 'Fix markdown lists and bold labels',
-    command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=markdown-lists,consecutive-bold-labels --fix',
+    command: cruxCmd('validate/validate-unified.ts', '--rules=markdown-lists,consecutive-bold-labels', '--fix'),
   },
   {
     name: 'Frontmatter Field Order',
     description: 'Reorder frontmatter fields to canonical order (identity first, volatile last)',
-    command: 'node --import tsx/esm crux/fix/fix-frontmatter-order.ts --apply',
+    command: cruxCmd('fix/fix-frontmatter-order.ts', '--apply'),
   },
 ];
 

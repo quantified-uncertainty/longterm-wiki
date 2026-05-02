@@ -122,7 +122,9 @@ jobs:
           echo "Job type filter: ${JOB_TYPE:-any}"
           echo "Max jobs: $MAX_JOBS"
 
-          node --import tsx/esm crux/worker/run.ts $ARGS
+          # Use prebuilt dist (QUA-1053) — avoids tsx loader cost.
+          # `pnpm install` runs postinstall=crux/build.mjs so dist/ exists.
+          node crux/dist/worker/run.js $ARGS
 
       - name: Summary
         if: always()

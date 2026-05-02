@@ -30,6 +30,7 @@ import { existsSync, appendFileSync } from "fs";
 import { join } from "path";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
+import { resolveCruxScriptArgs } from "../lib/cli.ts";
 
 const args = process.argv.slice(2);
 const CI_MODE = args.includes("--ci") || process.env.CI === "true";
@@ -131,9 +132,13 @@ interface ValidatorResult {
 function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
   return new Promise((resolve) => {
     const startTime = Date.now();
-    const scriptPath = join(PROJECT_ROOT, validator.script);
+    // validator.script is project-rooted (e.g. "crux/validate/foo.ts").
+    // Strip the leading "crux/" so we can ask the resolver for the
+    // dist-or-tsx invocation; falling back to the source path if not.
+    const cruxRel = validator.script.replace(/^crux\//, "");
+    const sourcePath = join(PROJECT_ROOT, validator.script);
 
-    if (!existsSync(scriptPath)) {
+    if (!existsSync(sourcePath)) {
       resolve({
         id: validator.id,
         name: validator.name,
@@ -150,7 +155,8 @@ function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
       return;
     }
 
-    const childArgs = ["--import", "tsx/esm", "--no-warnings", scriptPath, "--ci"];
+    const { args: scriptInvocation } = resolveCruxScriptArgs(cruxRel);
+    const childArgs = [...scriptInvocation, "--ci"];
     if (validator.extraArgs) {
       childArgs.push(...validator.extraArgs);
     }
