@@ -65,6 +65,7 @@ import {
   type DispatchOptions,
   type PermissionMode,
 } from '../lib/agent-workspace/dispatch.ts';
+import { ensureSlotTmpDir } from '../lib/agent-workspace/tsx-cache-isolation.ts';
 import { realDoctorEnv } from '../lib/agent-workspace/doctor/env.ts';
 import { SLOTS_CHECKS } from '../lib/agent-workspace/doctor/slots.ts';
 import { RELEASES_CHECKS } from '../lib/agent-workspace/doctor/releases.ts';
@@ -546,12 +547,15 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
   const branch = git(slotDir, 'branch', '--show-current') || 'detached';
   const fullWindowName = sanitizeForTmux(`A${slot}:${branch}`);
 
+  // Isolate tsx compile cache per-slot. tmux's `-e KEY=VALUE` sets the env var
+  // on the new window; the shell + any `pnpm crux ...` invocations inside it
+  // inherit it. See tsx-cache-isolation.ts.
+  const slotTmpDir = ensureSlotTmpDir(slot);
+  const tmuxArgs = ['new-window', '-n', fullWindowName, '-c', slotDir, '-e', `TMPDIR=${slotTmpDir}`];
+  if (withClaude) tmuxArgs.push('claude');
+
   try {
-    if (withClaude) {
-      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir, 'claude'], { stdio: 'inherit' });
-    } else {
-      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir], { stdio: 'inherit' });
-    }
+    execFileSync('tmux', tmuxArgs, { stdio: 'inherit' });
     return { exitCode: 0, output: `Opened tmux window ${fullWindowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
   } catch (e) {
     return { exitCode: 1, output: `Error opening tmux window: ${e instanceof Error ? e.message : String(e)}` };
@@ -956,6 +960,9 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
     appendSystemPrompt: options.appendSystemPrompt,
     permissionMode,
     force: !!options.force,
+    // Isolate tsx compile cache per-slot to eliminate cross-slot fs contention
+    // that has caused 25+ minute hangs under heavy concurrent load.
+    tmpDir: ensureSlotTmpDir(slot),
   };
 
   let result;
