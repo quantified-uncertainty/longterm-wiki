@@ -21,6 +21,16 @@
 
 set -uo pipefail
 
+# ── User identity ────────────────────────────────────────────────────────────
+# launchd LaunchAgents do NOT inherit USER/LOGNAME from the user's shell, and
+# without these the macOS keychain lookup that claude uses for its OAuth
+# subscription returns "Not logged in" — patrol would silently fall back to
+# whatever ANTHROPIC_API_KEY is in the env (API billing) or fail outright.
+# Derive both from `id -un` so they match the launchd asid (gui/501) the
+# agent runs under.
+export USER="${USER:-$(id -un)}"
+export LOGNAME="${LOGNAME:-$USER}"
+
 # ── PATH setup ────────────────────────────────────────────────────────────────
 # launchd starts agents with a minimal PATH (/usr/bin:/bin:/usr/sbin:/sbin).
 # Source nvm so `pnpm`, `node`, and `tsx` resolve, then prepend the standard
@@ -41,7 +51,11 @@ if ! command -v pnpm >/dev/null 2>&1 && [ -d "$NVM_DIR/versions/node" ]; then
   [ -n "$fallback_bin" ] && export PATH="$fallback_bin:${PATH:-}"
 fi
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+# ~/.local/bin: Claude Code's CLI installer puts `claude` here. Without this
+# entry, patrol's `spawn claude ENOENT` errors on the very first fix attempt
+# even though the supervisor itself runs cleanly. Other tools that npm-install
+# globally land in homebrew/usr-local, which is already covered.
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
 # Patrol creates worktrees under .claude/worktrees/, so the supervisor must
 # run from a wiki clone (typically lw/main/), not from coord/ or a slot.

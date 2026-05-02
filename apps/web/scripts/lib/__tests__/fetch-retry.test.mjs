@@ -11,6 +11,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   fetchJsonWithRetry,
   fetchRecordVerdicts,
+  fetchPaginatedItems,
   setFullBuildMode,
 } from '../wiki-server-data.mjs';
 
@@ -348,5 +349,134 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior (QUA-448: no env-
     expect(calls[0]).toContain('offset=0');
     expect(calls[1]).toContain('offset=200');
     expect(calls[2]).toContain('offset=400');
+  });
+});
+
+describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
+  const noSleep = async () => {};
+
+  it('paginates correctly across multiple full pages', async () => {
+    const mkPage = (start, count) =>
+      Array.from({ length: count }, (_, i) => ({ id: start + i }));
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: mkPage(0, 200) } }),
+      mockResponse({ ok: true, json: { items: mkPage(200, 200) } }),
+      mockResponse({ ok: true, json: { items: mkPage(400, 7) } }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result).toHaveLength(407);
+    expect(calls[0]).toContain('limit=200&offset=0');
+    expect(calls[1]).toContain('limit=200&offset=200');
+    expect(calls[2]).toContain('limit=200&offset=400');
+  });
+
+  it('returns null when a mid-pagination page exhausts retries', async () => {
+    // Matches the legacy contract: callers fall back to YAML-only data on
+    // partial pagination failures rather than ship a half-set.
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: Array.from({ length: 200 }, (_, i) => ({ id: i })) } }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result).toBeNull();
+  });
+
+  it('retries transient 5xx within a page and continues', async () => {
+    const { fetcher, calls } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 500 }), // transient on page 1
+      mockResponse({ ok: true, json: { items: Array.from({ length: 200 }, (_, i) => ({ id: i })) } }),
+      mockResponse({ ok: true, json: { items: [{ id: 200 }] } }), // short page → done
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result).toHaveLength(201);
+    expect(calls).toHaveLength(3);
+  });
+
+  it('uses a fresh AbortSignal per page (no shared signal across pages)', async () => {
+    // Pre-QUA-1000, the inner fetchAllPages helper shared one AbortSignal
+    // across every page fetch. Each page must now receive its own signal so
+    // that a slow page doesn't poison subsequent pages with an exhausted budget.
+    const seenSignals = [];
+    const fetcher = async (_url, init) => {
+      seenSignals.push(init.signal);
+      return mockResponse({
+        ok: true,
+        json: { items: seenSignals.length < 3
+          ? Array.from({ length: 200 }, (_, i) => ({ id: i }))
+          : [{ id: 999 }] },
+      });
+    };
+    await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(seenSignals).toHaveLength(3);
+    // Each call must have received a *different* AbortSignal instance — that's
+    // the regression we're guarding against. A shared signal would make all
+    // three references identical.
+    const unique = new Set(seenSignals);
+    expect(unique.size).toBe(3);
+  });
+
+  it('does not share AbortSignals across parallel pagination calls', async () => {
+    // The QUA-1000 root cause: 11 parallel paginated fetchers in
+    // mergePGRecordsIntoKB shared one 30s AbortSignal. When the wall-clock
+    // budget elapsed, every in-flight request aborted at once. With
+    // fetchPaginatedItems delegating each page to fetchJsonWithRetry, two
+    // parallel calls must produce fully disjoint signal sets.
+    const callerASignals = [];
+    const callerBSignals = [];
+    const makeFetcher = (sink) => async (_url, init) => {
+      sink.push(init.signal);
+      return mockResponse({ ok: true, json: { items: [{ id: 1 }] } });
+    };
+    await Promise.all([
+      fetchPaginatedItems('http://x/api/grants/all', 'items', {
+        fetchImpl: makeFetcher(callerASignals),
+        sleepImpl: noSleep,
+      }),
+      fetchPaginatedItems('http://x/api/personnel/all', 'items', {
+        fetchImpl: makeFetcher(callerBSignals),
+        sleepImpl: noSleep,
+      }),
+    ]);
+    expect(callerASignals).toHaveLength(1);
+    expect(callerBSignals).toHaveLength(1);
+    // The two calls must have completely disjoint signals; pre-fix they would
+    // have shared the single fetchOpts.signal from line 1464.
+    expect(callerASignals[0]).not.toBe(callerBSignals[0]);
+  });
+
+  it('handles empty first page gracefully', async () => {
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { items: [] } }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result).toEqual([]);
+  });
+
+  it('treats missing itemsKey as empty (does not crash)', async () => {
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { /* no items key */ } }),
+    ]);
+    const result = await fetchPaginatedItems('http://x/api/grants/all', 'items', {
+      fetchImpl: fetcher,
+      sleepImpl: noSleep,
+    });
+    expect(result).toEqual([]);
   });
 });
