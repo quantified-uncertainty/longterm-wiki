@@ -22,14 +22,16 @@ import {
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
+  parseAgentSessionId,
 } from "./research-improve-entity.ts";
 import {
-  checkImproveEntityMutex,
+  assertNoImproveEntityMutexConflict,
   ImproveEntityMutexError,
-  IMPROVE_ENTITY_PIPELINE_NAME,
   IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
   type CheckMutexOptions,
 } from "../lib/improve-entity/mutex.ts";
+import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
@@ -274,29 +276,44 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
   }
 
   // QUA-1032 single-instance mutex (suite-level). Refuse to start if any
-  // improve-entity family run (single or suite) is already in flight. We
-  // check BOTH pipeline names so a stand-alone improve-entity blocks the
-  // suite at this level — otherwise the suite would proceed past the
-  // suite-only check, then collide on the first per-entity invocation
-  // and abort mid-flight with a partial snapshot.
-  //
-  // --force skips this check. Per-entity invocations below always pass
-  // force=true (regardless of whether the operator passed --force) because
-  // the suite already owns the family-level lock — without that, the very
-  // first per-entity check would self-conflict on the suite's own
-  // `improve-entity-suite` running row.
-  const conflict = await checkImproveEntityMutex({
-    pipelineNames: [
-      IMPROVE_ENTITY_PIPELINE_NAME,
-      IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
-    ],
+  // family-member run (single or suite) is already in flight. The
+  // `withPipelineRun` wrapper below registers this suite under
+  // `improve-entity-suite` so a sibling suite started a moment later sees
+  // *this* run as a conflict via the same check.
+  await assertNoImproveEntityMutexConflict({
     force: opts.force,
-    ...(opts.mutexCheckOverrides ?? {}),
+    mutexCheckOverrides: opts.mutexCheckOverrides,
   });
-  if (conflict) {
-    throw new ImproveEntityMutexError(conflict);
-  }
 
+  // QUA-1032: register the suite as a `pipeline_runs` row so a second suite
+  // started seconds later (i.e. between this suite's per-entity invocations)
+  // sees the suite-family conflict via the mutex check. Without this wrapper
+  // there is no `improve-entity-suite` row anywhere, so suite-vs-suite
+  // blocking would only work coincidentally — when both happen to be inside
+  // a per-entity invocation at the same instant.
+  return withPipelineRun(
+    {
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      // Same posture as the per-entity loop: dev sessions without server
+      // creds keep iterating; the helper logs a visible warning.
+      allowOffline: true,
+    },
+    async () => runSuiteBody(opts, suitePath, snapshotDir, improver),
+  );
+}
+
+/**
+ * Inner body of {@link runSuite} — separated so it runs inside the
+ * `pipeline_runs` lifecycle. The pre-flight checks (tag validation, mutex)
+ * stay outside the wrapper so a refused start doesn't write a row.
+ */
+async function runSuiteBody(
+  opts: SuiteRunOptions,
+  suitePath: string,
+  snapshotDir: string,
+  improver: NonNullable<SuiteRunOptions["improver"]>,
+): Promise<SuiteSnapshot> {
   const startedAt = new Date().toISOString();
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
@@ -337,11 +354,9 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         maxIters: opts.maxIters,
         dryRun: opts.dryRun,
         quiet: true,
-        // The per-entity mutex check looks for any running `improve-entity`
-        // OR `improve-entity-suite` row — including this suite's own row.
-        // Pass force=true unconditionally so the suite's per-entity calls
-        // don't self-conflict. The suite-level check above already
-        // enforced the family-wide lock; we don't need it twice.
+        // The per-entity check would otherwise self-conflict on the suite's
+        // own `improve-entity-suite` running row. We already cleared the
+        // family lock at the suite level, so skip the per-entity re-check.
         force: true,
       });
       if (result.reason === BUDGET_EXHAUSTED_REASON) {

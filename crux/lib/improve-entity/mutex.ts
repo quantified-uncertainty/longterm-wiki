@@ -185,6 +185,31 @@ export class ImproveEntityMutexError extends Error {
   }
 }
 
+/**
+ * Family-wide mutex check used by both the single-entity and suite call sites.
+ * Always queries for both family members so a stand-alone `improve-entity`
+ * blocks the suite and vice versa.
+ *
+ * Throws {@link ImproveEntityMutexError} on conflict; resolves with no value
+ * when the family is clear or `force=true`.
+ */
+export async function assertNoImproveEntityMutexConflict(options: {
+  force?: boolean;
+  mutexCheckOverrides?: Pick<
+    CheckMutexOptions,
+    'list' | 'nowMs' | 'freshnessMs'
+  >;
+}): Promise<void> {
+  const conflict = await checkImproveEntityMutex({
+    pipelineNames: [IMPROVE_ENTITY_PIPELINE_NAME, IMPROVE_ENTITY_SUITE_PIPELINE_NAME],
+    force: options.force,
+    ...(options.mutexCheckOverrides ?? {}),
+  });
+  if (conflict) {
+    throw new ImproveEntityMutexError(conflict);
+  }
+}
+
 // ── Internal helpers ────────────────────────────────────────────────────────
 
 /** Convert a `Date | string | null | undefined` field into ms-since-epoch.

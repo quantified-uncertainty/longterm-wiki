@@ -12,6 +12,22 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+// QUA-1032: the suite now wraps its body in `withPipelineRun` to register
+// itself as a `pipeline_runs` row. Mock the lifecycle helper at the module
+// level so tests don't hit the wiki-server. The real wrapper has
+// `allowOffline: true` so production survives outages, but in tests we get
+// faster, quieter runs by short-circuiting the wrapper entirely.
+vi.mock("../lib/pipeline-runs/lifecycle.ts", () => ({
+  withPipelineRun: vi.fn((_options: unknown, body: (ctx: unknown) => Promise<unknown>) =>
+    body({
+      runId: "test-run",
+      offline: true,
+      markStatus: vi.fn(),
+      markFollowup: vi.fn(),
+    }),
+  ),
+}));
+
 import {
   MIN_USEFUL_BUDGET_USD,
   aggregateResult,
