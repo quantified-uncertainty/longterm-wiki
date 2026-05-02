@@ -7,7 +7,7 @@
  * SuiteRunOptions.improver — no LLM, no YAML writes, no network.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -28,6 +28,34 @@ import {
 } from "./research-improve-entity-suite.ts";
 import { BudgetExhaustedError } from "./research-improve-entity.ts";
 import type { ImproveResult, IterationMetrics } from "./research-improve-entity.ts";
+import {
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+  ImproveEntityMutexError,
+} from "../lib/improve-entity/mutex.ts";
+import type { CheckMutexOptions } from "../lib/improve-entity/mutex.ts";
+
+// QUA-1032: every runSuite call needs an injected mutex `list` to avoid
+// network calls to `/api/pipeline-runs`. This default returns "no running
+// rows" so the suite proceeds normally.
+function noopMutexOverrides(): Pick<CheckMutexOptions, "list" | "nowMs"> {
+  return {
+    list: vi.fn().mockResolvedValue({ ok: true, data: { runs: [], count: 0 } }),
+    nowMs: () => Date.parse("2026-05-01T20:00:00.000Z"),
+  };
+}
+
+// Wrap runSuite to inject the no-op mutex override by default. Tests that
+// want to exercise the mutex pass `mutexCheckOverrides` themselves.
+// Spread `opts` first so a caller-supplied mutexCheckOverrides wins; otherwise
+// fall back to the no-op.
+async function runSuiteForTest(
+  opts: Parameters<typeof runSuite>[0],
+): Promise<Awaited<ReturnType<typeof runSuite>>> {
+  return runSuite({
+    ...opts,
+    mutexCheckOverrides: opts.mutexCheckOverrides ?? noopMutexOverrides(),
+  });
+}
 
 // ── fixtures ───────────────────────────────────────────────────────────────
 
@@ -326,7 +354,7 @@ describe("runSuite", () => {
         iterations: [makeIter({ cost_research_usd: 0.02, cost_extract_usd: 0.01 })],
       });
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "happy",
       totalBudgetUsd: 4.0,
       maxIters: 2,
@@ -364,7 +392,7 @@ describe("runSuite", () => {
       calls.push(slug);
       return makeResult(slug);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "filter",
       totalBudgetUsd: 2.0,
       maxIters: 1,
@@ -394,7 +422,7 @@ describe("runSuite", () => {
     // Total = 0.10, per-entity cap = (0.10/3)*2 = 0.0667. spendthrift burns 0.0667.
     // Remaining after entity 1 = 0.10 - 0.0667 = 0.0333, which is below
     // MIN_USEFUL_BUDGET_USD ($0.05) → halt.
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "halt",
       totalBudgetUsd: 0.1,
       maxIters: 1,
@@ -422,7 +450,7 @@ describe("runSuite", () => {
       return makeResult(slug, { iterations: [makeIter({ cost_research_usd: 0, cost_extract_usd: 0 })] });
     };
     // Total=$2, N=2 → per-entity cap = $2.
-    await runSuite({
+    await runSuiteForTest({
       tag: "cap",
       totalBudgetUsd: 2.0,
       maxIters: 1,
@@ -457,7 +485,7 @@ describe("runSuite", () => {
       }
       throw new Error(`improver should not have been called for ${slug}`);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "budget-stop",
       totalBudgetUsd: 8.0,
       maxIters: 1,
@@ -492,7 +520,7 @@ describe("runSuite", () => {
       if (slug === "burner") throw new BudgetExhaustedError(2.5, 1.0);
       throw new Error(`improver should not have been called for ${slug}`);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "budget-rethrow",
       totalBudgetUsd: 8.0,
       maxIters: 1,
@@ -517,7 +545,7 @@ describe("runSuite", () => {
       if (slug === "boom") throw new Error("synthetic blast");
       return makeResult(slug);
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "fail",
       totalBudgetUsd: 4.0,
       maxIters: 1,
@@ -539,7 +567,7 @@ describe("runSuite", () => {
       calls++;
       return makeResult("never-called");
     };
-    const snap = await runSuite({
+    const snap = await runSuiteForTest({
       tag: "empty",
       totalBudgetUsd: 1.0,
       maxIters: 1,
@@ -562,7 +590,7 @@ describe("runSuite", () => {
       return makeResult("alpha");
     };
     await expect(
-      runSuite({
+      runSuiteForTest({
         tag: "../etc/passwd",
         totalBudgetUsd: 4.0,
         maxIters: 1,
@@ -574,6 +602,86 @@ describe("runSuite", () => {
     expect(calls).toBe(0);
     // No snapshot file written.
     expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
+  });
+
+  // ── QUA-1032 mutex wiring ────────────────────────────────────────────────
+
+  it("refuses to start when another improve-entity-suite run is in flight", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite({ slug: "alpha", type: "policy" });
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    const fakeRunningRow = {
+      runId: "other-suite",
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: 17,
+      status: "running",
+      startedAt: new Date(NOW - 60_000).toISOString(),
+      heartbeatAt: new Date(NOW - 30_000).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+    let improverCalled = 0;
+    const improver = async () => {
+      improverCalled++;
+      return makeResult("alpha");
+    };
+    await expect(
+      runSuiteForTest({
+        tag: "blocked",
+        totalBudgetUsd: 2.0,
+        maxIters: 1,
+        suitePath,
+        snapshotDir,
+        improver,
+        mutexCheckOverrides: { list, nowMs: () => NOW },
+      }),
+    ).rejects.toBeInstanceOf(ImproveEntityMutexError);
+    expect(improverCalled).toBe(0);
+    // No snapshot — refused before the loop started.
+    expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
+  });
+
+  it("--force bypasses the mutex check (and forwards force to per-entity calls)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    // Fresh suite-level conflict that --force should bypass.
+    const fakeRunningRow = {
+      runId: "other-suite",
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: 1,
+      status: "running",
+      startedAt: new Date(NOW).toISOString(),
+      heartbeatAt: new Date(NOW).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+    const forceSeenByImprover: boolean[] = [];
+    const improver = async ({ force, slug }: { slug: string; force?: boolean }) => {
+      forceSeenByImprover.push(force === true);
+      return makeResult(slug);
+    };
+    const snap = await runSuiteForTest({
+      tag: "force",
+      totalBudgetUsd: 4.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+      force: true,
+      mutexCheckOverrides: { list, nowMs: () => NOW },
+    });
+    // Both entities ran; suite-level check was short-circuited by --force.
+    expect(snap.entities.map((r) => r.status)).toEqual(["completed", "completed"]);
+    // Per-entity calls also received force=true so they don't re-check (and
+    // would have hit the same conflict if they did).
+    expect(forceSeenByImprover).toEqual([true, true]);
+    // The list mock should not have been called: --force short-circuits
+    // before the API request.
+    expect(list).not.toHaveBeenCalled();
   });
 });
 

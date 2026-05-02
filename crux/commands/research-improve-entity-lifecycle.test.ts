@@ -24,6 +24,12 @@ vi.mock("../lib/pipeline-runs/lifecycle.ts", () => ({
 // Suppress the "improve-entity result" stdout from a real run.
 const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
+// QUA-1032: keep the mutex check from making real network calls. These tests
+// don't exercise the mutex; they care about the lifecycle wrapper.
+const NOOP_MUTEX_OVERRIDES = {
+  list: vi.fn().mockResolvedValue({ ok: true, data: { runs: [], count: 0 } }),
+};
+
 describe("improveSingleEntity wraps its body with withPipelineRun (QUA-957)", () => {
   // A real policy entity from `data/entities/responses.yaml` so `findEntity`
   // resolves without needing fs mocks. Stable test fixture — the slug
@@ -68,6 +74,7 @@ describe("improveSingleEntity wraps its body with withPipelineRun (QUA-957)", ()
       budgetUsd: 0.01,
       dryRun: true,
       quiet: true,
+      mutexCheckOverrides: NOOP_MUTEX_OVERRIDES,
     });
 
     expect(mockWithPipelineRun).toHaveBeenCalledTimes(1);
@@ -93,6 +100,7 @@ describe("improveSingleEntity wraps its body with withPipelineRun (QUA-957)", ()
         budgetUsd: 0.01,
         dryRun: true,
         quiet: true,
+        mutexCheckOverrides: NOOP_MUTEX_OVERRIDES,
       }),
     ).rejects.toThrow(/target must be a positive integer/);
 
@@ -111,9 +119,93 @@ describe("improveSingleEntity wraps its body with withPipelineRun (QUA-957)", ()
         budgetUsd: 0.01,
         dryRun: true,
         quiet: true,
+        mutexCheckOverrides: NOOP_MUTEX_OVERRIDES,
       }),
     ).rejects.toThrow(/Entity not found/);
 
     expect(mockWithPipelineRun).not.toHaveBeenCalled();
+  });
+
+  // ── QUA-1032 mutex wiring ────────────────────────────────────────────────
+
+  it("does NOT invoke withPipelineRun when the mutex check finds a fresh running run", async () => {
+    mockWithPipelineRun.mockReset();
+    const { improveSingleEntity } = await import("./research-improve-entity.ts");
+    const { ImproveEntityMutexError } = await import(
+      "../lib/improve-entity/mutex.ts"
+    );
+
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    const fakeRunningRow = {
+      runId: "other-run",
+      pipelineName: "improve-entity",
+      agentSessionId: 99,
+      status: "running",
+      startedAt: new Date(NOW).toISOString(),
+      heartbeatAt: new Date(NOW).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+
+    await expect(
+      improveSingleEntity({
+        slug: FIXTURE_SLUG,
+        target: 1,
+        maxIters: 1,
+        budgetUsd: 0.01,
+        dryRun: true,
+        quiet: true,
+        mutexCheckOverrides: { list, nowMs: () => NOW },
+      }),
+    ).rejects.toBeInstanceOf(ImproveEntityMutexError);
+
+    expect(mockWithPipelineRun).not.toHaveBeenCalled();
+    expect(list).toHaveBeenCalledTimes(1);
+  });
+
+  it("--force bypasses the mutex check even when a conflict exists", async () => {
+    mockWithPipelineRun.mockReset();
+    mockWithPipelineRun.mockResolvedValue({
+      entity_slug: FIXTURE_SLUG,
+      entity_id: FIXTURE_STABLE_ID,
+      entity_type: "policy",
+      iterations: [],
+      final_coverage: 0,
+      final_facts: {},
+      total_cost_usd: 0,
+      total_duration_s: 0,
+      hit_target: false,
+      reason: "test-stub",
+    });
+    const { improveSingleEntity } = await import("./research-improve-entity.ts");
+
+    const NOW = Date.parse("2026-05-01T20:00:00.000Z");
+    const fakeRunningRow = {
+      runId: "other-run",
+      pipelineName: "improve-entity",
+      agentSessionId: 99,
+      status: "running",
+      startedAt: new Date(NOW).toISOString(),
+      heartbeatAt: new Date(NOW).toISOString(),
+    };
+    const list = vi
+      .fn()
+      .mockResolvedValue({ ok: true, data: { runs: [fakeRunningRow], count: 1 } });
+
+    await improveSingleEntity({
+      slug: FIXTURE_SLUG,
+      target: 1,
+      maxIters: 1,
+      budgetUsd: 0.01,
+      dryRun: true,
+      quiet: true,
+      force: true,
+      mutexCheckOverrides: { list, nowMs: () => NOW },
+    });
+
+    // --force should short-circuit BEFORE the API call.
+    expect(list).not.toHaveBeenCalled();
+    expect(mockWithPipelineRun).toHaveBeenCalledTimes(1);
   });
 });
