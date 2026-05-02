@@ -81,6 +81,11 @@ interface Bucket {
   confidenceWeightedSum: number;
   /** Sum of weights for the same rows (used as the denominator). */
   confidenceWeightSum: number;
+  /**
+   * QUA-992: max `checkedAt` across rows in this bucket. NULL when no row
+   * supplied a `checkedAt`. Drives the recency tie-breaker.
+   */
+  latestCheckedAt: Date | null;
 }
 
 /**
@@ -171,7 +176,13 @@ export function aggregateEvidence(
     const w = effectiveWeight(row);
     let bucket = buckets.get(verdict);
     if (!bucket) {
-      bucket = { weight: 0, rowCount: 0, confidenceWeightedSum: 0, confidenceWeightSum: 0 };
+      bucket = {
+        weight: 0,
+        rowCount: 0,
+        confidenceWeightedSum: 0,
+        confidenceWeightSum: 0,
+        latestCheckedAt: null,
+      };
       buckets.set(verdict, bucket);
     }
     bucket.weight += w;
@@ -179,6 +190,11 @@ export function aggregateEvidence(
     if (typeof row.confidence === "number") {
       bucket.confidenceWeightedSum += row.confidence * w;
       bucket.confidenceWeightSum += w;
+    }
+    if (row.checkedAt) {
+      if (!bucket.latestCheckedAt || row.checkedAt > bucket.latestCheckedAt) {
+        bucket.latestCheckedAt = row.checkedAt;
+      }
     }
   }
   if (buckets.size === 0) {
@@ -192,12 +208,13 @@ export function aggregateEvidence(
     };
   }
 
-  // Step 5: pick winner. Score desc, then priority asc.
+  // Step 5: pick winner. Score desc, then recency desc (QUA-992), then priority asc.
   const contributing = sortContributing(
     [...buckets.entries()].map(([verdict, b]) => ({
       verdict,
       weight: b.weight,
       rowCount: b.rowCount,
+      latestCheckedAt: b.latestCheckedAt,
     })),
   );
   const winningVerdict = contributing[0].verdict;
@@ -220,10 +237,32 @@ export function aggregateEvidence(
   };
 }
 
-/** Sort contributing buckets by weight desc, ties broken by priority. */
+/**
+ * Float-tolerance for weight equality (QUA-992). Production weights come
+ * from the `relevance_score real` PG column and end up summed across rows,
+ * so values like `0.1 + 0.2 = 0.30000000000000004` are routine. Without an
+ * epsilon, a 1-ULP gap defeats `weight !== weight` and silently bypasses
+ * the recency tie-break — exactly the QUA-979 failure mode this fix is
+ * supposed to close. 1e-9 is well below any real relevance signal (`real`
+ * is single-precision, ~7 decimal digits) and well above representation
+ * noise from typical `0.x + 0.y` sums.
+ */
+const WEIGHT_EQUALITY_EPSILON = 1e-9;
+
+/**
+ * Sort contributing buckets by weight desc, ties broken by recency desc
+ * (QUA-992) — a fresh re-check should supersede stale evidence at equal
+ * weight. Final tie-break is `SOURCE_CHECK_VERDICT_PRIORITY` (more-actionable
+ * wins) for callers that don't supply `checkedAt` (e.g. legacy tests, or
+ * legitimately concurrent checks).
+ */
 function sortContributing(items: ContributingVerdict[]): ContributingVerdict[] {
   return [...items].sort((a, b) => {
-    if (a.weight !== b.weight) return b.weight - a.weight;
+    const weightDiff = b.weight - a.weight;
+    if (Math.abs(weightDiff) > WEIGHT_EQUALITY_EPSILON) return weightDiff;
+    const at = a.latestCheckedAt?.getTime() ?? null;
+    const bt = b.latestCheckedAt?.getTime() ?? null;
+    if (at !== null && bt !== null && at !== bt) return bt - at;
     const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a.verdict] ?? 99;
     const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b.verdict] ?? 99;
     return aPri - bPri;
