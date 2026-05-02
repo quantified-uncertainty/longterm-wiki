@@ -22,7 +22,16 @@ import {
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
+  parseAgentSessionId,
 } from "./research-improve-entity.ts";
+import {
+  assertNoImproveEntityMutexConflict,
+  ImproveEntityMutexError,
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+  type CheckMutexOptions,
+} from "../lib/improve-entity/mutex.ts";
+import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
@@ -196,6 +205,12 @@ export interface SuiteRunOptions {
    * Default is the real `improveSingleEntity` from research-improve-entity.ts.
    */
   improver?: (opts: ImproveOptions) => Promise<ImproveResult>;
+  /** When true, skip the QUA-1032 single-instance mutex check on the suite
+   *  and on each per-entity invocation. Default false. */
+  force?: boolean;
+  /** Test injection — passed through to {@link checkImproveEntityMutex} for
+   *  the suite-level mutex check. Production callers leave this undefined. */
+  mutexCheckOverrides?: Pick<CheckMutexOptions, "list" | "nowMs" | "freshnessMs">;
 }
 
 export interface SuiteSnapshot {
@@ -260,6 +275,45 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
     );
   }
 
+  // QUA-1032 single-instance mutex (suite-level). Refuse to start if any
+  // family-member run (single or suite) is already in flight. The
+  // `withPipelineRun` wrapper below registers this suite under
+  // `improve-entity-suite` so a sibling suite started a moment later sees
+  // *this* run as a conflict via the same check.
+  await assertNoImproveEntityMutexConflict({
+    force: opts.force,
+    mutexCheckOverrides: opts.mutexCheckOverrides,
+  });
+
+  // QUA-1032: register the suite as a `pipeline_runs` row so a second suite
+  // started seconds later (i.e. between this suite's per-entity invocations)
+  // sees the suite-family conflict via the mutex check. Without this wrapper
+  // there is no `improve-entity-suite` row anywhere, so suite-vs-suite
+  // blocking would only work coincidentally — when both happen to be inside
+  // a per-entity invocation at the same instant.
+  return withPipelineRun(
+    {
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      // Same posture as the per-entity loop: dev sessions without server
+      // creds keep iterating; the helper logs a visible warning.
+      allowOffline: true,
+    },
+    async () => runSuiteBody(opts, suitePath, snapshotDir, improver),
+  );
+}
+
+/**
+ * Inner body of {@link runSuite} — separated so it runs inside the
+ * `pipeline_runs` lifecycle. The pre-flight checks (tag validation, mutex)
+ * stay outside the wrapper so a refused start doesn't write a row.
+ */
+async function runSuiteBody(
+  opts: SuiteRunOptions,
+  suitePath: string,
+  snapshotDir: string,
+  improver: NonNullable<SuiteRunOptions["improver"]>,
+): Promise<SuiteSnapshot> {
   const startedAt = new Date().toISOString();
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
@@ -300,6 +354,10 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         maxIters: opts.maxIters,
         dryRun: opts.dryRun,
         quiet: true,
+        // The per-entity check would otherwise self-conflict on the suite's
+        // own `improve-entity-suite` running row. We already cleared the
+        // family lock at the suite level, so skip the per-entity re-check.
+        force: true,
       });
       if (result.reason === BUDGET_EXHAUSTED_REASON) {
         console.warn(
@@ -377,7 +435,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run]",
+        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run] [--force]",
       exitCode: 1,
     };
   }
@@ -392,6 +450,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 2;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
   const dryRun = !!options.dryRun;
+  const force = !!options.force;
 
   if (!Number.isFinite(totalBudgetUsd) || totalBudgetUsd <= 0) {
     return { output: `--budget must be a positive number; got ${options.budget}`, exitCode: 1 };
@@ -405,8 +464,13 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
   let snapshot;
   try {
-    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun });
+    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun, force });
   } catch (err) {
+    // QUA-1032: mutex conflicts use exit code 2 to distinguish "another suite
+    // is running" from a generic suite failure (exit 1).
+    if (err instanceof ImproveEntityMutexError) {
+      return { output: err.message, exitCode: 2 };
+    }
     const msg = err instanceof Error ? err.message : String(err);
     return { output: `improve-entity-suite failed: ${msg}`, exitCode: 1 };
   }
@@ -455,6 +519,10 @@ Options:
   --max-iters=N     Max iterations per entity (default 2).
   --target=N        Per-entity (provisions+stakeholders) target (passed through).
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
+  --force           Skip the QUA-1032 single-instance mutex check. By default,
+                    refuses to start (exit 2) if another improve-entity-suite
+                    or improve-entity run is already in flight. Use only for
+                    explicit takeover after a crashed run.
 
 Budget governance:
   Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.

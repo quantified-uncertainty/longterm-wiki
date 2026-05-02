@@ -62,6 +62,12 @@ import {
   type WithPipelineRunOptions,
 } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import {
+  assertNoImproveEntityMutexConflict,
+  ImproveEntityMutexError,
+  IMPROVE_ENTITY_PIPELINE_NAME,
+  type CheckMutexOptions,
+} from "../lib/improve-entity/mutex.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const ENTITIES_DIR = path.join(ROOT, "data/entities");
@@ -166,6 +172,12 @@ export interface ImproveOptions {
    *  fast-exit behavior). Recommended for CI gate suite runs (QUA-871) so
    *  per-run results aren't sensitive to worker-queue timing. */
   waitForSettle?: boolean;
+  /** When true, skip the QUA-1032 single-instance mutex check. Use only for
+   *  explicit takeover after a crashed run. Default false. */
+  force?: boolean;
+  /** Test injection — passed through to {@link checkImproveEntityMutex}.
+   *  Production callers leave this undefined. */
+  mutexCheckOverrides?: Pick<CheckMutexOptions, "list" | "nowMs" | "freshnessMs">;
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -1085,6 +1097,16 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     );
   }
 
+  // QUA-1032 single-instance mutex: refuse to start if any family-member run
+  // (single or suite) is already in flight. Runs *before* `withPipelineRun`
+  // so this run's own `improve-entity` row hasn't been inserted yet, avoiding
+  // self-detection. Suite per-entity calls pass `force: true` because the
+  // suite's outer `withPipelineRun` already owns the family lock.
+  await assertNoImproveEntityMutexConflict({
+    force: opts.force,
+    mutexCheckOverrides: opts.mutexCheckOverrides,
+  });
+
   // Pull the active agent_session_id (primed by crux.mjs at startup) so the
   // pipeline_runs row links back to the agent that triggered the run.
   // `getCachedAuditSessionId` returns a string; agent_sessions.id is bigint
@@ -1132,7 +1154,7 @@ export function buildImproveEntityRunOptions(
   agentSessionId: number | null,
 ): WithPipelineRunOptions {
   return {
-    pipelineName: "improve-entity",
+    pipelineName: IMPROVE_ENTITY_PIPELINE_NAME,
     entityId: entity.stableId ?? entity.id,
     shape: entity.type,
     agentSessionId,
@@ -1273,18 +1295,25 @@ async function doImproveSingleEntity(args: {
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N] [--wait-for-settle]", exitCode: 1 };
+    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]", exitCode: 1 };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
   const noWrite = !!options.dryRun;
   const waitForSettle = !!options.waitForSettle;
+  const force = !!options.force;
 
   let result: ImproveResult;
   try {
-    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite, waitForSettle });
+    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite, waitForSettle, force });
   } catch (err) {
+    // QUA-1032: mutex conflicts use exit code 2 to distinguish "another run
+    // is in flight" from a generic failure (exit 1). The message is already
+    // formatted by `formatMutexError` — surface it as-is.
+    if (err instanceof ImproveEntityMutexError) {
+      return { output: err.message, exitCode: 2 };
+    }
     return { output: err instanceof Error ? err.message : String(err), exitCode: 1 };
   }
   return { output: "", exitCode: result.hit_target ? 0 : 2 };
@@ -1292,7 +1321,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle]
+    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]
 
 Closed-loop iterative entity improver. Discovers sources via runResearch,
 extracts gap-targeted claims with Haiku, pre-filters by token presence,
@@ -1316,6 +1345,10 @@ Options:
                        terminal status, applying any newly-verified verdicts
                        (capped at 30 min). Recommended for CI gate / suite runs
                        so per-run results aren't sensitive to worker timing.
+  --force              Skip the QUA-1032 single-instance mutex check. By
+                       default, refuses to start (exit 2) if another
+                       improve-entity run is already in flight. Use only for
+                       explicit takeover after a crashed run.
 `,
     exitCode: 0,
   };
