@@ -26,7 +26,7 @@ function instrumentLabel(s: string): string {
 
 export interface FundingRoundRow {
   key: string;
-  /** URL-safe slug used for `/funding-rounds/<slug>` (QUA-908). Falls back to key when missing. */
+  /** URL-safe slug; falls back to key when missing. */
   slug?: string | null;
   name: string;
   companyName: string;

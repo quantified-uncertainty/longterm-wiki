@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   getAllKBRecords,
   getKBRecords,
+  findFactBaseRecordBySlugOrKey,
   type KBRecordEntry,
 } from "@/data/factbase";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
@@ -111,17 +112,6 @@ function parseInvestment(record: KBRecordEntry): ParsedInvestment {
   };
 }
 
-// ── Lookup helpers ─────────────────────────────────────────────────────
-
-/** Find a record by slug (preferred) or fall back to legacy 10-char key. */
-function findRoundRecord(idOrSlug: string): KBRecordEntry | undefined {
-  const allRounds = getAllKBRecords("funding-rounds");
-  return (
-    allRounds.find((r) => r.slug === idOrSlug) ??
-    allRounds.find((r) => r.key === idOrSlug)
-  );
-}
-
 // ── Static params ──────────────────────────────────────────────────────
 
 export function generateStaticParams() {
@@ -137,7 +127,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const record = findRoundRecord(id);
+  const record = findFactBaseRecordBySlugOrKey("funding-rounds", id);
   if (!record) {
     return { title: "Funding Round Not Found" };
   }
@@ -157,13 +147,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function FundingRoundDetailPage({ params }: PageProps) {
   const { id } = await params;
   const allRounds = getAllKBRecords("funding-rounds");
-  const record = findRoundRecord(id);
+  const record = findFactBaseRecordBySlugOrKey("funding-rounds", id);
 
   if (!record) notFound();
 
-  // Legacy URL: `/funding-rounds/<10-char-key>` redirects to slug URL.
-  // findRoundRecord prefers slug match, so reaching `record.key === id`
-  // means slug match missed → request was by legacy key.
+  // Redirect legacy /funding-rounds/<key> → /funding-rounds/<slug>.
   if (record.slug && record.key === id) {
     redirect(`/funding-rounds/${record.slug}`);
   }

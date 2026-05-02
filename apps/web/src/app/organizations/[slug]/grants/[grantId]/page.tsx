@@ -105,9 +105,7 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
   const funderTypedEntity = getTypedEntityById(grant.ownerEntityId);
   const funderWikiPageId = funderTypedEntity?.wikiId ?? null;
 
-  // Resolve the funding program's URL slug (QUA-908). Grants store the
-  // program's 10-char key; the [id]/page.tsx route accepts both, but linking
-  // straight to the slug avoids a redirect hop.
+  // Link straight to the program's slug to avoid the legacy-key redirect hop.
   let programHref: string | null = null;
   if (grant.programId) {
     const programRecord = getAllKBRecords("funding-programs").find(

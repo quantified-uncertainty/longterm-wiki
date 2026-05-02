@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, type KBRecordEntry } from "@/data/factbase";
+import { getAllKBRecords, findFactBaseRecordBySlugOrKey } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
@@ -33,17 +33,6 @@ export function generateStaticParams() {
   return allPrograms.map((record) => ({ id: record.slug ?? record.key }));
 }
 
-// ── Lookup helpers ─────────────────────────────────────────────────────
-
-/** Find a record by slug (preferred) or fall back to legacy 10-char key. */
-function findProgramRecord(idOrSlug: string): KBRecordEntry | undefined {
-  const allPrograms = getAllKBRecords("funding-programs");
-  return (
-    allPrograms.find((r) => r.slug === idOrSlug) ??
-    allPrograms.find((r) => r.key === idOrSlug)
-  );
-}
-
 // ── Metadata ───────────────────────────────────────────────────────────
 
 interface PageProps {
@@ -52,7 +41,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const record = findProgramRecord(id);
+  const record = findFactBaseRecordBySlugOrKey("funding-programs", id);
   if (!record) {
     return { title: "Funding Program Not Found" };
   }
@@ -72,13 +61,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function FundingProgramDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const record = findProgramRecord(id);
+  const record = findFactBaseRecordBySlugOrKey("funding-programs", id);
 
   if (!record) return notFound();
 
-  // Legacy URL: `/funding-programs/<10-char-key>` redirects to slug URL.
-  // findProgramRecord prefers slug match, so reaching `record.key === id`
-  // means slug match missed → request was by legacy key.
+  // Redirect legacy /funding-programs/<key> → /funding-programs/<slug>.
   if (record.slug && record.key === id) {
     redirect(`/funding-programs/${record.slug}`);
   }

@@ -1578,9 +1578,9 @@ export async function fetchFactsFromPG() {
 /**
  * @param {object} kb - The serialized KB object (mutated).
  * @param {object} [opts]
- * @param {Record<string, string>} [opts.stableIdToSlug] - Map of entity stableId → slug, used
- *   to namespace funding-rounds slugs by their owning company (QUA-908). When omitted,
- *   funding records still get slugs but cannot be owner-prefixed for collision resolution.
+ * @param {Record<string, string>} [opts.stableIdToSlug] - Map of entity stableId → slug.
+ *   Used to namespace funding-rounds slugs by their owning company. When omitted,
+ *   funding records still get slugs but cannot be owner-prefixed for collisions.
  */
 export async function mergePGRecordsIntoKB(kb, opts = {}) {
   const stableIdToSlug = opts.stableIdToSlug ?? {};
@@ -1877,11 +1877,9 @@ export async function mergePGRecordsIntoKB(kb, opts = {}) {
     publicationRowToRecordEntry,
   );
 
-  // --- Assign URL slugs to funding-programs and funding-rounds (QUA-908) ---
-  // Records' canonical 10-char keys leaked into URLs (`/funding-programs/pJ9oHvQ1Bb`).
-  // Generate human-readable slugs from the record name (and owner-entity slug for
-  // collision resolution). The 10-char key is preserved for verdict lookups and
-  // legacy-URL redirects in [id]/page.tsx.
+  // Assign URL slugs to funding-programs and funding-rounds. Records' canonical
+  // 10-char keys are preserved for verdict lookups and legacy-URL redirects in
+  // [id]/page.tsx; the slug becomes the user-facing URL identifier.
   const getOwnerSlug = (stableId) => stableIdToSlug[stableId] ?? null;
   for (const collection of ['funding-programs', 'funding-rounds']) {
     const allRecords = [];

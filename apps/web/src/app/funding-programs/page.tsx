@@ -38,13 +38,12 @@ export default function FundingProgramsPage() {
 
   // Build enriched rows for the table.
   // `id` is the canonical 10-char key (used for verdict lookups and the React row key).
-  // `slug` is the human-readable URL slug (QUA-908) — falls back to id when missing.
-  const recordByKey = new Map(allRecords.map((r) => [r.key, r]));
+  // `slug` is the human-readable URL slug — falls back to id when missing.
   const rows: FundingProgramListRow[] = programs.map((p) => {
     const org = resolveOrg(p.ownerEntityId);
     return {
       id: p.key,
-      slug: recordByKey.get(p.key)?.slug ?? null,
+      slug: p.slug,
       name: p.name,
       orgId: p.ownerEntityId,
       orgName: org.name,

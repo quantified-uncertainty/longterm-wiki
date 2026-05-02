@@ -13,7 +13,7 @@ import { FP_STATUS_COLORS, PROGRAM_TYPE_LABELS } from "./funding-programs-consta
 
 export interface FundingProgramListRow {
   id: string;
-  /** URL-safe slug used for `/funding-programs/<slug>` (QUA-908). Falls back to id when missing. */
+  /** URL-safe slug; falls back to id when missing. */
   slug?: string | null;
   name: string;
   orgId: string;

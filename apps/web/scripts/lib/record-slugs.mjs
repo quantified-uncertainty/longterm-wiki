@@ -1,33 +1,20 @@
 /**
- * Record slug generation for FactBase records served from PG.
- *
- * QUA-908: `/funding-programs/<10-char-id>` and `/funding-rounds/<10-char-id>`
- * exposed raw stableIds in the URL. This module generates human-readable URL
- * slugs from the record's display name (and owner-entity slug for namespacing
- * generic round names like "Series A").
- *
- * Slugs are assigned at build-time and stored on FactBaseRecordEntry.slug.
- * The 10-char `key` is preserved for verdict lookups, React keys, and
- * legacy-URL redirects in [id]/page.tsx.
+ * URL-slug generation for FactBase records served from PG (funding-programs
+ * and funding-rounds). Slugs are derived from the record's display name at
+ * build-time. The 10-char `key` is preserved for verdict lookups and
+ * legacy-URL redirects.
  *
  * Stability contract: same (name, ownerEntity, key) → same slug across
- * builds. Collisions are resolved deterministically by appending a 4-char
- * suffix derived from the record's key, never by build order.
+ * builds. Collisions are resolved deterministically (sorted by key), never
+ * by build order.
  */
 
-/**
- * Slugify a string: lowercase, replace non-alphanumerics with hyphens,
- * collapse runs, and trim to a reasonable URL length.
- *
- * @param {string} text
- * @returns {string}
- */
 export function slugify(text) {
   if (!text) return "";
   return String(text)
     .toLowerCase()
     .normalize("NFKD")
-    .replace(/\p{M}+/gu, "") // strip combining marks (diacritics)
+    .replace(/\p{M}+/gu, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80)
@@ -35,12 +22,11 @@ export function slugify(text) {
 }
 
 /**
- * Compute candidate slugs for a record: the bare-name slug and the
- * owner-prefixed form. Caller picks which to assign based on collisions.
+ * Compute candidate slugs for a record. `assignSlugs` picks `bare` or
+ * `withOwner` based on the collection's policy and collision state.
  *
- * If the bare-name slug already starts with (or equals) the owner slug —
- * e.g. name="Anthropic Series G" with ownerSlug="anthropic" — no double-
- * prefixing.
+ * Skips double-prefixing when the bare slug already starts with the owner
+ * slug (e.g. name "Anthropic Series G" + owner "anthropic").
  *
  * @param {{key: string, ownerEntityId: string, fields: Record<string, unknown>}} record
  * @param {(stableId: string) => string | null} getOwnerSlug
@@ -48,37 +34,33 @@ export function slugify(text) {
  */
 export function candidateSlugs(record, getOwnerSlug) {
   const rawName = typeof record.fields.name === "string" ? record.fields.name : "";
-  const baseSlug = slugify(rawName) || slugify(record.key);
+  const bare = slugify(rawName) || slugify(record.key);
   const ownerSlug = record.ownerEntityId ? getOwnerSlug(record.ownerEntityId) : null;
 
   let withOwner;
-  if (!ownerSlug) {
-    withOwner = baseSlug;
-  } else if (baseSlug === ownerSlug || baseSlug.startsWith(`${ownerSlug}-`)) {
-    withOwner = baseSlug;
+  if (!ownerSlug || bare === ownerSlug || bare.startsWith(`${ownerSlug}-`)) {
+    withOwner = bare;
   } else {
-    withOwner = baseSlug ? `${ownerSlug}-${baseSlug}` : ownerSlug;
+    withOwner = bare ? `${ownerSlug}-${bare}` : ownerSlug;
   }
 
-  return { bare: baseSlug, withOwner };
+  return { bare, withOwner };
 }
 
 /**
- * Assign a unique slug to every record in a collection. Mutates each record
- * to add a `slug` field. Two-pass: first try the preferred slug for the
- * collection; collisions cascade to owner-prefixed → 4-char key suffix.
+ * Assign a unique URL slug to every record in a collection. Mutates each
+ * record to add a `slug` field.
  *
- * For `funding-rounds`, the preferred slug is owner-prefixed (round names
- * like "Series A" recur at every funder, so namespacing is the default).
- * For `funding-programs`, the preferred slug is the bare name (program
- * names like "Rise Global Talent Program" are usually distinctive); a
- * cross-funder collision falls back to the owner-prefixed form.
+ * Cascade per record: first-choice → fallback → 4-char key-prefix suffix.
+ * For `funding-rounds`, first-choice is the owner-prefixed slug (round
+ * names like "Series A" recur at every funder, so namespacing is the
+ * contract — no fallback to bare). For `funding-programs`, first-choice
+ * is the bare name; cross-funder collisions fall back to owner-prefixed.
  *
- * Slugs are also guarded against shadowing other records' 10-char `key`
- * values: if a slugified name happens to equal another record's key, we
- * apply the suffix immediately so legacy `/funding-*\/<key>` URLs always
- * resolve to the right record. Without the guard, slug-first lookup in
- * `findProgramRecord` could return the wrong record.
+ * Slugs are guarded against equalling another record's 10-char `key` so
+ * legacy `/funding-*\/<key>` URLs always resolve to the right record (the
+ * detail-page lookup prefers slug; without the guard a slugified name
+ * matching a sibling's key could shadow the legacy URL).
  *
  * @param {Array<{key: string, ownerEntityId: string, fields: Record<string, unknown>, slug?: string}>} records
  * @param {string} collection
@@ -86,42 +68,28 @@ export function candidateSlugs(record, getOwnerSlug) {
  * @returns {Map<string, string>} Map of record.key → assigned slug.
  */
 export function assignSlugs(records, collection, getOwnerSlug) {
+  const preferOwner = collection === "funding-rounds";
   const candidates = records.map((r) => ({
     record: r,
     ...candidateSlugs(r, getOwnerSlug),
   }));
 
-  // For funding-rounds, the preferred slug is owner-prefixed — base names
-  // ("Series A") recur at every company. For funding-programs the bare
-  // form is preferred; only colliding ones need owner-prefixing.
-  const preferOwner = collection === "funding-rounds";
-
-  // Count first-choice slug occurrences so we know which need disambiguation.
   const firstChoiceCounts = new Map();
   for (const c of candidates) {
     const first = preferOwner ? c.withOwner : c.bare;
     firstChoiceCounts.set(first, (firstChoiceCounts.get(first) ?? 0) + 1);
   }
 
-  // Slug-vs-key shadowing guard: collect every record key so we never assign
-  // a slug that equals some other record's legacy URL identifier.
   const keys = new Set(records.map((r) => r.key));
-
   const taken = new Set();
   const assigned = new Map();
 
-  // Sort by record key so collision suffixes are stable across builds.
   candidates.sort((a, b) => a.record.key.localeCompare(b.record.key));
 
   for (const c of candidates) {
     const first = preferOwner ? c.withOwner : c.bare;
-    const second = preferOwner ? c.withOwner : c.withOwner;
-    // For funding-rounds (preferOwner): second === first, so no second-choice
-    // cascade — collisions go straight to the suffix path. Owner-prefixed
-    // slug is the contract; we never strip back to a bare round name.
-    // For funding-programs: second is withOwner (a real fallback before suffix).
+    const fallback = c.withOwner; // collapses to `first` for funding-rounds
 
-    // Cascade: first-choice → second-choice (when distinct) → suffixed.
     let candidate;
     if (
       (firstChoiceCounts.get(first) ?? 0) === 1 &&
@@ -130,11 +98,11 @@ export function assignSlugs(records, collection, getOwnerSlug) {
     ) {
       candidate = first;
     } else if (
-      first !== second &&
-      !taken.has(second) &&
-      !shadowsOtherKey(second, c.record.key, keys)
+      first !== fallback &&
+      !taken.has(fallback) &&
+      !shadowsOtherKey(fallback, c.record.key, keys)
     ) {
-      candidate = second;
+      candidate = fallback;
     } else {
       candidate = first;
     }
@@ -146,9 +114,9 @@ export function assignSlugs(records, collection, getOwnerSlug) {
       continue;
     }
 
-    // Need a suffix to disambiguate. Use the canonical 4-char prefix of the
-    // record's own key (lowercased, filtered) — deterministic across builds
-    // and ties the suffix to the right record.
+    // Suffix from the record's own key — deterministic and ties uniqueness
+    // back to the canonical id. The "|| 'x'" only fires for keys that are
+    // entirely non-alphanumeric, which 10-char base62 keys never are.
     const suffix = c.record.key.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 4) || "x";
     let final = `${candidate}-${suffix}`;
     let n = 1;
@@ -163,11 +131,6 @@ export function assignSlugs(records, collection, getOwnerSlug) {
   return assigned;
 }
 
-/**
- * True when `slug` equals an existing record's `key`, but not the owning
- * record's own key. Prevents `/funding-rounds/<slug>` from shadowing the
- * legacy `/funding-rounds/<key>` URL of a different record.
- */
 function shadowsOtherKey(slug, ownKey, keys) {
   return slug !== ownKey && keys.has(slug);
 }
