@@ -5,13 +5,17 @@
  *
  * Bans new `const VALID_*` declarations and inline `z.enum([...])` literals in
  * apps/wiki-server/src/routes/tablebase/ — both are markers of an entity wire
- * schema being hand-written in a sync route instead of imported from the
- * canonical schema package (target: packages/entity-schemas, per QUA-943).
+ * schema being hand-written in a sync route instead of imported from a
+ * canonical shared schema.
  *
  * The current baseline of files containing drift markers is recorded in
- * .entity-schema-drift-allowlist.txt. As routes migrate to canonical schemas
- * entries are removed from the allowlist. The file reaches zero entries when
- * QUA-943 closes.
+ * .entity-schema-drift-allowlist.txt. The validator fails if a NEW route adds
+ * drift markers without being added to the allowlist — preventing new drift
+ * from accumulating. Existing entries can be removed when a route is migrated
+ * to a shared schema, but there is no active plan driving the allowlist to
+ * zero (the QUA-943 v5 plan that originally drove this was rejected — see
+ * QUA-1043). Treat this as standalone hygiene against new drift, not as a
+ * migration progress meter.
  *
  * Suppression: add `// schema-drift-ok: <reason>` on the same line. The
  * reason is mandatory (matches the buildSuppressionRegex contract used by
@@ -226,7 +230,7 @@ export function runCheck(
   if (errors === 0) {
     console.log(`${c.green}No entity-schema drift outside allowlist (${filesWithDrift.size} files allowlisted, ${allFiles.length} files scanned)${c.reset}`);
     if (filesWithDrift.size > 0) {
-      console.log(`${c.dim}QUA-943 closure metric: ${filesWithDrift.size} files still need migration to canonical schemas${c.reset}`);
+      console.log(`${c.dim}${filesWithDrift.size} file(s) on the allowlist (no active plan to drive this to zero — see QUA-1043).${c.reset}`);
     }
   } else {
     if (newViolations.length > 0) {
@@ -236,7 +240,7 @@ export function runCheck(
         console.log(`  ${c.red}${v.file}:${v.line}${c.reset} [${v.kind}]`);
         console.log(`    ${c.dim}${v.text}${c.reset}`);
       }
-      console.log(`\n${c.dim}Fix: import the canonical schema from packages/entity-schemas (QUA-943) instead of hand-writing.${c.reset}`);
+      console.log(`\n${c.dim}Fix: import the schema from a shared canonical location instead of hand-writing it in the route.${c.reset}`);
       console.log(`${c.dim}Suppress a single legitimate use (e.g., query-string enum): add \`// ${SUPPRESSION_MARKER}: <reason>\` on the same line.${c.reset}`);
       console.log(`${c.dim}If migration to canonical schemas is not yet possible, add the file to ${relative(PROJECT_ROOT, allowlistPath)}.${c.reset}\n`);
     }
