@@ -67,7 +67,7 @@ export default function EventsPage() {
         ))}
       </div>
 
-      <Suspense fallback={<TableSkeleton rows={10} columns={5} />}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={7} />}>
         <EventsTable rows={rows} />
       </Suspense>
     </div>

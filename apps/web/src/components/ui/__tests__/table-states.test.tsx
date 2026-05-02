@@ -11,7 +11,7 @@ import {
   DEFAULT_LOADING_LABEL,
   DEFAULT_EMPTY_LABEL,
   DEFAULT_ERROR_LABEL,
-} from "../table-states";
+} from "@/components/ui/table-states";
 
 function renderInTable(node: React.ReactNode) {
   return render(
@@ -62,13 +62,22 @@ describe("TableErrorRow", () => {
     expect(cell).toHaveTextContent("API down");
   });
 
-  it("renders error message from Error instance", () => {
+  it("renders DEFAULT_ERROR_LABEL for Error instances (does not surface error.message)", () => {
+    // Error instances often carry transport/runtime details unsuitable for end-users.
+    // The canonical primitive collapses them to the safe fallback; callers wanting a
+    // custom message must pass an explicit string.
     renderInTable(<TableErrorRow colSpan={3} error={new Error("boom")} />);
-    expect(screen.getByText("boom")).toBeInTheDocument();
+    expect(screen.getByText(DEFAULT_ERROR_LABEL)).toBeInTheDocument();
+    expect(screen.queryByText("boom")).not.toBeInTheDocument();
   });
 
-  it("falls back to default error label when error message is empty", () => {
+  it("falls back to default error label when error string is empty", () => {
     renderInTable(<TableErrorRow colSpan={3} error="" />);
+    expect(screen.getByText(DEFAULT_ERROR_LABEL)).toBeInTheDocument();
+  });
+
+  it("falls back to default error label when error string is whitespace-only", () => {
+    renderInTable(<TableErrorRow colSpan={3} error="   " />);
     expect(screen.getByText(DEFAULT_ERROR_LABEL)).toBeInTheDocument();
   });
 });
@@ -124,5 +133,11 @@ describe("TableErrorBlock", () => {
     const btn = screen.getByRole("button", { name: /retry/i });
     btn.click();
     expect(retry).toHaveBeenCalledOnce();
+  });
+
+  it("renders DEFAULT_ERROR_LABEL for Error instances (does not surface error.message)", () => {
+    render(<TableErrorBlock error={new Error("internal stack details")} />);
+    expect(screen.getByText(DEFAULT_ERROR_LABEL)).toBeInTheDocument();
+    expect(screen.queryByText("internal stack details")).not.toBeInTheDocument();
   });
 });

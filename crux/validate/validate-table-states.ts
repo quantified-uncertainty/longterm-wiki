@@ -108,6 +108,8 @@ const IMPORT_RE = /from\s+["']@\/components\/ui\/table-states["']/;
  * `\b` lets `"<TableLoadingRow"` (a string literal) bypass.
  */
 const CANONICAL_JSX_RE = /<(?:TableLoadingRow|TableEmptyRow|TableErrorRow|TableSkeleton|TableEmptyBlock|TableErrorBlock)(?:\s|\/?>)/;
+/** Looser open-tag form used for multiline tracking (no immediate close required). */
+const CANONICAL_JSX_OPEN_RE = /<(?:TableLoadingRow|TableEmptyRow|TableErrorRow|TableSkeleton|TableEmptyBlock|TableErrorBlock)\b/;
 /**
  * Opt-out comment: requires a `//`, `/*`, or `{/*` comment marker followed by
  * a non-empty reason after `table-states-ok:`. Plain `"table-states-ok:"`
@@ -138,8 +140,68 @@ function checkFile(filePath: string): Violation[] {
   const lines = content.split("\n");
   const violations: Violation[] = [];
 
+  // State carried across lines so multiline JSX block comments and multiline
+  // canonical-element openings don't false-flag continuation lines that
+  // contain the banned literal in attributes (e.g. `label="Loading users..."`).
+  let inBlockComment = false; // inside `{/* ... */}` JSX block comment
+  let inCanonicalElement = false; // inside `<TableLoadingRow ...>` spanning multiple lines
+
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i];
+
+    // Update block-comment state. We process opens and closes in order so a
+    // single-line `{/* ... */}` (or `/* ... */`) toggles in and out within the
+    // same iteration. Multi-line forms leave `inBlockComment` true until the
+    // line containing `*/}` (or `*/`) is reached.
+    let cursor = 0;
+    let lineHasContentOutsideComment = false;
+    while (cursor < rawLine.length) {
+      if (inBlockComment) {
+        const closeJsx = rawLine.indexOf("*/}", cursor);
+        const closeC = rawLine.indexOf("*/", cursor);
+        const close = closeJsx >= 0 && (closeC < 0 || closeJsx <= closeC) ? closeJsx + 3 : (closeC >= 0 ? closeC + 2 : -1);
+        if (close < 0) {
+          cursor = rawLine.length;
+        } else {
+          inBlockComment = false;
+          cursor = close;
+        }
+      } else {
+        const openJsx = rawLine.indexOf("{/*", cursor);
+        const openC = rawLine.indexOf("/*", cursor);
+        const open = openJsx >= 0 && (openC < 0 || openJsx <= openC) ? openJsx : openC;
+        if (open < 0) {
+          if (rawLine.slice(cursor).trim().length > 0) lineHasContentOutsideComment = true;
+          cursor = rawLine.length;
+        } else {
+          if (rawLine.slice(cursor, open).trim().length > 0) lineHasContentOutsideComment = true;
+          inBlockComment = true;
+          cursor = open + (rawLine.startsWith("{/*", open) ? 3 : 2);
+        }
+      }
+    }
+
+    // If the entire line was inside a block comment (no content outside), skip it.
+    if (!lineHasContentOutsideComment) continue;
+
+    // Update canonical-element state.
+    // Open: a multiline `<TableLoadingRow` etc. without an immediate `>` or `/>`
+    // on the same line. Close: `>` or `/>` while we're tracking.
+    if (!inCanonicalElement && CANONICAL_JSX_OPEN_RE.test(rawLine) && !CANONICAL_JSX_RE.test(rawLine)) {
+      // Found `<TableLoadingRow` (or similar) but not the immediate-close form —
+      // this is a multiline element. Skip the rest of the loop body and start tracking.
+      // We still need to check this opening line for closure in case the open and
+      // close are split by attributes on the same line ending in `>`.
+      const closesOnSameLine = /[/>]>/.test(rawLine) || /\s>\s*$/.test(rawLine);
+      inCanonicalElement = !closesOnSameLine;
+      continue;
+    }
+    if (inCanonicalElement) {
+      // Inside a canonical element body — skip until we see the closing `>` or `/>`.
+      if (/\/?>/.test(rawLine)) inCanonicalElement = false;
+      continue;
+    }
+
     if (isComment(rawLine)) continue;
     // Skip lines that import from the canonical module.
     if (IMPORT_RE.test(rawLine)) continue;
