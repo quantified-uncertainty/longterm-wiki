@@ -27,3 +27,8 @@ export {
   type FilterChipsProps,
 } from "./FilterChips";
 export { EntityDataPage } from "./EntityDataPage";
+export {
+  DirectoryIndexShell,
+  type DirectoryIndexShellProps,
+  type DirectoryIndexShellStat,
+} from "./DirectoryIndexShell";
