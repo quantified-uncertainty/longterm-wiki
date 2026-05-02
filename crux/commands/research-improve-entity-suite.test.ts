@@ -36,6 +36,7 @@ import {
   computeDefaultTotalBudgetUsd,
   computePerEntityCap,
   filterToSupportedTypes,
+  inspectSuite,
   isValidTag,
   loadSuite,
   median,
@@ -44,6 +45,8 @@ import {
   type PerEntityRecord,
   type SuiteEntry,
 } from "./research-improve-entity-suite.ts";
+import type { EntityWithType } from "../lib/research/entity-loader.ts";
+import type { PipelineRunRow } from "../lib/wiki-server/pipeline-runs.ts";
 import { BudgetExhaustedError } from "./research-improve-entity.ts";
 import type { ImproveResult, IterationMetrics } from "./research-improve-entity.ts";
 import {
@@ -794,5 +797,97 @@ describe("computeDefaultTotalBudgetUsd", () => {
 
   it("propagates loadSuite errors (e.g. missing file)", () => {
     expect(() => computeDefaultTotalBudgetUsd("/nonexistent/path/suite.yaml")).toThrow();
+  });
+});
+
+// ── inspectSuite (QUA-1034) ────────────────────────────────────────────────
+
+describe("inspectSuite", () => {
+  function writeSuite(entries: SuiteEntry[]): string {
+    const dir = tmpdir("inspect-suite");
+    const filePath = path.join(dir, "suite.yaml");
+    fs.writeFileSync(
+      filePath,
+      entries
+        .map((e) =>
+          `- slug: ${e.slug}\n  type: ${e.type}` +
+          (e.expected_min_coverage != null ? `\n  expected_min_coverage: ${e.expected_min_coverage}` : "") +
+          "\n",
+        )
+        .join(""),
+    );
+    return filePath;
+  }
+
+  it("returns one report per supported entity, with cost from injected history", async () => {
+    const suitePath = writeSuite([
+      { slug: "a-policy", type: "policy" },
+      { slug: "b-policy", type: "policy" },
+      { slug: "c-org", type: "organization" }, // filtered out (v1: policy-only)
+    ]);
+    const entitiesById: Record<string, EntityWithType> = {
+      "a-policy": { id: "a-policy", type: "policy", title: "A", stableId: "sid_a" },
+      "b-policy": { id: "b-policy", type: "policy", title: "B", stableId: "sid_b" },
+    };
+    const fakeRuns = [
+      { runId: "r1", pipelineName: "improve-entity", entityId: "sid_a", status: "committed", costUsd: "0.80" },
+    ] as unknown as PipelineRunRow[];
+    const { reports, notFound } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn((slug: string) => entitiesById[slug] ?? null),
+      fetchHistoryFn: vi.fn(async () => fakeRuns),
+    });
+    expect(notFound).toEqual([]);
+    expect(reports).toHaveLength(2);
+    expect(reports[0].slug).toBe("a-policy");
+    expect(reports[0].costSource).toBe("history"); // matched the fake run
+    expect(reports[1].slug).toBe("b-policy");
+    expect(reports[1].costSource).toBe("fallback"); // no matching history
+  });
+
+  it("collects slugs that are in the suite YAML but missing from data/entities/", async () => {
+    const suitePath = writeSuite([
+      { slug: "present", type: "policy" },
+      { slug: "missing", type: "policy" },
+    ]);
+    const { reports, notFound } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn((slug: string) =>
+        slug === "present"
+          ? ({ id: "present", type: "policy", stableId: "sid_p" } as EntityWithType)
+          : null,
+      ),
+      fetchHistoryFn: vi.fn(async () => []),
+    });
+    expect(reports.map((r) => r.slug)).toEqual(["present"]);
+    expect(notFound).toEqual(["missing"]);
+  });
+
+  it("uses fallback estimates when fetchHistory returns []", async () => {
+    const suitePath = writeSuite([{ slug: "a", type: "policy" }]);
+    const { reports } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn(() => ({ id: "a", type: "policy", stableId: "sid_a" } as EntityWithType)),
+      fetchHistoryFn: vi.fn(async () => []),
+    });
+    expect(reports[0].costSource).toBe("fallback");
+    expect(reports[0].historicalRunCount).toBe(0);
+  });
+
+  it("makes ZERO calls to the real improver — inspect path is LLM-free", async () => {
+    // The CLI inspect short-circuit means improveSingleEntity should never be
+    // called. inspectSuite() does not take an improver — that's the point.
+    // This test verifies the function signature does not regress: its only
+    // injectables are loadEntityFn + fetchHistoryFn, both of which are
+    // read-only. If a future change adds an `improver?:` to `InspectSuiteOptions`,
+    // this test won't catch it directly, but the static-source check in
+    // inspect.test.ts (`expect(source).not.toMatch(/createLlmClient/)`) will.
+    const suitePath = writeSuite([{ slug: "a", type: "policy" }]);
+    const loadEntityFn = vi.fn(() => ({ id: "a", type: "policy", stableId: "sid_a" } as EntityWithType));
+    const fetchHistoryFn = vi.fn(async () => [] as PipelineRunRow[]);
+    await inspectSuite({ suitePath, loadEntityFn, fetchHistoryFn });
+    // Sanity: only the two injected hooks were invoked.
+    expect(loadEntityFn).toHaveBeenCalledTimes(1);
+    expect(fetchHistoryFn).toHaveBeenCalledTimes(1);
   });
 });
