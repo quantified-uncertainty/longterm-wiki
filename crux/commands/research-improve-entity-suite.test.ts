@@ -832,12 +832,15 @@ describe("inspectSuite", () => {
     const fakeRuns = [
       { runId: "r1", pipelineName: "improve-entity", entityId: "sid_a", status: "committed", costUsd: "0.80" },
     ] as unknown as PipelineRunRow[];
-    const { reports, notFound } = await inspectSuite({
+    const { reports, notFound, unsupported } = await inspectSuite({
       suitePath,
       loadEntityFn: vi.fn((slug: string) => entitiesById[slug] ?? null),
       fetchHistoryFn: vi.fn(async () => fakeRuns),
     });
     expect(notFound).toEqual([]);
+    // The "c-org" entry in the suite is filtered out as unsupported (v1:
+    // policy-only). It must surface in `unsupported`, NOT be silently dropped.
+    expect(unsupported).toEqual([{ slug: "c-org", type: "organization" }]);
     expect(reports).toHaveLength(2);
     expect(reports[0].slug).toBe("a-policy");
     expect(reports[0].costSource).toBe("history"); // matched the fake run
@@ -850,7 +853,7 @@ describe("inspectSuite", () => {
       { slug: "present", type: "policy" },
       { slug: "missing", type: "policy" },
     ]);
-    const { reports, notFound } = await inspectSuite({
+    const { reports, notFound, unsupported } = await inspectSuite({
       suitePath,
       loadEntityFn: vi.fn((slug: string) =>
         slug === "present"
@@ -861,6 +864,7 @@ describe("inspectSuite", () => {
     });
     expect(reports.map((r) => r.slug)).toEqual(["present"]);
     expect(notFound).toEqual(["missing"]);
+    expect(unsupported).toEqual([]);
   });
 
   it("uses fallback estimates when fetchHistory returns []", async () => {

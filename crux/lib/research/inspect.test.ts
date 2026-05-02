@@ -10,12 +10,27 @@
  *     this is the load-bearing acceptance criterion (zero LLM calls).
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+// Mock the pipeline-runs client at module scope so fetchHistoricalRuns can be
+// exercised without hitting the real wiki-server. Each test sets the mock
+// behavior via the exported `listPipelineRunsMock` controller.
+const listPipelineRunsMock = vi.fn();
+vi.mock("../wiki-server/pipeline-runs.ts", async () => {
+  const actual = await vi.importActual<typeof import("../wiki-server/pipeline-runs.ts")>(
+    "../wiki-server/pipeline-runs.ts",
+  );
+  return {
+    ...actual,
+    listPipelineRuns: (...args: unknown[]) => listPipelineRunsMock(...args),
+  };
+});
 
 import {
   buildInspectionReport,
   COST_RANGE_SPREAD,
   estimateEntityCost,
+  fetchHistoricalRuns,
   formatInspectionHeader,
   formatInspectionLine,
   formatInspectionSuite,
@@ -214,6 +229,22 @@ describe("estimateEntityCost", () => {
     expect(r.historicalRunCount).toBe(2);
     expect(r.estimatedCostUsd).toBe(1.0); // median of 0.75, 1.25
   });
+
+  it("rejects non-numeric costUsd via the !Number.isFinite branch", () => {
+    // If a future migration ever stores a sentinel like "n/a" in cost_usd,
+    // Number("n/a") = NaN. The `!Number.isFinite(c)` filter must skip these
+    // so the median isn't poisoned with NaN. Without this rejection, every
+    // estimate would silently become NaN.
+    const e = makePolicy();
+    const runs = [
+      makeRun({ costUsd: "not-a-number" }),
+      makeRun({ runId: "r2", costUsd: "Infinity" }),
+      makeRun({ runId: "r3", costUsd: "0.25" }),
+    ];
+    const r = estimateEntityCost(e, runs);
+    expect(r.historicalRunCount).toBe(1);
+    expect(r.estimatedCostUsd).toBe(0.25);
+  });
 });
 
 // ── buildInspectionReport ───────────────────────────────────────────────────
@@ -397,6 +428,69 @@ describe("formatInspectionSuite", () => {
     expect(lines[0]).toContain("2 entities");
     expect(lines[1]).toContain("fisa-702");
     expect(lines[2]).toContain("eu-ai-act");
+  });
+});
+
+// ── fetchHistoricalRuns ─────────────────────────────────────────────────────
+
+describe("fetchHistoricalRuns", () => {
+  beforeEach(() => {
+    listPipelineRunsMock.mockReset();
+  });
+  afterEach(() => {
+    listPipelineRunsMock.mockReset();
+  });
+
+  it("returns runs from the typed client on success", async () => {
+    const runs = [
+      makeRun({ runId: "r1", costUsd: "0.50" }),
+      makeRun({ runId: "r2", costUsd: "1.00" }),
+    ];
+    listPipelineRunsMock.mockResolvedValueOnce({
+      ok: true,
+      data: { runs, count: runs.length },
+    });
+    const out = await fetchHistoricalRuns(123);
+    expect(out).toBe(runs);
+    // Confirm the limit + pipelineName were forwarded.
+    expect(listPipelineRunsMock).toHaveBeenCalledWith({
+      pipelineName: "improve-entity",
+      limit: 123,
+    });
+  });
+
+  it("returns [] and logs a warning with both error code AND message on failure", async () => {
+    listPipelineRunsMock.mockResolvedValueOnce({
+      ok: false,
+      error: "unavailable",
+      message: "Connection refused",
+    });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const out = await fetchHistoricalRuns();
+      expect(out).toEqual([]);
+      // The dead-`??`-chain bug would have logged just "unavailable" and
+      // dropped the human-readable "Connection refused". Both must appear.
+      const messages = warn.mock.calls.map((c) => String(c[0]));
+      expect(messages.some((m) => m.includes("unavailable"))).toBe(true);
+      expect(messages.some((m) => m.includes("Connection refused"))).toBe(true);
+      expect(messages.some((m) => m.includes("fallback"))).toBe(true);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("uses default limit when caller omits it", async () => {
+    listPipelineRunsMock.mockResolvedValueOnce({
+      ok: true,
+      data: { runs: [], count: 0 },
+    });
+    await fetchHistoricalRuns();
+    // Default = 500 per the function signature.
+    expect(listPipelineRunsMock).toHaveBeenCalledWith({
+      pipelineName: "improve-entity",
+      limit: 500,
+    });
   });
 });
 

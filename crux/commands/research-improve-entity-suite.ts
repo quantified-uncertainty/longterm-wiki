@@ -476,9 +476,14 @@ export interface InspectSuiteOptions {
 
 /**
  * Inspect every supported entity in the suite. Returns one report per
- * entity that was found in `data/entities/*.yaml`. Skipped entries (slug
- * not present in YAML, or unsupported type per `filterToSupportedTypes`)
- * are listed in `notFound` so the caller can surface them.
+ * entity that was found in `data/entities/*.yaml`. Skipped entries are
+ * surfaced under two distinct buckets so the caller can present each
+ * appropriately:
+ *   - `notFound`: slug listed in the suite YAML but missing from
+ *     `data/entities/*.yaml`. Likely a stale suite entry or a typo.
+ *   - `unsupported`: slug present in the suite YAML but its `type`
+ *     doesn't match `filterToSupportedTypes` (today: only `policy`).
+ *     Will be picked up automatically when a new analyzer lands.
  *
  * Pure-ish: side effects are limited to the injected `loadEntityFn` and
  * `fetchHistoryFn` (file reads + one read-only HTTP call). No LLM, no
@@ -487,6 +492,7 @@ export interface InspectSuiteOptions {
 export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
   reports: InspectionReport[];
   notFound: string[];
+  unsupported: SuiteEntry[];
 }> {
   const suitePath = opts.suitePath ?? SUITE_YAML;
   const loadEntity = opts.loadEntityFn ?? findEntity;
@@ -494,6 +500,7 @@ export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
 
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
+  const unsupported = all.filter((e) => !supported.includes(e));
   const runs = await fetchHistory();
 
   const reports: InspectionReport[] = [];
@@ -506,7 +513,7 @@ export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
     }
     reports.push(buildInspectionReport(entity, runs));
   }
-  return { reports, notFound };
+  return { reports, notFound, unsupported };
 }
 
 // ── CLI entry point ─────────────────────────────────────────────────────────
@@ -517,11 +524,17 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   // QUA-1034: --inspect short-circuits BEFORE tag/budget validation, mutex
   // check, withPipelineRun wrapper, or the suite runner. Pure pre-flight.
   if (options.inspect) {
-    const { reports, notFound } = await inspectSuite();
+    const { reports, notFound, unsupported } = await inspectSuite();
     const lines: string[] = [formatInspectionSuite(reports, "Suite (improve-entity)")];
     if (notFound.length > 0) {
       lines.push(
         `\nNote: ${notFound.length} suite entr${notFound.length === 1 ? "y" : "ies"} not found in data/entities/*.yaml: ${notFound.join(", ")}`,
+      );
+    }
+    if (unsupported.length > 0) {
+      const labels = unsupported.map((e) => `${e.slug} (${e.type})`).join(", ");
+      lines.push(
+        `\nNote: ${unsupported.length} suite entr${unsupported.length === 1 ? "y" : "ies"} skipped — type not yet supported by the inspector: ${labels}`,
       );
     }
     return { output: lines.join("\n"), exitCode: 0 };

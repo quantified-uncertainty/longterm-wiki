@@ -223,8 +223,11 @@ export async function fetchHistoricalRuns(
     limit,
   });
   if (!r.ok) {
+    // ApiResult error union has both `error` (machine code, always present) and
+    // `message` (human-readable). Log both — the previous form `?? r.message ??
+    // 'unknown'` was dead because `error` is never null.
     console.warn(
-      `[inspect] failed to fetch pipeline_runs history (${r.error ?? r.message ?? 'unknown'}); ` +
+      `[inspect] failed to fetch pipeline_runs history (${r.error}: ${r.message}); ` +
         `using fallback cost estimates`,
     );
     return [];
