@@ -186,6 +186,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- model_aliases JOIN entities JOIN wiki_pages: alias-based search (QUA-745) ---
+  // Mirrors the Phase 3 SQL in apps/wiki-server/src/routes/wikibase/pages.ts:
+  //   DISTINCT ON (wp.slug) ... ORDER BY wp.slug, rank DESC
+  //   WHERE wp.entity_type = 'ai-model' AND wp.wiki_id IS NOT NULL
+  //         AND (ma.alias = $1 OR ma.alias LIKE $2)
+  //         AND wp.slug NOT IN excludeIds
   if (q.includes("model_aliases") && q.includes("join entities") && q.includes("join wiki_pages")) {
     const aliasLower = params[0] as string;
     const aliasPrefix = params[1] as string; // "alias%" form
@@ -193,9 +198,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const excludeIds = (params[3] as string[]) || [];
     const prefixCore = aliasPrefix.endsWith("%") ? aliasPrefix.slice(0, -1) : aliasPrefix;
 
-    type Hit = { row: Record<string, unknown>; rank: number };
-    const hits: Hit[] = [];
-    const seen = new Set<string>();
+    // Step 1: collect all candidate (slug, rank) pairs that match the WHERE.
+    type Candidate = { slug: string; row: Record<string, unknown>; rank: number };
+    const candidates: Candidate[] = [];
     for (const a of modelAliasesStore) {
       const isExact = a.alias === aliasLower;
       const isPrefix = a.alias.startsWith(prefixCore);
@@ -209,12 +214,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const page = pagesStore.get(ent.id);
       if (!page) continue;
       if (excludeIds.includes(page.slug as string)) continue;
-      if (page.entity_type === "internal") continue;
+      if (page.entity_type !== "ai-model") continue;
       if (page.wiki_id == null) continue;
-      if (seen.has(page.slug as string)) continue;
-      seen.add(page.slug as string);
 
-      hits.push({
+      const rank = isExact ? 100.0 : 50.0;
+      candidates.push({
+        slug: page.slug as string,
+        rank,
         row: {
           id: page.slug,
           wiki_id: page.wiki_id,
@@ -224,13 +230,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
           category: page.category,
           reader_importance: page.reader_importance,
           quality: page.quality,
-          rank: isExact ? 100.0 : 50.0,
+          rank,
           snippet: page.description || null,
         },
-        rank: isExact ? 100.0 : 50.0,
       });
     }
-    hits.sort((a, b) => b.rank - a.rank);
+
+    // Step 2: DISTINCT ON (slug) — keep the highest-rank candidate per slug.
+    const bySlug = new Map<string, Candidate>();
+    for (const c of candidates) {
+      const existing = bySlug.get(c.slug);
+      if (!existing || c.rank > existing.rank) bySlug.set(c.slug, c);
+    }
+
+    // Step 3: sort by rank DESC (mimics the post-DISTINCT resort).
+    const hits = Array.from(bySlug.values()).sort((a, b) => b.rank - a.rank);
     return hits.slice(0, limit).map((h) => h.row);
   }
 
@@ -615,6 +629,113 @@ describe("Pages API", () => {
 
       const res = await app.request(
         "/api/pages/search?q=phantom-2024-01-01"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(0);
+    });
+
+    // Prefix match: a partial query like "claude-3-5" should still resolve
+    // to the canonical page via an alias starting with that prefix.
+    it("resolves an alias via prefix match", async () => {
+      await seedPage(app, "claude-3-5-sonnet", "Claude 3.5 Sonnet", {
+        entityType: "ai-model",
+      });
+      entitiesStore.set("claude-3-5-sonnet", {
+        id: "claude-3-5-sonnet",
+        stable_id: "sid_claude35sonnet",
+      });
+      modelAliasesStore.push({
+        alias: "claude-3-5-sonnet-20240620",
+        model_stable_id: "sid_claude35sonnet",
+      });
+
+      const res = await app.request(
+        "/api/pages/search?q=claude-3-5-sonnet-2024",
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results.map((r: { id: string }) => r.id)).toContain(
+        "claude-3-5-sonnet",
+      );
+    });
+
+    // Dedup: when multiple aliases (one exact, one prefix-only) point at the
+    // same model, the canonical page should appear exactly once.
+    it("dedupes when multiple aliases point at the same model", async () => {
+      await seedPage(app, "gpt-4-turbo", "GPT-4 Turbo", {
+        entityType: "ai-model",
+      });
+      entitiesStore.set("gpt-4-turbo", {
+        id: "gpt-4-turbo",
+        stable_id: "sid_gpt4turbo",
+      });
+      modelAliasesStore.push(
+        { alias: "gpt-4-turbo", model_stable_id: "sid_gpt4turbo" },
+        {
+          alias: "gpt-4-turbo-2024-04-09",
+          model_stable_id: "sid_gpt4turbo",
+        },
+        {
+          alias: "gpt-4-turbo-preview",
+          model_stable_id: "sid_gpt4turbo",
+        },
+      );
+
+      const res = await app.request("/api/pages/search?q=gpt-4-turbo");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const matches = body.results.filter(
+        (r: { id: string }) => r.id === "gpt-4-turbo",
+      );
+      expect(matches).toHaveLength(1);
+    });
+
+    // Adversarial: a `%` in the user query must not act as a LIKE wildcard.
+    // Without escapeIlike(), "%" would match every alias. The mock dispatch
+    // uses startsWith for prefix matching which mirrors the escaped form.
+    it("does not treat user input '%' as a LIKE wildcard", async () => {
+      await seedPage(app, "claude-3-haiku", "Claude 3 Haiku", {
+        entityType: "ai-model",
+      });
+      entitiesStore.set("claude-3-haiku", {
+        id: "claude-3-haiku",
+        stable_id: "sid_haiku",
+      });
+      modelAliasesStore.push({
+        alias: "claude-3-haiku-20240307",
+        model_stable_id: "sid_haiku",
+      });
+
+      // A bare "%" (or "_") should NOT match the haiku alias as a wildcard.
+      const res = await app.request("/api/pages/search?q=%25");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // FTS / trigram may produce no results either; the assertion is that
+      // the alias-search phase did NOT match haiku via wildcard expansion.
+      expect(
+        body.results.find((r: { id: string }) => r.id === "claude-3-haiku"),
+      ).toBeUndefined();
+    });
+
+    // Defense in depth: even if an alias points at a non-ai-model entity
+    // (corruption / future schema drift), it must NOT leak into search.
+    it("rejects an alias whose target page is not entity_type=ai-model", async () => {
+      await seedPage(app, "openai", "OpenAI", {
+        // Wrong type — alias should not resolve here.
+        entityType: "organization",
+      });
+      entitiesStore.set("openai", {
+        id: "openai",
+        stable_id: "sid_openai",
+      });
+      modelAliasesStore.push({
+        alias: "openai-mystery-model",
+        model_stable_id: "sid_openai",
+      });
+
+      const res = await app.request(
+        "/api/pages/search?q=openai-mystery-model",
       );
       expect(res.status).toBe(200);
       const body = await res.json();

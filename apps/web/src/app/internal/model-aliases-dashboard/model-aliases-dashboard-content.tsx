@@ -89,7 +89,11 @@ export async function ModelAliasesDashboardContent() {
       modelStableId,
       rows: rows.sort((a, b) => a.alias.localeCompare(b.alias)),
     }))
-    .sort((a, b) => b.rows.length - a.rows.length);
+    .sort(
+      (a, b) =>
+        b.rows.length - a.rows.length ||
+        a.modelStableId.localeCompare(b.modelStableId),
+    );
 
   return (
     <>
@@ -109,7 +113,7 @@ export async function ModelAliasesDashboardContent() {
         <StatCard
           label="Canonical Models"
           value={byModel.size.toString()}
-          sub={`with ≥1 alias`}
+          sub="with ≥1 alias"
         />
         <StatCard
           label="Sources"
@@ -207,7 +211,7 @@ export async function ModelAliasesDashboardContent() {
             </code>{" "}
             to populate this table from seed YAML, or promote an entry from{" "}
             <a
-              href="/wiki/E2541"
+              href="/internal/benchmark-quarantine-dashboard"
               className="text-primary hover:underline"
             >
               Benchmark Quarantine

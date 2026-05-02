@@ -62,6 +62,12 @@ interface PageSearchRow {
 
 const MAX_PAGE_SIZE = 200;
 
+// Phase 3 alias-search (QUA-745): bound user input length and rank exact
+// matches above prefix matches within the alias-search result set.
+const MAX_ALIAS_QUERY_LEN = 200;
+const ALIAS_EXACT_RANK = 100.0;
+const ALIAS_PREFIX_RANK = 50.0;
+
 // ---- Schemas (from shared api-types) ----
 
 // Re-exported so external consumers (e.g. tests) can import them by name.
@@ -149,9 +155,17 @@ const pagesApp = new Hono()
     if (results.length < limit) {
       const aliasLower = rawQ.trim().toLowerCase();
       // Reject empty / overlong queries to keep the LIKE/trgm path bounded.
-      if (aliasLower.length > 0 && aliasLower.length <= 200) {
+      if (aliasLower.length > 0 && aliasLower.length <= MAX_ALIAS_QUERY_LEN) {
+        // DISTINCT ON dedupes the result when multiple aliases point at the
+        // same model (e.g. both "gpt-4-turbo" and "gpt-4-turbo-2024-04-09"
+        // resolve to GPT-4 Turbo) — without it, the same wiki page would
+        // appear in `results` once per matching alias.
+        // entity_type filter: defense in depth. The FK only enforces that
+        // model_stable_id resolves to *some* entity; the business rule that
+        // it's an ai-model lives in the ingester. A future bad ingester or
+        // data migration could route an alias to a person/concept entity.
         const aliasResults = await rawDb.unsafe<PageSearchRow[]>(
-          `SELECT
+          `SELECT DISTINCT ON (wp.slug)
             wp.slug AS id,
             wp.wiki_id,
             wp.title,
@@ -160,16 +174,16 @@ const pagesApp = new Hono()
             wp.category,
             wp.reader_importance,
             wp.quality,
-            CASE WHEN ma.alias = $1 THEN 100.0 ELSE 50.0 END AS rank,
+            CASE WHEN ma.alias = $1 THEN ${ALIAS_EXACT_RANK} ELSE ${ALIAS_PREFIX_RANK} END AS rank,
             wp.description AS snippet
           FROM model_aliases ma
           JOIN entities e ON e.stable_id = ma.model_stable_id
           JOIN wiki_pages wp ON wp.slug = e.id
           WHERE (ma.alias = $1 OR ma.alias LIKE $2)
             AND wp.wiki_id IS NOT NULL
-            AND (wp.entity_type IS NULL OR wp.entity_type != 'internal')
+            AND wp.entity_type = 'ai-model'
             AND wp.slug NOT IN (SELECT unnest($4::text[]))
-          ORDER BY rank DESC, wp.reader_importance DESC NULLS LAST
+          ORDER BY wp.slug, rank DESC, wp.reader_importance DESC NULLS LAST
           LIMIT $3`,
           [
             aliasLower,
@@ -180,6 +194,8 @@ const pagesApp = new Hono()
             results.map((r) => r.id),
           ],
         );
+        // DISTINCT ON ordered by slug for dedup; resort by rank for output.
+        aliasResults.sort((a, b) => Number(b.rank) - Number(a.rank));
         results = [...results, ...aliasResults];
       }
     }
