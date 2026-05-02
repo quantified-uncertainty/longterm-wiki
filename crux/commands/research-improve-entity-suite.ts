@@ -6,7 +6,7 @@
 // (verified-rate, cost, applied counts) the read-only benchmark can't see.
 //
 // Usage:
-//   pnpm crux tb improve-entity-suite --tag=baseline --budget=10 --max-iters=2
+//   pnpm crux tb improve-entity-suite --tag=baseline --max-iters=1
 //   pnpm crux tb improve-entity-suite --tag=after-token-filter --budget=5 --dry-run
 
 import fs from "node:fs";
@@ -43,6 +43,15 @@ const SUPPORTED_TYPES = new Set<string>(["policy"]);
 
 /** Per-entity floor below which the inner loop is guaranteed to no-op. */
 export const MIN_USEFUL_BUDGET_USD = 0.05;
+
+/**
+ * Default per-entity budget allocation, USD. The CLI default total budget
+ * is `DEFAULT_PER_ENTITY_BUDGET_USD * N` where N is the count of
+ * supported entities in the suite YAML. QUA-1033: lowered from a flat
+ * $10 total to $2 per supported entity to cap blast radius from accidental
+ * suite runs (most policies converge in 1 iteration with <$2 in spend).
+ */
+export const DEFAULT_PER_ENTITY_BUDGET_USD = 2.0;
 
 /**
  * Tag flows into the snapshot filename. Reject anything that could escape
@@ -347,7 +356,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run]",
+        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=$N] [--max-iters=N] [--target=N] [--dry-run]",
       exitCode: 1,
     };
   }
@@ -358,8 +367,23 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
       exitCode: 1,
     };
   }
-  const totalBudgetUsd = options.budget != null ? parseFloat(options.budget as string) : 10.0;
-  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 2;
+  // QUA-1033: default is $2 × N supported entities (computed at runtime), not
+  // a flat $10. We load the suite once here to count supported entities so the
+  // default scales with suite size; the explicit `--budget` flag still wins.
+  let totalBudgetUsd: number;
+  if (options.budget != null) {
+    totalBudgetUsd = parseFloat(options.budget as string);
+  } else {
+    let supportedCount: number;
+    try {
+      supportedCount = filterToSupportedTypes(loadSuite()).length;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { output: `Failed to load suite for default budget: ${msg}`, exitCode: 1 };
+    }
+    totalBudgetUsd = DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount;
+  }
+  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
   const dryRun = !!options.dryRun;
 
@@ -409,7 +433,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run]
+    output: `crux tb improve-entity-suite --tag=<label> [--budget=$N] [--max-iters=N] [--target=N] [--dry-run]
 
 Run the closed-loop improve-entity over every supported entity in
 crux/benchmarks/entity-suite.yaml. Produces a structured snapshot under
@@ -421,8 +445,9 @@ state delta.
 
 Options:
   --tag=<label>     Required. Snapshot label (e.g. baseline, after-X).
-  --budget=N        Total LLM spend cap across the suite, USD (default 10).
-  --max-iters=N     Max iterations per entity (default 2).
+  --budget=N        Total LLM spend cap across the suite, USD.
+                    Default: $${DEFAULT_PER_ENTITY_BUDGET_USD.toFixed(0)} × N supported entities (QUA-1033).
+  --max-iters=N     Max iterations per entity (default 1).
   --target=N        Per-entity (provisions+stakeholders) target (passed through).
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
 

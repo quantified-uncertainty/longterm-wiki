@@ -13,6 +13,7 @@ import os from "node:os";
 import path from "node:path";
 
 import {
+  DEFAULT_PER_ENTITY_BUDGET_USD,
   MIN_USEFUL_BUDGET_USD,
   aggregateResult,
   computeAggregate,
@@ -510,5 +511,40 @@ describe("constants", () => {
   it("MIN_USEFUL_BUDGET_USD matches the inner-loop floor in research-improve-entity", () => {
     // Mirrors the `budgetRemaining <= 0.05` guard in research-improve-entity.ts.
     expect(MIN_USEFUL_BUDGET_USD).toBe(0.05);
+  });
+
+  it("DEFAULT_PER_ENTITY_BUDGET_USD is $2 per QUA-1033 spec", () => {
+    // QUA-1033 specifies $2 per supported entity as the suite default. Changing
+    // this constant changes the default total budget for all suite invocations
+    // — keep the test in sync with the constant if we ever revisit the value.
+    expect(DEFAULT_PER_ENTITY_BUDGET_USD).toBe(2.0);
+  });
+
+  it("DEFAULT_PER_ENTITY_BUDGET_USD × N propagates through runSuite as totalBudgetUsd", async () => {
+    // The CLI's default-budget computation passes `DEFAULT_PER_ENTITY_BUDGET_USD * supported.length`
+    // as `totalBudgetUsd`. This test verifies the per-entity inner-budget math
+    // that follows: per-entity cap = (total / N) × 2 = $2 × 2 = $4 with this default.
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const supportedCount = 2;
+    const defaultTotalBudget = DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount;
+    const budgetsSeen: number[] = [];
+    const improver = async ({ budgetUsd }: { budgetUsd?: number }) => {
+      budgetsSeen.push(budgetUsd ?? -1);
+      return makeResult("x", { iterations: [makeIter({ cost_research_usd: 0, cost_extract_usd: 0 })] });
+    };
+    const snap = await runSuite({
+      tag: "default-budget",
+      totalBudgetUsd: defaultTotalBudget,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(snap.budget_usd).toBe(4.0);
+    expect(snap.per_entity_cap_usd).toBeCloseTo(4.0, 6); // (4/2)*2
+    expect(budgetsSeen).toEqual([4.0, 4.0]);
   });
 });
