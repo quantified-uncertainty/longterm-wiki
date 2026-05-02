@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { getKBRecordSchema } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
@@ -8,6 +10,45 @@ import { titleCase } from "@/components/wiki/factbase/format";
 import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 
 import { SectionHeader } from "./entity-section-header";
+
+/**
+ * Maximum rows rendered server-side per collection. Beyond this, we show a
+ * "showing N of M" notice. Two reasons to cap this:
+ *
+ * - **Hydration safety (QUA-1052)**: rendering thousands of rows in the SSR
+ *   payload makes the HTML so large that React hydration intermittently fails
+ *   with #418 (observed at 75-90% rate on coefficient-giving's 2,626-grant
+ *   table). The 8.5MB page split across ~3,400 RSC chunks has a race between
+ *   hydration walker and chunk arrival.
+ * - **Page weight**: a flat unbounded table is rarely the right UX for an
+ *   entity profile — dedicated sub-pages (grants, personnel, etc.) handle
+ *   filtering and pagination properly.
+ *
+ * The limit is deliberately well below the smallest size that triggered
+ * the hydration race on prod (somewhere between 545 and 1,649 rows), with
+ * room for organic growth of normal entities without hitting it.
+ *
+ * Exported for tests so they can assert behavior at the boundary without
+ * hardcoding the literal in three places.
+ */
+export const MAX_SSR_ROWS = 200;
+
+/**
+ * Collection slugs that have their own browseable directory or sub-page.
+ * When `GenericCollectionTable` truncates one of these, the notice points
+ * users at the right place to see the full set instead of stranding them.
+ *
+ * Keys are FactBase collection names (`itemCollections` keys). The dedicated
+ * directories use the same slug as a path segment.
+ */
+const DIRECTORY_FOR_COLLECTION: Record<string, { href: string; label: string }> = {
+  grants: { href: "/grants", label: "Browse all grants in the Grants directory" },
+  publications: { href: "/publications", label: "Browse all publications in the Publications directory" },
+  investments: { href: "/investments", label: "Browse all investments in the Investments directory" },
+  "funding-rounds": { href: "/funding-rounds", label: "Browse all rounds in the Funding Rounds directory" },
+  "funding-programs": { href: "/funding-programs", label: "Browse all programs in the Funding Programs directory" },
+  divisions: { href: "/divisions", label: "Browse all divisions in the Divisions directory" },
+};
 
 /** Generic collection table (for collections without special rendering). */
 export function GenericCollectionTable({
@@ -32,6 +73,9 @@ export function GenericCollectionTable({
     ? [...schemaFieldNames, ...[...allFieldNames].filter((f) => !schemaFieldNames.includes(f))]
     : [...allFieldNames];
 
+  const truncated = items.length > MAX_SSR_ROWS;
+  const visibleItems = truncated ? items.slice(0, MAX_SSR_ROWS) : items;
+
   return (
     <section className="mb-6">
       <SectionHeader title={titleCase(collectionName)} count={items.length} id={`col-${collectionName}`} />
@@ -50,7 +94,7 @@ export function GenericCollectionTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {items.map((item) => {
+            {visibleItems.map((item) => {
               const recordId = String(item.key);
               const verdict = getRecordVerdict(collectionName, recordId);
               return (
@@ -86,6 +130,24 @@ export function GenericCollectionTable({
             })}
           </tbody>
         </table>
+        {truncated && (
+          <div className="border-t border-border/50 px-3 py-2 text-xs text-muted-foreground">
+            Showing first {MAX_SSR_ROWS.toLocaleString("en-US")} of{" "}
+            {items.length.toLocaleString("en-US")} rows.
+            {DIRECTORY_FOR_COLLECTION[collectionName] && (
+              <>
+                {" "}
+                <Link
+                  href={DIRECTORY_FOR_COLLECTION[collectionName].href}
+                  className="text-primary hover:underline"
+                >
+                  {DIRECTORY_FOR_COLLECTION[collectionName].label}
+                </Link>
+                .
+              </>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
