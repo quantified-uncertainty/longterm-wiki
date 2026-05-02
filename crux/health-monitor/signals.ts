@@ -24,12 +24,54 @@ export function evaluateCiStale(
   nowMs = Date.now(),
 ): SignalEvaluation {
   const signal: SignalId = 'ci-stale';
+  const tsIso = new Date(nowMs).toISOString();
 
   if (ci.fetchError) {
     return { signal, alert: null, reason: `ci-fetch-error: ${ci.fetchError}` };
   }
+
+  // No green found in the sampled window. There are two sub-cases:
+  //   (a) The repo is quiet — no completed runs at all on main. Don't alert.
+  //   (b) Every sampled run is a non-success conclusion (failure, cancelled,
+  //       timed out). The last green is older than the entire sample, so
+  //       it's at least as stale as the oldest sample timestamp — that's
+  //       exactly when ci-stale should fire loudest. Use the oldest sampled
+  //       run's age as a *lower bound* for the synthetic age.
+  // The earlier MVP missed (b): an all-failures sampled window returned
+  // alert: null, suppressing the alert exactly when CI was most broken.
+  // Caught in QUA-1048 review pass.
   if (!ci.lastGreenAt) {
-    return { signal, alert: null, reason: 'no green CI run found in recent history' };
+    if (ci.completedRunsSampled === 0) {
+      return { signal, alert: null, reason: 'no completed runs sampled' };
+    }
+    let syntheticAgeSeconds = config.ciStaleThresholdSeconds;
+    let oldestForReason: string | null = null;
+    if (ci.oldestSampledAt) {
+      const oldestMs = new Date(ci.oldestSampledAt).getTime();
+      if (!Number.isNaN(oldestMs)) {
+        const ageFromOldest = Math.floor((nowMs - oldestMs) / 1000);
+        if (ageFromOldest > syntheticAgeSeconds) syntheticAgeSeconds = ageFromOldest;
+        oldestForReason = ci.oldestSampledAt;
+      }
+    }
+    return {
+      signal,
+      alert: {
+        signal,
+        since: tsIso,
+        detectedAt: tsIso,
+        context: {
+          lastGreenAt: null,
+          lastConclusion: ci.lastConclusion,
+          ageSeconds: syntheticAgeSeconds,
+          thresholdSeconds: config.ciStaleThresholdSeconds,
+          completedRunsSampled: ci.completedRunsSampled,
+          oldestSampledAt: oldestForReason,
+          syntheticAge: true,
+        },
+      },
+      reason: `no green in last ${ci.completedRunsSampled} completed runs (≥ ${formatSeconds(syntheticAgeSeconds)} stale)`,
+    };
   }
 
   const lastGreenMs = new Date(ci.lastGreenAt).getTime();
@@ -46,7 +88,6 @@ export function evaluateCiStale(
     };
   }
 
-  const tsIso = new Date(nowMs).toISOString();
   return {
     signal,
     alert: {

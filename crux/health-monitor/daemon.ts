@@ -51,7 +51,17 @@ export const DEFAULT_CONFIG: DaemonConfig = {
 };
 
 export function buildConfig(overrides: Partial<DaemonConfig> = {}): DaemonConfig {
-  return { ...DEFAULT_CONFIG, ...overrides };
+  const merged = { ...DEFAULT_CONFIG, ...overrides };
+  // Clamp pacing to safe minimums. The CLI parser refuses 0/negative, but a
+  // programmatic caller (or a future config-file path) could pass them.
+  // Without this clamp, ciCheckEveryNCycles=0 makes `cycleNum % 0` = NaN
+  // (always false after cycle 0), silently disabling CI checks forever.
+  if (merged.pollIntervalSeconds < 1) merged.pollIntervalSeconds = 1;
+  if (merged.ciCheckEveryNCycles < 1) merged.ciCheckEveryNCycles = 1;
+  if (merged.jobsTrendWindowSeconds < 60) merged.jobsTrendWindowSeconds = 60;
+  if (merged.jobsTrendMinGrowthSeconds < 0) merged.jobsTrendMinGrowthSeconds = 0;
+  if (merged.ciStaleThresholdSeconds < 60) merged.ciStaleThresholdSeconds = 60;
+  return merged;
 }
 
 interface HealthEndpointResponse {
@@ -104,12 +114,23 @@ export async function fetchHealthSnapshot(nowMs = Date.now()): Promise<HealthSna
       };
     }
     const data = (await res.json()) as HealthEndpointResponse;
+    // `serverHealthy` means "we received parseable queue-state data" — NOT
+    // strictly "the server reports status:healthy". A server returning
+    // `{status:"degraded"}` with a numeric pendingJobs still gives us valid
+    // queue information; we want jobs-stuck evaluation to consider those
+    // samples. The reviewer caught this in the QUA-1048 review pass: the
+    // earlier strict `status === 'healthy'` check let a degraded-but-
+    // responsive server silently discard its own queue data.
+    const hasQueueData =
+      typeof data.pendingJobs === 'number' &&
+      (data.oldestPendingJobAgeSeconds === null ||
+        typeof data.oldestPendingJobAgeSeconds === 'number');
     return {
       ts,
       pendingJobs: data.pendingJobs ?? null,
       oldestPendingJobAgeSeconds: data.oldestPendingJobAgeSeconds ?? null,
       uptime: data.uptime ?? null,
-      serverHealthy: data.status === 'healthy',
+      serverHealthy: hasQueueData,
     };
   } catch (err) {
     return {
@@ -132,19 +153,33 @@ export async function fetchCiSnapshot(nowMs = Date.now()): Promise<CiSnapshot> {
     );
     const runs = resp.workflow_runs ?? [];
     if (runs.length === 0) {
-      return { ts, lastGreenAt: null, lastConclusion: null };
+      return {
+        ts,
+        lastGreenAt: null,
+        lastConclusion: null,
+        completedRunsSampled: 0,
+        oldestSampledAt: null,
+      };
     }
     const lastGreen = runs.find((r) => r.conclusion === 'success');
+    // GitHub returns workflow_runs newest-first. The oldest sampled run is
+    // the last in the list — we use it as a lower-bound for the ci-stale
+    // synthetic age when no green is found in the page.
+    const oldest = runs[runs.length - 1];
     return {
       ts,
       lastGreenAt: lastGreen?.created_at ?? null,
       lastConclusion: runs[0].conclusion,
+      completedRunsSampled: runs.length,
+      oldestSampledAt: oldest.created_at ?? null,
     };
   } catch (err) {
     return {
       ts,
       lastGreenAt: null,
       lastConclusion: null,
+      completedRunsSampled: 0,
+      oldestSampledAt: null,
       fetchError: err instanceof Error ? err.message : String(err),
     };
   }

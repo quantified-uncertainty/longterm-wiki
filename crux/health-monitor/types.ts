@@ -17,6 +17,15 @@ export interface CiSnapshot {
   ts: string;                          // when the GitHub poll happened
   lastGreenAt: string | null;          // ISO of most recent green main run, or null
   lastConclusion: string | null;       // conclusion of the most recent completed run
+  /** Total completed runs in the sampled page — needed to disambiguate
+   *  "no green found because no runs at all" from "no green found because
+   *  the entire sampled window is non-green failures" (the second is a
+   *  ci-stale alert; the first is just a quiet repo). */
+  completedRunsSampled: number;
+  /** ISO timestamp of the oldest completed run in the sampled page, or null
+   *  if no runs were sampled. Used to attribute a synthetic age when no
+   *  green run was found. */
+  oldestSampledAt: string | null;
   fetchError?: string;
 }
 

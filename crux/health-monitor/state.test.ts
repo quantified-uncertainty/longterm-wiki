@@ -145,6 +145,24 @@ describe('history persistence', () => {
   });
 });
 
+describe('clearAlert ENOENT-safety', () => {
+  it('is a no-op when called twice in a row', () => {
+    writeAlert(CACHE_DIR, {
+      signal: 'ci-stale',
+      since: '2026-05-02T10:00:00Z',
+      detectedAt: '2026-05-02T10:00:00Z',
+      context: {},
+    });
+    expect(() => {
+      // First call deletes; second call must not throw ENOENT.
+      // (Real-world: another process unlinks between our existsSync and unlink.)
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      clearAlert(CACHE_DIR, 'ci-stale');
+      clearAlert(CACHE_DIR, 'ci-stale');
+    }).not.toThrow();
+  });
+});
+
 describe('pid file', () => {
   it('writes and reads pid', () => {
     writePidFile(CACHE_DIR, 12345);

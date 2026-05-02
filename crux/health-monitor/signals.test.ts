@@ -39,24 +39,35 @@ function snap(opts: {
   };
 }
 
+function ciSnap(opts: Partial<CiSnapshot> & { ts?: string } = {}): CiSnapshot {
+  return {
+    ts: opts.ts ?? new Date(NOW).toISOString(),
+    lastGreenAt: opts.lastGreenAt ?? null,
+    lastConclusion: opts.lastConclusion ?? null,
+    completedRunsSampled: opts.completedRunsSampled ?? 0,
+    oldestSampledAt: opts.oldestSampledAt ?? null,
+    fetchError: opts.fetchError,
+  };
+}
+
 describe('evaluateCiStale', () => {
   it('clears the alert when last green is recent', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
-      lastGreenAt: isoMinutesAgo(30),     // 30 min ago
+    const ci = ciSnap({
+      lastGreenAt: isoMinutesAgo(30),
       lastConclusion: 'success',
-    };
+      completedRunsSampled: 5,
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).toBeNull();
     expect(res.reason).toMatch(/under/);
   });
 
   it('alerts when last green is older than threshold', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
-      lastGreenAt: isoMinutesAgo(180),    // 3h ago, threshold is 2h
+    const ci = ciSnap({
+      lastGreenAt: isoMinutesAgo(180),
       lastConclusion: 'failure',
-    };
+      completedRunsSampled: 5,
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).not.toBeNull();
     expect(res.alert!.signal).toBe('ci-stale');
@@ -68,44 +79,71 @@ describe('evaluateCiStale', () => {
   });
 
   it('exact threshold counts as stale (>= threshold)', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
-      lastGreenAt: isoMinutesAgo(120),    // exactly 2h
+    const ci = ciSnap({
+      lastGreenAt: isoMinutesAgo(120),
       lastConclusion: 'success',
-    };
+      completedRunsSampled: 5,
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).not.toBeNull();
   });
 
-  it('does not alert when no green is found (insufficient data)', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
+  it('alerts when sampled window has runs but none are green (QUA-1048 review fix)', () => {
+    const ci = ciSnap({
       lastGreenAt: null,
       lastConclusion: 'failure',
-    };
+      completedRunsSampled: 10,
+      oldestSampledAt: isoMinutesAgo(300),  // 5h old → ≥ threshold
+    });
+    const res = evaluateCiStale(ci, ciConfig, NOW);
+    expect(res.alert).not.toBeNull();
+    expect(res.alert!.context).toMatchObject({
+      lastGreenAt: null,
+      completedRunsSampled: 10,
+      syntheticAge: true,
+    });
+    expect(res.alert!.context.ageSeconds).toBe(300 * 60);
+    expect(res.reason).toMatch(/no green in last 10/);
+  });
+
+  it('uses the threshold as a lower bound when oldest sampled run is fresher than threshold', () => {
+    const ci = ciSnap({
+      lastGreenAt: null,
+      lastConclusion: 'failure',
+      completedRunsSampled: 10,
+      oldestSampledAt: isoMinutesAgo(30),   // only 30 min old
+    });
+    const res = evaluateCiStale(ci, ciConfig, NOW);
+    expect(res.alert).not.toBeNull();
+    expect(res.alert!.context.ageSeconds).toBe(CI_THRESHOLD);
+  });
+
+  it('does NOT alert when zero completed runs sampled (quiet repo)', () => {
+    const ci = ciSnap({
+      lastGreenAt: null,
+      lastConclusion: null,
+      completedRunsSampled: 0,
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).toBeNull();
-    expect(res.reason).toMatch(/no green/);
+    expect(res.reason).toMatch(/no completed runs/);
   });
 
   it('does not alert when fetch failed (transient API outage)', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
-      lastGreenAt: null,
-      lastConclusion: null,
+    const ci = ciSnap({
       fetchError: 'rate limit',
-    };
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).toBeNull();
     expect(res.reason).toMatch(/ci-fetch-error/);
   });
 
   it('does not crash on unparseable timestamps', () => {
-    const ci: CiSnapshot = {
-      ts: new Date(NOW).toISOString(),
+    const ci = ciSnap({
       lastGreenAt: 'not-a-date',
       lastConclusion: 'success',
-    };
+      completedRunsSampled: 5,
+    });
     const res = evaluateCiStale(ci, ciConfig, NOW);
     expect(res.alert).toBeNull();
     expect(res.reason).toMatch(/unparseable/);

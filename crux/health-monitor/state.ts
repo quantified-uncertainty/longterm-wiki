@@ -11,7 +11,7 @@
  * state/alert-* files and surfaces them as <system-reminder> blocks.
  */
 
-import { appendFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { Alert, HealthSnapshot, SignalId } from './types.ts';
 
@@ -44,8 +44,15 @@ export function writeAlert(cacheDir: string, alert: Alert): void {
 }
 
 export function clearAlert(cacheDir: string, signal: SignalId): void {
+  // ENOENT-safe: a concurrent process may have just unlinked it. The
+  // existsSync→unlinkSync sequence is non-atomic; rely on the unlink itself
+  // and swallow ENOENT. Other errors (EPERM, EISDIR) propagate.
   const f = alertFilePath(cacheDir, signal);
-  if (existsSync(f)) unlinkSync(f);
+  try {
+    unlinkSync(f);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+  }
 }
 
 export function readAlert(cacheDir: string, signal: SignalId): Alert | null {
@@ -85,7 +92,19 @@ export function readRecentHistory(
   return out;
 }
 
-/** Trim history older than `keepSeconds` to bound disk usage. */
+/**
+ * Trim history older than `keepSeconds` to bound disk usage.
+ *
+ * Crash-safe: writes to `<file>.tmp` then atomically renames over the
+ * original. A SIGKILL during the rewrite leaves either the original intact
+ * or the new file fully written — never a zero-byte file. (Caught in
+ * QUA-1048 review pass.)
+ *
+ * Concurrency caveat: if another process appends to the original file
+ * between our read and the rename, that append is lost. The `runDaemon`
+ * singleton makes the daemon→daemon case impossible; the daemon→`once`
+ * race is documented in the command help.
+ */
 export function trimHistory(
   cacheDir: string,
   keepSeconds: number,
@@ -104,7 +123,9 @@ export function trimHistory(
       // drop corrupt
     }
   }
-  writeFileSync(f, kept.join('\n') + (kept.length > 0 ? '\n' : ''));
+  const tmp = f + '.tmp';
+  writeFileSync(tmp, kept.join('\n') + (kept.length > 0 ? '\n' : ''));
+  renameSync(tmp, f);
 }
 
 export function writePidFile(cacheDir: string, pid: number): void {
