@@ -209,7 +209,19 @@ export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
 
 // ── Snapshot persistence ────────────────────────────────────────────────────
 
+/**
+ * On-disk snapshot schema version (QUA-890). Bump on any breaking change to
+ * `SuiteSnapshot` shape so `--list` / `--diff` can detect old snapshots and
+ * either migrate or warn instead of silently producing wrong output.
+ *
+ * Pre-QUA-890 snapshots have no `schema_version` field; treat `undefined`
+ * as v0 if a future migration needs to distinguish.
+ */
+export const SNAPSHOT_SCHEMA_VERSION = 1;
+
 export interface SuiteSnapshot {
+  /** On-disk schema version. Absent on pre-QUA-890 snapshots (treat as v0). */
+  schema_version?: number;
   tag: string;
   timestamp: string;
   git_sha: string | null;
@@ -223,6 +235,7 @@ export function buildSnapshot(
   records: PerEntityRecord[],
 ): SuiteSnapshot {
   return {
+    schema_version: SNAPSHOT_SCHEMA_VERSION,
     tag,
     timestamp: new Date().toISOString(),
     git_sha: gitSha(),
@@ -237,19 +250,48 @@ export function snapshotPath(snapshotDir: string, snap: SuiteSnapshot): string {
   return path.join(snapshotDir, `${stamp}__${snap.tag}.json`);
 }
 
+/**
+ * Write `snap` atomically to a uniquely-named JSON file in `snapshotDir`.
+ *
+ * Atomic-write protocol (QUA-890): write the body to a per-PID `.tmp` file
+ * and `fs.linkSync()` it to the final path, then unlink the tmp. POSIX
+ * `link` is atomic within a filesystem, so a SIGINT (or `kill -9`) between
+ * open() and the final flush leaves either no destination file or a
+ * fully-formed one — never a half-JSON artifact that would wedge `--list`
+ * for everyone. The pre-QUA-890 implementation used
+ * `writeFileSync(..., {flag: "wx"})` which could leave a truncated file
+ * on interrupt.
+ *
+ * Why `link` instead of `rename`: POSIX `rename` silently overwrites the
+ * destination, so we'd lose the same-millisecond + same-tag collision
+ * detection the old `wx` flag gave us. `link` fails with EEXIST in that
+ * case, letting the suffix loop step to `__1.json`, `__2.json`, etc.
+ */
 export function writeSnapshot(snapshotDir: string, snap: SuiteSnapshot): string {
   fs.mkdirSync(snapshotDir, { recursive: true });
-  // Same-millisecond + same-tag would overwrite silently. Open exclusive (wx)
-  // and increment a numeric suffix on EEXIST until we land a unique filename.
   const base = snapshotPath(snapshotDir, snap).replace(/\.json$/, "");
   const body = JSON.stringify(snap, null, 2) + "\n";
+  // Per-PID tmp suffix avoids cross-process collisions on a shared dir.
+  // Including a random component too, so a single process writing back-to-back
+  // snapshots in the same tick can't reuse the same tmp path.
+  const tmpFile = `${base}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`;
+  fs.writeFileSync(tmpFile, body);
   for (let i = 0; ; i++) {
     const file = i === 0 ? `${base}.json` : `${base}__${i}.json`;
     try {
-      fs.writeFileSync(file, body, { flag: "wx" });
+      fs.linkSync(tmpFile, file);
+      fs.unlinkSync(tmpFile);
       return file;
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+      if ((e as NodeJS.ErrnoException).code === "EEXIST") continue;
+      // Non-collision error: clean the tmp file so we don't leak `.tmp`
+      // artifacts into the snapshot dir, then propagate.
+      try {
+        fs.unlinkSync(tmpFile);
+      } catch {
+        /* ignore — original error is the interesting one */
+      }
+      throw e;
     }
   }
 }

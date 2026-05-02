@@ -26,6 +26,7 @@ import {
   median,
   p25,
   scoreSuite,
+  SNAPSHOT_SCHEMA_VERSION,
   takeSnapshot,
   writeSnapshot,
   type PerEntityRecord,
@@ -378,6 +379,90 @@ describe("snapshot persistence", () => {
       writeSnapshot(tmp, aOld);
       const list = listSnapshotsInDir(tmp);
       expect(list.map((s) => s.tag)).toEqual(["a", "b"]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  // QUA-890: schema_version + atomic-write protocol.
+  it("buildSnapshot stamps the current SNAPSHOT_SCHEMA_VERSION", () => {
+    const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+    expect(snap.schema_version).toBe(SNAPSHOT_SCHEMA_VERSION);
+  });
+
+  it("writeSnapshot leaves no .tmp artifacts in the snapshot dir on success", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      writeSnapshot(tmp, snap);
+      const remaining = fs.readdirSync(tmp).filter((f) => f.endsWith(".tmp"));
+      expect(remaining).toEqual([]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot leaves no .tmp artifacts when the suffix loop retries", () => {
+    // Pre-create a directory at the un-suffixed destination filename. The
+    // first linkSync fails with EEXIST, the loop retries at `__1.json`, and
+    // the per-PID tmp file must be unlinked exactly once on success.
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const baseFile = path.join(tmp, snap.timestamp.replace(/[:.]/g, "-") + "__baseline.json");
+      fs.mkdirSync(baseFile);
+      const written = writeSnapshot(tmp, snap);
+      expect(written).toMatch(/__1\.json$/);
+      const tmpFiles = fs.readdirSync(tmp).filter((f) => f.endsWith(".tmp"));
+      expect(tmpFiles).toEqual([]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot writes valid JSON containing schema_version", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const file = writeSnapshot(tmp, snap);
+      const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
+      expect(parsed.schema_version).toBe(SNAPSHOT_SCHEMA_VERSION);
+      expect(parsed.tag).toBe("baseline");
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("listSnapshotsInDir reads pre-QUA-890 snapshots without schema_version", () => {
+    // Backwards-compat: snapshots written before QUA-890 lack schema_version.
+    // listSnapshotsInDir must still parse them — `schema_version` is optional.
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const legacy = {
+        tag: "legacy",
+        timestamp: "2026-01-01T00:00:00.000Z",
+        git_sha: null,
+        suite_size: 1,
+        entities: [makeRecord("x", 0.5)],
+        aggregate: {
+          scored_count: 1,
+          unsupported_count: 0,
+          missing_count: 0,
+          type_mismatch_count: 0,
+          median_coverage_score: 0.5,
+          p25_coverage_score: 0.5,
+          count_below_min: 0,
+          below_min_slugs: [],
+        },
+      };
+      fs.writeFileSync(
+        path.join(tmp, "2026-01-01T00-00-00-000Z__legacy.json"),
+        JSON.stringify(legacy, null, 2),
+      );
+      const list = listSnapshotsInDir(tmp);
+      expect(list).toHaveLength(1);
+      expect(list[0].tag).toBe("legacy");
+      expect(list[0].schema_version).toBeUndefined();
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
