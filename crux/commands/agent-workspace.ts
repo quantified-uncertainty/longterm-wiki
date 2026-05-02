@@ -982,16 +982,27 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   }
 
   const { handle } = result;
+  const warnings = apiKeyWarning ? [apiKeyWarning] : [];
+  const basePayload = {
+    slot,
+    runId: handle.runId,
+    sessionId: handle.sessionId,
+    pid: handle.pid,
+    runDir: handle.runDir,
+    cwd,
+    startedAt: handle.startedAt,
+    cmd: handle.cmd,
+  };
 
   // Briefly poll for early errors so credit-low / auth failures surface as
   // dispatch failures instead of "Dispatched to slot aN" + silent death. See
-  // QUA-1057 for the original symptom.
-  const earlyError = await pollForEarlyDispatchError(env, handle.eventsFile);
+  // QUA-1057 for the original symptom. Healthy workers exit on the first
+  // events.jsonl write (~100ms); cold-spawn-die paths use the pidAlive guard.
+  const earlyError = await pollForEarlyDispatchError(env, handle.eventsFile, { pid: handle.pid });
   if (earlyError) {
     const statusSuffix = earlyError.status !== undefined ? ` (HTTP ${earlyError.status})` : '';
-    const apiKeyEnvName = 'ANTHROPIC_API_KEY'; // anthropic-billing-key-remap-ok
     const stripHint = apiKeyWarning
-      ? `\n  hint: parent env had ${apiKeyEnvName} set; even after stripping, the OAuth subscription itself may have failed (check 'claude /login').`
+      ? `\n  hint: parent env had the API key set; even after stripping, the OAuth subscription itself may have failed (check 'claude /login').`
       : '';
     const errorOutput =
       `Error: dispatched worker exited early on slot a${slot}: ${earlyError.message}${statusSuffix}\n` +
@@ -1002,22 +1013,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
     if (options.json) {
       return {
         exitCode: 2,
-        output: JSON.stringify(
-          {
-            slot,
-            runId: handle.runId,
-            sessionId: handle.sessionId,
-            pid: handle.pid,
-            runDir: handle.runDir,
-            cwd,
-            startedAt: handle.startedAt,
-            cmd: handle.cmd,
-            earlyError,
-            warnings: apiKeyWarning ? [apiKeyWarning] : [],
-          },
-          null,
-          2,
-        ),
+        output: JSON.stringify({ ...basePayload, earlyError, warnings }, null, 2),
       };
     }
     return { exitCode: 2, output: errorOutput };
@@ -1039,21 +1035,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   if (options.json) {
     return {
       exitCode: 0,
-      output: JSON.stringify(
-        {
-          slot,
-          runId: handle.runId,
-          sessionId: handle.sessionId,
-          pid: handle.pid,
-          runDir: handle.runDir,
-          cwd,
-          startedAt: handle.startedAt,
-          cmd: handle.cmd,
-          warnings: apiKeyWarning ? [apiKeyWarning] : [],
-        },
-        null,
-        2,
-      ),
+      output: JSON.stringify({ ...basePayload, warnings }, null, 2),
     };
   }
   return { exitCode: 0, output };

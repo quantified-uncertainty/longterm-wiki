@@ -555,6 +555,8 @@ export interface EarlyDispatchError {
 }
 
 export interface PollForEarlyDispatchErrorOptions {
+  /** Pid of the spawned worker — used to distinguish "alive, just slow" from "dead, never emitted". */
+  pid: number;
   /** Total budget for the poll loop in ms. Default: 1000. */
   deadlineMs?: number;
   /** Sleep between poll attempts in ms. Default: 100. */
@@ -564,22 +566,31 @@ export interface PollForEarlyDispatchErrorOptions {
 }
 
 /**
- * Briefly poll the events file for an early `result` event with `is_error: true`.
+ * Briefly poll the events file for an early failure of a freshly-spawned worker.
  *
- * Catches the credit-low / auth-failure case where the spawned worker dies in
- * ~160ms with `is_error: true, api_error_status: 400, result: "Credit balance
- * is too low"` — without this surfacing, the dispatch command returns
- * "Dispatched to slot aN" successfully and the operator only learns of the
- * failure by tailing `events.jsonl`. See QUA-1057.
+ * Three cases:
+ * - Worker emits a `result` event with `is_error: true` (credit-low, auth-fail,
+ *   API-side rejection) → returns the decoded error. This is the original
+ *   QUA-1057 symptom: spawned `claude --print` dies in ~160ms with
+ *   `is_error: true, api_error_status: 400, result: "Credit balance is too low"`.
+ * - Worker writes any non-error event (init, assistant, etc.) → returns null
+ *   immediately. The presence of *any* event proves the worker booted; a
+ *   healthy run is then off the dispatcher's critical path.
+ * - Worker writes nothing at all and the pid is dead by deadline → returns a
+ *   synthetic "exited before emitting any events" error. Catches binary-missing,
+ *   OAuth-expired-with-no-API-fallback, and similar fail-before-stream-init
+ *   modes that QUA-1057's symptom-shaped detector would have missed.
+ * - Worker writes nothing but is still alive at deadline → returns null.
+ *   Slow boots (e.g. MCP servers initializing) shouldn't be flagged as failures.
  *
- * Returns null if no error is observed before the deadline. Returns the
- * decoded error otherwise. Healthy workers cost ~100ms of latency on the
- * happy path (one poll interval); credit-low etc. resolve in ~200ms.
+ * Latency: healthy dispatches incur one poll interval (~100ms) before returning
+ * because `claude` writes the `init` event well within the first interval.
+ * Credit-low etc. resolve in ~200ms. Cold-spawn-die cases pay the full deadline.
  */
 export async function pollForEarlyDispatchError(
   env: DispatchEnv,
   eventsFile: string,
-  opts: PollForEarlyDispatchErrorOptions = {},
+  opts: PollForEarlyDispatchErrorOptions,
 ): Promise<EarlyDispatchError | null> {
   const deadlineMs = opts.deadlineMs ?? 1000;
   const intervalMs = opts.intervalMs ?? 100;
@@ -587,20 +598,37 @@ export async function pollForEarlyDispatchError(
   const start = Date.now();
   while (Date.now() - start < deadlineMs) {
     await wait(intervalMs);
-    const result = readFinalResultEvent(env, eventsFile);
-    if (!result) continue;
-    // Any result event (error or success) means the worker has terminated:
-    // exit the poll early. We only surface the error case to the operator;
-    // a fast successful run just falls through to the normal "Dispatched" path.
-    if (result.kind === 'error' && result.raw) {
-      const raw = result.raw as Record<string, unknown>;
-      const msg = typeof raw.result === 'string' ? (raw.result as string) : 'unknown error';
-      const status = typeof raw.api_error_status === 'number' ? (raw.api_error_status as number) : undefined;
-      return status !== undefined ? { message: msg, status } : { message: msg };
+    const raw = env.readFile(eventsFile);
+    if (raw && raw.trim()) {
+      // Worker emitted at least one event — it's alive. If the *last* event is
+      // a terminal error result, surface it; otherwise the worker is making
+      // progress and the dispatcher can return immediately.
+      const result = readFinalResultEvent(env, eventsFile);
+      if (result && result.kind === 'error' && result.raw) {
+        return decodeEarlyError(result.raw as Record<string, unknown>);
+      }
+      return null;
     }
-    return null;
+  }
+  // Deadline reached with no events. Distinguish "alive but slow boot" (return
+  // null, dispatcher proceeds) from "died before stream-init" (synthetic error).
+  if (!env.pidAlive(opts.pid)) {
+    return {
+      message: 'worker exited before emitting any events (likely auth failure or missing binary — check stderr.log)',
+    };
   }
   return null;
+}
+
+/**
+ * Pull the operator-relevant fields out of a stream-json `result` event
+ * payload. Tolerant of missing/wrong-typed fields.
+ */
+function decodeEarlyError(raw: Record<string, unknown>): EarlyDispatchError {
+  const msg = typeof raw.result === 'string' ? raw.result : 'unknown error';
+  const out: EarlyDispatchError = { message: msg };
+  if (typeof raw.api_error_status === 'number') out.status = raw.api_error_status;
+  return out;
 }
 
 /**
