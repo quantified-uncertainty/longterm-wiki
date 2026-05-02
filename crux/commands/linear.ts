@@ -1403,6 +1403,26 @@ Options (comment):
 Options (done):
   --pr=URL            PR URL to include in the completion comment; moves to In Review
 
+Options (start):
+  --force             Skip the dedup pre-check. Posts a "⚠ Claimed with --force"
+                      annotation so the override is captured in Linear history.
+
+Dedup pre-check (start, agent-checklist init):
+  Before posting the start comment, three signals are consulted in order — any
+  one is sufficient to block (exit 2):
+    1. PG agent_sessions (authoritative, ~50ms): linear_id=QUA-NNN, status=active,
+       updated_at > now() - 30min. The 30-minute window matches active_agents
+       stale-sweep — a crashed session releases its claim automatically.
+    2. Linear start comments (fallback): scrape "🤖 Claude Code starting work"
+       comments from the last 24h on a different slot, not yet superseded by
+       a "🤖 Claude Code finished work" reply.
+    3. Open PRs (paranoia): any open PR in the wiki repo whose title or body
+       mentions QUA-NNN.
+  Re-running from the same slot is treated as session resumption, not a
+  collision. All three sources fail-open: if a source is unreachable we skip
+  it and try the next. Use --force to override (e.g. the other session is
+  genuinely abandoned). The dedup check was added after QUA-406 / QUA-440.
+
 Options (audit):
   --bucket=<name>     Filter to one bucket: shipped, parent-epic, orphan, stuck, active
   --fix               Auto-close SHIPPED and PARENT-EPIC issues (move to Done with comment)

@@ -92,6 +92,10 @@ Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs a
 
 **IMPORTANT:** Always use `crux gh pr create` and `crux gh pr detect` instead of raw curl commands. The crux commands route through `githubApi()` which validates request bodies for shell-expansion corruption (ANSI codes, dotenv output, etc.) before sending to GitHub.
 
+### Push appears to "succeed" but remote doesn't move
+
+If you don't see `To github.com:...` after `git push`, the push didn't happen — the pre-push hook killed it. The gate's output is loud enough to bury the failure. Scroll up past the gate output to find the real error before retrying.
+
 ## Step 3: Verify GitHub is green
 
 1. Wait 15 seconds for checks to register, then run `pnpm crux gh ci status --wait` to poll until all checks complete.
@@ -159,6 +163,21 @@ gh pr view <PR#> --json reviewThreads --jq '
   Look for a "Prompt for AI Agents" section in the comment body — it contains ready-made instructions.
 - **🧹 Nitpick** — Fix only if trivial and clearly correct. Skip if debatable.
 - **Informational notes** — No action needed; these are just observations.
+
+### CodeRabbit "Addressed in commit X" markers — DO NOT TRUST
+
+CodeRabbit sometimes appends `✅ Addressed in commit <sha>` to a thread when it thinks a follow-up commit fixed the finding. Empirically these markers are **unreliable** in two ways:
+
+1. **The referenced SHA may not exist.** Saw `✅ Addressed in commit 3d5cbbe` on PR #4538 and `✅ Addressed in commits 760b1ba to 2ce2219` on PR #4482 — `git show` returned `unknown revision` for both.
+2. **Even when the SHA exists, the relevant code may not actually reflect the fix.** PR #4482 finding 3 was marked addressed but the code still had the bug pattern — the partial hardening that did land was unrelated.
+
+**Always verify** before treating a finding as resolved:
+
+```bash
+git show <sha> --stat                  # 1. confirm the cited commit exists
+grep -n "<bad-pattern>" <path>         # 2. grep the current file for the bug pattern
+# If both are clean, finding is resolved. Otherwise treat as outstanding regardless of marker.
+```
 
 After addressing comments: commit, push, and go back to Step 3 to verify CI stays green.
 
