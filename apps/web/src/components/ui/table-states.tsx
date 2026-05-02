@@ -18,8 +18,14 @@ import { cn } from "@/lib/utils";
 
 export const DEFAULT_LOADING_LABEL = "Loading…";
 export const DEFAULT_EMPTY_LABEL = "No results.";
-export const DEFAULT_EMPTY_AFTER_FILTER_LABEL = "No matches.";
 export const DEFAULT_ERROR_LABEL = "Failed to load data.";
+
+// Skeleton geometry — pseudo-random row widths via integer indices
+// so SSR and client hydration produce identical markup.
+const SKELETON_MIN_WIDTH_PCT = 40;
+const SKELETON_WIDTH_RANGE_PCT = 50;
+const SKELETON_ROW_MULT = 13;
+const SKELETON_COL_MULT = 7;
 
 // ── Row variants (render inside <tbody>) ─────────────────────────────────
 
@@ -37,15 +43,17 @@ export function TableLoadingRow({
     <tr>
       <td
         colSpan={colSpan}
-        role="status"
-        aria-live="polite"
         aria-busy="true"
         className={cn(
           "py-8 text-center text-sm text-muted-foreground",
           className,
         )}
       >
-        <span className="inline-flex items-center gap-2">
+        <span
+          role="status"
+          aria-live="polite"
+          className="inline-flex items-center gap-2"
+        >
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           <span>{label}</span>
         </span>
@@ -139,7 +147,13 @@ export function TableSkeleton({
                   <td key={c} className="px-4 py-3">
                     <div
                       className="h-3 animate-pulse rounded bg-muted-foreground/15"
-                      style={{ width: `${40 + ((r * 13 + c * 7) % 50)}%` }}
+                      style={{
+                        width: `${
+                          SKELETON_MIN_WIDTH_PCT +
+                          ((r * SKELETON_ROW_MULT + c * SKELETON_COL_MULT) %
+                            SKELETON_WIDTH_RANGE_PCT)
+                        }%`,
+                      }}
                     />
                   </td>
                 ))}

@@ -25,7 +25,10 @@ import {
   TableHeader,
   TableRow,
 } from "./table"
-import { TableEmptyRow } from "./table-states"
+// Note: kept on shadcn TableRow/TableCell instead of TableEmptyRow because
+// shadcn rows carry hover/border/data-state styling that the bare-<tr>
+// canonical row would strip. See QUA-1008 review notes.
+import { DEFAULT_EMPTY_LABEL } from "./table-states"
 
 // New API: accepts table instance directly
 interface DataTableWithTableProps<TData> {
@@ -154,7 +157,11 @@ function DataTableWithTable<TData>({
               )
             })
           ) : (
-            <TableEmptyRow colSpan={columns.length} className="h-24" />
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                {DEFAULT_EMPTY_LABEL}
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>

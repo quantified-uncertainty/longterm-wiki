@@ -100,6 +100,36 @@ function isComment(line: string): boolean {
   );
 }
 
+/** Match `from "@/components/ui/table-states"` with either quote style. */
+const IMPORT_RE = /from\s+["']@\/components\/ui\/table-states["']/;
+/**
+ * Match a JSX call site for any of the canonical components. Must be followed
+ * by whitespace, `/>`, or `>` to qualify as a real JSX element open — bare
+ * `\b` lets `"<TableLoadingRow"` (a string literal) bypass.
+ */
+const CANONICAL_JSX_RE = /<(?:TableLoadingRow|TableEmptyRow|TableErrorRow|TableSkeleton|TableEmptyBlock|TableErrorBlock)(?:\s|\/?>)/;
+/**
+ * Opt-out comment: requires a `//`, `/*`, or `{/*` comment marker followed by
+ * a non-empty reason after `table-states-ok:`. Plain `"table-states-ok:"`
+ * inside a string literal does NOT bypass — only an actual comment does.
+ */
+const OPT_OUT_RE = /(?:\/\/|\/\*|\{\/\*)\s*table-states-ok:\s+\S/;
+
+/** Strip a trailing `// ...` comment so a banned literal in a comment doesn't false-flag. */
+function stripTrailingLineComment(line: string): string {
+  // Naive but adequate for our scan: find `//` not inside a string literal.
+  // We accept some false negatives (banned literal lives inside a string after `//`)
+  // — those are vanishingly rare and the regex still requires the literal text.
+  const idx = line.indexOf("//");
+  if (idx < 0) return line;
+  // Don't strip if the `//` is inside a quoted string up to that point.
+  const prefix = line.slice(0, idx);
+  const dquoteCount = (prefix.match(/(?<!\\)"/g) ?? []).length;
+  const squoteCount = (prefix.match(/(?<!\\)'/g) ?? []).length;
+  if (dquoteCount % 2 === 1 || squoteCount % 2 === 1) return line;
+  return prefix;
+}
+
 function checkFile(filePath: string): Violation[] {
   const relPath = relative(PROJECT_ROOT, filePath).replace(/\\/g, "/");
   if (ALLOWLIST.has(relPath)) return [];
@@ -109,27 +139,22 @@ function checkFile(filePath: string): Violation[] {
   const violations: Violation[] = [];
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (isComment(line)) continue;
-    // Skip lines that import from the canonical module — they're allowed.
-    if (line.includes("from \"@/components/ui/table-states\"")) continue;
-    if (line.includes("from '@/components/ui/table-states'")) continue;
-    // Skip lines that invoke the canonical components directly. Their `label`
-    // / `message` props legitimately contain the "Loading…" string.
-    if (
-      line.includes("<TableLoadingRow") ||
-      line.includes("<TableEmptyRow") ||
-      line.includes("<TableErrorRow") ||
-      line.includes("<TableSkeleton") ||
-      line.includes("<TableEmptyBlock") ||
-      line.includes("<TableErrorBlock")
-    ) {
-      continue;
-    }
-    // Skip lines with explicit override (or with override on previous line).
-    if (line.includes("table-states-ok:")) continue;
+    const rawLine = lines[i];
+    if (isComment(rawLine)) continue;
+    // Skip lines that import from the canonical module.
+    if (IMPORT_RE.test(rawLine)) continue;
+    // Skip lines that invoke a canonical component as a JSX element.
+    // `<TableLoadingRow ...>` etc. — the regex requires a real tag boundary,
+    // so substring mentions in strings/comments don't bypass.
+    if (CANONICAL_JSX_RE.test(rawLine)) continue;
+    // Explicit opt-out — must be a `//` comment with a non-empty reason.
+    // Accept either on this line or on the previous line (the comment-above-JSX form).
+    if (OPT_OUT_RE.test(rawLine)) continue;
     const prev = i > 0 ? lines[i - 1] : "";
-    if (prev.includes("table-states-ok:")) continue;
+    if (OPT_OUT_RE.test(prev)) continue;
+    // Strip trailing `//` comments before regex match so doc comments
+    // mentioning the banned literal don't false-flag.
+    const line = stripTrailingLineComment(rawLine);
 
     for (const { name, regex } of BANNED_PATTERNS) {
       const match = line.match(regex);
@@ -137,7 +162,7 @@ function checkFile(filePath: string): Violation[] {
         violations.push({
           file: relPath,
           line: i + 1,
-          text: line.trim(),
+          text: rawLine.trim(),
           pattern: name,
         });
         break;
@@ -148,19 +173,21 @@ function checkFile(filePath: string): Violation[] {
   return violations;
 }
 
-export function runCheck(): {
+export function runCheck(opts: { roots?: string[]; quiet?: boolean } = {}): {
   passed: boolean;
   errors: number;
   violations: Violation[];
 } {
   const c = getColors();
-  console.log(
+  const log = opts.quiet ? () => undefined : (m: string) => console.log(m);
+  log(
     `${c.blue}Checking for bespoke table loading/empty/error states (QUA-1008)…${c.reset}\n`,
   );
 
+  const roots = opts.roots ?? SCAN_ROOTS;
   const allFiles: string[] = [];
-  for (const dir of SCAN_ROOTS) {
-    const abs = join(PROJECT_ROOT, dir);
+  for (const dir of roots) {
+    const abs = dir.startsWith("/") ? dir : join(PROJECT_ROOT, dir);
     allFiles.push(...collectFiles(abs));
   }
 
@@ -168,17 +195,17 @@ export function runCheck(): {
   for (const f of allFiles) all.push(...checkFile(f));
 
   if (all.length === 0) {
-    console.log(
+    log(
       `${c.green}No bespoke loading/empty/error states found (${allFiles.length} files checked)${c.reset}`,
     );
   } else {
-    console.log(
+    log(
       `${c.red}Found ${all.length} bespoke loading state(s) outside @/components/ui/table-states:${c.reset}\n`,
     );
     for (const v of all) {
-      console.log(`  ${c.red}${v.file}:${v.line}${c.reset}`);
-      console.log(`    ${c.dim}${v.text}${c.reset}`);
-      console.log(
+      log(`  ${c.red}${v.file}:${v.line}${c.reset}`);
+      log(`    ${c.dim}${v.text}${c.reset}`);
+      log(
         `    ${c.dim}Fix: import { TableLoadingRow, TableSkeleton } from "@/components/ui/table-states"${c.reset}\n`,
       );
     }

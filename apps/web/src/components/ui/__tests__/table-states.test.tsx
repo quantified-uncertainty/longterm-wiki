@@ -23,11 +23,14 @@ function renderInTable(node: React.ReactNode) {
 
 describe("TableLoadingRow", () => {
   it("renders default loading label with status role and aria-busy", () => {
-    renderInTable(<TableLoadingRow colSpan={5} />);
-    const cell = screen.getByRole("status");
-    expect(cell).toHaveTextContent(DEFAULT_LOADING_LABEL);
+    const { container } = renderInTable(<TableLoadingRow colSpan={5} />);
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent(DEFAULT_LOADING_LABEL);
+    expect(status).toHaveAttribute("aria-live", "polite");
+    // aria-busy lives on the <td> (cell role) so AT can announce the table is loading;
+    // role="status" lives on the inner <span> to avoid overriding the cell's implicit role.
+    const cell = container.querySelector("td");
     expect(cell).toHaveAttribute("aria-busy", "true");
-    expect(cell).toHaveAttribute("aria-live", "polite");
     expect(cell).toHaveAttribute("colspan", "5");
   });
 

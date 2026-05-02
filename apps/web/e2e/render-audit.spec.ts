@@ -564,16 +564,17 @@ test.describe("Render audit — canonical table states", () => {
    */
   test("/grants empty-after-filter renders consistent empty messaging", async ({ page }) => {
     await loadPage(page, "/grants");
-    // Type in a search query no grant will match
-    const searchInput = page.locator('input[type="search"], input[placeholder*="earch" i]').first();
-    if ((await searchInput.count()) > 0) {
-      await searchInput.fill("zzzzzzzz_no_match_query_xyz");
-      await page.waitForTimeout(500);
-      const text = await getMainText(page);
-      // Must NOT contain the bespoke variants we replaced
-      expect(text).not.toContain("Loading grants table...");
-      // Must contain the canonical empty messaging variant
-      expect(text.toLowerCase()).toMatch(/no\s+(grants|matches|results)/);
-    }
+    // Type in a search query no grant will match. Fail loudly if no input is
+    // found — silently no-oping turns a broken search UI into a passing test.
+    const searchInput = page
+      .locator('input[type="search"], input[placeholder*="earch" i]')
+      .first();
+    await expect(searchInput).toBeVisible({ timeout: 5000 });
+    await searchInput.fill("zzzzzzzz_no_match_query_xyz");
+    await page.waitForTimeout(500);
+    const text = await getMainText(page);
+    // Must contain a canonical "no matches" messaging variant — not the
+    // bespoke loading string we replaced in QUA-1008.
+    expect(text.toLowerCase()).toMatch(/no\s+(grants|matches|results)/);
   });
 });
