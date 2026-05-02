@@ -201,36 +201,38 @@ export function renderScorecardGradesYaml(facts: MirrorFact[]): string {
 // ── Filesystem operations ──────────────────────────────────────────────
 
 /**
+ * Look up the per-entity directory path for `slug` if the entity has any
+ * fb-entity yaml on disk (single-file or directory form). Pure — does not
+ * mutate the filesystem.
+ *
+ * Returns the directory path (which may not yet exist on disk in the
+ * single-file case) or null if no fb-entity yaml exists for this slug.
+ */
+export function findEntityDirPath(slug: string, fbEntitiesDir: string): string | null {
+  const dirPath = join(fbEntitiesDir, slug);
+  if (existsSync(dirPath) && statSync(dirPath).isDirectory()) return dirPath;
+  if (existsSync(join(fbEntitiesDir, `${slug}.yaml`))) return dirPath;
+  return null;
+}
+
+/**
  * Convert `fb-entities/<slug>.yaml` to `fb-entities/<slug>/entity.yaml`
- * if needed. After this call the entity is in directory form, so the
- * managed `scorecard-grades.yaml` can sit alongside it.
- *
- * If `<slug>/` already exists (directory form), this is a no-op. If
- * neither exists (entity has no fb-entity yaml at all), this is also a
- * no-op — caller should handle that case (we don't create stub entities;
- * scorecard-only entities are skipped).
- *
- * Returns the directory path (`fb-entities/<slug>/`) when the entity has
- * a directory we can write to, or null when no fb-entity exists.
+ * if needed, and return the per-entity directory path. No-op when the
+ * directory form is already in place. Returns null when no fb-entity
+ * yaml exists for this slug — caller decides whether to skip silently
+ * or warn (we don't create stub entities here).
  */
 export function ensurePerEntityDir(slug: string, fbEntitiesDir: string): string | null {
-  const dirPath = join(fbEntitiesDir, slug);
-  const filePath = join(fbEntitiesDir, `${slug}.yaml`);
+  const dirPath = findEntityDirPath(slug, fbEntitiesDir);
+  if (!dirPath) return null;
 
-  // Already a directory.
-  if (existsSync(dirPath) && statSync(dirPath).isDirectory()) {
-    return dirPath;
-  }
+  // If the directory already exists on disk, we're done.
+  if (existsSync(dirPath) && statSync(dirPath).isDirectory()) return dirPath;
 
-  // Single-file form — migrate.
-  if (existsSync(filePath) && statSync(filePath).isFile()) {
-    mkdirSync(dirPath, { recursive: true });
-    const newMain = join(dirPath, MAIN_FILE);
-    renameSync(filePath, newMain);
-    return dirPath;
-  }
-
-  return null;
+  // Otherwise the single-file form exists — migrate it.
+  mkdirSync(dirPath, { recursive: true });
+  renameSync(join(fbEntitiesDir, `${slug}.yaml`), join(dirPath, MAIN_FILE));
+  return dirPath;
 }
 
 /**
@@ -389,35 +391,14 @@ export async function syncScorecardFactsToYaml(
       continue;
     }
 
-    if (opts.dryRun) {
-      const dirPath = join(fbEntitiesDir, slug);
-      const filePath = existsSync(join(fbEntitiesDir, `${slug}.yaml`)) || existsSync(dirPath)
-        ? join(dirPath, MANAGED_FILE)
-        : null;
-      if (!filePath) {
-        summary.entitiesSkippedNoFbYaml++;
-        summary.details.push({
-          slug,
-          stableId,
-          factCount: facts.length,
-          status: 'skipped-no-fb-yaml',
-          path: null,
-        });
-      } else {
-        summary.entitiesWritten++;
-        summary.details.push({
-          slug,
-          stableId,
-          factCount: facts.length,
-          status: 'written',
-          path: filePath,
-        });
-        writtenPaths.add(filePath);
-      }
-      continue;
-    }
-
-    const path = writeScorecardGradesForEntity(slug, facts, fbEntitiesDir);
+    // For dry-run, look up the would-be path without mutating; for the
+    // live path, perform the write and capture the resulting path.
+    const path = opts.dryRun
+      ? (() => {
+          const dir = findEntityDirPath(slug, fbEntitiesDir);
+          return dir ? join(dir, MANAGED_FILE) : null;
+        })()
+      : writeScorecardGradesForEntity(slug, facts, fbEntitiesDir);
     if (!path) {
       summary.entitiesSkippedNoFbYaml++;
       summary.details.push({
