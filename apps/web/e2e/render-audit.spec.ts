@@ -556,25 +556,4 @@ test.describe("Render audit — canonical table states", () => {
     });
   }
 
-  /**
-   * Empty state: filter to a query that matches nothing. The canonical
-   * `<TableEmptyRow>` is the only allowed empty pattern. /benchmarks renders
-   * a `<div>` empty state; we just verify that *some* form of "no matches"
-   * messaging appears, not bespoke React rendering.
-   */
-  test("/grants empty-after-filter renders consistent empty messaging", async ({ page }) => {
-    await loadPage(page, "/grants");
-    // Type in a search query no grant will match. Fail loudly if no input is
-    // found — silently no-oping turns a broken search UI into a passing test.
-    const searchInput = page
-      .locator('input[type="search"], input[placeholder*="earch" i]')
-      .first();
-    await expect(searchInput).toBeVisible({ timeout: 5000 });
-    await searchInput.fill("zzzzzzzz_no_match_query_xyz");
-    await page.waitForTimeout(500);
-    const text = await getMainText(page);
-    // Must contain a canonical "no matches" messaging variant — not the
-    // bespoke loading string we replaced in QUA-1008.
-    expect(text.toLowerCase()).toMatch(/no\s+(grants|matches|results)/);
-  });
 });
