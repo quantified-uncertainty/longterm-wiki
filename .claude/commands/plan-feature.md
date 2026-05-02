@@ -34,7 +34,7 @@ Run these checks before launching any agents. **STOP and ask the user** if any t
 
 ## Phase 0: Empirical Archaeology — quantify the problem
 
-**Run this BEFORE any solution thinking.** A plan whose scope is set without empirical evidence will over-scope by default — see `.claude/rules/agent-planning-discipline.md` § "Empirical evidence before scope" and the QUA-1045 retro for why. The v4 plan that triggered this gate scoped 5 months of work on the assumption that "the YAML pipeline is fragile"; an empirical pass run after the plan's scaffolding PRs had already shipped found the real incident set was 7 across 4 mechanisms — fundamentally changing the plan. ("Scaffolding PRs" = the resulting plan's own Phase 0 — implementation Phase 0, distinct from this skill's Phase 0 here.)
+**Run this BEFORE any solution thinking.** A plan whose scope is set without empirical evidence will over-scope by default. The v4 plan that triggered this gate scoped 5 months of work on the assumption that "the YAML pipeline is fragile"; an empirical pass run after the plan's scaffolding PRs had already shipped found the real incident set was 7 across 4 mechanisms — fundamentally changing the plan. ("Scaffolding PRs" = the resulting plan's own Phase 0 — implementation Phase 0, distinct from this skill's Phase 0 here.)
 
 ### 0a. Skip conditions
 
@@ -84,7 +84,7 @@ Read both agent results. Then write `/tmp/plan-feature-evidence.md` with:
 ═══════════════════════════════════════════
 ```
 
-**Then stop and wait for user response.** The user must explicitly approve the framing in their own words ("yes, plan for the [N]-mechanism case", "narrow to mechanism X only", "halt — this is theoretical") before Phase 1 begins. Paraphrasing or pushback is the *positive signal* that the user has actually engaged with the framing — it is what you want, not a problem to overcome. But engagement alone is not yet approval; the engagement must be followed by an explicit "yes, proceed" before Phase 1 begins. Silence ≠ approval. "Looks good" without paraphrasing or pushback ≠ approval (it could mean the user skimmed without engaging).
+**Then stop and wait for user response.** The user must explicitly approve the framing in their own words ("yes, plan for the [N]-mechanism case", "narrow to mechanism X only", "halt — this is theoretical") before Phase 1 begins. Paraphrasing or pushback is the *positive signal* that the user has actually engaged — it is what you want, not a problem to overcome — but engagement alone is not yet approval. Only an explicit "yes, proceed" begins Phase 1. Silence and unqualified "looks good" do not count.
 
 If the user wants to proceed despite weak evidence, document the choice in the eventual plan body under "Open Questions" — "Empirical evidence weak; proceeded anyway because [user reason]." This makes the assumption legible to the next reader.
 
@@ -109,7 +109,7 @@ In all agent prompts below, replace `{{FEATURE}}` with this problem statement.
 
 1. **Codebase agent** (Explore, thoroughness: "very thorough"): "Search the codebase for anything related to {{FEATURE}}. Find: existing code, partial implementations, related systems, data models, database tables, API routes, UI components, test files. Check: `apps/web/src/app/`, `apps/wiki-server/src/routes/`, `crux/commands/`, `data/`, `packages/`. Report as a table: | File/system | What it does | Lines | Relevant to plan because... |"
 
-2. **GitHub history agent** (general-purpose): "Search GitHub for all prior work on {{FEATURE}}. Run:
+2. **GitHub history agent** (general-purpose): "If Phase 0 ran, the incident enumeration is already in `/tmp/plan-feature-evidence.md` — read it first, then focus on *prior implementation attempts and their outcomes*, not re-enumerating incidents. Search GitHub for all prior work on {{FEATURE}}. Run:
    - `pnpm crux gh issues search '{{FEATURE_KEYWORDS}}'` (open and `--closed`)
    - `gh discussion list -R quantified-uncertainty/longterm-wiki --limit 30 --json number,title,comments` then filter for relevant titles
    - `git log --all --oneline --grep='{{FEATURE_KEYWORDS}}' | head -20`
@@ -237,7 +237,7 @@ Each agent reads `/tmp/feature-plan-draft.md` from disk before evaluating.
 
 2. **UX critic** (general-purpose, uses WebSearch): "Read `/tmp/feature-plan-draft.md`. Evaluate from the user's perspective. Will this make the site better or more complex? Is the IA intuitive? Would a new visitor understand it? Search the web for '{{FEATURE_TYPE}} UX best practices' and compare. For each concern: | Issue | Severity | Suggested fix |"
 
-3. **Deletion-only reviewer** (general-purpose) — *the constrained mandate*: "Read `/tmp/feature-plan-draft.md` and `/tmp/plan-feature-evidence.md`. Your mandate is constrained: **you may ONLY argue for deleting scope.** You may not propose new validators, safety nets, fallback layers, monitoring systems, or 'one more abstraction.' You may not say 'add X to handle Y.' Your only outputs are: phases that should be cut, mitigations that should be removed, abstractions that should be inlined, sub-tasks that should be deferred to a future ticket. For each deletion: | What to cut | Why it's not needed | What evidence (or lack of evidence) supports cutting it | Risk of cutting |. If you find nothing to cut, say 'no deletions found' explicitly — do not pad with additive findings. The plan author will weigh these against the technical critic's additive findings."
+3. **Deletion-only reviewer** (general-purpose) — *the constrained mandate*: "Read `/tmp/feature-plan-draft.md` and `/tmp/plan-feature-evidence.md`. Your mandate is constrained: **you may ONLY argue for deleting scope.** You may not propose new validators, safety nets, fallback layers, monitoring systems, or 'one more abstraction.' Your only outputs are: phases that should be cut, mitigations that should be removed, abstractions that should be inlined, sub-tasks that should be deferred to a future ticket. For each deletion: | What to cut | Why it's not needed | What evidence (or lack of evidence) supports cutting it | Risk of cutting |. If you find nothing to cut, say 'no deletions found' explicitly — do not pad with additive findings. The plan author will weigh these against the technical critic's additive findings."
 
 4. **Strategic challenger** (general-purpose): "Read `/tmp/feature-plan-draft.md` and `/tmp/plan-feature-evidence.md`. Question the *premise*, not just the design. Ask: (1) Is the problem this plan solves the actual problem, or a proxy for it? (2) Is the chosen approach addressing the highest-frequency mechanism in the evidence summary, or a smaller one? (3) Is there an entirely different framing — patch the specific bugs, change the contract, accept the failure mode — that's never been considered? (4) Is the plan over-fitted to the loudest recent incident? Report: | Premise question | Why it might be wrong | Alternative framing |. Do not refine the existing plan; argue against it."
 

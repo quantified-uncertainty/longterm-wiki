@@ -4,7 +4,7 @@ Applies to multi-week plans, multi-PR refactors, and any feature where an agent 
 
 ## Why this file exists
 
-QUA-943 ("machine-write PG-primary transition") shipped through a costly planning failure. An agent authored a 5-month / ~30,000-LOC plan (v4). Two red-team passes added 19 mitigations and 0 deletions. Nine PRs of Phase 0 work merged before the framing was challenged. A v5 reframe (~5 weeks, ~3,000 LOC) was drafted and 12 child tickets filed — and an empirical investigation then revealed v5 was *also* over-scoped and partially mistargeted.
+QUA-943 ("machine-write PG-primary transition") shipped through a costly planning failure. An agent authored a 5-month / ~30,000-LOC plan (v4); two red-team passes operated within it without challenging the framing; a v5 reframe (~5 weeks, ~3,000 LOC) was drafted and 12 child tickets filed — and an empirical investigation then revealed v5 was *also* over-scoped and partially mistargeted.
 
 The pattern that worked was the user pushing back specifically and repeatedly: "Why migrate everything?" "Why is it so hard?" "Investigate more." Without that, the agent would have happily executed v5 as first sketched. This file encodes the lessons so that pushback is structural, not personal. Full retro: QUA-1045.
 
@@ -35,7 +35,7 @@ Before scoping a multi-week plan, run an **empirical archaeology pass**:
 
 Do this **before** writing the plan, not after. v4's scope assumed "the YAML pipeline is fragile" — an empirical pass that took ~4 hours found 7 confirmed incidents in 4 distinct classes, fundamentally changing the plan. That pass should have happened before v4 was authored, not after Phase 0 had already shipped.
 
-If you cannot find empirical evidence and you're still planning, that itself is evidence — that the urgency is theoretical. Halt and surface this to the user.
+If you cannot find empirical evidence, the urgency is theoretical. Halt and surface this to the user.
 
 ### 3. Watch the additive-only red-team smell
 
@@ -49,7 +49,7 @@ Counter-pressure rules:
 
 ### 4. Cap iterations on a moving foundation
 
-**If scope keeps moving across plan revisions, stop planning and start measuring.** v4 → v5 → "v5 is also wrong" is the sound of a foundation that hasn't been validated. Each new layer of refinement is more compute and more sunk cost on an unverified premise.
+**If scope keeps moving across plan revisions, stop planning and start measuring.** v4 → v5 → "v5 is also wrong" means the foundation isn't validated. More refinement is more sunk cost on an unverified premise.
 
 Heuristics:
 
