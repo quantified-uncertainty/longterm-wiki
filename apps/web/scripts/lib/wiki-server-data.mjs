@@ -289,7 +289,9 @@ export async function fetchBulkItems(url, itemsKey, opts = {}) {
  * Used as the deploy-ordering fallback for `fetchBulkItems`. New callers
  * should prefer /bulk; this stays around so old wiki-servers keep working.
  *
- * @param {string} url          Full URL of `.../all` (no query string).
+ * @param {string} url          Full URL of `.../all`; may include an existing
+ *                              query string — `limit` and `offset` are appended
+ *                              with the correct `&` or `?` separator.
  * @param {string} itemsKey     Response field containing the array.
  * @param {object} [opts]
  * @param {HeadersInit} [opts.headers]
@@ -301,25 +303,35 @@ export async function fetchBulkItems(url, itemsKey, opts = {}) {
  * @returns {Promise<{ok: true, items: any[]} | {ok: false, reason: string, status?: number}>}
  */
 export async function fetchPaginatedItems(url, itemsKey, opts = {}) {
-  const pageSize = opts.pageSize ?? 200;
-  const timeoutMs = opts.timeoutMs ?? 60_000;
-  const attempts = opts.attempts ?? 3;
+  const {
+    pageSize = 200,
+    timeoutMs = 30_000,
+    attempts = 3,
+    headers,
+    fetchImpl,
+    sleepImpl,
+  } = opts;
+  if (!Number.isInteger(pageSize) || pageSize <= 0) {
+    return { ok: false, reason: `invalid pageSize: ${pageSize}` };
+  }
+  const sep = url.includes('?') ? '&' : '?';
   const allItems = [];
   let offset = 0;
 
   while (true) {
-    const pageUrl = `${url}?limit=${pageSize}&offset=${offset}`;
+    const pageUrl = `${url}${sep}limit=${pageSize}&offset=${offset}`;
     const result = await fetchJsonWithRetry(pageUrl, {
-      headers: opts.headers,
+      headers,
       timeoutMs,
       attempts,
-      fetchImpl: opts.fetchImpl,
-      sleepImpl: opts.sleepImpl,
+      fetchImpl,
+      sleepImpl,
     });
     if (!result.ok) {
       return { ok: false, reason: `${result.reason} at offset=${offset}`, status: result.status };
     }
-    const items = result.data[itemsKey];
+    // Defensive: null/non-object data would NPE on plain property access.
+    const items = result.data?.[itemsKey];
     if (!Array.isArray(items)) {
       return {
         ok: false,
