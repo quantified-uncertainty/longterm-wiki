@@ -154,6 +154,15 @@ describe("parseBenchmarkSkip", () => {
       .toEqual({ reason: "foo" });
   });
 
+  it("strips backticks from the reason (markdown injection hardening)", () => {
+    expect(parseBenchmarkSkip("<!-- benchmark-skip: foo `code` bar -->"))
+      .toEqual({ reason: "foo code bar" });
+  });
+
+  it("returns null when the only content is backticks", () => {
+    expect(parseBenchmarkSkip("<!-- benchmark-skip: ``` -->")).toBeNull();
+  });
+
   it("ignores unrelated HTML comments", () => {
     expect(
       parseBenchmarkSkip("<!-- benchmark-other: blah -->\n<!-- ci-skip -->"),
@@ -249,7 +258,7 @@ describe("decide", () => {
     expect(d.verdict).toBe("pass");
   });
 
-  it("handles null medians gracefully (zero scored entities)", () => {
+  it("handles null medians gracefully (zero scored entities both sides)", () => {
     const empty = makeCov(0);
     empty.aggregate.median_coverage_score = null;
     empty.aggregate.p25_coverage_score = null;
@@ -257,6 +266,25 @@ describe("decide", () => {
     const d = decide(empty, empty, makeImprove(0.92), makeImprove(0.92), null, THRESH);
     expect(d.verdict).toBe("pass");
     expect(d.delta.median_coverage_score).toBeNull();
+  });
+
+  it("flags candidate suite degradation: baseline scored, candidate has no median", () => {
+    const candEmpty = makeCov(0);
+    candEmpty.aggregate.median_coverage_score = null;
+    candEmpty.aggregate.p25_coverage_score = null;
+    candEmpty.aggregate.scored_count = 0;
+    const d = decide(makeCov(0.85), candEmpty, makeImprove(0.92), makeImprove(0.92), null, THRESH);
+    expect(d.verdict).toBe("fail");
+    expect(d.reasons[0]).toMatch(/no scorable coverage median/);
+  });
+
+  it("flags candidate suite degradation: baseline completed entities, candidate completed zero", () => {
+    const candFailed = makeImprove(0);
+    candFailed.aggregate.entities_completed = 0;
+    candFailed.aggregate.entities_skipped_budget = 2;
+    const d = decide(makeCov(0.85), makeCov(0.85), makeImprove(0.92), candFailed, null, THRESH);
+    expect(d.verdict).toBe("fail");
+    expect(d.reasons.some(r => /completed zero entities/.test(r))).toBe(true);
   });
 
   it("custom thresholds are respected", () => {
@@ -440,6 +468,65 @@ describe("run", () => {
       });
       expect(r.exitCode).toBe(2);
       expect(r.output).toMatch(/verified-threshold/);
+    });
+  });
+
+  it("exits 2 (not 1) on malformed JSON in candidate snapshot", async () => {
+    return withTmpDir(async (dir) => {
+      const candCov = path.join(dir, "cand-cov.json");
+      const candImp = path.join(dir, "cand-imp.json");
+      // Write invalid JSON — readSnapshot will throw on parse.
+      fs.writeFileSync(candCov, "{not valid json");
+      writeJson(candImp, makeImprove(0.92));
+
+      const r = await run([], {
+        candidateCoverage: candCov,
+        candidateImprove: candImp,
+      });
+      // Critical: NOT 1 (regression). 1 would block unrelated PRs across
+      // the whole repo until the cron re-uploaded an artifact.
+      expect(r.exitCode).toBe(2);
+      expect(r.output).toMatch(/Failed to parse/);
+    });
+  });
+
+  it("exits 2 on malformed JSON in baseline snapshot", async () => {
+    return withTmpDir(async (dir) => {
+      const baseCov = path.join(dir, "base-cov.json");
+      const baseImp = path.join(dir, "base-imp.json");
+      const candCov = path.join(dir, "cand-cov.json");
+      const candImp = path.join(dir, "cand-imp.json");
+      fs.writeFileSync(baseCov, "garbage");
+      writeJson(baseImp, makeImprove(0.92));
+      writeJson(candCov, makeCov(0.85));
+      writeJson(candImp, makeImprove(0.92));
+
+      const r = await run([], {
+        baselineCoverage: baseCov,
+        baselineImprove: baseImp,
+        candidateCoverage: candCov,
+        candidateImprove: candImp,
+      });
+      expect(r.exitCode).toBe(2);
+    });
+  });
+
+  it("rejects coverageThreshold of 0 and negative", async () => {
+    return withTmpDir(async (dir) => {
+      const candCov = path.join(dir, "cand-cov.json");
+      const candImp = path.join(dir, "cand-imp.json");
+      writeJson(candCov, makeCov(0.85));
+      writeJson(candImp, makeImprove(0.92));
+
+      for (const bad of ["0", "-0.05", "abc"]) {
+        const r = await run([], {
+          candidateCoverage: candCov,
+          candidateImprove: candImp,
+          coverageThreshold: bad,
+        });
+        expect(r.exitCode).toBe(2);
+        expect(r.output).toMatch(/coverage-threshold/);
+      }
     });
   });
 

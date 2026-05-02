@@ -49,6 +49,16 @@ When **not** to use it: a real, unintended regression. Override is for "I know t
 - **Per cron run**: same cap, runs once daily.
 - **No-op pipeline change** (e.g., a comment-only edit in a triggered file): typically ~$0.30–$0.50 because most entities converge in iteration 1 with cached sourcing.
 
+`$5` is the ticket's explicit budget cap and is **lower** than the suite's natural default of `$2 × N supported entities` (QUA-1033 — `$16` for the current 8-entity suite). The implied per-entity cap is `$5 / 8 = $0.625`, sufficient for the typical $0.04 policy run with retry headroom but tight if multiple entities need extended sourcing. If the gate starts seeing chronic `entities_skipped_budget > 0` on no-op PRs, raise the workflow budget rather than relaxing the threshold.
+
+## Security & trust model
+
+Both workflows are `pull_request`-triggered (not `pull_request_target`), run against the PR head SHA, and are passed `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`, and `LONGTERMWIKI_SERVER_API_KEY`. That means anyone who can push to a branch in this repo and craft a PR that touches one of the triggered paths can run arbitrary code with those secrets in scope.
+
+- **Fork PRs are blocked** by `if: github.event.pull_request.head.repo.full_name == github.repository`. Fork pushers don't get the secrets and the gate doesn't run for them — a maintainer who wants the gate to fire on a fork's diff has to branch the change into the canonical repo first.
+- **Same-repo pushers are trusted**, transitively, because anyone with push access to the canonical repo already has indirect access to the secrets via repository settings, Actions logs from existing scheduled workflows, and the deploy pipeline. The gate doesn't widen the trust boundary; it just runs on a trigger that other CI jobs already use the same way (cf. `linear-verify-pr.yml`).
+- A future hardening step would be to split the gate into a `pull_request` artifact-producing job (no secrets) plus a `workflow_run`-triggered comparison job (secrets, against `main`). That isolation is heavier than v1 needs but worth filing if the threat model changes.
+
 ## Baseline persistence
 
 Baseline snapshots live as GitHub Actions artifacts (`actions/upload-artifact@v4`, 30-day retention) on the cron workflow's runs. The PR gate uses `actions/github-script` to find the latest successful baseline run, then `actions/download-artifact@v4` with `run-id` for cross-workflow download.

@@ -29,6 +29,11 @@ import { type CommandResult } from "../lib/cli.ts";
 import type { SuiteSnapshot as CoverageSnapshot } from "./research-benchmark-suite.ts";
 import type { SuiteSnapshot as ImproveSnapshot } from "./research-improve-entity-suite.ts";
 
+/** Default thresholds — duplicated in usage output, validation error message,
+ *  and the PR-comment footer, so kept in one place. */
+export const DEFAULT_COVERAGE_THRESHOLD = 0.05;
+export const DEFAULT_VERIFIED_THRESHOLD = 0.05;
+
 /** Parsed `<!-- benchmark-skip: <reason> -->` marker from a PR body.
  *  The reason is preserved verbatim so a human can audit the override
  *  without looking at the raw body. */
@@ -43,12 +48,17 @@ export interface BenchmarkSkip {
  * smuggle an override into a wall of "## Summary" prose). An empty reason
  * falls through as "no override" — a reviewer who finds an empty marker
  * should fix it rather than us silently honoring it.
+ *
+ * The reason is stripped of backticks before being returned so it can be
+ * embedded in a markdown code span without breaking out into live HTML.
+ * (A PR author already controls the body, so this is hardening for
+ * surprise rather than adversarial — but cheap.)
  */
 export function parseBenchmarkSkip(prBody: string): BenchmarkSkip | null {
   // [ \t] (not \s) on either side of the keyword so we never bridge a newline.
   const m = prBody.match(/<!--[ \t]*benchmark-skip:[ \t]*([^\n>]+?)[ \t]*-->/i);
   if (!m) return null;
-  const reason = m[1].trim();
+  const reason = m[1].replace(/`/g, "").trim();
   if (!reason) return null;
   return { reason };
 }
@@ -123,14 +133,36 @@ export function decide(
   const candVer = candidateImprove.aggregate.median_verified_rate;
   const dVer = round4(candVer - baseVer);
 
-  if (dCov !== null && dCov < -thresholds.coverage) {
+  // Suite degradation guard: if baseline scored entities but candidate
+  // produced no scorable median, the suite ran but no entity completed
+  // coverage scoring. That's a regression even though dCov is null.
+  if (baseCov !== null && candCov === null) {
+    reasons.push(
+      "candidate suite produced no scorable coverage median " +
+        `(baseline median was ${baseCov.toFixed(3)}). ` +
+        "All entities are missing / unsupported / type-mismatched.",
+    );
+  } else if (dCov !== null && dCov < -thresholds.coverage) {
     reasons.push(
       `median(coverage_score) dropped ${(-dCov).toFixed(3)} ` +
         `(${baseCov!.toFixed(3)} → ${candCov!.toFixed(3)}), ` +
         `threshold ${thresholds.coverage}.`,
     );
   }
-  if (dVer < -thresholds.verified) {
+
+  // Symmetric guard for the improve-entity-suite: zero entities completed
+  // means the suite ran but produced no data. computeAggregate currently
+  // returns 0 in that case, which would compare against a non-zero baseline
+  // and false-positive as "verified rate dropped to 0". Detect explicitly
+  // and report the actual cause.
+  const candCompleted = candidateImprove.aggregate.entities_completed;
+  if (candCompleted === 0 && baselineImprove.aggregate.entities_completed > 0) {
+    reasons.push(
+      "candidate suite completed zero entities " +
+        `(baseline completed ${baselineImprove.aggregate.entities_completed}). ` +
+        "All entities skipped due to budget or failed mid-run.",
+    );
+  } else if (dVer < -thresholds.verified) {
     reasons.push(
       `median(verified_rate) dropped ${(-dVer * 100).toFixed(1)}pts ` +
         `(${(baseVer * 100).toFixed(1)} → ${(candVer * 100).toFixed(1)}), ` +
@@ -177,15 +209,6 @@ export function decide(
 function fmt2(n: number | null | undefined): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
   return n.toFixed(2);
-}
-
-function fmtDelta(before: number | null, after: number | null): string {
-  if (before === null && after === null) return "—";
-  if (before === null) return `**${fmt2(after)}** _(new)_`;
-  if (after === null) return `${fmt2(before)} → **—** _(gone)_`;
-  const d = after - before;
-  const sign = d > 0 ? "+" : "";
-  return `${fmt2(before)} → **${fmt2(after)}** (${sign}${d.toFixed(2)})`;
 }
 
 /**
@@ -377,10 +400,10 @@ export async function run(
   }
 
   const coverageThreshold = parseFloat(
-    (options.coverageThreshold as string | undefined) ?? "0.05",
+    (options.coverageThreshold as string | undefined) ?? String(DEFAULT_COVERAGE_THRESHOLD),
   );
   const verifiedThreshold = parseFloat(
-    (options.verifiedThreshold as string | undefined) ?? "0.05",
+    (options.verifiedThreshold as string | undefined) ?? String(DEFAULT_VERIFIED_THRESHOLD),
   );
   if (!Number.isFinite(coverageThreshold) || coverageThreshold <= 0) {
     return {
@@ -400,10 +423,25 @@ export async function run(
     };
   }
 
-  const candidateCov = readSnapshot<CoverageSnapshot>(candidateCovPath, "candidate coverage");
-  const candidateImprove = readSnapshot<ImproveSnapshot>(candidateImprovePath, "candidate improve");
-  const baselineCov = readSnapshotIfExists<CoverageSnapshot>(baselineCovPath, "baseline coverage");
-  const baselineImprove = readSnapshotIfExists<ImproveSnapshot>(baselineImprovePath, "baseline improve");
+  // Read failures (corrupt JSON, permission errors) get exit 2, NOT exit 1 —
+  // exit 1 means "regression detected" by contract, and a corrupt baseline
+  // artifact masquerading as a regression would block unrelated PRs across
+  // the whole repo until the cron re-uploads.
+  let candidateCov: CoverageSnapshot;
+  let candidateImprove: ImproveSnapshot;
+  let baselineCov: CoverageSnapshot | null;
+  let baselineImprove: ImproveSnapshot | null;
+  try {
+    candidateCov = readSnapshot<CoverageSnapshot>(candidateCovPath, "candidate coverage");
+    candidateImprove = readSnapshot<ImproveSnapshot>(candidateImprovePath, "candidate improve");
+    baselineCov = readSnapshotIfExists<CoverageSnapshot>(baselineCovPath, "baseline coverage");
+    baselineImprove = readSnapshotIfExists<ImproveSnapshot>(baselineImprovePath, "baseline improve");
+  } catch (e) {
+    return {
+      output: e instanceof Error ? e.message : String(e),
+      exitCode: 2,
+    };
+  }
 
   let override: BenchmarkSkip | null = null;
   if (prBodyFile && fs.existsSync(prBodyFile)) {

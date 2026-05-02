@@ -39,6 +39,12 @@ concurrency:
 
 jobs:
   benchmark:
+    # Skip on PRs from forks: the workflow needs LLM keys, prod wiki-server
+    # creds, and pull-requests:write to comment. None of those are passed
+    # to fork PRs by GitHub policy, so the gate would fail confusingly. A
+    # release manager who wants the gate to fire on a fork PR can branch
+    # the change into the canonical repo and re-open.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -140,12 +146,23 @@ jobs:
         id: snaps
         run: |
           set -euo pipefail
-          # Both snapshot dirs exist by now — improve-entity-suite ran first
-          # and benchmark-suite ran second, so this is a strict mtime sort.
-          IMP=$(ls -t .claude/snapshots/improve-entity-suite/*__pr-${PR_NUMBER}.json | head -n 1)
-          BENCH=$(ls -t .claude/snapshots/benchmark-suite/*__pr-${PR_NUMBER}.json | head -n 1)
-          echo "candidate-improve=$IMP" >> "$GITHUB_OUTPUT"
-          echo "candidate-bench=$BENCH" >> "$GITHUB_OUTPUT"
+          # Bash command-substitution suppresses `set -e` for the inner ls,
+          # so we have to explicit-check both paths after assignment. An
+          # empty value here would silently propagate as `--candidate-X=`
+          # (empty string) into the next step.
+          shopt -s nullglob
+          IMP_LIST=( $(ls -t .claude/snapshots/improve-entity-suite/*__pr-${PR_NUMBER}.json 2>/dev/null) )
+          BENCH_LIST=( $(ls -t .claude/snapshots/benchmark-suite/*__pr-${PR_NUMBER}.json 2>/dev/null) )
+          if [ ${#IMP_LIST[@]} -eq 0 ]; then
+            echo "::error::No improve-entity-suite snapshot found for tag pr-${PR_NUMBER}. The suite step likely failed."
+            exit 1
+          fi
+          if [ ${#BENCH_LIST[@]} -eq 0 ]; then
+            echo "::error::No benchmark-suite snapshot found for tag pr-${PR_NUMBER}. The benchmark step likely failed."
+            exit 1
+          fi
+          echo "candidate-improve=${IMP_LIST[0]}" >> "$GITHUB_OUTPUT"
+          echo "candidate-bench=${BENCH_LIST[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Compute regression verdict
         id: verdict
@@ -195,11 +212,18 @@ jobs:
             }
             const body = fs.readFileSync(file, 'utf8');
             const MARKER = '<!-- improve-pipeline-benchmark:comment-marker -->';
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
+            // Paginate — long PRs have >30 comments and the marker may not
+            // be on page 1. listComments without paginate would fail to
+            // find an existing comment and stack a new one on every run.
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              },
+            );
             const existing = comments.find(c => c.body && c.body.includes(MARKER));
             if (existing) {
               await github.rest.issues.updateComment({
