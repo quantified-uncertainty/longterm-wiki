@@ -22,6 +22,7 @@ import {
   SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from './prompt-guidelines.ts';
+import { buildScorecardGradeExcerpt } from './scorecard-grade-excerpt.ts';
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
 import { tryWikidataMatch } from './wikidata-matcher.ts';
 import { tryOpenAlexMatch } from './openalex-matcher.ts';
@@ -150,6 +151,18 @@ export function buildRecordSourcingPrompt(
     })
     .join('\n');
 
+  // QUA-978: scorecard pages (FLI Index, FMTI, etc.) lay out per-dimension
+  // grade tables sequentially. Each dimension's deep section commonly sits
+  // past the 30K prompt window, leaving the LLM with only the overall
+  // grade — and it then false-positive-contradicts the per-dim claim
+  // ("claimed D, source shows C+ overall"). Dispatch to a domain-aware
+  // extractor that locates the dimension's deep section. Other record
+  // types use the unchanged first-N-chars slice.
+  const excerpt =
+    data.recordType === 'scorecard_grade'
+      ? buildScorecardGradeExcerpt(data.fields, sourceText, PROMPT_CONTENT_LENGTH)
+      : sourceText.slice(0, PROMPT_CONTENT_LENGTH);
+
   return `You are a fact-checker. Given the source text below, verify this structured data record.
 
 Record type: ${data.recordType}
@@ -159,7 +172,7 @@ ${fieldsStr}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
+${excerpt}
 ---
 
 Does the source text confirm, contradict, or not address the claims in this record?

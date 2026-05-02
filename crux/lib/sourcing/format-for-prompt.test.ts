@@ -254,3 +254,77 @@ describe('buildRecordSourcingPrompt — monetary field annotation', () => {
     expect(prompt).toContain('~61 billion');
   });
 });
+
+// ── buildRecordSourcingPrompt — scorecard_grade dispatch (QUA-978) ─────
+
+describe('buildRecordSourcingPrompt — scorecard_grade excerpt dispatch', () => {
+  function makeScorecardData(fields: Record<string, string | number | null>): RecordItemData {
+    return {
+      kind: 'record',
+      recordType: 'scorecard_grade',
+      recordId: 'fli_index-winter-2025|sid_test|test-dim',
+      fields: { publisher: 'fli_index', entity: 'TestOrg', ...fields },
+    };
+  }
+
+  it('uses domain-aware excerpt for per-dimension scorecard_grade rows', () => {
+    // Source text long enough to exceed the prompt window with the
+    // dimension's deep section past the first 30K chars.
+    const header = 'MAIN_SCORECARD_TABLE '.padEnd(8_000, '.');
+    const padding = 'noise '.repeat(7_000); // ~42K chars, total ~50K
+    const deep = 'Existential Safety This domain examines preparedness';
+    const sourceText = header + padding + deep;
+
+    const data = makeScorecardData({
+      dimension: 'Existential Safety',
+      scoreLetter: 'D',
+    });
+
+    const prompt = buildRecordSourcingPrompt(data, 'Scorecard claim', sourceText);
+
+    // Both header AND the dimension's deep section must be in the prompt.
+    expect(prompt).toContain('MAIN_SCORECARD_TABLE');
+    expect(prompt).toContain('Existential Safety This domain');
+    expect(prompt).toContain('[... omitted: middle of source document ...]');
+  });
+
+  it('uses default first-N-chars slice for non-scorecard record types', () => {
+    // Build a 50K-char source where the same "deep section" exists past
+    // the 30K window. For a non-scorecard record type the dispatch should
+    // NOT route through the domain-aware extractor — the deep section
+    // stays out of the excerpt.
+    const header = 'EARLY_HEADER '.padEnd(8_000, '.');
+    const padding = 'noise '.repeat(7_000);
+    const deep = 'Existential Safety This domain examines';
+    const sourceText = header + padding + deep;
+
+    const data: RecordItemData = {
+      kind: 'record',
+      recordType: 'grant',
+      recordId: 'g_test',
+      fields: { dimension: 'Existential Safety' },
+    };
+
+    const prompt = buildRecordSourcingPrompt(data, 'Grant', sourceText);
+    expect(prompt).toContain('EARLY_HEADER');
+    expect(prompt).not.toContain('Existential Safety This domain');
+    expect(prompt).not.toContain('[... omitted: middle of source document ...]');
+  });
+
+  it('falls back to first-N slice for scorecard "Overall" rows', () => {
+    const header = 'OVERALL_TABLE '.padEnd(8_000, '.');
+    const padding = 'noise '.repeat(7_000);
+    const deep = 'Existential Safety This domain examines';
+    const sourceText = header + padding + deep;
+
+    const data = makeScorecardData({
+      dimension: 'Overall',
+      scoreLetter: 'C+',
+    });
+
+    const prompt = buildRecordSourcingPrompt(data, 'Overall claim', sourceText);
+    expect(prompt).toContain('OVERALL_TABLE');
+    // No dispatch into the dimension extractor → no "omitted" separator.
+    expect(prompt).not.toContain('[... omitted: middle of source document ...]');
+  });
+});
