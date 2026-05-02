@@ -1303,9 +1303,8 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
     return { output: "Usage: crux tb improve-entity <slug> [--inspect | --target=N --budget=N --max-iters=N --wait-for-settle --force]", exitCode: 1 };
   }
 
-  // QUA-1034: --inspect short-circuits BEFORE any LLM client creation,
-  // mutex check, or pipeline_runs row insertion. True dry-run with zero
-  // Anthropic API spend.
+  // --inspect short-circuits BEFORE any LLM client creation, mutex check,
+  // or pipeline_runs row insertion. True dry-run with zero Anthropic spend.
   if (options.inspect) {
     const found = findEntity(slug);
     if (!found) {

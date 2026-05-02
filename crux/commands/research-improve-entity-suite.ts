@@ -32,7 +32,8 @@ import {
 } from "../lib/improve-entity/mutex.ts";
 import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
-import { findEntity } from "../lib/research/entity-loader.ts";
+import { loadEntityMap, type EntityWithType } from "../lib/research/entity-loader.ts";
+import { formatCount } from "../lib/output.ts";
 import {
   buildInspectionReport,
   fetchHistoricalRuns,
@@ -183,31 +184,10 @@ export function aggregateResult(slug: string, type: string, result: ImproveResul
   };
 }
 
-/** Median of a numeric list. Linear interpolation between adjacent samples. */
-export function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const sorted = [...xs].sort((a, b) => a - b);
-  const mid = (sorted.length - 1) / 2;
-  const lo = Math.floor(mid);
-  const hi = Math.ceil(mid);
-  return (sorted[lo] + sorted[hi]) / 2;
-}
-
-/**
- * 25th-percentile via the standard linear-interpolation method (the same
- * R-7 / NumPy default behavior). Returns 0 for empty input.
- */
-export function p25(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  if (xs.length === 1) return xs[0];
-  const sorted = [...xs].sort((a, b) => a - b);
-  const idx = (sorted.length - 1) * 0.25;
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo];
-  const frac = idx - lo;
-  return sorted[lo] * (1 - frac) + sorted[hi] * frac;
-}
+// median + p25 moved to ../lib/stats.ts (QUA-1034 review). Re-exported here so
+// existing test imports `from "./research-improve-entity-suite.ts"` keep working.
+import { median, p25 } from "../lib/stats.ts";
+export { median, p25 };
 
 /** Compute aggregate metrics across the per-entity rows. Pure. */
 export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
@@ -468,8 +448,13 @@ async function runSuiteBody(
 export interface InspectSuiteOptions {
   /** Path to the suite YAML. Defaults to crux/benchmarks/entity-suite.yaml. */
   suitePath?: string;
-  /** Injected for tests — defaults to the real findEntity (reads YAML). */
-  loadEntityFn?: typeof findEntity;
+  /**
+   * Injected for tests — given a slug, returns the entity or null. Defaults
+   * to a one-time `loadEntityMap()` lookup so an N-slug suite triggers ONE
+   * directory scan, not N. The `findEntity(slug)` signature was a tempting
+   * default but causes O(N×M) reads on `data/entities/*.yaml`.
+   */
+  loadEntityFn?: (slug: string) => EntityWithType | null;
   /** Injected for tests — defaults to the real fetchHistoricalRuns (hits wiki-server). */
   fetchHistoryFn?: typeof fetchHistoricalRuns;
 }
@@ -495,7 +480,16 @@ export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
   unsupported: SuiteEntry[];
 }> {
   const suitePath = opts.suitePath ?? SUITE_YAML;
-  const loadEntity = opts.loadEntityFn ?? findEntity;
+  // Default loader builds a single Map from one directory scan, then closes
+  // over it for O(1) per-slug lookup. Avoids the O(N×M) re-scan that would
+  // happen if `findEntity` were the default (it re-reads every yaml file).
+  const defaultLoader = opts.loadEntityFn
+    ? null
+    : (() => {
+        const map = loadEntityMap();
+        return (slug: string) => map.get(slug) ?? null;
+      })();
+  const loadEntity = opts.loadEntityFn ?? defaultLoader!;
   const fetchHistory = opts.fetchHistoryFn ?? fetchHistoricalRuns;
 
   const all = loadSuite(suitePath);
@@ -521,20 +515,20 @@ export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   void args;
 
-  // QUA-1034: --inspect short-circuits BEFORE tag/budget validation, mutex
-  // check, withPipelineRun wrapper, or the suite runner. Pure pre-flight.
+  // --inspect short-circuits BEFORE tag/budget validation, mutex check,
+  // withPipelineRun wrapper, or the suite runner. Pure pre-flight, zero LLM.
   if (options.inspect) {
     const { reports, notFound, unsupported } = await inspectSuite();
     const lines: string[] = [formatInspectionSuite(reports, "Suite (improve-entity)")];
     if (notFound.length > 0) {
       lines.push(
-        `\nNote: ${notFound.length} suite entr${notFound.length === 1 ? "y" : "ies"} not found in data/entities/*.yaml: ${notFound.join(", ")}`,
+        `\nNote: ${formatCount(notFound.length, "suite entry", "suite entries")} not found in data/entities/*.yaml: ${notFound.join(", ")}`,
       );
     }
     if (unsupported.length > 0) {
       const labels = unsupported.map((e) => `${e.slug} (${e.type})`).join(", ");
       lines.push(
-        `\nNote: ${unsupported.length} suite entr${unsupported.length === 1 ? "y" : "ies"} skipped — type not yet supported by the inspector: ${labels}`,
+        `\nNote: ${formatCount(unsupported.length, "suite entry", "suite entries")} skipped — type not yet supported by the inspector: ${labels}`,
       );
     }
     return { output: lines.join("\n"), exitCode: 0 };

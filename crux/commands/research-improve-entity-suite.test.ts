@@ -878,20 +878,23 @@ describe("inspectSuite", () => {
     expect(reports[0].historicalRunCount).toBe(0);
   });
 
-  it("makes ZERO calls to the real improver — inspect path is LLM-free", async () => {
-    // The CLI inspect short-circuit means improveSingleEntity should never be
-    // called. inspectSuite() does not take an improver — that's the point.
-    // This test verifies the function signature does not regress: its only
-    // injectables are loadEntityFn + fetchHistoryFn, both of which are
-    // read-only. If a future change adds an `improver?:` to `InspectSuiteOptions`,
-    // this test won't catch it directly, but the static-source check in
-    // inspect.test.ts (`expect(source).not.toMatch(/createLlmClient/)`) will.
-    const suitePath = writeSuite([{ slug: "a", type: "policy" }]);
-    const loadEntityFn = vi.fn(() => ({ id: "a", type: "policy", stableId: "sid_a" } as EntityWithType));
+  it("invokes loadEntityFn once per supported slug and fetchHistoryFn exactly once", async () => {
+    // The actual "no LLM calls" guarantee is enforced in inspect.test.ts via a
+    // static-source check on inspect.ts imports. This test just confirms that
+    // inspectSuite's only side-effect surface is the two injected hooks (no
+    // hidden calls to a third API/improver) and that fetchHistory is called
+    // ONCE up-front, not per-entity (was a regression risk during the O(N×M)
+    // findEntity → loadEntityMap refactor).
+    const suitePath = writeSuite([
+      { slug: "a", type: "policy" },
+      { slug: "b", type: "policy" },
+    ]);
+    const loadEntityFn = vi.fn((slug: string) =>
+      ({ id: slug, type: "policy", stableId: `sid_${slug}` } as EntityWithType),
+    );
     const fetchHistoryFn = vi.fn(async () => [] as PipelineRunRow[]);
     await inspectSuite({ suitePath, loadEntityFn, fetchHistoryFn });
-    // Sanity: only the two injected hooks were invoked.
-    expect(loadEntityFn).toHaveBeenCalledTimes(1);
-    expect(fetchHistoryFn).toHaveBeenCalledTimes(1);
+    expect(loadEntityFn).toHaveBeenCalledTimes(2); // one per supported slug
+    expect(fetchHistoryFn).toHaveBeenCalledTimes(1); // single up-front fetch
   });
 });

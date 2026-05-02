@@ -16,6 +16,11 @@ export const DEFAULT_ENTITIES_DIR = path.join(ROOT, "data/entities");
 export interface EntityWithType {
   id: string;
   type: string;
+  /** Canonical stable ID (`sid_*`). Optional because legacy entries / tests
+   *  may construct partial entities, but virtually all real YAML rows have
+   *  one. Adding it here lets callers write `entity.stableId ?? entity.id`
+   *  without a `(entity as { stableId?: string })` cast. */
+  stableId?: string;
   [k: string]: unknown;
 }
 
@@ -65,4 +70,17 @@ export function findEntity(
   entitiesDir: string = DEFAULT_ENTITIES_DIR,
 ): EntityWithType | null {
   return loadAllEntities(entitiesDir).find((e) => e.id === slug) ?? null;
+}
+
+/**
+ * Load every entity once and return a `Map<id, entity>` for O(1) lookup.
+ * Use this when you need to look up many slugs in a row — calling
+ * {@link findEntity} in a loop re-reads every YAML file on each call
+ * (O(N×M) where N = slugs and M = .yaml files in the dir).
+ */
+export function loadEntityMap(
+  entitiesDir: string = DEFAULT_ENTITIES_DIR,
+): Map<string, EntityWithType> {
+  const all = loadAllEntities(entitiesDir);
+  return new Map(all.map((e) => [e.id, e]));
 }

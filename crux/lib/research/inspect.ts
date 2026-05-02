@@ -28,20 +28,18 @@ import {
   type PipelineRunRow,
 } from '../wiki-server/pipeline-runs.ts';
 import { IMPROVE_ENTITY_PIPELINE_NAME } from '../improve-entity/mutex.ts';
+import { formatCount } from '../output.ts';
+import { median } from '../stats.ts';
 
 /**
- * Type-based fallback used when an entity has zero historical runs with a
- * populated `cost_usd`. Numbers are deliberately on the conservative-high
- * side of the QUA-1034 spec's "$1-2 per policy entity" guidance — the cost
- * of overestimating an inspection is a small overshoot in the displayed
- * range, the cost of underestimating is the user proceeds and gets billed
- * 2-3x what they expected.
+ * Per-entity fallback used when an entity has zero historical runs with a
+ * populated `cost_usd`. Deliberately on the conservative-high side of the
+ * spec's "$1-2 per policy entity" guidance — overestimating bumps the
+ * displayed range, underestimating gets the user billed 2-3x what they
+ * expected. Single constant for now; if calibration ever diverges by
+ * entity type, switch to a `Record<string, number>`.
  */
-const FALLBACK_COST_BY_TYPE: Record<string, number> = {
-  policy: 1.5,
-  organization: 1.5,
-};
-const DEFAULT_FALLBACK_COST = 1.5;
+const FALLBACK_COST_USD = 1.5;
 
 /**
  * Spread on the displayed total cost range. The point estimate carries
@@ -75,7 +73,7 @@ export function inspectGaps(entity: EntityWithType): {
   populated: Record<string, number>;
 } {
   if (entity.type === 'policy') {
-    const e = entity as unknown as PolicyEntity;
+    const e = entity as PolicyEntity;
     return {
       gaps: analyzePolicyGaps(e),
       populated: {
@@ -87,7 +85,7 @@ export function inspectGaps(entity: EntityWithType): {
     };
   }
   if (entity.type === 'organization') {
-    const e = entity as unknown as OrganizationEntity;
+    const e = entity as OrganizationEntity;
     return {
       gaps: analyzeOrganizationGaps(e),
       populated: {
@@ -100,13 +98,6 @@ export function inspectGaps(entity: EntityWithType): {
     };
   }
   return { gaps: [], populated: {} };
-}
-
-function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const sorted = [...xs].sort((a, b) => a - b);
-  const mid = (sorted.length - 1) / 2;
-  return (sorted[Math.floor(mid)] + sorted[Math.ceil(mid)]) / 2;
 }
 
 /**
@@ -123,7 +114,7 @@ export function estimateEntityCost(
   entity: EntityWithType,
   runs: PipelineRunRow[],
 ): { estimatedCostUsd: number; costSource: 'history' | 'fallback'; historicalRunCount: number } {
-  const targetId = (entity as { stableId?: string }).stableId ?? entity.id;
+  const targetId = entity.stableId ?? entity.id;
   const matched: number[] = [];
   for (const r of runs) {
     if (r.entityId !== targetId) continue;
@@ -141,8 +132,7 @@ export function estimateEntityCost(
       historicalRunCount: matched.length,
     };
   }
-  const fallback = FALLBACK_COST_BY_TYPE[entity.type] ?? DEFAULT_FALLBACK_COST;
-  return { estimatedCostUsd: fallback, costSource: 'fallback', historicalRunCount: 0 };
+  return { estimatedCostUsd: FALLBACK_COST_USD, costSource: 'fallback', historicalRunCount: 0 };
 }
 
 /**
@@ -156,10 +146,10 @@ export function buildInspectionReport(
 ): InspectionReport {
   const { gaps, populated } = inspectGaps(entity);
   const cost = estimateEntityCost(entity, runs);
-  const titleRaw = (entity as { title?: unknown }).title;
+  const titleRaw = entity.title;
   return {
     slug: entity.id,
-    entityId: (entity as { stableId?: string }).stableId ?? entity.id,
+    entityId: entity.stableId ?? entity.id,
     type: entity.type,
     title: typeof titleRaw === 'string' ? titleRaw : entity.id,
     populated,
@@ -183,7 +173,7 @@ export function formatInspectionLine(r: InspectionReport): string {
   const gapsSummary = gapKeys || 'none';
   const costSrc =
     r.costSource === 'history'
-      ? `est from ${r.historicalRunCount} prior run${r.historicalRunCount === 1 ? '' : 's'}`
+      ? `est from ${formatCount(r.historicalRunCount, 'prior run')}`
       : 'fallback est';
   return `- ${r.slug} (${r.entityId}): ${populatedSummary}. Gaps: ${gapsSummary}. Est: $${r.estimatedCostUsd.toFixed(2)} (${costSrc}).`;
 }
@@ -196,8 +186,7 @@ export function formatInspectionHeader(
   const total = reports.reduce((s, r) => s + r.estimatedCostUsd, 0);
   const lo = (total * (1 - COST_RANGE_SPREAD)).toFixed(2);
   const hi = (total * (1 + COST_RANGE_SPREAD)).toFixed(2);
-  const noun = reports.length === 1 ? 'entity' : 'entities';
-  return `${suiteName}: ${reports.length} ${noun}, estimated total cost: $${lo}–$${hi} (point: $${total.toFixed(2)})`;
+  return `${suiteName}: ${formatCount(reports.length, 'entity', 'entities')}, estimated total cost: $${lo}–$${hi} (point: $${total.toFixed(2)})`;
 }
 
 /** Format a full suite report (header + per-entity lines). */
