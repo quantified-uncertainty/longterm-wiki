@@ -305,12 +305,15 @@ export async function fetchBulkItems(url, itemsKey, opts = {}) {
 export async function fetchPaginatedItems(url, itemsKey, opts = {}) {
   const {
     pageSize = 200,
-    timeoutMs = 60_000,
+    timeoutMs = 30_000,
     attempts = 3,
     headers,
     fetchImpl,
     sleepImpl,
   } = opts;
+  if (!Number.isInteger(pageSize) || pageSize <= 0) {
+    return { ok: false, reason: `invalid pageSize: ${pageSize}` };
+  }
   const sep = url.includes('?') ? '&' : '?';
   const allItems = [];
   let offset = 0;

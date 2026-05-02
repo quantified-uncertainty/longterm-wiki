@@ -816,4 +816,24 @@ describe('fetchPaginatedItems — QUA-1000 per-page timeout regression', () => {
     expect(seenHeaders[0]).toEqual(customHeaders);
     expect(seenHeaders[1]).toEqual(customHeaders);
   });
+
+  it('returns failure for invalid pageSize (zero)', async () => {
+    const result = await fetchPaginatedItems('http://x/api/items/all', 'items', {
+      pageSize: 0,
+      fetchImpl: async () => { throw new Error('should not be called'); },
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/invalid pageSize/);
+  });
+
+  it('returns failure for invalid pageSize (negative)', async () => {
+    const result = await fetchPaginatedItems('http://x/api/items/all', 'items', {
+      pageSize: -1,
+      fetchImpl: async () => { throw new Error('should not be called'); },
+      sleepImpl: noSleep,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/invalid pageSize/);
+  });
 });
