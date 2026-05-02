@@ -127,22 +127,21 @@ async function cmdSync(
   // entity="..." predicate="fli-index-grade" /> renders the live grade.
   // Idempotent: re-runs with unchanged grades produce zero file changes.
   // --no-factbase-mirror skips this step (e.g. when only fetching/scraping).
+  // Best-effort: a wiki-server outage during the mirror does not fail
+  // a successful PG sync — operator can re-run `pnpm crux fb
+  // sync-scorecard-facts` later.
   if (mirrorFactbase) {
-    const { syncScorecardFactsToYaml } = await import(
+    const { runMirrorAfterSync } = await import(
       "../lib/scorecards/factbase-mirror.ts"
     );
-    try {
-      const summary = await syncScorecardFactsToYaml({ dryRun });
-      const factVerb = dryRun ? "would mirror" : "mirrored";
+    const { summary, error } = await runMirrorAfterSync(dryRun);
+    if (summary) {
+      const verb = dryRun ? "would mirror" : "mirrored";
       console.log(
-        `✓ FactBase mirror: ${factVerb} ${summary.entitiesWritten} entit${summary.entitiesWritten === 1 ? "y" : "ies"} (${summary.apiGrades} grades, ${summary.entitiesSkippedNoFbYaml + summary.entitiesSkippedNoSlug} skipped)`,
+        `✓ FactBase mirror: ${verb} ${summary.written} entit${summary.written === 1 ? "y" : "ies"} (${summary.skipped} skipped${summary.removed > 0 ? `, ${summary.removed} stale ${dryRun ? "would be removed" : "removed"}` : ""})`,
       );
-    } catch (err) {
-      // FactBase mirror is best-effort — never fail a successful PG sync.
-      // The wiki-server might be unreachable from CI; the operator can
-      // re-run `pnpm crux fb sync-scorecard-facts` later.
-      const message = err instanceof Error ? err.message : String(err);
-      console.warn(`⚠ FactBase mirror skipped: ${message}`);
+    } else if (error) {
+      console.warn(`⚠ FactBase mirror skipped: ${error}`);
     }
   }
 

@@ -100,32 +100,32 @@ async function fmtiIngestCommand(
 
   // QUA-865: mirror the latest "overall" FMTI grades into FactBase YAML.
   // On by default; --no-factbase-mirror opts out. Idempotent. Best-effort:
-  // failure here doesn't fail the PG sync result.
+  // failure here doesn't fail the PG sync result — mirror errors land in
+  // a separate channel so `result.errors` (which gates the exit code) is
+  // not polluted by a wiki-server outage that's unrelated to FMTI.
   const mirrorFactbase = !(
     options.noFactbaseMirror === true || options["no-factbase-mirror"] === true
   );
   let mirrorSummary: { written: number; skipped: number; removed: number } | null = null;
+  let mirrorError: string | null = null;
   if (mirrorFactbase) {
-    const { syncScorecardFactsToYaml } = await import(
+    const { runMirrorAfterSync } = await import(
       "../lib/scorecards/factbase-mirror.ts"
     );
-    try {
-      const summary = await syncScorecardFactsToYaml({ dryRun });
-      mirrorSummary = {
-        written: summary.entitiesWritten,
-        skipped: summary.entitiesSkippedNoFbYaml + summary.entitiesSkippedNoSlug,
-        removed: summary.removed,
-      };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      result.errors.push(`FactBase mirror skipped: ${message}`);
-    }
+    const result_ = await runMirrorAfterSync(dryRun);
+    mirrorSummary = result_.summary;
+    mirrorError = result_.error;
+    if (mirrorError) console.warn(`⚠ FactBase mirror skipped: ${mirrorError}`);
   }
 
   if (options.ci) {
     return {
       exitCode: result.errors.length ? 1 : 0,
-      output: JSON.stringify({ ...result, factbaseMirror: mirrorSummary }, null, 2),
+      output: JSON.stringify(
+        { ...result, factbaseMirror: mirrorSummary, factbaseMirrorError: mirrorError },
+        null,
+        2,
+      ),
     };
   }
 
@@ -134,7 +134,9 @@ async function fmtiIngestCommand(
     human.output +=
       `\nFactBase mirror: ${dryRun ? "would write" : "wrote"} ${mirrorSummary.written} entit${mirrorSummary.written === 1 ? "y" : "ies"}` +
       (mirrorSummary.skipped > 0 ? `, ${mirrorSummary.skipped} skipped` : "") +
-      (mirrorSummary.removed > 0 ? `, ${mirrorSummary.removed} stale removed` : "") +
+      (mirrorSummary.removed > 0
+        ? `, ${mirrorSummary.removed} stale ${dryRun ? "would be removed" : "removed"}`
+        : "") +
       "\n";
   }
   return human;

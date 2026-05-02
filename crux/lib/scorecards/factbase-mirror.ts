@@ -22,8 +22,8 @@
  * the same way they read every other org-level fact.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, rmSync, readdirSync, statSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, rmSync, rmdirSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import yaml from 'js-yaml';
 import {
   getAllScorecardGrades,
@@ -172,9 +172,8 @@ export function buildFactsByEntity(grades: ApiGrade[]): FactsByEntity {
 export function buildSlugByStableId(entities: EntityWithType[]): Map<string, string> {
   const out = new Map<string, string>();
   for (const e of entities) {
-    const stableId = (e as { stableId?: unknown }).stableId;
-    if (typeof stableId !== 'string') continue;
-    out.set(stableId, e.id);
+    if (typeof e.stableId !== 'string') continue;
+    out.set(e.stableId, e.id);
   }
   return out;
 }
@@ -259,18 +258,22 @@ export function writeScorecardGradesForEntity(
 }
 
 /**
- * Find every existing `<slug>/scorecard-grades.yaml` in the fb-entities
- * directory. Used to clean up files for entities that no longer have
- * scorecard grades (e.g. an org dropped from a wave).
+ * Find every existing managed scorecard-grades.yaml in the fb-entities
+ * directory. Returns `{slug, path}` tuples — used to clean up files for
+ * entities that no longer have scorecard grades (e.g. an org dropped
+ * from a wave). Returns an empty list when the fb-entities directory
+ * doesn't exist.
  */
-export function findExistingManagedFiles(fbEntitiesDir: string): string[] {
+export function findExistingManagedFiles(
+  fbEntitiesDir: string,
+): Array<{ slug: string; path: string }> {
   if (!existsSync(fbEntitiesDir)) return [];
-  const out: string[] = [];
+  const out: Array<{ slug: string; path: string }> = [];
   const entries = readdirSync(fbEntitiesDir, { withFileTypes: true });
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const candidate = join(fbEntitiesDir, entry.name, MANAGED_FILE);
-    if (existsSync(candidate)) out.push(candidate);
+    if (existsSync(candidate)) out.push({ slug: entry.name, path: candidate });
   }
   return out;
 }
@@ -281,15 +284,17 @@ export function findExistingManagedFiles(fbEntitiesDir: string): string[] {
  * moving `entity.yaml` back to `<slug>.yaml` so the clean-up doesn't
  * leave behind a directory with a single file.
  *
+ * `fbEntitiesDir` must be the canonical fb-entities root that contains
+ * `slug` — passed explicitly so this function never silently deletes
+ * outside the expected tree.
+ *
  * Returns true if anything changed.
  */
-export function removeManagedFile(filePath: string): boolean {
+export function removeManagedFile(slug: string, fbEntitiesDir: string): boolean {
+  const dirPath = join(fbEntitiesDir, slug);
+  const filePath = join(dirPath, MANAGED_FILE);
   if (!existsSync(filePath)) return false;
   rmSync(filePath);
-
-  const dirPath = dirname(filePath);
-  const fbEntitiesDir = dirname(dirPath);
-  const slug = dirPath.slice(fbEntitiesDir.length + 1);
 
   // Examine what's left in the entity directory.
   const remaining = readdirSync(dirPath);
@@ -297,9 +302,9 @@ export function removeManagedFile(filePath: string): boolean {
     // Only entity.yaml left — fold back to single-file form.
     const newSingle = join(fbEntitiesDir, `${slug}.yaml`);
     renameSync(join(dirPath, MAIN_FILE), newSingle);
-    rmSync(dirPath, { recursive: true });
+    rmdirSync(dirPath);
   } else if (remaining.length === 0) {
-    rmSync(dirPath, { recursive: true });
+    rmdirSync(dirPath);
   }
 
   return true;
@@ -323,9 +328,9 @@ export interface SyncSummary {
   /** Per-entity outcomes for verbose output. */
   details: Array<{
     slug: string | null;
-    stableId: string;
+    stableId: string | null;
     factCount: number;
-    status: 'written' | 'skipped-no-fb-yaml' | 'skipped-no-slug';
+    status: 'written' | 'skipped-no-fb-yaml' | 'skipped-no-slug' | 'removed';
     path: string | null;
   }>;
 }
@@ -423,17 +428,62 @@ export async function syncScorecardFactsToYaml(
 
   // Clean up stale managed files: any existing scorecard-grades.yaml that
   // wasn't written this run belongs to an entity that no longer has any
-  // scorecard grades (e.g. dropped from latest wave).
-  if (!opts.dryRun) {
-    const existingManaged = findExistingManagedFiles(fbEntitiesDir);
-    for (const filePath of existingManaged) {
-      if (writtenPaths.has(filePath)) continue;
-      removeManagedFile(filePath);
-      summary.removed++;
-    }
+  // scorecard grades (e.g. dropped from latest wave). In dry-run we still
+  // count would-be removals so the operator's preview is accurate.
+  const existingManaged = findExistingManagedFiles(fbEntitiesDir);
+  for (const { slug, path } of existingManaged) {
+    if (writtenPaths.has(path)) continue;
+    if (!opts.dryRun) removeManagedFile(slug, fbEntitiesDir);
+    summary.removed++;
+    summary.details.push({
+      slug,
+      stableId: null,
+      factCount: 0,
+      status: 'removed',
+      path,
+    });
   }
 
   return summary;
+}
+
+// ── Post-sync orchestration helper ─────────────────────────────────────
+
+export interface PostSyncMirrorResult {
+  written: number;
+  skipped: number;
+  removed: number;
+}
+
+/**
+ * Run the FactBase mirror as a post-step of a scorecard ingest. Returns
+ * `{summary, error}` — never throws. Failures are reported as warnings on
+ * the console and surfaced in `error` so the caller can include them in
+ * its CI output without conflating mirror failures with PG-sync failures.
+ *
+ * Both `import-scorecards sync` and `scorecards fmti ingest` call this
+ * with consistent semantics: a wiki-server outage during the mirror does
+ * not fail the PG sync (per QUA-865).
+ */
+export async function runMirrorAfterSync(
+  dryRun: boolean,
+): Promise<{ summary: PostSyncMirrorResult | null; error: string | null }> {
+  try {
+    const summary = await syncScorecardFactsToYaml({ dryRun });
+    return {
+      summary: {
+        written: summary.entitiesWritten,
+        skipped: summary.entitiesSkippedNoFbYaml + summary.entitiesSkippedNoSlug,
+        removed: summary.removed,
+      },
+      error: null,
+    };
+  } catch (err) {
+    return {
+      summary: null,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────
@@ -468,26 +518,29 @@ async function fetchAllOverallGrades(): Promise<ApiGrade[]> {
   return all;
 }
 
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
 /**
- * Render the wave label embedded in `notes:`. Falls back to the raw
- * asOf when the date isn't in a recognized form.
- *   2025-12-02  → "Winter 2025"
+ * Render a human label for the snapshot date, used in the `notes:` field
+ * of each generated fact. Falls back to the raw `asOf` string when the
+ * date isn't in a recognized form.
+ *   2025-12-02  → "December 2025"
  *   2025-10-01  → "October 2025"
  *   2024-06     → "June 2024"
  *   2025        → "2025"
+ *   "garbage"   → "garbage" (fall-through; do not throw)
  */
-function formatWaveLabel(asOf: string): string {
+export function formatWaveLabel(asOf: string): string {
   const m = /^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(asOf);
   if (!m) return asOf;
   const [, yearStr, monthStr] = m;
   const year = Number(yearStr);
   if (!monthStr) return String(year);
   const month = Number(monthStr);
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
-  if (month >= 1 && month <= 12) return `${monthNames[month - 1]} ${year}`;
+  if (month >= 1 && month <= 12) return `${MONTH_NAMES[month - 1]} ${year}`;
   return asOf;
 }
 

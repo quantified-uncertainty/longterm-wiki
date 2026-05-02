@@ -125,6 +125,14 @@ describe('gradeToFact', () => {
     expect(fact).toBeNull();
   });
 
+  it('returns null when scorecardSource is null (left-join hole)', () => {
+    expect(gradeToFact(makeGrade({ scorecardSource: null as unknown as string }))).toBeNull();
+  });
+
+  it('returns null when scorecardSource is empty string', () => {
+    expect(gradeToFact(makeGrade({ scorecardSource: '' }))).toBeNull();
+  });
+
   it('returns null when scoreRaw is empty', () => {
     expect(gradeToFact(makeGrade({ scoreRaw: '' }))).toBeNull();
   });
@@ -399,7 +407,11 @@ describe('removeManagedFile + findExistingManagedFiles', () => {
     writeFileSync(join(tmp, 'c.yaml'), '', 'utf-8');
 
     const found = findExistingManagedFiles(tmp);
-    expect(found).toEqual([join(tmp, 'a', 'scorecard-grades.yaml')]);
+    expect(found).toEqual([{ slug: 'a', path: join(tmp, 'a', 'scorecard-grades.yaml') }]);
+  });
+
+  it('returns [] when the fb-entities directory does not exist', () => {
+    expect(findExistingManagedFiles(join(tmp, 'nonexistent'))).toEqual([]);
   });
 
   it('un-migrates back to single-file form when only entity.yaml is left after removal', () => {
@@ -407,7 +419,7 @@ describe('removeManagedFile + findExistingManagedFiles', () => {
     writeFileSync(join(tmp, 'a', 'entity.yaml'), 'entity: sid_a\n', 'utf-8');
     writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
 
-    const removed = removeManagedFile(join(tmp, 'a', 'scorecard-grades.yaml'));
+    const removed = removeManagedFile('a', tmp);
 
     expect(removed).toBe(true);
     expect(existsSync(join(tmp, 'a'))).toBe(false);
@@ -421,7 +433,7 @@ describe('removeManagedFile + findExistingManagedFiles', () => {
     writeFileSync(join(tmp, 'a', 'extra.yaml'), 'facts: []\n', 'utf-8');
     writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
 
-    removeManagedFile(join(tmp, 'a', 'scorecard-grades.yaml'));
+    removeManagedFile('a', tmp);
 
     expect(existsSync(join(tmp, 'a'))).toBe(true);
     expect(existsSync(join(tmp, 'a', 'entity.yaml'))).toBe(true);
@@ -429,8 +441,18 @@ describe('removeManagedFile + findExistingManagedFiles', () => {
     expect(existsSync(join(tmp, 'a', 'scorecard-grades.yaml'))).toBe(false);
   });
 
-  it('returns false when the file does not exist', () => {
-    expect(removeManagedFile(join(tmp, 'a', 'scorecard-grades.yaml'))).toBe(false);
+  it('removes an empty entity directory if the managed file was its only file', () => {
+    mkdirSync(join(tmp, 'a'));
+    writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
+
+    removeManagedFile('a', tmp);
+
+    expect(existsSync(join(tmp, 'a'))).toBe(false);
+    expect(existsSync(join(tmp, 'a.yaml'))).toBe(false);
+  });
+
+  it('returns false when the managed file does not exist', () => {
+    expect(removeManagedFile('a', tmp)).toBe(false);
   });
 });
 
@@ -617,5 +639,138 @@ describe('syncScorecardFactsToYaml', () => {
     expect(Array.isArray(parsed.facts)).toBe(true);
     expect(parsed.facts).toHaveLength(1);
     expect(parsed.facts[0].property).toBe('fli-index-grade');
+  });
+
+  it('previews would-be removals in dry-run mode without touching the FS', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
+    // Run once live to create a managed file.
+    await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [makeGrade({ entityId: 'sid_anth' })],
+    });
+    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
+
+    // Now dry-run with no grades — the would-be removal must show up in
+    // the summary count but the FS must remain untouched.
+    const summary = await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [],
+      dryRun: true,
+    });
+    expect(summary.removed).toBe(1);
+    expect(summary.details.some((d) => d.status === 'removed' && d.slug === 'anthropic')).toBe(true);
+    // FS unchanged — the managed file is still there.
+    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
+  });
+
+  it('records each removed entity in summary.details', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
+    await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [makeGrade({ entityId: 'sid_anth' })],
+    });
+
+    const summary = await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [],
+    });
+
+    const removedDetail = summary.details.find((d) => d.status === 'removed');
+    expect(removedDetail).toBeDefined();
+    expect(removedDetail!.slug).toBe('anthropic');
+    expect(removedDetail!.path).toBe(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
+  });
+});
+
+describe('formatWaveLabel', () => {
+  it('formats full ISO dates with month name', async () => {
+    const { formatWaveLabel } = await import('../factbase-mirror.ts');
+    expect(formatWaveLabel('2025-12-02')).toBe('December 2025');
+    expect(formatWaveLabel('2025-10-01')).toBe('October 2025');
+  });
+
+  it('formats year-month dates with month name', async () => {
+    const { formatWaveLabel } = await import('../factbase-mirror.ts');
+    expect(formatWaveLabel('2024-06')).toBe('June 2024');
+  });
+
+  it('formats year-only dates as just the year', async () => {
+    const { formatWaveLabel } = await import('../factbase-mirror.ts');
+    expect(formatWaveLabel('2025')).toBe('2025');
+  });
+
+  it('returns the raw asOf when the regex does not match', async () => {
+    const { formatWaveLabel } = await import('../factbase-mirror.ts');
+    expect(formatWaveLabel('not-a-date')).toBe('not-a-date');
+    expect(formatWaveLabel('')).toBe('');
+  });
+
+  it('returns the raw asOf when the month is out of range', async () => {
+    const { formatWaveLabel } = await import('../factbase-mirror.ts');
+    expect(formatWaveLabel('2025-13-01')).toBe('2025-13-01');
+    expect(formatWaveLabel('2025-00')).toBe('2025-00');
+  });
+});
+
+describe('readManagedFile (adversarial inputs)', () => {
+  let tmp: string;
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it('returns [] when the file does not exist', () => {
+    expect(readManagedFile(join(tmp, 'missing.yaml'))).toEqual([]);
+  });
+
+  it('returns [] when the file is empty', () => {
+    const path = join(tmp, 'empty.yaml');
+    writeFileSync(path, '', 'utf-8');
+    expect(readManagedFile(path)).toEqual([]);
+  });
+
+  it('returns [] when the file has no facts key', () => {
+    const path = join(tmp, 'no-facts.yaml');
+    writeFileSync(path, 'entity: sid_x\n', 'utf-8');
+    expect(readManagedFile(path)).toEqual([]);
+  });
+
+  it('returns [] when facts is not an array', () => {
+    const path = join(tmp, 'bad-facts.yaml');
+    writeFileSync(path, 'facts: "not-an-array"\n', 'utf-8');
+    expect(readManagedFile(path)).toEqual([]);
+  });
+
+  it('drops malformed entries via isMirrorFact filter', () => {
+    const path = join(tmp, 'mixed.yaml');
+    // First entry is valid, second is missing required fields, third has wrong types.
+    const content = `facts:
+  - id: f_aaa1234567
+    property: fli-index-grade
+    value: "C+"
+    asOf: "2025-12-02"
+    source: https://example.com
+    notes: "ok"
+  - id: f_bbb1234567
+    # missing other fields
+  - id: 42
+    property: x
+    value: "y"
+    asOf: "2025"
+    source: "u"
+    notes: "n"
+`;
+    writeFileSync(path, content, 'utf-8');
+    const facts = readManagedFile(path);
+    expect(facts).toHaveLength(1);
+    expect(facts[0].id).toBe('f_aaa1234567');
   });
 });
