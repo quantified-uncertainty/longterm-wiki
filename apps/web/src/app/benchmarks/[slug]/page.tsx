@@ -424,7 +424,7 @@ function TestedByCell({
         <span className="text-xs text-muted-foreground/60">—</span>
       )}
       {methodologyNotes && (
-        <details className="inline-block">
+        <details className="relative inline-block">
           <summary
             className="cursor-pointer list-none text-muted-foreground hover:text-foreground transition-colors text-xs select-none"
             title="Show methodology notes"
@@ -432,7 +432,7 @@ function TestedByCell({
           >
             ⓘ
           </summary>
-          <div className="absolute z-10 mt-1 w-72 rounded-md border border-border bg-card p-3 text-xs text-card-foreground shadow-md">
+          <div className="absolute left-0 top-full z-10 mt-1 w-72 rounded-md border border-border bg-card p-3 text-xs text-card-foreground shadow-md">
             <div className="font-semibold mb-1 text-muted-foreground">
               Methodology
             </div>
