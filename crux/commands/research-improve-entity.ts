@@ -17,8 +17,8 @@
 //   - organization  (data/entities/organizations.yaml)
 //
 // Usage:
-//   pnpm crux tb improve-entity fisa-702 --target=15 --budget=2 --max-iters=3
-//   pnpm crux tb improve-entity anthropic --target=10 --max-iters=1
+//   pnpm crux tb improve-entity fisa-702 --target=15
+//   pnpm crux tb improve-entity anthropic --target=10 --max-iters=2 --budget=4
 
 import fs from "node:fs";
 import path from "node:path";
@@ -160,7 +160,7 @@ export interface ImproveOptions {
   target?: number;
   /** Max LLM spend in USD across all iterations. Default 2.0. */
   budgetUsd?: number;
-  /** Max iterations. Default 3. */
+  /** Max iterations. Default 1 (QUA-1033 — most policies converge in 1). */
   maxIters?: number;
   /** When true, don't write YAML back. */
   dryRun?: boolean;
@@ -1076,7 +1076,7 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
   const slug = opts.slug.trim();
   if (!slug) throw new Error("improveSingleEntity: slug is required");
   const target = opts.target ?? 12;
-  const maxIters = opts.maxIters ?? 3;
+  const maxIters = opts.maxIters ?? 1;
   const budgetUsd = opts.budgetUsd ?? 2.0;
   if (!Number.isInteger(target) || target <= 0) {
     throw new Error(`improveSingleEntity: target must be a positive integer; got ${opts.target}`);
@@ -1298,7 +1298,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
     return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]", exitCode: 1 };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
-  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
+  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
   const noWrite = !!options.dryRun;
   const waitForSettle = !!options.waitForSettle;
@@ -1338,7 +1338,7 @@ Options:
                        throws BudgetExhaustedError, exits with reason
                        "budget-exhausted", and the pipeline_runs row is marked
                        aborted with errorCode=budget_exhausted (default: 2.0).
-  --max-iters=N        Max iterations (default: 3)
+  --max-iters=N        Max iterations (default: 1)
   --dry-run            Don't write YAML
   --wait-for-settle    After the main loop exits (target/iters/budget), keep
                        polling any unsettled batches until all claims reach a
