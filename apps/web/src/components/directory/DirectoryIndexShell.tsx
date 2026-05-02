@@ -19,6 +19,11 @@ import { ProfileStatCard } from "./ProfileStatCard";
 
 export interface DirectoryIndexShellStat {
   label: string;
+  /**
+   * Pre-formatted display value. Callers format numbers, currency, dates etc.
+   * before passing them in — the shell does not own formatting (see QUA-1006
+   * for cross-table cell-formatting standardization).
+   */
   value: string;
   sub?: string;
   href?: string;
@@ -83,9 +88,9 @@ export function DirectoryIndexShell({
 
       {stats && stats.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {stats.map((s) => (
+          {stats.map((s, i) => (
             <ProfileStatCard
-              key={s.label}
+              key={`${i}-${s.label}`}
               label={s.label}
               value={s.value}
               sub={s.sub}
