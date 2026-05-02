@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template for ~/Library/LaunchAgents/com.qu.health-monitor.plist (QUA-1048).
+
+  Install via scripts/launchd/health-monitor.sh — the install script fills
+  in the absolute supervisor and home-dir paths before copying.
+
+  Why these keys (mirrored from com.qu.pr-patrol.plist for consistency):
+    KeepAlive       respawn the supervisor on crash. Combined with the
+                    inner while-loop in health-monitor-supervisor.sh, this
+                    gives two layers of recovery.
+    RunAtLoad       start at login + on launchctl load, no manual nudge.
+    ThrottleInterval=30  prevent tight crash loops if something is fundamentally
+                    broken (missing supervisor, missing pnpm, etc.). Matches
+                    the inner sleep so the cadence is consistent.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.qu.health-monitor</string>
+
+    <!--
+      Invoke /bin/bash explicitly rather than relying on the supervisor's
+      shebang. macOS attributes shell-script execution to the kernel-resolved
+      interpreter chain (`/usr/bin/env bash …`), and a Full Disk Access grant
+      on `/bin/bash` does NOT propagate through that chain — the supervisor
+      exits 126 ("Operation not permitted") on every cycle. Spelling bash
+      explicitly here makes /bin/bash the responsible exec, so the FDA grant
+      the install script tells users to add actually applies. See QUA-1004.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__SUPERVISOR__</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/.cache/health-monitor/launchd.out</string>
+
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.cache/health-monitor/launchd.err</string>
+</dict>
+</plist>
