@@ -51,7 +51,12 @@ const BANNED_PATTERNS: { pattern: RegExp; suggest: string; label: string }[] = [
   },
 ];
 
-const ALLOW_MARKER = 'table-formatting-ok';
+export const ALLOW_MARKER = 'table-formatting-ok';
+
+export interface BannedHit {
+  label: string;
+  suggest: string;
+}
 
 interface Violation {
   file: string;
@@ -59,6 +64,25 @@ interface Violation {
   text: string;
   label: string;
   suggest: string;
+}
+
+/**
+ * Pure helper: returns null if `line` is clean, or `{label, suggest}` for the
+ * first banned pattern it matches. Honors the same-line and previous-line
+ * `// table-formatting-ok` marker, plus comment-line skips. Exposed for unit
+ * tests so the matching logic can be exercised without filesystem setup.
+ */
+export function lineHasBannedFormatter(
+  line: string,
+  prevLine: string = '',
+): BannedHit | null {
+  if (isCommentLine(line)) return null;
+  if (line.includes(ALLOW_MARKER)) return null;
+  if (isCommentLine(prevLine) && prevLine.includes(ALLOW_MARKER)) return null;
+  for (const { pattern, suggest, label } of BANNED_PATTERNS) {
+    if (pattern.test(line)) return { label, suggest };
+  }
+  return null;
 }
 
 /** Recursively collect *-table.tsx files under apps/web/src/app, excluding internal/. */
@@ -111,26 +135,15 @@ function checkFile(filePath: string): Violation[] {
   const relPath = relative(PROJECT_ROOT, filePath);
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (isCommentLine(line)) continue;
-
-    // Skip if this line carries an allow marker, or the previous line is a
-    // comment carrying the marker.
-    if (line.includes(ALLOW_MARKER)) continue;
-    const prev = i > 0 ? lines[i - 1] : '';
-    if (isCommentLine(prev) && prev.includes(ALLOW_MARKER)) continue;
-
-    for (const { pattern, suggest, label } of BANNED_PATTERNS) {
-      if (pattern.test(line)) {
-        violations.push({
-          file: relPath,
-          line: i + 1,
-          text: line.trim(),
-          label,
-          suggest,
-        });
-        break;
-      }
+    const hit = lineHasBannedFormatter(lines[i], i > 0 ? lines[i - 1] : '');
+    if (hit) {
+      violations.push({
+        file: relPath,
+        line: i + 1,
+        text: lines[i].trim(),
+        label: hit.label,
+        suggest: hit.suggest,
+      });
     }
   }
 

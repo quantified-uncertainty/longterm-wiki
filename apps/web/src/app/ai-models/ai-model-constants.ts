@@ -28,14 +28,3 @@ export const SAFETY_LEVEL_COLORS: Record<string, string> = {
   "ASL-4":
     "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
-
-/**
- * Format a context window token count for display.
- * Values < 1,000 are shown as plain numbers (e.g., "512").
- * Values >= 1,000 are shown with K/M suffix (e.g., "8K", "128K", "1M").
- */
-export function formatContext(tokens: number): string {
-  if (tokens >= 1_000_000) return `${Math.floor(tokens / 1_000_000)}M`;
-  if (tokens >= 1_000) return `${Math.floor(tokens / 1_000)}K`;
-  return tokens.toLocaleString("en-US");
-}
