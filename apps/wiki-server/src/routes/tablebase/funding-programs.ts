@@ -10,6 +10,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 
@@ -162,6 +163,21 @@ const fundingProgramsApp = new Hono()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every funding program in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(fundingPrograms)
+        .orderBy(desc(fundingPrograms.syncedAt), desc(fundingPrograms.id)),
+      formatRow,
+      routeName: "funding-programs/bulk",
+    });
+    return c.json({ fundingPrograms: rows, total });
   })
 
   // ---- GET /by-org/:orgId ----

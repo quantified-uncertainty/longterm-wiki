@@ -21,6 +21,7 @@ import {
   SyncEntitiesBatchSchema,
 } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { applyAuditContext } from "../../middleware/audit-context.js";
 import {
   buildSearchCondition,
@@ -960,6 +961,33 @@ const entitiesApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({ entities: rows, total, limit, offset });
+  })
+
+  // ---- GET /bulk — all entities, no pagination ----
+  // For build-data and other server-side consumers that need the full list
+  // in one round-trip. UI/dashboard callers stay on GET / (paginated).
+  // QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select({
+          id: entities.id,
+          wikiId: entities.wikiId,
+          stableId: entities.stableId,
+          entityType: entities.entityType,
+          title: entities.title,
+          description: entities.description,
+          website: entities.website,
+          tags: entities.tags,
+          status: entities.status,
+          lastUpdated: entities.lastUpdated,
+        })
+        .from(entities)
+        .orderBy(asc(entities.id)),
+      routeName: "entities/bulk",
+    });
+    return c.json({ entities: rows, total });
   })
 
   // ---- POST /sync ----
