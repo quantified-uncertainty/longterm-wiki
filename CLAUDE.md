@@ -196,6 +196,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 These cover the session lifecycle and the always-applicable conventions. They auto-load on every turn.
 
 - `.claude/rules/agent-session-workflow.md` — Session start/end workflow
+- `.claude/rules/agent-planning-discipline.md` — Multi-week plans require human framing approval, empirical evidence before scope, ≥3 diverse-mandate reviewers (QUA-1045)
 - `.claude/rules/environment-setup.md` — Worktree, LSP, slot ports, wiki-server auto-prod
 - `.claude/rules/github-issue-tracking.md` — Issue tracking (Linear primary, GitHub legacy)
 - `.claude/rules/proactive-github-filing.md` — When/how to file issues (in Linear)
