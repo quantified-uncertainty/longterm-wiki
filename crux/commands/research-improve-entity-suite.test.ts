@@ -436,7 +436,11 @@ describe("runSuite", () => {
     ]);
   });
 
-  it("treats BudgetExhaustedError as skipped_budget and stops dispatching further entities (QUA-1017)", async () => {
+  it("production path: result.reason='budget-exhausted' from improveSingleEntity is recorded as skipped_budget and stops dispatch (QUA-1017)", async () => {
+    // The real path: improveSingleEntity catches BudgetExhaustedError
+    // internally (via doImproveSingleEntity's catch) and converts it into
+    // a graceful return with reason="budget-exhausted". The suite reads
+    // that reason and stops dispatching. This test mirrors that contract.
     const { suitePath, snapshotDir } = writeFixtureSuite(
       { slug: "first", type: "policy" },
       { slug: "burner", type: "policy" },
@@ -448,11 +452,17 @@ describe("runSuite", () => {
       calls.push(slug);
       if (slug === "first") return makeResult(slug);
       if (slug === "burner") {
-        // Simulate the per-entity hard cap firing inside improveSingleEntity.
-        throw new BudgetExhaustedError(2.5, 1.0);
+        // Mirror what doImproveSingleEntity returns after catching
+        // BudgetExhaustedError: reason="budget-exhausted", hit_target=false,
+        // total_cost_usd reflects partial-iteration spend from the live
+        // CostTracker (not the per-iter sum, which would undercount).
+        return makeResult(slug, {
+          reason: "budget-exhausted",
+          hit_target: false,
+          iterations: [],
+          total_cost_usd: 1.85,
+        });
       }
-      // Should never be called — third/fourth must be skipped after the
-      // burner trips the cap.
       throw new Error(`improver should not have been called for ${slug}`);
     };
     const snap = await runSuite({
@@ -467,13 +477,46 @@ describe("runSuite", () => {
     expect(snap.entities).toHaveLength(4);
     expect(snap.entities[0].status).toBe("completed");
     expect(snap.entities[1].status).toBe("skipped_budget");
-    expect(snap.entities[1].error).toMatch(/Spent \$2\.5000 of \$1\.00 budget/);
+    expect(snap.entities[1].error).toMatch(/spent \$1\.8500 of \$/);
     expect(snap.entities[2].status).toBe("skipped_budget");
     expect(snap.entities[2].error).toBeUndefined();
     expect(snap.entities[3].status).toBe("skipped_budget");
     expect(snap.entities[3].error).toBeUndefined();
     expect(snap.aggregate.entities_completed).toBe(1);
     expect(snap.aggregate.entities_skipped_budget).toBe(3);
+    expect(snap.aggregate.entities_failed).toBe(0);
+  });
+
+  it("defensive path: BudgetExhaustedError thrown out of improveSingleEntity is also caught and treated as skipped_budget (QUA-1017)", async () => {
+    // The defensive catch in runSuite — for any future code that re-throws
+    // BudgetExhaustedError after the inner catch (e.g. abort during the
+    // YAML write path). Should produce the same outcome as the production
+    // path above.
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "first", type: "policy" },
+      { slug: "burner", type: "policy" },
+      { slug: "third", type: "policy" },
+    );
+    const calls: string[] = [];
+    const improver = async ({ slug }: { slug: string }) => {
+      calls.push(slug);
+      if (slug === "first") return makeResult(slug);
+      if (slug === "burner") throw new BudgetExhaustedError(2.5, 1.0);
+      throw new Error(`improver should not have been called for ${slug}`);
+    };
+    const snap = await runSuite({
+      tag: "budget-rethrow",
+      totalBudgetUsd: 8.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(calls).toEqual(["first", "burner"]);
+    expect(snap.entities[1].status).toBe("skipped_budget");
+    expect(snap.entities[1].error).toMatch(/Spent \$2\.5000 of \$1\.00 budget/);
+    expect(snap.entities[2].status).toBe("skipped_budget");
+    expect(snap.aggregate.entities_skipped_budget).toBe(2);
     expect(snap.aggregate.entities_failed).toBe(0);
   });
 

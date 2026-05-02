@@ -71,10 +71,12 @@ const SUPPORTED_TYPES = new Set(["policy", "organization"]);
 
 /**
  * Thrown when the live CostTracker total has reached the configured `--budget`
- * cap. Caught by `doImproveSingleEntity` (which converts it to a graceful
- * `reason: "budget-exhausted"` exit so the snapshot/YAML write still happens)
- * and by the suite runner (which records the entity as `skipped_budget` and
- * stops dispatching further entities). QUA-1017.
+ * cap. Always caught by `doImproveSingleEntity`, which converts it to a
+ * graceful `reason: "budget-exhausted"` return so the snapshot/YAML write
+ * still happens for partial work. The suite runner reads that reason from
+ * the result, records the entity as `skipped_budget`, and stops dispatching
+ * further entities. The suite ALSO has a defensive catch for this error in
+ * case a future change re-throws after the inner catch. QUA-1017.
  */
 export class BudgetExhaustedError extends Error {
   readonly spentUsd: number;
@@ -858,6 +860,13 @@ async function runIteration(
     duration_s: 0,
   };
 
+  // Hard-cap guard at the top of the iteration. Throws
+  // BudgetExhaustedError if the live tracker has already reached the
+  // configured budget (caught one frame up by doImproveSingleEntity, which
+  // converts it to a graceful budget-exhausted exit). Doing this before
+  // gapsFor so an aborted iter contributes no log noise. QUA-1017.
+  checkBudgetOrThrow(tracker, budgetUsd);
+
   const gaps = gapsFor(entity);
   m.gaps_identified = gaps.length;
   if (gaps.length === 0) {
@@ -868,8 +877,6 @@ async function runIteration(
   console.log(`[iter ${iter}] gaps: ${gaps.map((g) => g.key).join(", ")}`);
 
   // 1. Discovery — focus on the top 3 gaps' research topics, joined.
-  // Hard-cap guard before the most expensive call in the iteration. QUA-1017.
-  checkBudgetOrThrow(tracker, budgetUsd);
   const topic = gaps.slice(0, 3).map((g) => g.researchTopic).join(" — ");
   const researchBudget = Math.min(0.5, budgetRemainingUsd * 0.2);
   console.log(`[iter ${iter}] research: "${topic.slice(0, 100)}" budget=$${researchBudget.toFixed(2)}`);
@@ -1103,9 +1110,11 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
       noWrite,
       opts,
     });
-    // Hard-cap exits aren't "committed" — the run stopped before completing
-    // its work. Mark the pipeline_runs row accordingly so dashboards distinguish
-    // budget-aborts from successful runs. QUA-1017.
+    // Hard-cap exits aren't "committed" at the run level — the loop stopped
+    // before completing its planned iterations. Any partial work *is* still
+    // written to YAML (saveEntity runs unconditionally), but the pipeline_runs
+    // row reflects the truncation so dashboards can distinguish budget-aborts
+    // from successful runs. QUA-1017.
     if (result.reason === "budget-exhausted") {
       ctx.markStatus("aborted", {
         reason: "budget_exhausted",
@@ -1180,19 +1189,20 @@ async function doImproveSingleEntity(args: {
   let reason = "max-iters";
 
   for (let i = 1; i <= maxIters; i++) {
-    // Hard-cap guard before kicking off a new iteration — cheap, prevents
-    // starting work that will obviously overshoot. QUA-1017.
-    if (tracker.totalCost >= budgetUsd) {
-      reason = "budget-exhausted";
-      break;
-    }
-    let out;
+    // Single budget enforcement path: runIteration's first action is
+    // checkBudgetOrThrow, so a pre-iter short-circuit here is redundant —
+    // we'd just be racing the same condition. Let the throw propagate up
+    // and the catch below handle it uniformly with mid-iteration aborts.
+    // QUA-1017.
+    let out: Awaited<ReturnType<typeof runIteration>>;
     try {
       out = await runIteration(entity, i, budgetUsd, tracker);
     } catch (err) {
       if (err instanceof BudgetExhaustedError) {
-        // The inner loop hit the hard cap mid-iteration. Treat as a clean exit
-        // so we still write the snapshot/YAML for whatever was applied.
+        // The inner loop hit the hard cap (either at iteration start or
+        // mid-flight after runResearch overshot). Treat as a clean exit so
+        // we still write the snapshot/YAML for whatever was applied in
+        // earlier iterations.
         console.warn(
           `[iter ${i}] budget exhausted: ${err.message}. Stopping after this iteration's partial work.`,
         );
@@ -1254,7 +1264,13 @@ async function doImproveSingleEntity(args: {
     iterations,
     final_coverage: finalCov.score,
     final_facts: finalCov.facts_in_yaml,
-    total_cost_usd: iterations.reduce((s, m) => s + m.cost_research_usd + m.cost_extract_usd, 0),
+    // Source from the live CostTracker rather than summing per-iteration
+    // metrics: an iteration that aborts mid-flight via BudgetExhaustedError
+    // never reaches `iterations.push(out.metrics)`, so the per-iter sum would
+    // undercount any spend incurred before the throw. tracker.totalCost
+    // captures every streamingCreate-recorded cost plus the perplexity
+    // recordExternalCost calls inside research-agent. QUA-1017.
+    total_cost_usd: tracker.totalCost,
     total_duration_s: (Date.now() - t0) / 1000,
     hit_target: hitTarget,
     reason,

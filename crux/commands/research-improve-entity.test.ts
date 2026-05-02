@@ -568,22 +568,10 @@ describe("checkBudgetOrThrow", () => {
    */
   function trackerWithCost(usd: number): CostTracker {
     const t = new CostTracker();
-    if (usd > 0) {
-      // record() expects token usage and computes cost via pricing.ts. We
-      // bypass that and push synthetic entries since the tests only care
-      // about totalCost. Double-cast through unknown is intentional — the
-      // entries array is readonly but vitest unit tests need direct seeding.
-      (t.entries as unknown as Array<unknown>).push({
-        model: "test",
-        inputTokens: 0,
-        outputTokens: 0,
-        cacheCreationInputTokens: 0,
-        cacheReadInputTokens: 0,
-        cost: usd,
-        label: "test",
-        timestamp: Date.now(),
-      });
-    }
+    // recordExternalCost is the public API for entries that don't come from a
+    // streamingCreate response (used in production for Perplexity calls). Keeps
+    // the test inside the tracker's typed surface — no readonly bypasses.
+    if (usd > 0) t.recordExternalCost("test-model", usd, "test");
     return t;
   }
 

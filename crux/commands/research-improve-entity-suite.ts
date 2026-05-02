@@ -283,10 +283,11 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
-    // Per-entity soft cap: 2× the equal-share allocation. The inner loop's
-    // own budget guard runs *between* iterations, so a single iteration that
-    // overshoots the cap is allowed to complete — see `improveSingleEntity`.
-    // The post-iter warning below catches actual cap-hits.
+    // Per-entity hard cap (QUA-1017): 2× the equal-share allocation. Enforced
+    // by the live CostTracker inside improveSingleEntity — every
+    // streamingCreate-bearing call runs `checkBudgetOrThrow` first, and a
+    // BudgetExhaustedError is converted to `reason="budget-exhausted"` so the
+    // suite can act on it via the result-reason check below.
     const entityBudget = Math.min(perEntityCap, remaining);
     console.log(
       `\n=== [${records.length + 1}/${N}] improve-entity-suite: ${entry.slug} ` +
@@ -301,6 +302,27 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         dryRun: opts.dryRun,
         quiet: true,
       });
+      // Per-entity hard cap (QUA-1017): improveSingleEntity catches its own
+      // BudgetExhaustedError and converts it to a graceful return with
+      // `reason="budget-exhausted"` (preserving partial-progress YAML write).
+      // The suite reads that reason here, records the entity as
+      // `skipped_budget` instead of `completed`, and breaks the dispatch loop.
+      // Cost is taken from result.total_cost_usd, which the entity computes
+      // from its live CostTracker so partial-iteration spend is accounted for.
+      if (result.reason === "budget-exhausted") {
+        console.warn(
+          `[suite] BUDGET-EXHAUSTED: ${entry.slug} spent $${result.total_cost_usd.toFixed(4)}; stopping suite`,
+        );
+        records.push(
+          emptyRecord(
+            entry,
+            "skipped_budget",
+            `entity hit hard cap mid-iteration: spent $${result.total_cost_usd.toFixed(4)} of $${entityBudget.toFixed(2)}`,
+          ),
+        );
+        totalSpent += result.total_cost_usd;
+        break;
+      }
       const record = aggregateResult(entry.slug, entry.type, result);
       records.push(record);
       totalSpent += result.total_cost_usd;
@@ -312,13 +334,13 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      // BudgetExhaustedError from the per-entity hard cap (QUA-1017): the
-      // entity hit its budget mid-iteration and aborted. Record as
-      // `skipped_budget` (the budget signal, not a real failure) and stop
-      // dispatching further entities — the suite's totalSpent has already
-      // consumed the per-entity allowance.
+      // Defensive: BudgetExhaustedError from improveSingleEntity is normally
+      // caught inside doImproveSingleEntity and surfaced via
+      // result.reason="budget-exhausted" above. This branch only fires if a
+      // future change re-throws (e.g. the abort happened during the YAML write
+      // path after the catch). Treat it as a budget signal, not a failure.
       if (err instanceof BudgetExhaustedError) {
-        console.warn(`[suite] BUDGET-EXHAUSTED: ${entry.slug}: ${msg}; stopping suite`);
+        console.warn(`[suite] BUDGET-EXHAUSTED (re-thrown): ${entry.slug}: ${msg}; stopping suite`);
         records.push(emptyRecord(entry, "skipped_budget", msg));
         totalSpent += err.spentUsd;
         break;
