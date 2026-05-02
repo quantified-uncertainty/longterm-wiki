@@ -1218,3 +1218,51 @@ properties:
     display:
       divisor: 0.01
       suffix: "%"
+
+  # ── Scorecards (auto-mirrored from PG, QUA-865) ────────────────
+  # One predicate per external scorecard source. Value is the raw
+  # "overall" grade string from the source (letter, percent, or score)
+  # and asOf is the snapshot's published date. Facts are written by
+  # `pnpm crux fb sync-scorecard-facts` into per-entity directories
+  # (`fb-entities/<slug>/scorecard-grades.yaml`); do not edit those
+  # files by hand.
+
+  fli-index-grade:
+    name: FLI AI Safety Index — Grade
+    description: "Overall letter grade from the FLI AI Safety Index (Future of Life Institute). Latest published wave only."
+    dataType: text
+    category: scorecards
+    temporal: true
+    appliesTo: [organization]
+
+  saferai-grade:
+    name: SaferAI Ratings — Overall Score
+    description: "Overall score from SaferAI Ratings (percent). Latest published wave only."
+    dataType: text
+    category: scorecards
+    temporal: true
+    appliesTo: [organization]
+
+  ailabwatch-grade:
+    name: AI Lab Watch — Grade
+    description: "Overall letter grade from AI Lab Watch. The source was frozen September 2025 — facts represent the final snapshot."
+    dataType: text
+    category: scorecards
+    temporal: true
+    appliesTo: [organization]
+
+  fmti-grade:
+    name: Stanford FMTI — Overall Score
+    description: "Overall score from the Stanford Foundation Model Transparency Index (out of 100). Latest published wave only."
+    dataType: text
+    category: scorecards
+    temporal: true
+    appliesTo: [organization]
+
+  seoul-tracker-grade:
+    name: Seoul Commitment Tracker — Score
+    description: "Overall score from The Midas Project's Seoul Commitment Tracker. Latest published wave only."
+    dataType: text
+    category: scorecards
+    temporal: true
+    appliesTo: [organization]

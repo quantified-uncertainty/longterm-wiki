@@ -298,3 +298,45 @@ revenue grew 300% in seven months
 Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" /> revenue
 vs OpenAI's ≈<Calc expr="{openai.valuation} / {openai.revenue}" precision={0} suffix="x" />
 ```
+
+## Scorecard grades (auto-mirrored from PG)
+
+External scorecard "overall" grades are mirrored into FactBase from the
+`scorecard_grades` PG table by `pnpm crux fb sync-scorecard-facts`
+(QUA-865). One predicate per source — value is the raw score string
+(letter, percent, or "X/100") and `asOf` is the snapshot's published date.
+
+| Predicate | Source | Example value |
+|-----------|--------|---------------|
+| `fli-index-grade` | FLI AI Safety Index | `C+` |
+| `saferai-grade` | SaferAI Ratings | `34%` |
+| `ailabwatch-grade` | AI Lab Watch (frozen Sept 2025) | `28%` |
+| `fmti-grade` | Stanford FMTI | `46/100` |
+| `seoul-tracker-grade` | Seoul Commitment Tracker | `Fulfilled` |
+
+Embed in MDX the same way as any other fact:
+
+```jsx
+Anthropic's most recent FLI grade: <FBF entity="anthropic" property="fli-index-grade" showDate />
+{/* → "C+ (as of 2025-12-02)" */}
+```
+
+```jsx
+Latest scores across all five trackers:
+- FLI: <FBF entity="anthropic" property="fli-index-grade" />
+- SaferAI: <FBF entity="anthropic" property="saferai-grade" />
+- FMTI: <FBF entity="anthropic" property="fmti-grade" />
+- AI Lab Watch: <FBF entity="anthropic" property="ailabwatch-grade" />
+- Seoul Commitment Tracker: <FBF entity="anthropic" property="seoul-tracker-grade" />
+```
+
+The mirror is run automatically after `pnpm crux tb import-scorecards sync`
+(and after `pnpm crux scorecards fmti ingest`); pass
+`--no-factbase-mirror` to skip when running in CI without wiki-server
+access. To run by hand: `pnpm crux fb sync-scorecard-facts`.
+
+Mirrored files live at `packages/factbase/data/fb-entities/<slug>/scorecard-grades.yaml`
+with a "do not edit by hand" header — re-running the sync rewrites them
+in place. When an entity has no other per-entity files in its directory,
+removing the scorecard file folds the directory back to the original
+`<slug>.yaml` form.

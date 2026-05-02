@@ -16,13 +16,28 @@ type RpcClient = ReturnType<typeof hc<ScorecardGradesRoute>>;
 export type ScorecardGradesAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
 export type ScorecardGradesSyncResult = SyncResponse;
 
-/** Fetch all scorecard-grades rows with pagination. */
+/** Fetch all scorecard-grades rows with pagination + optional filters. */
 export async function getAllScorecardGrades(
-  options?: { limit?: number; offset?: number },
+  options?: {
+    limit?: number;
+    offset?: number;
+    snapshotId?: string;
+    entityId?: string;
+    scorecardSource?: string;
+    /** Filter to grades whose snapshot has `is_latest=true`. */
+    latest?: boolean;
+    /** Filter to dimension_slug='overall' (the per-org rollup row). */
+    overall?: boolean;
+  },
 ): Promise<ApiResult<ScorecardGradesAllResult>> {
   const params = new URLSearchParams();
   if (options?.limit != null) params.set('limit', String(options.limit));
   if (options?.offset != null) params.set('offset', String(options.offset));
+  if (options?.snapshotId) params.set('snapshotId', options.snapshotId);
+  if (options?.entityId) params.set('entityId', options.entityId);
+  if (options?.scorecardSource) params.set('scorecardSource', options.scorecardSource);
+  if (options?.latest != null) params.set('latest', String(options.latest));
+  if (options?.overall != null) params.set('overall', String(options.overall));
   const qs = params.toString();
   return apiRequest<ScorecardGradesAllResult>(
     'GET',

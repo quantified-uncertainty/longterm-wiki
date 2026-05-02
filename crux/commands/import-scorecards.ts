@@ -18,8 +18,13 @@
  *   pnpm crux tb import-scorecards analyze --source=fli_index
  *   pnpm crux tb import-scorecards sync --dry-run         # all, no writes
  *   pnpm crux tb import-scorecards sync --source=saferai
+ *   pnpm crux tb import-scorecards sync --no-factbase-mirror   # skip QUA-865 yaml mirror
  *   pnpm crux tb import-scorecards fetch --source=fli_index --wave=summer-2025
  *   pnpm crux tb import-scorecards extract --source=fli_index --wave=summer-2025
+ *
+ * QUA-865: `sync` runs `pnpm crux fb sync-scorecard-facts` after the PG sync
+ * to mirror "overall" grades into FactBase YAML. Pass `--no-factbase-mirror`
+ * to skip — useful in CI where the wiki-server isn't reachable.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
@@ -97,6 +102,7 @@ async function cmdSync(
   dryRun: boolean,
   sourceFilter: string | undefined,
   verbose: boolean,
+  mirrorFactbase: boolean,
 ): Promise<CommandResult> {
   const sources = pickSources(sourceFilter);
   const ctx = buildOrgResolver();
@@ -114,6 +120,29 @@ async function cmdSync(
       const message = err instanceof Error ? err.message : String(err);
       console.error(`✗ ${adapter.name}: ${message}`);
       return { exitCode: 1 };
+    }
+  }
+
+  // QUA-865: mirror "overall" grades into FactBase YAML so <FBF
+  // entity="..." predicate="fli-index-grade" /> renders the live grade.
+  // Idempotent: re-runs with unchanged grades produce zero file changes.
+  // --no-factbase-mirror skips this step (e.g. when only fetching/scraping).
+  if (mirrorFactbase) {
+    const { syncScorecardFactsToYaml } = await import(
+      "../lib/scorecards/factbase-mirror.ts"
+    );
+    try {
+      const summary = await syncScorecardFactsToYaml({ dryRun });
+      const factVerb = dryRun ? "would mirror" : "mirrored";
+      console.log(
+        `✓ FactBase mirror: ${factVerb} ${summary.entitiesWritten} entit${summary.entitiesWritten === 1 ? "y" : "ies"} (${summary.apiGrades} grades, ${summary.entitiesSkippedNoFbYaml + summary.entitiesSkippedNoSlug} skipped)`,
+      );
+    } catch (err) {
+      // FactBase mirror is best-effort — never fail a successful PG sync.
+      // The wiki-server might be unreachable from CI; the operator can
+      // re-run `pnpm crux fb sync-scorecard-facts` later.
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`⚠ FactBase mirror skipped: ${message}`);
     }
   }
 
@@ -233,7 +262,12 @@ async function syncCommand(
   const dryRun = !!options.dryRun || !!options["dry-run"];
   const verbose = !!options.verbose;
   const sourceFilter = (options.source as string) || undefined;
-  return cmdSync(dryRun, sourceFilter, verbose);
+  // QUA-865: factbase mirror is on by default; --no-factbase-mirror opts out.
+  const mirrorFactbase = !(
+    options.noFactbaseMirror === true ||
+    options["no-factbase-mirror"] === true
+  );
+  return cmdSync(dryRun, sourceFilter, verbose, mirrorFactbase);
 }
 
 async function listCommand(

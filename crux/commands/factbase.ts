@@ -24,6 +24,7 @@ import { commands as backfillSourcesCommands } from './factbase-backfill-sources
 import { commands as resourceUnverifiablesCommands } from './factbase-resource-unverifiables.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { commands as verdictsCommands } from './factbase-verdicts.ts';
+import { commands as syncScorecardFactsCommands } from './factbase-sync-scorecard-facts.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
 import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/factbase-loader.ts';
@@ -1191,6 +1192,8 @@ export const commands = {
   'migrate-entities-status': migrateEntitiesCommands.status,
   // QUA-930: FactBase-scoped wrapper around POST /api/sourcing/cleanup-orphans
   'verdicts': verdictsCommands.default,
+  // QUA-865: mirror scorecard "overall" grades into FactBase YAML
+  'sync-scorecard-facts': syncScorecardFactsCommands['sync-scorecard-facts'],
 };
 
 export function getHelp(): string {
@@ -1221,6 +1224,7 @@ Commands:
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
   verdicts prune-orphans        Delete orphan fact verdicts (QUA-930) [--apply]
+  sync-scorecard-facts          Mirror scorecard "overall" grades into FactBase YAML (QUA-865) [--dry-run] [--json]
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)

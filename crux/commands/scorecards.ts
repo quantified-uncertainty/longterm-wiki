@@ -27,6 +27,9 @@ interface CommandOptions extends BaseOptions {
   dryRun?: boolean;
   ensureStubs?: boolean;
   ci?: boolean;
+  /** QUA-865: skip the post-ingest FactBase YAML mirror (on by default). */
+  noFactbaseMirror?: boolean;
+  "no-factbase-mirror"?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -95,11 +98,46 @@ async function fmtiIngestCommand(
     ensureStubEntities: !!options.ensureStubs,
   });
 
-  if (options.ci) {
-    return { exitCode: result.errors.length ? 1 : 0, output: JSON.stringify(result, null, 2) };
+  // QUA-865: mirror the latest "overall" FMTI grades into FactBase YAML.
+  // On by default; --no-factbase-mirror opts out. Idempotent. Best-effort:
+  // failure here doesn't fail the PG sync result.
+  const mirrorFactbase = !(
+    options.noFactbaseMirror === true || options["no-factbase-mirror"] === true
+  );
+  let mirrorSummary: { written: number; skipped: number; removed: number } | null = null;
+  if (mirrorFactbase) {
+    const { syncScorecardFactsToYaml } = await import(
+      "../lib/scorecards/factbase-mirror.ts"
+    );
+    try {
+      const summary = await syncScorecardFactsToYaml({ dryRun });
+      mirrorSummary = {
+        written: summary.entitiesWritten,
+        skipped: summary.entitiesSkippedNoFbYaml + summary.entitiesSkippedNoSlug,
+        removed: summary.removed,
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      result.errors.push(`FactBase mirror skipped: ${message}`);
+    }
   }
 
-  return formatHumanReadable(result, dryRun);
+  if (options.ci) {
+    return {
+      exitCode: result.errors.length ? 1 : 0,
+      output: JSON.stringify({ ...result, factbaseMirror: mirrorSummary }, null, 2),
+    };
+  }
+
+  const human = formatHumanReadable(result, dryRun);
+  if (mirrorSummary) {
+    human.output +=
+      `\nFactBase mirror: ${dryRun ? "would write" : "wrote"} ${mirrorSummary.written} entit${mirrorSummary.written === 1 ? "y" : "ies"}` +
+      (mirrorSummary.skipped > 0 ? `, ${mirrorSummary.skipped} skipped` : "") +
+      (mirrorSummary.removed > 0 ? `, ${mirrorSummary.removed} stale removed` : "") +
+      "\n";
+  }
+  return human;
 }
 
 function formatHumanReadable(result: IngestResult, dryRun: boolean): CommandResult {
