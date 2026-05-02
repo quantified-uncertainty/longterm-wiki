@@ -54,6 +54,26 @@ export const MIN_USEFUL_BUDGET_USD = 0.05;
 export const DEFAULT_PER_ENTITY_BUDGET_USD = 2.0;
 
 /**
+ * Compute the CLI default `--budget` value: load the suite, count supported
+ * entities, multiply by {@link DEFAULT_PER_ENTITY_BUDGET_USD}. Pure and
+ * exported so the CLI's default-computation path is unit-testable without
+ * having to drive `run()` end-to-end.
+ *
+ * Throws if the suite has zero supported entities — the CLI catches this
+ * and surfaces a friendlier message than "--budget must be a positive number".
+ */
+export function computeDefaultTotalBudgetUsd(suitePath?: string): {
+  totalBudgetUsd: number;
+  supportedCount: number;
+} {
+  const supportedCount = filterToSupportedTypes(loadSuite(suitePath)).length;
+  return {
+    totalBudgetUsd: DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount,
+    supportedCount,
+  };
+}
+
+/**
  * Tag flows into the snapshot filename. Reject anything that could escape
  * the snapshot dir (path separators, traversal sequences) or cause shell /
  * filesystem surprises. Allowlist matches typical labels: alphanumeric,
@@ -356,7 +376,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=$N] [--max-iters=N] [--target=N] [--dry-run]",
+        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run]",
       exitCode: 1,
     };
   }
@@ -368,20 +388,29 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
     };
   }
   // QUA-1033: default is $2 × N supported entities (computed at runtime), not
-  // a flat $10. We load the suite once here to count supported entities so the
-  // default scales with suite size; the explicit `--budget` flag still wins.
+  // a flat $10. The default scales with suite size; the explicit `--budget`
+  // flag still wins. Helper is `computeDefaultTotalBudgetUsd` so the path is
+  // unit-testable independently from the rest of `run()`.
   let totalBudgetUsd: number;
   if (options.budget != null) {
     totalBudgetUsd = parseFloat(options.budget as string);
   } else {
-    let supportedCount: number;
+    let computed: { totalBudgetUsd: number; supportedCount: number };
     try {
-      supportedCount = filterToSupportedTypes(loadSuite()).length;
+      computed = computeDefaultTotalBudgetUsd();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       return { output: `Failed to load suite for default budget: ${msg}`, exitCode: 1 };
     }
-    totalBudgetUsd = DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount;
+    if (computed.supportedCount === 0) {
+      return {
+        output:
+          "Suite has no supported entities (only `policy` is supported in v1). " +
+          "Either add a policy entry to crux/benchmarks/entity-suite.yaml, or pass --budget=N explicitly.",
+        exitCode: 1,
+      };
+    }
+    totalBudgetUsd = computed.totalBudgetUsd;
   }
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
@@ -433,7 +462,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity-suite --tag=<label> [--budget=$N] [--max-iters=N] [--target=N] [--dry-run]
+    output: `crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run]
 
 Run the closed-loop improve-entity over every supported entity in
 crux/benchmarks/entity-suite.yaml. Produces a structured snapshot under

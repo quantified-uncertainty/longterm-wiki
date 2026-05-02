@@ -17,8 +17,8 @@
 //   - organization  (data/entities/organizations.yaml)
 //
 // Usage:
-//   pnpm crux tb improve-entity fisa-702 --target=15 --budget=2 --max-iters=1
-//   pnpm crux tb improve-entity anthropic --target=10 --max-iters=2
+//   pnpm crux tb improve-entity fisa-702 --target=15
+//   pnpm crux tb improve-entity anthropic --target=10 --max-iters=2 --budget=4
 
 import fs from "node:fs";
 import path from "node:path";
@@ -1190,7 +1190,7 @@ async function doImproveSingleEntity(args: {
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N] [--wait-for-settle]", exitCode: 1 };
+    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle]", exitCode: 1 };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;

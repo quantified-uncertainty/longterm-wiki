@@ -17,6 +17,7 @@ import {
   MIN_USEFUL_BUDGET_USD,
   aggregateResult,
   computeAggregate,
+  computeDefaultTotalBudgetUsd,
   computePerEntityCap,
   filterToSupportedTypes,
   isValidTag,
@@ -546,5 +547,35 @@ describe("constants", () => {
     expect(snap.budget_usd).toBe(4.0);
     expect(snap.per_entity_cap_usd).toBeCloseTo(4.0, 6); // (4/2)*2
     expect(budgetsSeen).toEqual([4.0, 4.0]);
+  });
+});
+
+// ── computeDefaultTotalBudgetUsd (CLI default-budget path) ──────────────────
+
+describe("computeDefaultTotalBudgetUsd", () => {
+  it("multiplies DEFAULT_PER_ENTITY_BUDGET_USD by the count of supported entities only", () => {
+    // 3 policies + 1 organization (organization is not supported in v1).
+    const { suitePath } = writeFixtureSuite(
+      { slug: "p1", type: "policy" },
+      { slug: "p2", type: "policy" },
+      { slug: "p3", type: "policy" },
+      { slug: "org", type: "organization" },
+    );
+    const r = computeDefaultTotalBudgetUsd(suitePath);
+    expect(r.supportedCount).toBe(3);
+    expect(r.totalBudgetUsd).toBeCloseTo(DEFAULT_PER_ENTITY_BUDGET_USD * 3, 6);
+  });
+
+  it("returns 0 supported and 0 total when the suite has no supported types", () => {
+    // CLI uses the supportedCount=0 signal to return a friendly error rather
+    // than a misleading "--budget must be a positive number".
+    const { suitePath } = writeFixtureSuite({ slug: "x", type: "organization" });
+    const r = computeDefaultTotalBudgetUsd(suitePath);
+    expect(r.supportedCount).toBe(0);
+    expect(r.totalBudgetUsd).toBe(0);
+  });
+
+  it("propagates loadSuite errors (e.g. missing file)", () => {
+    expect(() => computeDefaultTotalBudgetUsd("/nonexistent/path/suite.yaml")).toThrow();
   });
 });
