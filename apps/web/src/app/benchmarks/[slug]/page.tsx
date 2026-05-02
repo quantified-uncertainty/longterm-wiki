@@ -393,18 +393,24 @@ function TestedByCell({
   testedByOrgName: string | null;
   methodologyNotes: string | null;
 }) {
-  // "unknown" / null collapse to em-dash so the column visually opts out
-  // for rows that don't have provenance, even when the table is showing it
-  // for siblings that do.
-  const showChip = testedBy && testedBy !== "unknown";
+  // "unknown"/null with no resolved org → em-dash. We still render the chip
+  // when only testedByOrgId resolves (org-only ingester case), since the
+  // hasProvenance gate already includes that as a trigger.
+  const showChip =
+    (testedBy && testedBy !== "unknown") || Boolean(testedByOrgName);
   const label = showChip
-    ? testedByOrgName ?? formatTestedBy(testedBy)
+    ? testedByOrgName ?? (testedBy ? formatTestedBy(testedBy) : null)
     : null;
+  // Only link when the org actually resolved to an entity (testedByOrgName
+  // is set by the merge function only when entityById.get(testedByOrgId)
+  // returns a hit). Linking on raw testedByOrgId would 404 for stale or
+  // not-yet-imported orgs.
+  const linkable = label && testedByOrgId && testedByOrgName;
 
   return (
     <div className="flex items-center gap-1.5">
       {label ? (
-        testedByOrgId ? (
+        linkable ? (
           <Link
             href={`/organizations/${testedByOrgId}`}
             className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
