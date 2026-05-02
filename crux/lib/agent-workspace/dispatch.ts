@@ -519,6 +519,119 @@ export function findResultEvent(events: EventSummary[]): EventSummary | null {
 }
 
 /**
+ * Sleep helper for poll loops. Extracted so tests can substitute a fake clock.
+ * Production callers pass `setTimeout` directly via the optional `wait` param.
+ */
+type WaitFn = (ms: number) => Promise<void>;
+const realWait: WaitFn = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Format the operator-facing warning that fires when ANTHROPIC_API_KEY is set
+ * in the parent env. The strip itself happens in `prepareClaudeSpawnEnv`; this
+ * helper produces the alarm-bell line so a successful dispatch leaves a trail
+ * an operator can see (per QUA-1010 patrol pattern). Returns `null` when no
+ * warning is needed.
+ *
+ * The warning lives here (not at the spawn site) because dispatch is async
+ * and the spawn site logs nowhere visible — we want the message to land in the
+ * `dispatchCmd` user-facing output.
+ */
+export function formatApiKeyWarning(env: NodeJS.ProcessEnv): string | null {
+  const apiKeyName = 'ANTHROPIC_API_KEY'; // anthropic-billing-key-remap-ok
+  if (!env[apiKeyName]) return null;
+  return (
+    `⚠ ${apiKeyName} was set in dispatch env — stripping it before spawning ` +
+    `claude so the OAuth subscription is used (see QUA-1010/QUA-1057). ` +
+    `Unset the key to silence this warning.`
+  );
+}
+
+/** Decoded early-error pulled out of the dispatched worker's first events. */
+export interface EarlyDispatchError {
+  /** Human-readable message lifted from the result event (`result` field). */
+  message: string;
+  /** API status code if present (`api_error_status`). */
+  status?: number;
+}
+
+export interface PollForEarlyDispatchErrorOptions {
+  /** Pid of the spawned worker — used to distinguish "alive, just slow" from "dead, never emitted". */
+  pid: number;
+  /** Total budget for the poll loop in ms. Default: 1000. */
+  deadlineMs?: number;
+  /** Sleep between poll attempts in ms. Default: 100. */
+  intervalMs?: number;
+  /** Replaceable timer for tests. Default: real setTimeout. */
+  wait?: WaitFn;
+}
+
+/**
+ * Briefly poll the events file for an early failure of a freshly-spawned worker.
+ *
+ * Three cases:
+ * - Worker emits a `result` event with `is_error: true` (credit-low, auth-fail,
+ *   API-side rejection) → returns the decoded error. This is the original
+ *   QUA-1057 symptom: spawned `claude --print` dies in ~160ms with
+ *   `is_error: true, api_error_status: 400, result: "Credit balance is too low"`.
+ * - Worker writes any non-error event (init, assistant, etc.) → returns null
+ *   immediately. The presence of *any* event proves the worker booted; a
+ *   healthy run is then off the dispatcher's critical path.
+ * - Worker writes nothing at all and the pid is dead by deadline → returns a
+ *   synthetic "exited before emitting any events" error. Catches binary-missing,
+ *   OAuth-expired-with-no-API-fallback, and similar fail-before-stream-init
+ *   modes that QUA-1057's symptom-shaped detector would have missed.
+ * - Worker writes nothing but is still alive at deadline → returns null.
+ *   Slow boots (e.g. MCP servers initializing) shouldn't be flagged as failures.
+ *
+ * Latency: healthy dispatches incur one poll interval (~100ms) before returning
+ * because `claude` writes the `init` event well within the first interval.
+ * Credit-low etc. resolve in ~200ms. Cold-spawn-die cases pay the full deadline.
+ */
+export async function pollForEarlyDispatchError(
+  env: DispatchEnv,
+  eventsFile: string,
+  opts: PollForEarlyDispatchErrorOptions,
+): Promise<EarlyDispatchError | null> {
+  const deadlineMs = opts.deadlineMs ?? 1000;
+  const intervalMs = opts.intervalMs ?? 100;
+  const wait = opts.wait ?? realWait;
+  const start = Date.now();
+  while (Date.now() - start < deadlineMs) {
+    await wait(intervalMs);
+    const raw = env.readFile(eventsFile);
+    if (raw && raw.trim()) {
+      // Worker emitted at least one event — it's alive. If the *last* event is
+      // a terminal error result, surface it; otherwise the worker is making
+      // progress and the dispatcher can return immediately.
+      const result = readFinalResultEvent(env, eventsFile);
+      if (result && result.kind === 'error' && result.raw) {
+        return decodeEarlyError(result.raw as Record<string, unknown>);
+      }
+      return null;
+    }
+  }
+  // Deadline reached with no events. Distinguish "alive but slow boot" (return
+  // null, dispatcher proceeds) from "died before stream-init" (synthetic error).
+  if (!env.pidAlive(opts.pid)) {
+    return {
+      message: 'worker exited before emitting any events (likely auth failure or missing binary — check stderr.log)',
+    };
+  }
+  return null;
+}
+
+/**
+ * Pull the operator-relevant fields out of a stream-json `result` event
+ * payload. Tolerant of missing/wrong-typed fields.
+ */
+function decodeEarlyError(raw: Record<string, unknown>): EarlyDispatchError {
+  const msg = typeof raw.result === 'string' ? raw.result : 'unknown error';
+  const out: EarlyDispatchError = { message: msg };
+  if (typeof raw.api_error_status === 'number') out.status = raw.api_error_status;
+  return out;
+}
+
+/**
  * Read only the final event line from the events file. Used by
  * `finalizeIfComplete` to avoid O(N) re-parsing the whole stream on every
  * dispatch-status call. The `result` event is always the *last* JSON line, so
