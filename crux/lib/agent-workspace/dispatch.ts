@@ -519,6 +519,91 @@ export function findResultEvent(events: EventSummary[]): EventSummary | null {
 }
 
 /**
+ * Sleep helper for poll loops. Extracted so tests can substitute a fake clock.
+ * Production callers pass `setTimeout` directly via the optional `wait` param.
+ */
+type WaitFn = (ms: number) => Promise<void>;
+const realWait: WaitFn = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Format the operator-facing warning that fires when ANTHROPIC_API_KEY is set
+ * in the parent env. The strip itself happens in `prepareClaudeSpawnEnv`; this
+ * helper produces the alarm-bell line so a successful dispatch leaves a trail
+ * an operator can see (per QUA-1010 patrol pattern). Returns `null` when no
+ * warning is needed.
+ *
+ * The warning lives here (not at the spawn site) because dispatch is async
+ * and the spawn site logs nowhere visible — we want the message to land in the
+ * `dispatchCmd` user-facing output.
+ */
+export function formatApiKeyWarning(env: NodeJS.ProcessEnv): string | null {
+  const apiKeyName = 'ANTHROPIC_API_KEY'; // anthropic-billing-key-remap-ok
+  if (!env[apiKeyName]) return null;
+  return (
+    `⚠ ${apiKeyName} was set in dispatch env — stripping it before spawning ` +
+    `claude so the OAuth subscription is used (see QUA-1010/QUA-1057). ` +
+    `Unset the key to silence this warning.`
+  );
+}
+
+/** Decoded early-error pulled out of the dispatched worker's first events. */
+export interface EarlyDispatchError {
+  /** Human-readable message lifted from the result event (`result` field). */
+  message: string;
+  /** API status code if present (`api_error_status`). */
+  status?: number;
+}
+
+export interface PollForEarlyDispatchErrorOptions {
+  /** Total budget for the poll loop in ms. Default: 1000. */
+  deadlineMs?: number;
+  /** Sleep between poll attempts in ms. Default: 100. */
+  intervalMs?: number;
+  /** Replaceable timer for tests. Default: real setTimeout. */
+  wait?: WaitFn;
+}
+
+/**
+ * Briefly poll the events file for an early `result` event with `is_error: true`.
+ *
+ * Catches the credit-low / auth-failure case where the spawned worker dies in
+ * ~160ms with `is_error: true, api_error_status: 400, result: "Credit balance
+ * is too low"` — without this surfacing, the dispatch command returns
+ * "Dispatched to slot aN" successfully and the operator only learns of the
+ * failure by tailing `events.jsonl`. See QUA-1057.
+ *
+ * Returns null if no error is observed before the deadline. Returns the
+ * decoded error otherwise. Healthy workers cost ~100ms of latency on the
+ * happy path (one poll interval); credit-low etc. resolve in ~200ms.
+ */
+export async function pollForEarlyDispatchError(
+  env: DispatchEnv,
+  eventsFile: string,
+  opts: PollForEarlyDispatchErrorOptions = {},
+): Promise<EarlyDispatchError | null> {
+  const deadlineMs = opts.deadlineMs ?? 1000;
+  const intervalMs = opts.intervalMs ?? 100;
+  const wait = opts.wait ?? realWait;
+  const start = Date.now();
+  while (Date.now() - start < deadlineMs) {
+    await wait(intervalMs);
+    const result = readFinalResultEvent(env, eventsFile);
+    if (!result) continue;
+    // Any result event (error or success) means the worker has terminated:
+    // exit the poll early. We only surface the error case to the operator;
+    // a fast successful run just falls through to the normal "Dispatched" path.
+    if (result.kind === 'error' && result.raw) {
+      const raw = result.raw as Record<string, unknown>;
+      const msg = typeof raw.result === 'string' ? (raw.result as string) : 'unknown error';
+      const status = typeof raw.api_error_status === 'number' ? (raw.api_error_status as number) : undefined;
+      return status !== undefined ? { message: msg, status } : { message: msg };
+    }
+    return null;
+  }
+  return null;
+}
+
+/**
  * Read only the final event line from the events file. Used by
  * `finalizeIfComplete` to avoid O(N) re-parsing the whole stream on every
  * dispatch-status call. The `result` event is always the *last* JSON line, so

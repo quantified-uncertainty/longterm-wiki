@@ -20,6 +20,8 @@ import {
   finalizeIfComplete,
   isPermissionMode,
   PERMISSION_MODES,
+  formatApiKeyWarning,
+  pollForEarlyDispatchError,
   type DispatchEnv,
   type RunMeta,
 } from '../dispatch.ts';
@@ -794,5 +796,181 @@ describe('finalizeIfComplete', () => {
     const out = finalizeIfComplete(env, paths, rp, BASE_META);
     expect(out.completedAt).toBeUndefined();
     expect(readCurrent(env, paths)).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatApiKeyWarning + pollForEarlyDispatchError (QUA-1010 / QUA-1057)
+// ---------------------------------------------------------------------------
+
+describe('formatApiKeyWarning', () => {
+  it('returns null when ANTHROPIC_API_KEY is not set', () => {
+    expect(formatApiKeyWarning({})).toBeNull();
+    expect(formatApiKeyWarning({ PATH: '/usr/bin', HOME: '/root' })).toBeNull();
+  });
+
+  it('returns a warning string referencing both QUA tickets when the key is set', () => {
+    const warning = formatApiKeyWarning({ ANTHROPIC_API_KEY: 'sk-ant-api03-test' });
+    expect(warning).not.toBeNull();
+    expect(warning).toContain('ANTHROPIC_API_KEY');
+    expect(warning).toContain('OAuth');
+    // Cross-link both tickets so future-grep can find this codepath.
+    expect(warning).toContain('QUA-1010');
+    expect(warning).toContain('QUA-1057');
+  });
+
+  it('treats an empty-string key as "not set" (matches the operator workaround)', () => {
+    // The documented workaround is `ANTHROPIC_API_KEY="" ./ws dispatch ...`,
+    // which leaves the env var present-but-empty. Empty string is falsy in
+    // `claude` itself (it falls back to OAuth), so the warning should not fire.
+    expect(formatApiKeyWarning({ ANTHROPIC_API_KEY: '' })).toBeNull();
+  });
+});
+
+describe('pollForEarlyDispatchError', () => {
+  /** Synchronous wait shim for the poll loop — yields to the microtask queue. */
+  const noWait = async (_ms: number) => { /* no-op */ };
+
+  it('returns null when no error result has been written before the deadline', async () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    // No events file at all → poll runs to completion and returns null.
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+
+  it('returns null when only non-error events have been written (worker is healthy)', async () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    env.files.set(
+      rp.eventsFile,
+      JSON.stringify({ type: 'system', subtype: 'init', model: 'sonnet' }) + '\n' +
+        JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'working' }] } }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+
+  it('surfaces a credit-low error result with both message and HTTP status', async () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    // The exact shape we observe in events.jsonl when ANTHROPIC_API_KEY has zero credits.
+    env.files.set(
+      rp.eventsFile,
+      JSON.stringify({
+        type: 'result',
+        is_error: true,
+        api_error_status: 400,
+        result: 'Credit balance is too low',
+        duration_ms: 160,
+      }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'Credit balance is too low', status: 400 });
+  });
+
+  it('surfaces an error without status when api_error_status is absent', async () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    env.files.set(
+      rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: true, result: 'something else broke' }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'something else broke' });
+  });
+
+  it('falls back to "unknown error" when the error result has no `result` string', async () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    env.files.set(rp.eventsFile, JSON.stringify({ type: 'result', is_error: true }) + '\n');
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'unknown error' });
+  });
+
+  it('returns null when the result event reports success (is_error: false)', async () => {
+    // A worker that completed successfully in <1s during the poll window
+    // should NOT be flagged as an early error.
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    env.files.set(
+      rp.eventsFile,
+      JSON.stringify({
+        type: 'result',
+        is_error: false,
+        stop_reason: 'end_turn',
+        num_turns: 1,
+        duration_ms: 200,
+        total_cost_usd: 0.01,
+      }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, rp.eventsFile, {
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression: realDispatchEnv must call prepareClaudeSpawnEnv (QUA-1010)
+// ---------------------------------------------------------------------------
+
+describe('realDispatchEnv ANTHROPIC_API_KEY stripping (QUA-1010 / QUA-1057)', () => {
+  it('strips ANTHROPIC_API_KEY from the env passed to the underlying spawn', async () => {
+    // We can't easily mock `child_process.spawn` without a module-level mock,
+    // so instead we exercise the same code path through the helper that
+    // realDispatchEnv uses (`prepareClaudeSpawnEnv`) and assert the contract
+    // that dispatch.ts depends on. This catches the regression of removing
+    // the import or accidentally passing raw `spawnEnv` again.
+    const { prepareClaudeSpawnEnv } = await import('../../claude-cli.ts');
+    const stripped = prepareClaudeSpawnEnv({
+      ANTHROPIC_API_KEY: 'sk-ant-api03-test',
+      CLAUDECODE: '1',
+      PATH: '/usr/bin',
+      TMPDIR: '/tmp/tsx-slot-a3',
+    });
+    expect(stripped.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(stripped.CLAUDECODE).toBeUndefined();
+    expect(stripped.PATH).toBe('/usr/bin');
+    expect(stripped.TMPDIR).toBe('/tmp/tsx-slot-a3');
+  });
+
+  it('source-level: dispatch.ts imports prepareClaudeSpawnEnv from claude-cli', async () => {
+    // Belt-and-braces: if a future refactor accidentally drops the import,
+    // this test fails. Reading the source is cheaper than a module mock.
+    const { readFileSync } = await import('fs');
+    const { fileURLToPath } = await import('url');
+    const here = fileURLToPath(import.meta.url);
+    const dispatchSrc = readFileSync(here.replace(/__tests__\/dispatch\.test\.ts$/, 'dispatch.ts'), 'utf-8');
+    expect(dispatchSrc).toMatch(/import\s*\{\s*prepareClaudeSpawnEnv\s*\}\s*from\s*['"]\.\.\/claude-cli\.ts['"]/);
+    expect(dispatchSrc).toMatch(/env:\s*prepareClaudeSpawnEnv\s*\(/);
   });
 });
