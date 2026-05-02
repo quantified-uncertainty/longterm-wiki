@@ -61,7 +61,7 @@ export function FundingProgramsSection({
                   <td className="py-2 px-3">
                     <span className="font-medium text-foreground text-xs">
                       <Link
-                        href={`/funding-programs/${p.key}`}
+                        href={`/funding-programs/${p.slug ?? p.key}`}
                         className="text-primary hover:underline"
                       >
                         {p.name}

@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords } from "@/data/factbase";
+import { getAllKBRecords, type KBRecordEntry } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
@@ -30,7 +30,18 @@ import { GrantsAwardedSection } from "./program-sections";
 
 export function generateStaticParams() {
   const allPrograms = getAllKBRecords("funding-programs");
-  return allPrograms.map((record) => ({ id: record.key }));
+  return allPrograms.map((record) => ({ id: record.slug ?? record.key }));
+}
+
+// ── Lookup helpers ─────────────────────────────────────────────────────
+
+/** Find a record by slug (preferred) or fall back to legacy 10-char key. */
+function findProgramRecord(idOrSlug: string): KBRecordEntry | undefined {
+  const allPrograms = getAllKBRecords("funding-programs");
+  return (
+    allPrograms.find((r) => r.slug === idOrSlug) ??
+    allPrograms.find((r) => r.key === idOrSlug)
+  );
 }
 
 // ── Metadata ───────────────────────────────────────────────────────────
@@ -41,8 +52,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allPrograms = getAllKBRecords("funding-programs");
-  const record = allPrograms.find((r) => r.key === id);
+  const record = findProgramRecord(id);
   if (!record) {
     return { title: "Funding Program Not Found" };
   }
@@ -62,10 +72,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function FundingProgramDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const allPrograms = getAllKBRecords("funding-programs");
-  const record = allPrograms.find((r) => r.key === id);
+  const record = findProgramRecord(id);
 
   if (!record) return notFound();
+
+  // Legacy URL: `/funding-programs/<10-char-key>` redirects to slug URL.
+  if (record.slug && record.slug !== id && record.key === id) {
+    redirect(`/funding-programs/${record.slug}`);
+  }
 
   const data = loadProgramPageData(record);
   const programVerdict = getRecordVerdict("funding-program", String(data.program.key));

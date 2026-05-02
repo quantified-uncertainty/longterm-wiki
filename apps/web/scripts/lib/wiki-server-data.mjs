@@ -11,6 +11,7 @@
 
 import { createHash } from 'node:crypto';
 import { getServerUrl, getApiKey } from './wiki-server-env.mjs';
+import { assignSlugs as assignRecordSlugs } from './record-slugs.mjs';
 
 // ---------------------------------------------------------------------------
 // Shared ID detection helpers
@@ -1574,7 +1575,15 @@ export async function fetchFactsFromPG() {
   }
 }
 
-export async function mergePGRecordsIntoKB(kb) {
+/**
+ * @param {object} kb - The serialized KB object (mutated).
+ * @param {object} [opts]
+ * @param {Record<string, string>} [opts.stableIdToSlug] - Map of entity stableId → slug, used
+ *   to namespace funding-rounds slugs by their owning company (QUA-908). When omitted,
+ *   funding records still get slugs but cannot be owner-prefixed for collision resolution.
+ */
+export async function mergePGRecordsIntoKB(kb, opts = {}) {
+  const stableIdToSlug = opts.stableIdToSlug ?? {};
   const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
@@ -1867,6 +1876,23 @@ export async function mergePGRecordsIntoKB(kb) {
     () => 'publications',
     publicationRowToRecordEntry,
   );
+
+  // --- Assign URL slugs to funding-programs and funding-rounds (QUA-908) ---
+  // Records' canonical 10-char keys leaked into URLs (`/funding-programs/pJ9oHvQ1Bb`).
+  // Generate human-readable slugs from the record name (and owner-entity slug for
+  // collision resolution). The 10-char key is preserved for verdict lookups and
+  // legacy-URL redirects in [id]/page.tsx.
+  const getOwnerSlug = (stableId) => stableIdToSlug[stableId] ?? null;
+  for (const collection of ['funding-programs', 'funding-rounds']) {
+    const allRecords = [];
+    for (const entityRecords of Object.values(kb.records)) {
+      const list = entityRecords[collection];
+      if (Array.isArray(list)) allRecords.push(...list);
+    }
+    if (allRecords.length > 0) {
+      assignRecordSlugs(allRecords, collection, getOwnerSlug);
+    }
+  }
 
   return {
     personnel: personnelCount,

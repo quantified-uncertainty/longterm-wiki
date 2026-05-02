@@ -13,6 +13,8 @@ import { FP_STATUS_COLORS, PROGRAM_TYPE_LABELS } from "./funding-programs-consta
 
 export interface FundingProgramListRow {
   id: string;
+  /** URL-safe slug used for `/funding-programs/<slug>` (QUA-908). Falls back to id when missing. */
+  slug?: string | null;
   name: string;
   orgId: string;
   orgName: string;
@@ -307,7 +309,7 @@ export function FundingProgramsListTable({
                 <td className="py-2.5 px-3">
                   <span className="flex items-center gap-1.5">
                     <Link
-                      href={`/funding-programs/${row.id}`}
+                      href={`/funding-programs/${row.slug ?? row.id}`}
                       className="font-medium text-foreground hover:text-primary transition-colors"
                     >
                       {row.name}

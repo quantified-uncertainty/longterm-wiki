@@ -421,6 +421,13 @@ export interface FactBaseRecordEntry {
   fields: Record<string, unknown>;
   /** Display name for non-entity participants (when allow_display_name is true) */
   displayName?: string;
+  /**
+   * URL-friendly slug derived from the record's display name. Assigned at
+   * build-time for collections that route on the slug (funding-programs,
+   * funding-rounds — QUA-908). The 10-char `key` remains the canonical
+   * identifier for verdict lookups, React keys, and legacy-URL redirects.
+   */
+  slug?: string;
 }
 
 /**

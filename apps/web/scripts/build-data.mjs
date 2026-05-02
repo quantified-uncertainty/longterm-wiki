@@ -731,7 +731,7 @@ async function main() {
 
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
   if (database.kb && !CONTENT_ONLY) {
-    const pgRecordCounts = await mergePGRecordsIntoKB(database.kb);
+    const pgRecordCounts = await mergePGRecordsIntoKB(database.kb, { stableIdToSlug });
     const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms + pgRecordCounts.divisionPersonnel + pgRecordCounts.entityEvents + pgRecordCounts.entityAssessments + pgRecordCounts.publications;
     if (pgTotal > 0) {
       const parts = [
