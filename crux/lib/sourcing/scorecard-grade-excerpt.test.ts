@@ -66,6 +66,45 @@ describe('findDimensionSection', () => {
     const text = baseHeader + 'governance evaluates how the org';
     expect(findDimensionSection(text, 'GOVERNANCE', 8000)).toBeGreaterThan(0);
   });
+
+  it('requires word boundary before dimension (no substring-of-larger-word matches)', () => {
+    // dimension="Risk" must NOT match inside "lowRisk evaluates the
+    // exposure" — that's a different concept appearing as a suffix of a
+    // compound word. A lookbehind-less regex matches because "Risk
+    // evaluates" is a literal substring; the lookbehind blocks it because
+    // the char before "Risk" ("w") is a word char.
+    const baseHeader = 'header '.repeat(2000);
+    const wrongAnchor = baseHeader + 'lowRisk evaluates the exposure';
+    expect(findDimensionSection(wrongAnchor, 'Risk', 8000)).toBe(-1);
+
+    // Confirm the right anchor still matches (dimension preceded by
+    // non-word char).
+    const rightAnchor = baseHeader + 'Risk evaluates the exposure';
+    expect(findDimensionSection(rightAnchor, 'Risk', 8000)).toBeGreaterThan(0);
+  });
+
+  it('returns the earliest deep-section anchor across all phrasings (not pattern-priority)', () => {
+    // Two phrasings present, with the 'evaluates' anchor EARLIER in the
+    // text than the 'This domain' anchor. We want the earliest one — not
+    // the first match of the most-specific pattern.
+    const baseHeader = 'header '.repeat(2000);
+    const evaluatesPos = baseHeader.length;
+    const text =
+      baseHeader +
+      'Privacy evaluates the controls' +
+      'filler '.repeat(500) +
+      'Privacy This domain summarizes ...';
+    const found = findDimensionSection(text, 'Privacy', 8000);
+    // Should land at the EARLIER anchor (the 'evaluates' phrasing),
+    // not the later 'This domain' one. Order in source text wins.
+    expect(found).toBe(evaluatesPos);
+  });
+
+  it('returns -1 for oversized dimension labels (ReDoS guard)', () => {
+    const huge = 'X'.repeat(500);
+    const text = 'padding '.repeat(2000) + huge + ' This domain evaluates';
+    expect(findDimensionSection(text, huge, 8000)).toBe(-1);
+  });
 });
 
 // ── buildScorecardGradeExcerpt ────────────────────────────────────────
@@ -168,6 +207,46 @@ describe('buildScorecardGradeExcerpt', () => {
     );
     expect(out).toBe(text.slice(0, 30_000));
     // No "omitted" separator since we used the simple path.
-    expect(out).not.toContain('omitted');
+    expect(out).not.toContain('[... omitted: middle of source document ...]');
+  });
+
+  it('treats "Overall Grade" and other "Overall *" variants as overall', () => {
+    const text = 'x'.repeat(50_000);
+    for (const variant of ['Overall', 'Overall Grade', 'Overall Score', 'OVERALL ']) {
+      const out = buildScorecardGradeExcerpt({ dimension: variant }, text, 30_000);
+      expect(out).toBe(text.slice(0, 30_000));
+    }
+  });
+
+  it('coerces numeric dimension labels (e.g., FMTI 4.3 indicators)', () => {
+    const header = 'HEADER '.padEnd(8_000, '.');
+    const padding = 'noise '.repeat(7_000);
+    // FMTI-style: dimension key is numeric, deep section opens with "4.3 evaluates ..."
+    const deep = '4.3 evaluates the regulatory framework';
+    const text = header + padding + deep;
+    const out = buildScorecardGradeExcerpt({ dimension: 4.3 }, text, 30_000);
+    expect(out).toContain('4.3 evaluates');
+    expect(out).toContain('[... omitted: middle of source document ...]');
+  });
+
+  it('header budget scales down with maxLength so it never exceeds 25% of the prompt', () => {
+    // If maxLength shrinks (say, to 20K), the 8K header would consume 40%
+    // of the window. The chooser caps header to maxLength/4 so the deep
+    // section still gets a usable window.
+    const header = 'HEADER '.padEnd(8_000, '.');
+    const padding = 'noise '.repeat(2_000);
+    const deep = 'Risk Assessment This domain evaluates';
+    const text = header + padding + deep;
+
+    // maxLength=20K. Header budget should be min(8000, 5000) = 5000, so
+    // the function looks for the deep section starting at offset 5000+,
+    // which is past the padded header — the deep section sits at ~20K.
+    const out = buildScorecardGradeExcerpt(
+      { dimension: 'Risk Assessment' },
+      text,
+      20_000,
+    );
+    expect(out).toContain('Risk Assessment This domain');
+    expect(out.length).toBeLessThanOrEqual(20_000);
   });
 });

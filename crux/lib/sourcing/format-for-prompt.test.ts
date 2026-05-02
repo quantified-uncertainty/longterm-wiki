@@ -285,7 +285,7 @@ describe('buildRecordSourcingPrompt — scorecard_grade excerpt dispatch', () =>
     // Both header AND the dimension's deep section must be in the prompt.
     expect(prompt).toContain('MAIN_SCORECARD_TABLE');
     expect(prompt).toContain('Existential Safety This domain');
-    expect(prompt).toContain('omitted');
+    expect(prompt).toContain('[... omitted: middle of source document ...]');
   });
 
   it('uses default first-N-chars slice for non-scorecard record types', () => {
@@ -308,7 +308,7 @@ describe('buildRecordSourcingPrompt — scorecard_grade excerpt dispatch', () =>
     const prompt = buildRecordSourcingPrompt(data, 'Grant', sourceText);
     expect(prompt).toContain('EARLY_HEADER');
     expect(prompt).not.toContain('Existential Safety This domain');
-    expect(prompt).not.toContain('omitted');
+    expect(prompt).not.toContain('[... omitted: middle of source document ...]');
   });
 
   it('falls back to first-N slice for scorecard "Overall" rows', () => {
@@ -325,6 +325,6 @@ describe('buildRecordSourcingPrompt — scorecard_grade excerpt dispatch', () =>
     const prompt = buildRecordSourcingPrompt(data, 'Overall claim', sourceText);
     expect(prompt).toContain('OVERALL_TABLE');
     // No dispatch into the dimension extractor → no "omitted" separator.
-    expect(prompt).not.toContain('omitted');
+    expect(prompt).not.toContain('[... omitted: middle of source document ...]');
   });
 });
