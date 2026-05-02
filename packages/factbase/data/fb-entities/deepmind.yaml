@@ -42,8 +42,8 @@ facts:
     value: 6000
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly
-      after Google Brain merger in April 2023"
+    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew
+      significantly after Google Brain merger in April 2023"
 
   # ── Revenue (UK entity filings — internal R&D remuneration from Alphabet) ──
   - id: f_Wq9Bxn5mKg
@@ -52,8 +52,9 @@ facts:
     asOf: "2023"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2023-deepmind-fullaccounts.pdf
     notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for
-      2023. Represents R&D remuneration from other Alphabet group undertakings, not
-      external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
+      2023. Represents R&D remuneration from other Alphabet group undertakings,
+      not external commercial revenue. Moved from 'revenue' to
+      'internal-revenue'."
 
   - id: f_8pLqVz3nRg
     property: internal-revenue
@@ -61,8 +62,8 @@ facts:
     asOf: "2024"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2024-deepmind-fullaccounts.pdf
     notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for
-      2024. Decrease from 2023 likely due to reorganization of internal billing after
-      Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
+      2024. Decrease from 2023 likely due to reorganization of internal billing
+      after Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
 
   # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
@@ -125,3 +126,21 @@ facts:
     value: https://en.wikipedia.org/wiki/Google_DeepMind
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
+  - id: f_oZFlModhym
+    property: ailabwatch-grade
+    value: 20%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_cNlnjXAKhL
+    property: fli-index-grade
+    value: C
+    asOf: 2025-12-02
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
+    notes: FLI AI Safety Index — December 2025
+  - id: f_Gd4de9vd9o
+    property: saferai-grade
+    value: 20%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025

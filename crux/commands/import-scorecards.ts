@@ -137,8 +137,12 @@ async function cmdSync(
     const { summary, error } = await runMirrorAfterSync(dryRun);
     if (summary) {
       const verb = dryRun ? "would mirror" : "mirrored";
+      const staleNote =
+        summary.staleFactsRemoved > 0
+          ? `, ${summary.staleFactsRemoved} stale fact(s) ${dryRun ? "would be removed" : "removed"}`
+          : "";
       console.log(
-        `✓ FactBase mirror: ${verb} ${summary.written} entit${summary.written === 1 ? "y" : "ies"} (${summary.skipped} skipped${summary.removed > 0 ? `, ${summary.removed} stale ${dryRun ? "would be removed" : "removed"}` : ""})`,
+        `✓ FactBase mirror: ${verb} ${summary.written} entit${summary.written === 1 ? "y" : "ies"} (${summary.skipped} skipped${staleNote})`,
       );
     } else if (error) {
       console.warn(`⚠ FactBase mirror skipped: ${error}`);

@@ -106,7 +106,7 @@ async function fmtiIngestCommand(
   const mirrorFactbase = !(
     options.noFactbaseMirror === true || options["no-factbase-mirror"] === true
   );
-  let mirrorSummary: { written: number; skipped: number; removed: number } | null = null;
+  let mirrorSummary: { written: number; skipped: number; staleFactsRemoved: number } | null = null;
   let mirrorError: string | null = null;
   if (mirrorFactbase) {
     const { runMirrorAfterSync } = await import(
@@ -134,8 +134,8 @@ async function fmtiIngestCommand(
     human.output +=
       `\nFactBase mirror: ${dryRun ? "would write" : "wrote"} ${mirrorSummary.written} entit${mirrorSummary.written === 1 ? "y" : "ies"}` +
       (mirrorSummary.skipped > 0 ? `, ${mirrorSummary.skipped} skipped` : "") +
-      (mirrorSummary.removed > 0
-        ? `, ${mirrorSummary.removed} stale ${dryRun ? "would be removed" : "removed"}`
+      (mirrorSummary.staleFactsRemoved > 0
+        ? `, ${mirrorSummary.staleFactsRemoved} stale fact(s) ${dryRun ? "would be removed" : "removed"}`
         : "") +
       "\n";
   }

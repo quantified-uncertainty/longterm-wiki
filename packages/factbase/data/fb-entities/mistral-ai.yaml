@@ -64,7 +64,9 @@ facts:
     value: 1.17e+8
     asOf: 2023-06
     source: https://www.polytechnique.edu/en/news/mistral-ai-french-ai-nugget-co-founded-two-x-alumni-raised-eu500-mlns-2023
-    notes: "Seed round only: EUR105M ($117M). Source URL mentions €500M total raised by end of 2023 across multiple rounds — this fact captures only the June 2023 seed. See later total-funding facts for cumulative figures."
+    notes: "Seed round only: EUR105M ($117M). Source URL mentions €500M total raised
+      by end of 2023 across multiple rounds — this fact captures only the June
+      2023 seed. See later total-funding facts for cumulative figures."
 
   - id: f_OnBjHPgr6g
     property: total-funding
@@ -85,8 +87,8 @@ facts:
     value: 3.05e+9
     asOf: 2025-09
     source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
-    notes: "Total of $3.05B raised over 7 rounds; includes Series C of EUR1.7B
-      ($2B) led by ASML"
+    notes: "Total of $3.05B raised over 7 rounds; includes Series C of EUR1.7B ($2B)
+      led by ASML"
 
   # ── Valuation ───────────────────────────────────────────────────
   - id: f_EBAJlOJh2Q
@@ -125,7 +127,8 @@ facts:
     asOf: "2024"
     source: https://electroiq.com/stats/mistral-ai-statistics/
     notes: "Approximately $30M (EUR28M) in annual revenue for 2024; up from ~$10M in
-      2023. Revenue primarily from model API licensing and enterprise contracts."
+      2023. Revenue primarily from model API licensing and enterprise
+      contracts."
 
   - id: f_75QHFTc8ig
     property: revenue
@@ -152,3 +155,15 @@ facts:
     source: https://anthemcreation.com/en/artificial-intelligence/mistral-ai-le-chat-ia-better-chatgpt/
     notes: "Le Chat had 4.2 million active users in its first month after February
       2025 launch"
+  - id: f_cjw2WWmsGH
+    property: fmti-grade
+    value: 18/100
+    asOf: 2025-12-01
+    source: https://crfm.stanford.edu/fmti/
+    notes: Stanford FMTI — December 2025
+  - id: f_XganxG9EtE
+    property: seoul-tracker-grade
+    value: Unfulfilled
+    asOf: 2025-02-10
+    source: https://www.seoul-tracker.org
+    notes: Seoul Commitment Tracker — February 2025

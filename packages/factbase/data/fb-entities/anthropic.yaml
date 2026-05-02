@@ -186,14 +186,17 @@ facts:
       - 300
     asOf: 2023-06
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other sources suggest up to 300"
+    notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other
+      sources suggest up to 300"
 
   # UNVERIFIED ESTIMATE — range, not point value
   - id: f_0PxEBZyv45
     property: headcount
     value: 600
     asOf: 2024-03
-    notes: "Rough mid-point estimate for early 2024. No published source; interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as range [500,700]; simplified to point estimate for consistency."
+    notes: "Rough mid-point estimate for early 2024. No published source;
+      interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as
+      range [500,700]; simplified to point estimate for consistency."
 
   - id: f_J3yAxRJ05k
     property: headcount
@@ -202,7 +205,8 @@ facts:
       - 1300
     asOf: 2025-03
     source: https://electroiq.com/stats/anthropic-statistics/
-    notes: "Sources report ~1,097 employees in early 2025; company planned to double by year-end"
+    notes: "Sources report ~1,097 employees in early 2025; company planned to double
+      by year-end"
 
   - id: f_arY5X2VqcY
     property: headcount
@@ -211,15 +215,17 @@ facts:
       - 2000
     asOf: 2025-09
     source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
-    notes: "At Series F announcement; tripling international headcount was announced but not yet completed"
+    notes: "At Series F announcement; tripling international headcount was announced
+      but not yet completed"
 
   # UNVERIFIED ESTIMATE
   - id: f_BdGi5l9dOg
     property: headcount
     value: 4074
     asOf: 2026-01
-    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic planned
-      to triple international headcount in late 2025. Treat as rough estimate."
+    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic
+      planned to triple international headcount in late 2025. Treat as rough
+      estimate."
 
   # ── Organizational ──────────────────────────────────────────────
   - id: f_8kX2pQ7mNr
@@ -303,7 +309,9 @@ facts:
     value: 32
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey (corrected from coding-market-share — source describes overall enterprise usage, not coding-specific)"
+    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey
+      (corrected from coding-market-share — source describes overall enterprise
+      usage, not coding-specific)"
 
   # ── Product & Usage ─────────────────────────────────────────────
   - id: f_JoN2Jr8liA
@@ -373,7 +381,8 @@ facts:
     property: secondary-valuation
     value: 3.5e+11
     asOf: 2025-11
-    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to secondary-valuation."
+    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to
+      secondary-valuation."
 
   - id: f_U3LMAv6zjQ
     property: revenue-guidance
@@ -482,3 +491,33 @@ facts:
     value: https://en.wikipedia.org/wiki/Anthropic
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
+  - id: f_eqJj2XWWcG
+    property: ailabwatch-grade
+    value: 28%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_mqX8Axj1O7
+    property: fli-index-grade
+    value: C+
+    asOf: 2025-12-02
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
+    notes: FLI AI Safety Index — December 2025
+  - id: f_d8598DNiGP
+    property: fmti-grade
+    value: 46/100
+    asOf: 2025-12-01
+    source: https://crfm.stanford.edu/fmti/
+    notes: Stanford FMTI — December 2025
+  - id: f_R2YVEQK4dn
+    property: saferai-grade
+    value: 34%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025
+  - id: f_3Mc64enN9S
+    property: seoul-tracker-grade
+    value: Fulfilled
+    asOf: 2025-02-10
+    source: https://www.seoul-tracker.org
+    notes: Seoul Commitment Tracker — February 2025

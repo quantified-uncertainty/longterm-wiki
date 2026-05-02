@@ -1,29 +1,31 @@
 /**
  * Unit tests for the scorecard → FactBase mirror (QUA-865).
  *
- * Tests run against a per-test tmp directory to exercise real file IO
- * without polluting the repo's fb-entities. Grades are injected as
- * test fixtures so no wiki-server is required.
+ * Tests run against a per-test tmp directory holding a synthetic
+ * single-file `<slug>.yaml`. Grades are injected as test fixtures so no
+ * wiki-server is required.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync, statSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, existsSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import yaml from 'js-yaml';
+import { parseDocument } from 'yaml';
 
 import {
   gradeToFact,
   buildFactsByEntity,
   buildSlugByStableId,
-  renderScorecardGradesYaml,
-  ensurePerEntityDir,
-  writeScorecardGradesForEntity,
-  removeManagedFile,
-  findExistingManagedFiles,
-  readManagedFile,
+  applyManagedFacts,
+  readEntityDocument,
+  writeEntityDocument,
+  findEntityFile,
+  writeManagedFactsToEntity,
+  findEntitiesWithManagedFacts,
   syncScorecardFactsToYaml,
+  formatWaveLabel,
   SCORECARD_PREDICATE_BY_SOURCE,
+  MANAGED_PREDICATES,
   type ApiGrade,
   type MirrorFact,
 } from '../factbase-mirror.ts';
@@ -32,9 +34,6 @@ import type { EntityWithType } from '../../research/entity-loader.ts';
 // ── Fixtures ───────────────────────────────────────────────────────────
 
 function makeGrade(overrides: Partial<ApiGrade> = {}): ApiGrade {
-  // The structure mirrors the wiki-server API response. We only need the
-  // fields the mirror reads — extra fields are fine but the explicit cast
-  // here keeps type errors tight if the API shape changes.
   const base: Record<string, unknown> = {
     id: 'snap1|sid_anth|overall',
     snapshotId: 'fli_index-winter-2025',
@@ -63,6 +62,15 @@ function makeGrade(overrides: Partial<ApiGrade> = {}): ApiGrade {
 function makeEntity(slug: string, stableId: string): EntityWithType {
   return { id: slug, type: 'organization', stableId } as unknown as EntityWithType;
 }
+
+const MINIMAL_ENTITY_YAML = `entity: sid_anth
+facts:
+  - id: f_human0001
+    property: revenue
+    value: 1e+9
+    asOf: '2025-01'
+    source: https://example.com/revenue
+`;
 
 // ── gradeToFact ─────────────────────────────────────────────────────────
 
@@ -112,8 +120,7 @@ describe('gradeToFact', () => {
   });
 
   it('handles every known scorecard source', () => {
-    const sources = Object.keys(SCORECARD_PREDICATE_BY_SOURCE);
-    for (const source of sources) {
+    for (const source of Object.keys(SCORECARD_PREDICATE_BY_SOURCE)) {
       const fact = gradeToFact(makeGrade({ scorecardSource: source }));
       expect(fact, `source=${source}`).not.toBeNull();
       expect(fact!.property).toBe(SCORECARD_PREDICATE_BY_SOURCE[source]);
@@ -121,8 +128,7 @@ describe('gradeToFact', () => {
   });
 
   it('returns null for an unknown scorecard source', () => {
-    const fact = gradeToFact(makeGrade({ scorecardSource: 'made_up_source' }));
-    expect(fact).toBeNull();
+    expect(gradeToFact(makeGrade({ scorecardSource: 'made_up_source' }))).toBeNull();
   });
 
   it('returns null when scorecardSource is null (left-join hole)', () => {
@@ -178,21 +184,17 @@ describe('buildFactsByEntity', () => {
 
   it('sorts each entity\'s facts by (predicate, asOf) for stable diffs', () => {
     const grades = [
-      // Two predicates, same date — should sort by predicate.
       makeGrade({ scorecardSource: 'saferai', scoreRaw: '34%', snapshotSourceUrl: 'https://safer-ai/' }),
       makeGrade({ scorecardSource: 'fli_index', scoreRaw: 'C+' }),
-      // Same predicate, different dates — should sort by asOf.
       makeGrade({ scorecardSource: 'fli_index', scoreRaw: 'B', publishedAt: '2024-12-01', snapshotId: 'fli-2024' }),
     ];
-    const out = buildFactsByEntity(grades);
-    const facts = out.get('sid_anth')!;
+    const facts = buildFactsByEntity(grades).get('sid_anth')!;
     expect(facts.map(f => f.property)).toEqual(['fli-index-grade', 'fli-index-grade', 'saferai-grade']);
-    // Within fli-index-grade, the older asOf comes first.
     expect(facts[0].asOf).toBe('2024-12-01');
     expect(facts[1].asOf).toBe('2025-12-02');
   });
 
-  it('drops grades that fail gradeToFact (e.g. unknown source)', () => {
+  it('drops grades that fail gradeToFact', () => {
     const grades = [
       makeGrade({ entityId: 'sid_a', scorecardSource: 'unknown_x' }),
       makeGrade({ entityId: 'sid_b' }),
@@ -229,16 +231,62 @@ describe('buildSlugByStableId', () => {
 
   it('handles non-string stableId values defensively', () => {
     const malformed = { id: 'broken', type: 'organization', stableId: 42 } as unknown as EntityWithType;
-    const map = buildSlugByStableId([malformed]);
-    expect(map.size).toBe(0);
+    expect(buildSlugByStableId([malformed]).size).toBe(0);
   });
 });
 
-// ── renderScorecardGradesYaml ───────────────────────────────────────────
+// ── MANAGED_PREDICATES ──────────────────────────────────────────────────
 
-describe('renderScorecardGradesYaml', () => {
+describe('MANAGED_PREDICATES', () => {
+  it('contains exactly the five scorecard predicates', () => {
+    expect([...MANAGED_PREDICATES].sort()).toEqual([
+      'ailabwatch-grade',
+      'fli-index-grade',
+      'fmti-grade',
+      'saferai-grade',
+      'seoul-tracker-grade',
+    ]);
+  });
+
+  it('matches every value in SCORECARD_PREDICATE_BY_SOURCE', () => {
+    for (const pred of Object.values(SCORECARD_PREDICATE_BY_SOURCE)) {
+      expect(MANAGED_PREDICATES.has(pred)).toBe(true);
+    }
+  });
+});
+
+// ── formatWaveLabel ─────────────────────────────────────────────────────
+
+describe('formatWaveLabel', () => {
+  it('formats full ISO dates with month name', () => {
+    expect(formatWaveLabel('2025-12-02')).toBe('December 2025');
+    expect(formatWaveLabel('2025-10-01')).toBe('October 2025');
+  });
+
+  it('formats year-month dates with month name', () => {
+    expect(formatWaveLabel('2024-06')).toBe('June 2024');
+  });
+
+  it('formats year-only dates as just the year', () => {
+    expect(formatWaveLabel('2025')).toBe('2025');
+  });
+
+  it('returns the raw asOf when the regex does not match', () => {
+    expect(formatWaveLabel('not-a-date')).toBe('not-a-date');
+    expect(formatWaveLabel('')).toBe('');
+  });
+
+  it('returns the raw asOf when the month is out of range', () => {
+    expect(formatWaveLabel('2025-13-01')).toBe('2025-13-01');
+    expect(formatWaveLabel('2025-00')).toBe('2025-00');
+  });
+});
+
+// ── applyManagedFacts ───────────────────────────────────────────────────
+
+describe('applyManagedFacts', () => {
   const fact: MirrorFact = {
-    id: 'f_abc1234567',
+    id: 'f_aaa1234567',
     property: 'fli-index-grade',
     value: 'C+',
     asOf: '2025-12-02',
@@ -246,213 +294,256 @@ describe('renderScorecardGradesYaml', () => {
     notes: 'FLI AI Safety Index — December 2025',
   };
 
-  it('emits a top-of-file warning header', () => {
-    const out = renderScorecardGradesYaml([fact]);
-    expect(out.startsWith('# Auto-generated')).toBe(true);
-    expect(out).toContain('Do not edit by hand');
-    expect(out).toContain('QUA-865');
+  it('appends fresh facts to a doc with no managed facts', () => {
+    const doc = parseDocument(MINIMAL_ENTITY_YAML);
+    const counts = applyManagedFacts(doc, [fact]);
+    expect(counts.removed).toBe(0);
+    expect(counts.appended).toBe(1);
+    const out = doc.toString();
+    expect(out).toContain('fli-index-grade');
+    expect(out).toContain('C+');
+    // Hand-curated revenue fact must still be present.
+    expect(out).toContain('property: revenue');
   });
 
-  it('round-trips through js-yaml without losing fields', () => {
-    const out = renderScorecardGradesYaml([fact]);
-    const parsed = yaml.load(out) as { facts: MirrorFact[] };
-    expect(parsed.facts).toHaveLength(1);
-    expect(parsed.facts[0]).toEqual(fact);
+  it('removes pre-existing managed facts before appending', () => {
+    const yaml = `entity: sid_anth
+facts:
+  - id: f_old1
+    property: fli-index-grade
+    value: 'D'
+    asOf: '2024-12-01'
+    source: https://old.example.com
+    notes: stale
+  - id: f_human
+    property: revenue
+    value: 1e+9
+    asOf: '2025-01'
+`;
+    const doc = parseDocument(yaml);
+    const counts = applyManagedFacts(doc, [fact]);
+    expect(counts.removed).toBe(1);
+    expect(counts.appended).toBe(1);
+    const out = doc.toString();
+    expect(out).not.toContain('f_old1');
+    expect(out).not.toContain("'D'");
+    expect(out).toContain('C+');
+    expect(out).toContain('property: revenue');
   });
 
-  it('preserves the {id, property, value, asOf, source, notes} key order in output', () => {
-    const out = renderScorecardGradesYaml([fact]);
-    const idIdx = out.indexOf('id:');
-    const propIdx = out.indexOf('property:');
-    const valIdx = out.indexOf('value:');
-    const asOfIdx = out.indexOf('asOf:');
-    const srcIdx = out.indexOf('source:');
-    const notesIdx = out.indexOf('notes:');
-    expect(idIdx).toBeGreaterThan(0);
-    expect(propIdx).toBeGreaterThan(idIdx);
-    expect(valIdx).toBeGreaterThan(propIdx);
-    expect(asOfIdx).toBeGreaterThan(valIdx);
-    expect(srcIdx).toBeGreaterThan(asOfIdx);
-    expect(notesIdx).toBeGreaterThan(srcIdx);
+  it('removes ALL managed predicate facts, not just the same source', () => {
+    const yaml = `entity: sid_anth
+facts:
+  - id: f_old_fli
+    property: fli-index-grade
+    value: 'D'
+    asOf: '2024-12-01'
+    source: https://old.example.com
+  - id: f_old_saferai
+    property: saferai-grade
+    value: '20%'
+    asOf: '2024-10-01'
+    source: https://old.safer-ai/
+  - id: f_human
+    property: revenue
+    value: 1e+9
+`;
+    const doc = parseDocument(yaml);
+    const counts = applyManagedFacts(doc, []);
+    expect(counts.removed).toBe(2);
+    expect(counts.appended).toBe(0);
+    const out = doc.toString();
+    expect(out).not.toContain('fli-index-grade');
+    expect(out).not.toContain('saferai-grade');
+    expect(out).toContain('property: revenue');
   });
 
-  it('produces byte-identical output for the same input', () => {
-    expect(renderScorecardGradesYaml([fact])).toBe(renderScorecardGradesYaml([fact]));
+  it('preserves comments in the entity yaml', () => {
+    const yaml = `# top-of-file comment
+entity: sid_anth
+# pre-facts comment
+facts:
+  - id: f_human
+    property: revenue
+    value: 1e+9
+    # inline comment
+    asOf: '2025-01'
+`;
+    const doc = parseDocument(yaml);
+    applyManagedFacts(doc, [fact]);
+    const out = doc.toString();
+    expect(out).toContain('# top-of-file comment');
+    expect(out).toContain('# pre-facts comment');
+    expect(out).toContain('# inline comment');
   });
 
-  it('does not wrap long source URLs', () => {
-    const longUrl = 'https://example.com/' + 'x'.repeat(150);
-    const out = renderScorecardGradesYaml([{ ...fact, source: longUrl }]);
-    // The URL must appear on a single line.
-    expect(out).toContain(longUrl);
+  it('creates a facts: sequence when missing', () => {
+    const doc = parseDocument(`entity: sid_anth\n`);
+    applyManagedFacts(doc, [fact]);
+    expect(doc.toString()).toContain('facts:');
+    expect(doc.toString()).toContain('fli-index-grade');
+  });
+
+  it('throws when the root is not a mapping', () => {
+    const doc = parseDocument(`- just-a-list\n`);
+    expect(() => applyManagedFacts(doc, [fact])).toThrow(/root is not a mapping/);
+  });
+
+  it('throws when facts is not a sequence', () => {
+    const doc = parseDocument(`entity: sid_anth\nfacts: "not-a-seq"\n`);
+    expect(() => applyManagedFacts(doc, [fact])).toThrow(/`facts` node is not a sequence/);
+  });
+
+  it('does not touch facts whose property is not in MANAGED_PREDICATES', () => {
+    const yaml = `entity: sid_anth
+facts:
+  - id: f_a
+    property: revenue
+    value: 1e+9
+  - id: f_b
+    property: valuation
+    value: 4e+10
+  - id: f_c
+    property: founded-by
+    value: someone
+`;
+    const doc = parseDocument(yaml);
+    const counts = applyManagedFacts(doc, []);
+    expect(counts.removed).toBe(0);
+    expect(counts.appended).toBe(0);
   });
 });
 
-// ── Filesystem helpers ──────────────────────────────────────────────────
+// ── findEntityFile ──────────────────────────────────────────────────────
 
-describe('ensurePerEntityDir', () => {
+describe('findEntityFile', () => {
   let tmp: string;
+  beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-')); });
+  afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, { recursive: true, force: true });
-  });
-
-  it('migrates a single-file entity to directory form', () => {
-    const yamlPath = join(tmp, 'anthropic.yaml');
-    writeFileSync(yamlPath, 'entity: sid_anth\nname: Anthropic\n', 'utf-8');
-
-    const dir = ensurePerEntityDir('anthropic', tmp);
-
-    expect(dir).toBe(join(tmp, 'anthropic'));
-    expect(existsSync(yamlPath)).toBe(false);
-    expect(existsSync(join(tmp, 'anthropic', 'entity.yaml'))).toBe(true);
-    // Original content preserved exactly.
-    expect(readFileSync(join(tmp, 'anthropic', 'entity.yaml'), 'utf-8'))
-      .toBe('entity: sid_anth\nname: Anthropic\n');
-  });
-
-  it('is a no-op when the directory already exists', () => {
-    const dir = join(tmp, 'anthropic');
-    mkdirSync(dir);
-    writeFileSync(join(dir, 'entity.yaml'), 'entity: sid_anth\n', 'utf-8');
-
-    const out = ensurePerEntityDir('anthropic', tmp);
-
-    expect(out).toBe(dir);
-    expect(readFileSync(join(dir, 'entity.yaml'), 'utf-8')).toBe('entity: sid_anth\n');
-  });
-
-  it('returns null when neither file nor directory exists', () => {
-    expect(ensurePerEntityDir('nonexistent', tmp)).toBeNull();
-  });
-});
-
-describe('writeScorecardGradesForEntity', () => {
-  let tmp: string;
-
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, { recursive: true, force: true });
-  });
-
-  const fact: MirrorFact = {
-    id: 'f_abc1234567',
-    property: 'fli-index-grade',
-    value: 'C+',
-    asOf: '2025-12-02',
-    source: 'https://futureoflife.org/ai-safety-index-winter-2025/',
-    notes: 'FLI AI Safety Index — December 2025',
-  };
-
-  it('writes scorecard-grades.yaml when the entity exists in single-file form', () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    const path = writeScorecardGradesForEntity('anthropic', [fact], tmp);
-    expect(path).toBe(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
-    expect(readManagedFile(path!)).toEqual([fact]);
-    // The original entity yaml moved into the directory under the standard name.
-    expect(existsSync(join(tmp, 'anthropic', 'entity.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'anthropic.yaml'))).toBe(false);
-  });
-
-  it('writes scorecard-grades.yaml when the entity already uses directory form', () => {
-    mkdirSync(join(tmp, 'anthropic'));
-    writeFileSync(join(tmp, 'anthropic', 'entity.yaml'), 'entity: sid_anth\n', 'utf-8');
-    const path = writeScorecardGradesForEntity('anthropic', [fact], tmp);
-    expect(path).toBe(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
+  it('returns the path when the single-file form exists', () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    expect(findEntityFile('anthropic', tmp)).toBe(join(tmp, 'anthropic.yaml'));
   });
 
   it('returns null when no fb-entity yaml exists for the slug', () => {
-    expect(writeScorecardGradesForEntity('ghost', [fact], tmp)).toBeNull();
-    expect(existsSync(join(tmp, 'ghost'))).toBe(false);
-  });
-
-  it('overwrites an existing scorecard-grades.yaml file', () => {
-    mkdirSync(join(tmp, 'anthropic'));
-    writeFileSync(join(tmp, 'anthropic', 'entity.yaml'), 'entity: sid_anth\n', 'utf-8');
-    writeFileSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'), 'old content\n', 'utf-8');
-
-    writeScorecardGradesForEntity('anthropic', [fact], tmp);
-
-    const written = readFileSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'), 'utf-8');
-    expect(written).not.toContain('old content');
-    expect(written).toContain('fli-index-grade');
+    expect(findEntityFile('anthropic', tmp)).toBeNull();
   });
 });
 
-describe('removeManagedFile + findExistingManagedFiles', () => {
+// ── writeManagedFactsToEntity ───────────────────────────────────────────
+
+describe('writeManagedFactsToEntity', () => {
   let tmp: string;
+  beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-')); });
+  afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
+  const fact: MirrorFact = {
+    id: 'f_aaa1234567',
+    property: 'fli-index-grade',
+    value: 'C+',
+    asOf: '2025-12-02',
+    source: 'https://futureoflife.org/ai-safety-index-winter-2025/',
+    notes: 'FLI AI Safety Index — December 2025',
+  };
+
+  it('writes facts inline into the entity yaml', () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    const result = writeManagedFactsToEntity('anthropic', [fact], tmp);
+    expect(result).not.toBeNull();
+    expect(result!.path).toBe(join(tmp, 'anthropic.yaml'));
+    expect(result!.appended).toBe(1);
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).toContain('fli-index-grade');
+    expect(out).toContain('C+');
   });
 
-  afterEach(() => {
-    rmSync(tmp, { recursive: true, force: true });
+  it('returns null when no fb-entity yaml exists', () => {
+    expect(writeManagedFactsToEntity('ghost', [fact], tmp)).toBeNull();
   });
 
-  it('finds every managed file across entity directories', () => {
-    mkdirSync(join(tmp, 'a'));
-    writeFileSync(join(tmp, 'a', 'entity.yaml'), '', 'utf-8');
-    writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
-    mkdirSync(join(tmp, 'b'));
-    writeFileSync(join(tmp, 'b', 'entity.yaml'), '', 'utf-8');
-    // Skip — no managed file
-    writeFileSync(join(tmp, 'c.yaml'), '', 'utf-8');
-
-    const found = findExistingManagedFiles(tmp);
-    expect(found).toEqual([{ slug: 'a', path: join(tmp, 'a', 'scorecard-grades.yaml') }]);
+  it('preserves existing hand-curated facts', () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    writeManagedFactsToEntity('anthropic', [fact], tmp);
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).toContain('property: revenue');
   });
 
-  it('returns [] when the fb-entities directory does not exist', () => {
-    expect(findExistingManagedFiles(join(tmp, 'nonexistent'))).toEqual([]);
+  it('replaces stale managed facts on re-write', () => {
+    const yaml = `entity: sid_anth
+facts:
+  - id: f_old
+    property: fli-index-grade
+    value: 'D'
+    asOf: '2024-12-01'
+    source: https://old.example.com
+`;
+    writeFileSync(join(tmp, 'anthropic.yaml'), yaml, 'utf-8');
+    const result = writeManagedFactsToEntity('anthropic', [fact], tmp);
+    expect(result!.removed).toBe(1);
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).not.toContain('f_old');
+    expect(out).toContain('C+');
+  });
+});
+
+// ── findEntitiesWithManagedFacts ────────────────────────────────────────
+
+describe('findEntitiesWithManagedFacts', () => {
+  let tmp: string;
+  beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-')); });
+  afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
+
+  it('returns slugs whose yaml mentions a managed predicate', () => {
+    writeFileSync(join(tmp, 'has-managed.yaml'),
+      `entity: sid_a\nfacts:\n  - id: f_x\n    property: fli-index-grade\n`, 'utf-8');
+    writeFileSync(join(tmp, 'plain.yaml'),
+      `entity: sid_b\nfacts:\n  - id: f_y\n    property: revenue\n`, 'utf-8');
+
+    const found = findEntitiesWithManagedFacts(tmp);
+    expect(found).toEqual(['has-managed']);
   });
 
-  it('un-migrates back to single-file form when only entity.yaml is left after removal', () => {
-    mkdirSync(join(tmp, 'a'));
-    writeFileSync(join(tmp, 'a', 'entity.yaml'), 'entity: sid_a\n', 'utf-8');
-    writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
-
-    const removed = removeManagedFile('a', tmp);
-
-    expect(removed).toBe(true);
-    expect(existsSync(join(tmp, 'a'))).toBe(false);
-    expect(existsSync(join(tmp, 'a.yaml'))).toBe(true);
-    expect(readFileSync(join(tmp, 'a.yaml'), 'utf-8')).toBe('entity: sid_a\n');
+  it('returns [] when fb-entities dir does not exist', () => {
+    expect(findEntitiesWithManagedFacts(join(tmp, 'nonexistent'))).toEqual([]);
   });
 
-  it('keeps the directory form when other files remain after removal', () => {
-    mkdirSync(join(tmp, 'a'));
-    writeFileSync(join(tmp, 'a', 'entity.yaml'), 'entity: sid_a\n', 'utf-8');
-    writeFileSync(join(tmp, 'a', 'extra.yaml'), 'facts: []\n', 'utf-8');
-    writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
-
-    removeManagedFile('a', tmp);
-
-    expect(existsSync(join(tmp, 'a'))).toBe(true);
-    expect(existsSync(join(tmp, 'a', 'entity.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'a', 'extra.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'a', 'scorecard-grades.yaml'))).toBe(false);
+  it('matches every managed predicate', () => {
+    let i = 0;
+    for (const pred of MANAGED_PREDICATES) {
+      writeFileSync(join(tmp, `e${i}.yaml`),
+        `entity: sid_${i}\nfacts:\n  - id: f_x\n    property: ${pred}\n`, 'utf-8');
+      i++;
+    }
+    expect(findEntitiesWithManagedFacts(tmp).length).toBe(MANAGED_PREDICATES.size);
   });
+});
 
-  it('removes an empty entity directory if the managed file was its only file', () => {
-    mkdirSync(join(tmp, 'a'));
-    writeFileSync(join(tmp, 'a', 'scorecard-grades.yaml'), '', 'utf-8');
+// ── readEntityDocument / writeEntityDocument round-trip ────────────────
 
-    removeManagedFile('a', tmp);
+describe('readEntityDocument / writeEntityDocument', () => {
+  let tmp: string;
+  beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-')); });
+  afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-    expect(existsSync(join(tmp, 'a'))).toBe(false);
-    expect(existsSync(join(tmp, 'a.yaml'))).toBe(false);
-  });
-
-  it('returns false when the managed file does not exist', () => {
-    expect(removeManagedFile('a', tmp)).toBe(false);
+  it('round-trips !ref and !date custom tags without error', () => {
+    const yaml = `entity: sid_anth
+facts:
+  - id: f_a
+    property: founded-by
+    value: !ref sid_zR4nW8xB2f
+  - id: f_b
+    property: founded-date
+    value: !date 2021
+    asOf: '2021'
+`;
+    const path = join(tmp, 'anthropic.yaml');
+    writeFileSync(path, yaml, 'utf-8');
+    const doc = readEntityDocument(path);
+    writeEntityDocument(path, doc);
+    const out = readFileSync(path, 'utf-8');
+    expect(out).toContain('!ref sid_zR4nW8xB2f');
+    expect(out).toContain('!date 2021');
   });
 });
 
@@ -460,18 +551,12 @@ describe('removeManagedFile + findExistingManagedFiles', () => {
 
 describe('syncScorecardFactsToYaml', () => {
   let tmp: string;
+  beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-')); });
+  afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, { recursive: true, force: true });
-  });
-
-  it('writes scorecard yaml for each rated entity that has a fb-entity file', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    writeFileSync(join(tmp, 'openai.yaml'), 'entity: sid_oai\n', 'utf-8');
+  it('writes scorecard yaml inline for each rated entity that has a fb-entity file', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    writeFileSync(join(tmp, 'openai.yaml'), `entity: sid_oai\n`, 'utf-8');
 
     const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
@@ -489,13 +574,12 @@ describe('syncScorecardFactsToYaml', () => {
     expect(summary.entitiesWritten).toBe(2);
     expect(summary.entitiesSkippedNoFbYaml).toBe(0);
     expect(summary.entitiesSkippedNoSlug).toBe(0);
-    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'openai', 'scorecard-grades.yaml'))).toBe(true);
+    expect(readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8')).toContain('fli-index-grade');
+    expect(readFileSync(join(tmp, 'openai.yaml'), 'utf-8')).toContain('fli-index-grade');
   });
 
   it('skips entities whose stableId has no slug mapping', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
     const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
@@ -504,13 +588,11 @@ describe('syncScorecardFactsToYaml', () => {
         makeGrade({ entityId: 'sid_unknown', scoreRaw: 'A' }),
       ],
     });
-
     expect(summary.entitiesSkippedNoSlug).toBe(1);
     expect(summary.entitiesWritten).toBe(1);
   });
 
   it('skips entities that resolve to a slug but have no fb-entity yaml on disk', async () => {
-    // anthropic is in entity catalog but no fb-entity yaml exists.
     const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
@@ -521,67 +603,63 @@ describe('syncScorecardFactsToYaml', () => {
   });
 
   it('is idempotent — running twice produces byte-identical output', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
     const opts = {
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [makeGrade({ entityId: 'sid_anth' })],
     };
     await syncScorecardFactsToYaml(opts);
-    const before = readFileSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'), 'utf-8');
+    const before = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
     await syncScorecardFactsToYaml(opts);
-    const after = readFileSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'), 'utf-8');
+    const after = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
     expect(after).toBe(before);
   });
 
-  it('removes stale managed files when an entity drops from the latest grades', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    // Run once to create the managed file.
+  it('removes stale managed facts when an entity drops from latest grades', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    // First run — add managed facts.
     await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [makeGrade({ entityId: 'sid_anth' })],
     });
-    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
+    expect(readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8')).toContain('fli-index-grade');
 
-    // Run again with empty grades — file should be removed.
+    // Second run with no grades — managed facts must be cleaned up.
     const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [],
     });
-
-    expect(summary.removed).toBe(1);
-    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(false);
-    // And the entity should be folded back to single-file form because
-    // entity.yaml is the only thing left in the dir.
-    expect(existsSync(join(tmp, 'anthropic.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'anthropic'))).toBe(false);
+    expect(summary.staleFactsRemoved).toBe(1);
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).not.toContain('fli-index-grade');
+    // Hand-curated facts preserved.
+    expect(out).toContain('property: revenue');
   });
 
-  it('overwrites a previous wave\'s grade when the predicate-source pair has new data', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    // First wave.
+  it('overwrites a previous wave\'s grade when same predicate-source has new data', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
     await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [makeGrade({ entityId: 'sid_anth', scoreRaw: 'C+', publishedAt: '2024-12-01' })],
     });
-    // Second wave (replaces the first because we filter on is_latest=true).
     await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [makeGrade({ entityId: 'sid_anth', scoreRaw: 'B-', publishedAt: '2025-12-02' })],
     });
-
-    const facts = readManagedFile(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
-    expect(facts).toHaveLength(1);
-    expect(facts[0].value).toBe('B-');
-    expect(facts[0].asOf).toBe('2025-12-02');
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).not.toContain("'C+'");
+    expect(out).toContain('B-');
+    expect(out).toContain('2025-12-02');
   });
 
-  it('--dry-run does not touch the filesystem', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
+  it('--dry-run does not modify any files', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    const before = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
     const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
@@ -589,9 +667,29 @@ describe('syncScorecardFactsToYaml', () => {
       dryRun: true,
     });
     expect(summary.entitiesWritten).toBe(1);
-    // Original single-file entity must not have been migrated.
-    expect(existsSync(join(tmp, 'anthropic.yaml'))).toBe(true);
-    expect(existsSync(join(tmp, 'anthropic'))).toBe(false);
+    expect(readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8')).toBe(before);
+  });
+
+  it('--dry-run still counts would-be stale removals', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    // Live run to add managed facts.
+    await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [makeGrade({ entityId: 'sid_anth' })],
+    });
+    const after = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+
+    // Dry-run with no grades — should report 1 would-be removal but not write.
+    const summary = await syncScorecardFactsToYaml({
+      fbEntitiesDir: tmp,
+      entities: [makeEntity('anthropic', 'sid_anth')],
+      grades: [],
+      dryRun: true,
+    });
+    expect(summary.staleFactsRemoved).toBe(1);
+    // FS unchanged.
+    expect(readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8')).toBe(after);
   });
 
   it('handles empty input gracefully', async () => {
@@ -601,11 +699,11 @@ describe('syncScorecardFactsToYaml', () => {
       grades: [],
     });
     expect(summary.entitiesWritten).toBe(0);
-    expect(summary.removed).toBe(0);
+    expect(summary.staleFactsRemoved).toBe(0);
   });
 
-  it('groups multiple sources for the same entity into one file', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
+  it('groups multiple sources for the same entity into one yaml file', async () => {
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
     await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
@@ -620,157 +718,23 @@ describe('syncScorecardFactsToYaml', () => {
         }),
       ],
     });
-    const facts = readManagedFile(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
-    expect(facts).toHaveLength(2);
-    expect(facts.map(f => f.property).sort()).toEqual(['fli-index-grade', 'saferai-grade']);
+    const out = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
+    expect(out).toContain('fli-index-grade');
+    expect(out).toContain('saferai-grade');
   });
 
-  it('produces a valid YAML file the loader can parse', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\nname: Anthropic\n', 'utf-8');
+  it('does not touch entities without managed facts during stale cleanup', async () => {
+    // anthropic has hand-curated facts but no scorecard grades; sync runs
+    // with empty grades. The file should remain byte-identical because
+    // findEntitiesWithManagedFacts skips files without a managed-predicate
+    // substring.
+    writeFileSync(join(tmp, 'anthropic.yaml'), MINIMAL_ENTITY_YAML, 'utf-8');
+    const before = readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8');
     await syncScorecardFactsToYaml({
-      fbEntitiesDir: tmp,
-      entities: [makeEntity('anthropic', 'sid_anth')],
-      grades: [makeGrade({ entityId: 'sid_anth' })],
-    });
-    // Sanity: js-yaml round-trip must be lossless on the produced file.
-    const written = readFileSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'), 'utf-8');
-    const parsed = yaml.load(written) as { facts: MirrorFact[] };
-    expect(parsed).toHaveProperty('facts');
-    expect(Array.isArray(parsed.facts)).toBe(true);
-    expect(parsed.facts).toHaveLength(1);
-    expect(parsed.facts[0].property).toBe('fli-index-grade');
-  });
-
-  it('previews would-be removals in dry-run mode without touching the FS', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    // Run once live to create a managed file.
-    await syncScorecardFactsToYaml({
-      fbEntitiesDir: tmp,
-      entities: [makeEntity('anthropic', 'sid_anth')],
-      grades: [makeGrade({ entityId: 'sid_anth' })],
-    });
-    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
-
-    // Now dry-run with no grades — the would-be removal must show up in
-    // the summary count but the FS must remain untouched.
-    const summary = await syncScorecardFactsToYaml({
-      fbEntitiesDir: tmp,
-      entities: [makeEntity('anthropic', 'sid_anth')],
-      grades: [],
-      dryRun: true,
-    });
-    expect(summary.removed).toBe(1);
-    expect(summary.details.some((d) => d.status === 'removed' && d.slug === 'anthropic')).toBe(true);
-    // FS unchanged — the managed file is still there.
-    expect(existsSync(join(tmp, 'anthropic', 'scorecard-grades.yaml'))).toBe(true);
-  });
-
-  it('records each removed entity in summary.details', async () => {
-    writeFileSync(join(tmp, 'anthropic.yaml'), 'entity: sid_anth\n', 'utf-8');
-    await syncScorecardFactsToYaml({
-      fbEntitiesDir: tmp,
-      entities: [makeEntity('anthropic', 'sid_anth')],
-      grades: [makeGrade({ entityId: 'sid_anth' })],
-    });
-
-    const summary = await syncScorecardFactsToYaml({
       fbEntitiesDir: tmp,
       entities: [makeEntity('anthropic', 'sid_anth')],
       grades: [],
     });
-
-    const removedDetail = summary.details.find((d) => d.status === 'removed');
-    expect(removedDetail).toBeDefined();
-    expect(removedDetail!.slug).toBe('anthropic');
-    expect(removedDetail!.path).toBe(join(tmp, 'anthropic', 'scorecard-grades.yaml'));
-  });
-});
-
-describe('formatWaveLabel', () => {
-  it('formats full ISO dates with month name', async () => {
-    const { formatWaveLabel } = await import('../factbase-mirror.ts');
-    expect(formatWaveLabel('2025-12-02')).toBe('December 2025');
-    expect(formatWaveLabel('2025-10-01')).toBe('October 2025');
-  });
-
-  it('formats year-month dates with month name', async () => {
-    const { formatWaveLabel } = await import('../factbase-mirror.ts');
-    expect(formatWaveLabel('2024-06')).toBe('June 2024');
-  });
-
-  it('formats year-only dates as just the year', async () => {
-    const { formatWaveLabel } = await import('../factbase-mirror.ts');
-    expect(formatWaveLabel('2025')).toBe('2025');
-  });
-
-  it('returns the raw asOf when the regex does not match', async () => {
-    const { formatWaveLabel } = await import('../factbase-mirror.ts');
-    expect(formatWaveLabel('not-a-date')).toBe('not-a-date');
-    expect(formatWaveLabel('')).toBe('');
-  });
-
-  it('returns the raw asOf when the month is out of range', async () => {
-    const { formatWaveLabel } = await import('../factbase-mirror.ts');
-    expect(formatWaveLabel('2025-13-01')).toBe('2025-13-01');
-    expect(formatWaveLabel('2025-00')).toBe('2025-00');
-  });
-});
-
-describe('readManagedFile (adversarial inputs)', () => {
-  let tmp: string;
-
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), 'fb-mirror-test-'));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, { recursive: true, force: true });
-  });
-
-  it('returns [] when the file does not exist', () => {
-    expect(readManagedFile(join(tmp, 'missing.yaml'))).toEqual([]);
-  });
-
-  it('returns [] when the file is empty', () => {
-    const path = join(tmp, 'empty.yaml');
-    writeFileSync(path, '', 'utf-8');
-    expect(readManagedFile(path)).toEqual([]);
-  });
-
-  it('returns [] when the file has no facts key', () => {
-    const path = join(tmp, 'no-facts.yaml');
-    writeFileSync(path, 'entity: sid_x\n', 'utf-8');
-    expect(readManagedFile(path)).toEqual([]);
-  });
-
-  it('returns [] when facts is not an array', () => {
-    const path = join(tmp, 'bad-facts.yaml');
-    writeFileSync(path, 'facts: "not-an-array"\n', 'utf-8');
-    expect(readManagedFile(path)).toEqual([]);
-  });
-
-  it('drops malformed entries via isMirrorFact filter', () => {
-    const path = join(tmp, 'mixed.yaml');
-    // First entry is valid, second is missing required fields, third has wrong types.
-    const content = `facts:
-  - id: f_aaa1234567
-    property: fli-index-grade
-    value: "C+"
-    asOf: "2025-12-02"
-    source: https://example.com
-    notes: "ok"
-  - id: f_bbb1234567
-    # missing other fields
-  - id: 42
-    property: x
-    value: "y"
-    asOf: "2025"
-    source: "u"
-    notes: "n"
-`;
-    writeFileSync(path, content, 'utf-8');
-    const facts = readManagedFile(path);
-    expect(facts).toHaveLength(1);
-    expect(facts[0].id).toBe('f_aaa1234567');
+    expect(readFileSync(join(tmp, 'anthropic.yaml'), 'utf-8')).toBe(before);
   });
 });

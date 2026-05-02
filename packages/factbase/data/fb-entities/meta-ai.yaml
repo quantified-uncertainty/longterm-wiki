@@ -71,7 +71,8 @@ facts:
     asOf: 2026-01
     source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
     notes: "Reality Labs cumulative losses since late 2020 (~5 years); cited at time
-      of January 2026 layoffs. This is a cumulative total, NOT an annual figure."
+      of January 2026 layoffs. This is a cumulative total, NOT an annual
+      figure."
 
   - id: f_bRw4Xn7K2g
     property: parent-revenue
@@ -128,3 +129,33 @@ facts:
     value: https://ai.meta.com/
     source: https://www.wikidata.org/wiki/Q112114913
     notes: From Wikidata Q112114913
+  - id: f_dx9SMnwEv7
+    property: ailabwatch-grade
+    value: 5%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_8pvJoBL6Vt
+    property: fli-index-grade
+    value: D
+    asOf: 2025-12-02
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
+    notes: FLI AI Safety Index — December 2025
+  - id: f_xAcU2uGvGO
+    property: fmti-grade
+    value: 31/100
+    asOf: 2025-12-01
+    source: https://crfm.stanford.edu/fmti/
+    notes: Stanford FMTI — December 2025
+  - id: f_MlJnqydPjZ
+    property: saferai-grade
+    value: 21%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025
+  - id: f_vrpqHBDnS1
+    property: seoul-tracker-grade
+    value: Partial
+    asOf: 2025-02-10
+    source: https://www.seoul-tracker.org
+    notes: Seoul Commitment Tracker — February 2025

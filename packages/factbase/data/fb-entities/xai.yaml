@@ -11,14 +11,16 @@ facts:
     property: headquarters
     value: "Palo Alto, CA"
     source: https://x.ai/about
-    notes: "Headquartered in Palo Alto per x.ai; operates a massive GPU cluster ('Colossus') in Memphis, TN. Previously listed as Austin, TX."
+    notes: "Headquartered in Palo Alto per x.ai; operates a massive GPU cluster
+      ('Colossus') in Memphis, TN. Previously listed as Austin, TX."
 
   - id: f_2O4rOQsrZg
     property: legal-structure
     value: "Subsidiary of SpaceX"
     validStart: 2026-02
     source: https://x.ai/about
-    notes: "xAI was acquired by SpaceX in February 2026; previously operated as an independent private company"
+    notes: "xAI was acquired by SpaceX in February 2026; previously operated as an
+      independent private company"
 
   - id: f_qr3MjbUa4Q
     property: founded-by
@@ -155,3 +157,33 @@ facts:
     value: https://en.wikipedia.org/wiki/XAI_(company)
     source: https://www.wikidata.org/wiki/Q120599684
     notes: From Wikidata Q120599684 (corrected from mismatched Q40890078)
+  - id: f_aP743lmG08
+    property: ailabwatch-grade
+    value: 4%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_yir5r90Mvv
+    property: fli-index-grade
+    value: D
+    asOf: 2025-12-02
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
+    notes: FLI AI Safety Index — December 2025
+  - id: f_xbvSP6JMMD
+    property: fmti-grade
+    value: 14/100
+    asOf: 2025-12-01
+    source: https://crfm.stanford.edu/fmti/
+    notes: Stanford FMTI — December 2025
+  - id: f_kbocli2Jpc
+    property: saferai-grade
+    value: 16%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025
+  - id: f_eZJHWyGL0k
+    property: seoul-tracker-grade
+    value: Partial
+    asOf: 2025-02-10
+    source: https://www.seoul-tracker.org
+    notes: Seoul Commitment Tracker — February 2025

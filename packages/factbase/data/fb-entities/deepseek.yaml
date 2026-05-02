@@ -6,8 +6,8 @@ facts:
     value: 2023-07
     source: https://en.wikipedia.org/wiki/DeepSeek
     notes: "Spun off from High-Flyer Quant as an independent AI research lab in July
-      2023; incorporated as Hangzhou DeepSeek Artificial Intelligence Basic Technology
-      Research Co., Ltd."
+      2023; incorporated as Hangzhou DeepSeek Artificial Intelligence Basic
+      Technology Research Co., Ltd."
 
   - id: f_0xSCmDaZEg
     property: headquarters
@@ -24,15 +24,15 @@ facts:
     property: founded-by-name
     value: Liang Wenfeng
     source: https://fortune.com/2025/01/27/deepseek-founder-liang-wenfeng-hedge-fund-manager-high-flyer-quant-trading/
-    notes: "Co-founder of High-Flyer hedge fund; serves as CEO of both High-Flyer and
-      DeepSeek"
+    notes: "Co-founder of High-Flyer hedge fund; serves as CEO of both High-Flyer
+      and DeepSeek"
 
   - id: f_bdfkNTZIbw
     property: legal-structure
     value: "Private subsidiary of High-Flyer"
     source: https://en.wikipedia.org/wiki/DeepSeek
-    notes: "84% owned by Liang Wenfeng; remainder held by individuals affiliated with
-      High-Flyer. No external VC funding as of early 2026."
+    notes: "84% owned by Liang Wenfeng; remainder held by individuals affiliated
+      with High-Flyer. No external VC funding as of early 2026."
 
   - id: f_enTjirXUUA
     property: website
@@ -50,8 +50,8 @@ facts:
     value: 100
     asOf: 2023-07
     source: https://www.scmp.com/tech/big-tech/article/3294357/chinas-ai-disrupter-deepseek-bets-low-key-team-young-geniuses-beat-us-giants
-    notes: "Nearly 100 AI engineers assembled by parent company High-Flyer by the time
-      DeepSeek spun off in mid-2023"
+    notes: "Nearly 100 AI engineers assembled by parent company High-Flyer by the
+      time DeepSeek spun off in mid-2023"
 
   - id: f_nkY9Jq4aTg
     property: headcount
@@ -82,7 +82,8 @@ facts:
   - id: f_VNYzXpqOeg
     property: description
     value: "Parent company High-Flyer manages approximately $8-10B in assets; hedge
-      fund averaged 56.6% returns in 2025, indirectly funding DeepSeek operations"
+      fund averaged 56.6% returns in 2025, indirectly funding DeepSeek
+      operations"
     source: https://www.bloomberg.com/news/articles/2026-01-12/deepseek-founder-liang-s-funds-surge-57-as-china-quants-boom
     notes: "High-Flyer AUM peaked at $12B before shrinking; 2025 returns helped fund
       continued AI research"
@@ -94,8 +95,8 @@ facts:
     asOf: 2025-06
     source: https://www.businessofapps.com/data/deepseek-statistics/
     notes: "$220M annual revenue run rate by mid-2025; primarily from API usage and
-      enterprise licenses. Actual billed revenue lower than theoretical due to free
-      web/app access and nighttime discounts."
+      enterprise licenses. Actual billed revenue lower than theoretical due to
+      free web/app access and nighttime discounts."
 
   # ── Model Details ───────────────────────────────────────────────
   - id: f_qbe0bnJl8Q
@@ -112,8 +113,8 @@ facts:
       hours over ~2 months on 2,048 H800 GPUs"
     asOf: 2024-12
     source: https://arxiv.org/abs/2412.19437
-    notes: "Dramatically lower than comparable frontier models; pre-training on 14.8T
-      tokens"
+    notes: "Dramatically lower than comparable frontier models; pre-training on
+      14.8T tokens"
 
   - id: f_WjkJd6O9vA
     property: description
@@ -121,8 +122,8 @@ facts:
       pipeline including base model ~$5.6M"
     asOf: 2025-01
     source: https://mlq.ai/news/deepseek-reveals-r1-model-training-cost-just-294000-in-peer-reviewed-nature-publication/
-    notes: "The $294K figure (per Nature paper) covers only the R1 RL training stage,
-      not the $5.6M V3 base model it builds upon"
+    notes: "The $294K figure (per Nature paper) covers only the R1 RL training
+      stage, not the $5.6M V3 base model it builds upon"
 
   # ── Users & Downloads ───────────────────────────────────────────
   - id: f_59Kp1EvULg
@@ -145,3 +146,21 @@ facts:
     asOf: 2025-04
     source: https://www.demandsage.com/deepseek-statistics/
     notes: "96.88 million MAU in April 2025; 25.81% increase over March"
+  - id: f_8j67oxvwlV
+    property: ailabwatch-grade
+    value: 1%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_6zxIcTY4nF
+    property: fli-index-grade
+    value: D
+    asOf: 2025-12-02
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
+    notes: FLI AI Safety Index — December 2025
+  - id: f_mZHKGta0nL
+    property: fmti-grade
+    value: 32/100
+    asOf: 2025-12-01
+    source: https://crfm.stanford.edu/fmti/
+    notes: Stanford FMTI — December 2025

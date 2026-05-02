@@ -14,7 +14,9 @@ facts:
     value: !ref sid_1L16qpyk5A
     asOf: 2026-04
     source: https://en.wikipedia.org/wiki/Satya_Nadella
-    notes: Satya Nadella has been Microsoft's CEO since 2014. Previous main value was sid_DBq1ddu8Mg (Mustafa Süleyman), who leads the Microsoft AI division, not Microsoft Corp — corrected per QUA-618.
+    notes: Satya Nadella has been Microsoft's CEO since 2014. Previous main value
+      was sid_DBq1ddu8Mg (Mustafa Süleyman), who leads the Microsoft AI
+      division, not Microsoft Corp — corrected per QUA-618.
   - id: f_cLGLs94fuy
     property: parent-organization
     value: Microsoft
@@ -25,3 +27,21 @@ facts:
     value: https://en.wikipedia.org/wiki/Microsoft_AI
     source: https://www.wikidata.org/wiki/Q125891217
     notes: From Wikidata Q125891217
+  - id: f_YcEb70AnJ1
+    property: ailabwatch-grade
+    value: 3%
+    asOf: 2025-09-01
+    source: https://ailabwatch.org/
+    notes: AI Lab Watch — September 2025
+  - id: f_CgwGi1z96B
+    property: saferai-grade
+    value: 18%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025
+  - id: f_5GuSclnep9
+    property: seoul-tracker-grade
+    value: Fulfilled
+    asOf: 2025-02-10
+    source: https://www.seoul-tracker.org
+    notes: Seoul Commitment Tracker — February 2025

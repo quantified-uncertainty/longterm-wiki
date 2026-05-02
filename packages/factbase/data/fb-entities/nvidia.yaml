@@ -22,8 +22,8 @@ facts:
     property: founded-by-name
     value: Jensen Huang
     source: https://www.wikidata.org/wiki/Q182477
-    notes: "Co-founded with Chris Malachowsky and Curtis Priem; Huang serves as
-      CEO since founding"
+    notes: "Co-founded with Chris Malachowsky and Curtis Priem; Huang serves as CEO
+      since founding"
 
   - id: f_n3aNvt6ee9
     property: ceo
@@ -51,7 +51,8 @@ facts:
     property: description
     value: "NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200,
       and B200 GPUs powering virtually all frontier AI training. Its proprietary
-      CUDA software ecosystem creates deep lock-in across the AI training stack."
+      CUDA software ecosystem creates deep lock-in across the AI training
+      stack."
     asOf: 2026-03
     notes: "Migrated from old entity system"
 
@@ -82,8 +83,7 @@ facts:
     value: 42000
     asOf: 2026-01
     source: https://stockanalysis.com/stocks/nvda/employees/
-    notes: "42,000 employees as of January 25, 2026 (end of FY2026); up 16.7%
-      YoY"
+    notes: "42,000 employees as of January 25, 2026 (end of FY2026); up 16.7% YoY"
 
   # ── Revenue (fiscal year ending January) ────────────────────────
   - id: f_nvRvFY23mz
@@ -113,8 +113,8 @@ facts:
     value: 2.159e+11
     asOf: 2026-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026
-    notes: "FY2026 annual revenue ($215.9B); 65% YoY growth. Q4 FY2026 was a
-      record $68.1B."
+    notes: "FY2026 annual revenue ($215.9B); 65% YoY growth. Q4 FY2026 was a record
+      $68.1B."
 
   # ── Quarterly Data Center Revenue ───────────────────────────────
   - id: f_MF4yOqWUTI
@@ -145,7 +145,8 @@ facts:
     value: 4.27e+12
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/nvda/market-cap/
-    notes: "Market cap as of March 24, 2026. Value fluctuates significantly; needs periodic re-verification."
+    notes: "Market cap as of March 24, 2026. Value fluctuates significantly; needs
+      periodic re-verification."
 
   # ── Gross Margin ────────────────────────────────────────────────
   - id: f_k3tgTSGXzg
@@ -154,3 +155,9 @@ facts:
     asOf: 2025-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025
     notes: "FY2025 gross margin of 75.0%, up from 72.7% in FY2024"
+  - id: f_nKkJ8mTs4E
+    property: saferai-grade
+    value: 16%
+    asOf: 2025-10-01
+    source: https://ratings.safer-ai.org/comparison/
+    notes: SaferAI Ratings — October 2025

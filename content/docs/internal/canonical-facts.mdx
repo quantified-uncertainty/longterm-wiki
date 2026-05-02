@@ -335,8 +335,11 @@ The mirror is run automatically after `pnpm crux tb import-scorecards sync`
 `--no-factbase-mirror` to skip when running in CI without wiki-server
 access. To run by hand: `pnpm crux fb sync-scorecard-facts`.
 
-Mirrored files live at `packages/factbase/data/fb-entities/<slug>/scorecard-grades.yaml`
-with a "do not edit by hand" header — re-running the sync rewrites them
-in place. When an entity has no other per-entity files in its directory,
-removing the scorecard file folds the directory back to the original
-`<slug>.yaml` form.
+Mirrored facts are appended **inline** to each rated org's existing
+`packages/factbase/data/fb-entities/<slug>.yaml` (no separate file, no
+per-entity directory). The scorecard predicates form a managed set —
+every existing fact whose `property` is in that set is removed before
+the fresh facts are appended, so re-running the sync produces
+byte-identical yaml when source data is unchanged. Hand-curated facts on
+other predicates are preserved by `parseDocument()`/`Document.toString()`
+round-trips.

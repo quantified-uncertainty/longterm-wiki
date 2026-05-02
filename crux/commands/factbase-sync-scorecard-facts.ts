@@ -71,30 +71,34 @@ function formatSummary(summary: SyncSummary, dryRun: boolean): string {
       `  skipped (no slug):     ${summary.entitiesSkippedNoSlug}`,
     );
   }
-  if (!dryRun && summary.removed > 0) {
-    lines.push(`  stale files removed:  ${summary.removed}`);
+  if (summary.staleFactsRemoved > 0) {
+    const removedVerb = dryRun ? 'stale facts (would remove)' : 'stale facts removed';
+    lines.push(`  ${removedVerb}:  ${summary.staleFactsRemoved}`);
   }
 
-  // Per-entity outcomes — show "skipped" rows so operators can see what
-  // didn't get mirrored and why. Limit "written" rows to keep the output
-  // readable when 50+ entities are touched.
-  const skipped = summary.details.filter((d) => d.status !== 'written');
-  if (skipped.length > 0) {
+  // Per-entity outcomes — show every non-written row (skip + stale-cleanup)
+  // so operators can see what didn't get mirrored and why.
+  const nonWritten = summary.details.filter((d) => d.status !== 'written');
+  if (nonWritten.length > 0) {
     lines.push('');
-    lines.push('Skipped entities:');
-    for (const d of skipped) {
-      const reason =
-        d.status === 'skipped-no-slug'
-          ? `stableId ${d.stableId} not in data/entities/*.yaml`
-          : `no fb-entity yaml at fb-entities/${d.slug}.yaml or fb-entities/${d.slug}/`;
+    lines.push('Skipped / cleaned-up entities:');
+    for (const d of nonWritten) {
+      let reason: string;
+      if (d.status === 'skipped-no-slug') {
+        reason = `stableId ${d.stableId} not in data/entities/*.yaml`;
+      } else if (d.status === 'skipped-no-fb-yaml') {
+        reason = `no fb-entity yaml at fb-entities/${d.slug}.yaml`;
+      } else {
+        reason = `removed ${d.factCount} stale managed fact(s) — no current grades`;
+      }
       lines.push(`  - ${d.slug ?? d.stableId}: ${reason}`);
     }
   }
 
-  if (!dryRun && summary.entitiesWritten > 0) {
+  if (!dryRun && (summary.entitiesWritten > 0 || summary.staleFactsRemoved > 0)) {
     lines.push('');
     lines.push(
-      `Run \`pnpm crux fb validate\` to confirm the new facts parse cleanly,`,
+      `Run \`pnpm crux fb validate\` to confirm the facts parse cleanly,`,
     );
     lines.push(
       `then commit the changes under packages/factbase/data/fb-entities/.`,
