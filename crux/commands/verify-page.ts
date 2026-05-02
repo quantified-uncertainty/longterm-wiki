@@ -27,8 +27,6 @@ import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -221,7 +219,6 @@ export async function verifyPageCommand(
       pipelineName: 'verify-page',
       entityId: page.slug,
       shape: mode,
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker: costTracker,
     },

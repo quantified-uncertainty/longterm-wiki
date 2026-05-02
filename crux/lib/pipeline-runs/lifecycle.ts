@@ -47,6 +47,8 @@ import {
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
 import type { CostTracker } from '../cost-tracker.ts';
+import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
+import { parseAgentSessionId } from './agent-session-id.ts';
 
 // Crux libs log via console (validate-no-console-log only blocks server
 // code under apps/wiki-server). Structured fields are stringified into
@@ -107,23 +109,27 @@ export async function withPipelineRun<T>(
 ): Promise<T> {
   const runId = randomUUID();
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
-  // QUA-1016: snapshot the tracker's entry count BEFORE the body runs so
-  // the pipeline_runs row only records the delta added by this body — not
-  // any pre-existing entries the caller already accumulated. This makes
-  // nested usage (e.g. improve-entity → research-agent, both sharing one
-  // CostTracker) attribute cost correctly: the inner row records only the
-  // research-agent spend, the outer row records the full improve-entity
-  // total. Without this, the inner row would double-count parent-spent
-  // costs and `pipeline_runs` "by pipeline" dashboards would be inflated.
+  // Snapshot the tracker's entry count BEFORE the body runs so each
+  // pipeline_runs row only records what its body added — not entries the
+  // caller already accumulated. Required for nested wraps (e.g.
+  // improve-entity → research-agent, sharing one tracker) so the inner
+  // row doesn't double-count parent spend.
   const trackerStartIndex = options.tracker?.entries.length ?? 0;
 
   // Start the run. Fail-closed by default.
+  // Defaults `agentSessionId` to the cached audit session id when callers
+  // don't pass one — covers the common case (a CLI command running inside
+  // an agent session) without duplicating the same coercion at every site.
+  // Tests and explicit callers can still override.
   const startResult = await startPipelineRun({
     runId,
     pipelineName: options.pipelineName,
     entityId: options.entityId ?? null,
     shape: options.shape ?? null,
-    agentSessionId: options.agentSessionId ?? null,
+    agentSessionId:
+      options.agentSessionId === undefined
+        ? parseAgentSessionId(getCachedAuditSessionId())
+        : options.agentSessionId,
   });
 
   if (!startResult.ok) {
@@ -286,9 +292,9 @@ interface CostTotals {
  * null — see QUA-1012 comment in `EndPipelineRunInput`).
  *
  * `startIndex` is the snapshot of `tracker.entries.length` taken before
- * the body ran (QUA-1016). Only entries added after that index are summed,
- * so a pipeline_run row records cost added by *this* body — not any cost
- * the caller's tracker already carried in. Required for nested
+ * the body ran. Only entries added after that index are summed, so a
+ * pipeline_run row records cost added by *this* body — not any cost the
+ * caller's tracker already carried in. Required for nested
  * withPipelineRun calls that share a single tracker.
  *
  * `costUsd` is rounded to 4 decimal places. The pricing module produces

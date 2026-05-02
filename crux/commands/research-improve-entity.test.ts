@@ -26,11 +26,11 @@ import {
   buildVerifiedVerdictsFromBatch,
   checkBudgetOrThrow,
   drainPendingBatches,
-  parseAgentSessionId,
   parseExtractedClaims,
   type ClaimVerdictRow,
   type SubmittedBatchInfo,
 } from "./research-improve-entity.ts";
+import { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
 import { CostTracker } from "../lib/cost-tracker.ts";
 import type { EntityWithType as ImportedEntityWithType } from "./research-improve-entity.ts";
 import type { PreFilterClaim } from "../lib/research/pre-filter.ts";

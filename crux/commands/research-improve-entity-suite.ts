@@ -22,8 +22,8 @@ import {
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
-  parseAgentSessionId,
 } from "./research-improve-entity.ts";
+import { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
 import {
   assertNoImproveEntityMutexConflict,
   ImproveEntityMutexError,

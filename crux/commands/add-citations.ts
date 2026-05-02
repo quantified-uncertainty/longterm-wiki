@@ -22,8 +22,6 @@ import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 
 // Reuse from verify-page.ts
 import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
@@ -371,37 +369,20 @@ export async function addCitationsCommand(
   const startTime = Date.now();
 
   // Load page
-  const page = findPageById(pageId);
-  if (!page) {
+  const loadedPage = findPageById(pageId);
+  if (!loadedPage) {
     return { exitCode: 1, output: `Page not found: ${pageId}` };
   }
+  // Narrow to non-null for the closure body — TS doesn't propagate the
+  // `if (!page)` narrowing across a nested function declaration.
+  const page = loadedPage;
 
   console.log(`\n  Adding citations to: ${page.title} (${page.slug})`);
   console.log(`  Mode: ${dryRun ? 'dry-run' : 'apply'}, limit: ${limit}, budget: $${budget}\n`);
 
   const costTracker = new CostTracker();
 
-  return withPipelineRun(
-    {
-      pipelineName: 'add-citations',
-      entityId: page.slug,
-      shape: dryRun ? 'dry-run' : 'apply',
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
-      allowOffline: true,
-      tracker: costTracker,
-    },
-    async () => addCitationsBody(page, dryRun, budget, limit, startTime, costTracker),
-  );
-}
-
-async function addCitationsBody(
-  page: NonNullable<ReturnType<typeof findPageById>>,
-  dryRun: boolean,
-  budget: number,
-  limit: number,
-  startTime: number,
-  costTracker: CostTracker,
-): Promise<CommandResult> {
+  async function addCitationsBody(): Promise<CommandResult> {
   // Step 1: Extract claims and classify
   console.log('  [1/4] Extracting claims...');
   const claims = await extractClaims(page.content);
@@ -596,6 +577,18 @@ async function addCitationsBody(
   ].join('\n');
 
   return { exitCode: 0, output };
+  }
+
+  return withPipelineRun(
+    {
+      pipelineName: 'add-citations',
+      entityId: page.slug,
+      shape: dryRun ? 'dry-run' : 'apply',
+      allowOffline: true,
+      tracker: costTracker,
+    },
+    addCitationsBody,
+  );
 }
 
 // ── Dry run formatting ───────────────────────────────────────────────

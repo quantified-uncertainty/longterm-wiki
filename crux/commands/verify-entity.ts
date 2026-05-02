@@ -23,8 +23,6 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getSourcingStats } from '../lib/wiki-server/sourcing-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
@@ -403,7 +401,6 @@ async function verifyEntityCommand(
       pipelineName: 'verify-entity',
       entityId,
       shape: typeFilter ?? 'all',
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker,
     },

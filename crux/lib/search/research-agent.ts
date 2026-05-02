@@ -35,8 +35,6 @@ import { createLlmClient, streamingCreate, extractText, MODELS } from '../llm.ts
 import type { SourceCacheEntry } from '../content/section-writer.ts';
 import type { CostTracker } from '../cost-tracker.ts';
 import { withPipelineRun } from '../pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../pipeline-runs/agent-session-id.ts';
 import { MODEL_PRICING } from '../pricing.ts';
 import { initFromPG, getResourceByUrl } from './resource-lookup.ts';
 import { saveResources } from '../../resource-io.ts';
@@ -591,7 +589,6 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       pipelineName: 'research-agent',
       entityId: request.pageContext?.entityId ?? null,
       shape: request.pageContext?.type ?? null,
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker: request.tracker,
     },

@@ -39,8 +39,6 @@ import { parseAndValidate } from '../json-parsing.ts';
 import { CostTracker } from '../cost-tracker.ts';
 import { sanitizeBatchCustomId, type BatchRequest } from '../anthropic-batch.ts';
 import { withPipelineRun } from '../pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../pipeline-runs/agent-session-id.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -439,7 +437,6 @@ export async function discoverSourceForFact(
       pipelineName: 'source-discover',
       entityId: input.entity.id,
       shape: input.fact.propertyId,
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker,
     },

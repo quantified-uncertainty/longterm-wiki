@@ -1169,13 +1169,6 @@ export function buildImproveEntityRunOptions(
 }
 
 /**
- * Re-export for backwards compatibility with callers (improve-entity-suite,
- * tests) that imported `parseAgentSessionId` from this module before QUA-1016
- * extracted it to `crux/lib/pipeline-runs/agent-session-id.ts`.
- */
-export { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
-
-/**
  * Inner body of `improveSingleEntity` — runs inside `withPipelineRun` so the
  * entire iteration loop, drain, and write are scoped to a single
  * `pipeline_runs` lifecycle. Phase 1 establishes the run record; Phase 2

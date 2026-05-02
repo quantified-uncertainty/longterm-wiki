@@ -188,10 +188,8 @@ describe('runResearch', () => {
     mockInitFromPG.mockResolvedValue(undefined);
     mockGetResourceByUrl.mockReturnValue(null);
     mockSaveResources.mockResolvedValue(undefined);
-    // QUA-1016: pipeline_runs uses the same apiRequest. Route /api/pipeline-runs
-    // calls to ok responses; everything else falls through to the per-test
-    // default. Without this, withPipelineRun's /start call would consume the
-    // first `mockResolvedValueOnce` set up for PG search and break tests.
+    // Route /api/pipeline-runs/* through ok responses so withPipelineRun's
+    // start/end calls don't consume per-test `mockResolvedValueOnce`s.
     mockApiRequest.mockImplementation(async (_method: string, path: string) => {
       if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
         return { ok: true, data: {} };
@@ -476,8 +474,7 @@ describe('runResearch', () => {
 
   it('pre-seeds from PG search results and includes "pg" in sourcesSearched', async () => {
     // Mock PG search returning results.
-    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
-    // don't consume the search mock.
+    // Pass /api/pipeline-runs through ok so the search mock isn't consumed.
     mockApiRequest.mockImplementation(async (_method: string, path: string) => {
       if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
         return { ok: true, data: {} };
@@ -508,8 +505,7 @@ describe('runResearch', () => {
 
   it('counts urlsAlreadyInPG when PG and web search overlap', async () => {
     // Mock PG search returning a URL that Exa also returns.
-    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
-    // don't consume the search mock.
+    // Pass /api/pipeline-runs through ok so the search mock isn't consumed.
     mockApiRequest.mockImplementation(async (_method: string, path: string) => {
       if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
         return { ok: true, data: {} };
@@ -537,8 +533,8 @@ describe('runResearch', () => {
   });
 
   it('continues when PG search fails', async () => {
-    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
-    // don't get rejected (which would abort the run before the body).
+    // Pass /api/pipeline-runs through ok so withPipelineRun's start call
+    // isn't rejected — only the PG search itself should reject.
     mockApiRequest.mockImplementation(async (_method: string, path: string) => {
       if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
         return { ok: true, data: {} };

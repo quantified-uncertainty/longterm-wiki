@@ -334,11 +334,10 @@ describe('withPipelineRun', () => {
           heartbeatIntervalMs: 1_000_000_000,
         },
         async () => {
-          // QUA-1016: the tracker delta is snapshotted from the index
-          // before the body ran, so cost must be recorded INSIDE the
-          // body for the /end payload to capture it. Pre-existing
-          // tracker entries (e.g. from a parent pipeline) are
-          // intentionally excluded.
+          // The tracker delta is snapshotted from the index before the
+          // body ran, so cost must be recorded INSIDE the body for the
+          // /end payload to capture it. Pre-existing tracker entries
+          // (e.g. from a parent pipeline) are intentionally excluded.
           //
           // Use a real model from the pricing table so calculateCost
           // does NOT silently fall through to 0 — that masking is what
@@ -404,7 +403,7 @@ describe('withPipelineRun', () => {
           async () => {
             // Cost recorded inside the body — withPipelineRun snapshots
             // the tracker's entry index at start, so only this call's
-            // entry is included in /end's costUsd (QUA-1016).
+            // entry is included in /end's costUsd.
             tracker.recordExternalCost('perplexity/sonar', 0.42, 'gap-search');
             throw new Error('mid-run abort');
           },
@@ -422,12 +421,12 @@ describe('withPipelineRun', () => {
       );
     });
 
-    it('records only the body-added delta when the tracker pre-existing entries (QUA-1016)', async () => {
-      // QUA-1016: nested withPipelineRun calls (e.g. improve-entity →
-      // research-agent) commonly share one CostTracker. Each pipeline_run
-      // row should record only what its body added, not entries the
-      // outer scope had already accumulated. Otherwise the inner row
-      // double-counts parent spend and "by-pipeline" dashboards inflate.
+    it('records only the body-added delta, not pre-existing tracker entries', async () => {
+      // Nested withPipelineRun calls (e.g. improve-entity → research-agent)
+      // commonly share one CostTracker. Each pipeline_run row should
+      // record only what its body added, not entries the outer scope
+      // had already accumulated. Otherwise the inner row double-counts
+      // parent spend and "by-pipeline" dashboards inflate.
       mockStart.mockResolvedValue({ ok: true, data: {} });
       mockEnd.mockResolvedValue({ ok: true, data: {} });
 

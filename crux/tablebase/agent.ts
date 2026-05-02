@@ -8,8 +8,6 @@
 import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import type { EnrichmentTask, TaskResult } from './types.ts';
 import { getSystemPrompt, getUserPrompt } from './prompts.ts';
 import { getToolDefinitions, buildToolHandlers } from './tools.ts';
@@ -69,7 +67,6 @@ export async function runEnrichmentAgent(
       pipelineName: 'tablebase-agent',
       entityId: task.entityId,
       shape: task.taskType,
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker,
     },

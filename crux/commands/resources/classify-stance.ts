@@ -14,8 +14,6 @@ import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts'
 import { callLlm } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
 import { withPipelineRun } from '../../lib/pipeline-runs/lifecycle.ts';
-import { getCachedAuditSessionId } from '../../lib/wiki-server/audit-context.ts';
-import { parseAgentSessionId } from '../../lib/pipeline-runs/agent-session-id.ts';
 import { getResourcesByPage, upsertResource } from '../../lib/wiki-server/resources.ts';
 import type { ResourceRow } from '../../lib/wiki-server/resources.ts';
 
@@ -117,7 +115,6 @@ export async function classifyStance(args: {
       pipelineName: 'classify-stance',
       entityId: page,
       shape: 'resources',
-      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
       allowOffline: true,
       tracker,
     },

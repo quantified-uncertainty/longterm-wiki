@@ -5,8 +5,8 @@
  * `agent_sessions.id` foreign key on `pipeline_runs`. Returns null when
  * the cache is unset or the value is non-numeric.
  *
- * Shared helper used by every `withPipelineRun` callsite so the coercion
- * is consistent across pipelines (QUA-1016).
+ * Shared helper used by `withPipelineRun` so the coercion is consistent
+ * across pipelines.
  */
 export function parseAgentSessionId(raw: string | null): number | null {
   if (raw == null) return null;

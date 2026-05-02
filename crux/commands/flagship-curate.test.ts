@@ -164,11 +164,8 @@ describe('flagship-curate', () => {
       usage: { input_tokens: 100, output_tokens: 50 },
       model: 'claude-haiku-4-5-20251001',
     }));
-    // QUA-1016: flagship-curate now wraps in withPipelineRun, which makes
-    // /api/pipeline-runs/start + /end calls through apiRequest. Without a
-    // default implementation the tests' specific mockResolvedValueOnce
-    // calls would be consumed by the start call. Route pipeline-runs to
-    // ok and pass through everything else.
+    // Route /api/pipeline-runs/* through ok responses so withPipelineRun's
+    // start/end calls don't consume per-test `mockResolvedValueOnce`s.
     mockApiRequest.mockImplementation(async (_method: unknown, path: unknown) => {
       if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
         return { ok: true, data: {} };
