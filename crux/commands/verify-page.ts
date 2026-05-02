@@ -26,6 +26,9 @@ import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
 import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -211,111 +214,124 @@ export async function verifyPageCommand(
   console.log(`\n  Verifying: ${page.title} (${page.slug})`);
   console.log(`  Mode: ${mode}\n`);
 
-  // Step 1: Extract claims
-  console.log('  [1/4] Extracting claims...');
-  const claims = await extractClaims(page.content);
-  console.log(`         Found ${claims.length} claims`);
-
-  if (claims.length === 0) {
-    return {
-      exitCode: 0,
-      output: `No verifiable claims found in ${page.title}`,
-    };
-  }
-
-  // Step 2: Classify cited vs uncited by checking if claim content appears in footnoted text
-  console.log('  [2/4] Classifying cited vs uncited...');
-  const footnoteMap = buildFootnoteMap(page.content);
-  const footnotedParagraphs = extractFootnotedSentences(page.content);
-
-  const classifiedClaims: ClaimWithCitation[] = claims.map(claim => ({
-    ...claim,
-    hasCitation: claimHasCitation(claim, footnotedParagraphs),
-    checkWorthy: isCheckWorthy(claim),
-  }));
-
-  const cited = classifiedClaims.filter(c => c.hasCitation);
-  const uncited = classifiedClaims.filter(c => !c.hasCitation);
-  const checkWorthy = uncited.filter(c => c.checkWorthy);
-
-  console.log(`         ${cited.length} cited, ${uncited.length} uncited (${checkWorthy.length} check-worthy)`);
-  console.log(`         ${footnoteMap.totalFootnotes} footnotes in page`);
-
-  if (mode === 'quick') {
-    // Quick mode: just report the breakdown
-    const report: PageSourcingReport = {
-      pageId: page.slug,
-      title: page.title,
-      totalClaims: claims.length,
-      citedClaims: cited.length,
-      uncitedClaims: uncited.length,
-      checkWorthyClaims: checkWorthy.length,
-      verified: 0,
-      verdicts: { supported: 0, contradicted: 0, partially_supported: 0, unverifiable: 0 },
-      claims: classifiedClaims.map(c => ({ ...c })),
-      cost: 0,
-      durationMs: Date.now() - startTime,
-    };
-
-    return { exitCode: 0, output: formatReport(report) };
-  }
-
-  // Step 3: Verify uncited check-worthy claims against web
-  console.log('  [3/4] Verifying uncited claims against web...');
   const costTracker = new CostTracker();
-  const client = createLlmClient();
 
-  const verifiedClaims: VerifiedClaim[] = [];
-  let verifiedCount = 0;
-  let budgetExhausted = false;
+  return withPipelineRun(
+    {
+      pipelineName: 'verify-page',
+      entityId: page.slug,
+      shape: mode,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker: costTracker,
+    },
+    async () => {
+      // Step 1: Extract claims
+      console.log('  [1/4] Extracting claims...');
+      const claims = await extractClaims(page.content);
+      console.log(`         Found ${claims.length} claims`);
 
-  for (const claim of classifiedClaims) {
-    const shouldVerify = mode === 'deep' && !claim.hasCitation && claim.checkWorthy;
+      if (claims.length === 0) {
+        return {
+          exitCode: 0,
+          output: `No verifiable claims found in ${page.title}`,
+        };
+      }
 
-    if (shouldVerify && costTracker.totalCost >= budget && !budgetExhausted) {
-      budgetExhausted = true;
-      console.log(`         Budget limit reached ($${budget}), skipping remaining claims`);
-    }
+      // Step 2: Classify cited vs uncited by checking if claim content appears in footnoted text
+      console.log('  [2/4] Classifying cited vs uncited...');
+      const footnoteMap = buildFootnoteMap(page.content);
+      const footnotedParagraphs = extractFootnotedSentences(page.content);
 
-    const underLimit = limit === 0 || verifiedCount < limit;
-    if (shouldVerify && costTracker.totalCost < budget && !budgetExhausted && underLimit) {
-      const verified = await verifyClaimAgainstWeb(claim, client, costTracker);
-      verifiedClaims.push(verified);
-      verifiedCount++;
-      const icon = verified.verdict === 'supported' ? '+' :
-        verified.verdict === 'contradicted' ? 'X' :
-        verified.verdict === 'partially_supported' ? '~' : '?';
-      console.log(`         [${icon}] ${verified.text.slice(0, 70)}...`);
-    } else {
-      verifiedClaims.push({ ...claim });
-    }
-  }
+      const classifiedClaims: ClaimWithCitation[] = claims.map(claim => ({
+        ...claim,
+        hasCitation: claimHasCitation(claim, footnotedParagraphs),
+        checkWorthy: isCheckWorthy(claim),
+      }));
 
-  console.log(`  [4/4] Done. Verified ${verifiedCount} claims against web.`);
+      const cited = classifiedClaims.filter(c => c.hasCitation);
+      const uncited = classifiedClaims.filter(c => !c.hasCitation);
+      const checkWorthy = uncited.filter(c => c.checkWorthy);
 
-  // Build report
-  const verdictCounts: Record<WebVerdict, number> = {
-    supported: 0, contradicted: 0, partially_supported: 0, unverifiable: 0,
-  };
-  for (const c of verifiedClaims) {
-    if (c.verdict) verdictCounts[c.verdict]++;
-  }
+      console.log(`         ${cited.length} cited, ${uncited.length} uncited (${checkWorthy.length} check-worthy)`);
+      console.log(`         ${footnoteMap.totalFootnotes} footnotes in page`);
 
-  const report: PageSourcingReport = {
-    pageId: page.slug,
-    title: page.title,
-    totalClaims: claims.length,
-    citedClaims: cited.length,
-    uncitedClaims: uncited.length,
-    checkWorthyClaims: checkWorthy.length,
-    verified: verifiedCount,
-    verdicts: verdictCounts,
-    claims: verifiedClaims,
-    cost: costTracker.totalCost,
-    durationMs: Date.now() - startTime,
-  };
+      if (mode === 'quick') {
+        // Quick mode: just report the breakdown
+        const report: PageSourcingReport = {
+          pageId: page.slug,
+          title: page.title,
+          totalClaims: claims.length,
+          citedClaims: cited.length,
+          uncitedClaims: uncited.length,
+          checkWorthyClaims: checkWorthy.length,
+          verified: 0,
+          verdicts: { supported: 0, contradicted: 0, partially_supported: 0, unverifiable: 0 },
+          claims: classifiedClaims.map(c => ({ ...c })),
+          cost: 0,
+          durationMs: Date.now() - startTime,
+        };
 
-  return { exitCode: 0, output: formatReport(report) };
+        return { exitCode: 0, output: formatReport(report) };
+      }
+
+      // Step 3: Verify uncited check-worthy claims against web
+      console.log('  [3/4] Verifying uncited claims against web...');
+      const client = createLlmClient();
+
+      const verifiedClaims: VerifiedClaim[] = [];
+      let verifiedCount = 0;
+      let budgetExhausted = false;
+
+      for (const claim of classifiedClaims) {
+        const shouldVerify = mode === 'deep' && !claim.hasCitation && claim.checkWorthy;
+
+        if (shouldVerify && costTracker.totalCost >= budget && !budgetExhausted) {
+          budgetExhausted = true;
+          console.log(`         Budget limit reached ($${budget}), skipping remaining claims`);
+        }
+
+        const underLimit = limit === 0 || verifiedCount < limit;
+        if (shouldVerify && costTracker.totalCost < budget && !budgetExhausted && underLimit) {
+          const verified = await verifyClaimAgainstWeb(claim, client, costTracker);
+          verifiedClaims.push(verified);
+          verifiedCount++;
+          const icon = verified.verdict === 'supported' ? '+' :
+            verified.verdict === 'contradicted' ? 'X' :
+            verified.verdict === 'partially_supported' ? '~' : '?';
+          console.log(`         [${icon}] ${verified.text.slice(0, 70)}...`);
+        } else {
+          verifiedClaims.push({ ...claim });
+        }
+      }
+
+      console.log(`  [4/4] Done. Verified ${verifiedCount} claims against web.`);
+
+      // Build report
+      const verdictCounts: Record<WebVerdict, number> = {
+        supported: 0, contradicted: 0, partially_supported: 0, unverifiable: 0,
+      };
+      for (const c of verifiedClaims) {
+        if (c.verdict) verdictCounts[c.verdict]++;
+      }
+
+      const report: PageSourcingReport = {
+        pageId: page.slug,
+        title: page.title,
+        totalClaims: claims.length,
+        citedClaims: cited.length,
+        uncitedClaims: uncited.length,
+        checkWorthyClaims: checkWorthy.length,
+        verified: verifiedCount,
+        verdicts: verdictCounts,
+        claims: verifiedClaims,
+        cost: costTracker.totalCost,
+        durationMs: Date.now() - startTime,
+      };
+
+      return { exitCode: 0, output: formatReport(report) };
+    },
+  );
 }
 
 // ── Report formatting ────────────────────────────────────────────────

@@ -326,27 +326,6 @@ describe('withPipelineRun', () => {
       const { EndPipelineRunSchema } = await import('../../../apps/wiki-server/src/api-types.ts');
 
       const tracker = new CostTracker();
-      // Use a real model from the pricing table so calculateCost does
-      // NOT silently fall through to 0 — that masking is what made the
-      // pre-review version of this test a tautology.
-      tracker.record('claude-sonnet-4-6', {
-        input_tokens: 1000,
-        output_tokens: 200,
-        cache_creation_input_tokens: 50,
-        cache_read_input_tokens: 30,
-      }, 'phase-1');
-      tracker.record('claude-sonnet-4-6', {
-        input_tokens: 500,
-        output_tokens: 100,
-        cache_creation_input_tokens: 0,
-        cache_read_input_tokens: 80,
-      }, 'phase-2');
-
-      // Sanity guard: this combination must produce an FP-imprecise
-      // total — that's what proves the rounding is exercised. If
-      // pricing math ever lands on a clean 4-dp value, swap to inputs
-      // that don't (e.g. add a cache-read token).
-      expect((tracker.totalCost * 10000) % 1).not.toBe(0);
 
       await withPipelineRun(
         {
@@ -354,8 +333,37 @@ describe('withPipelineRun', () => {
           tracker,
           heartbeatIntervalMs: 1_000_000_000,
         },
-        async () => 'done',
+        async () => {
+          // QUA-1016: the tracker delta is snapshotted from the index
+          // before the body ran, so cost must be recorded INSIDE the
+          // body for the /end payload to capture it. Pre-existing
+          // tracker entries (e.g. from a parent pipeline) are
+          // intentionally excluded.
+          //
+          // Use a real model from the pricing table so calculateCost
+          // does NOT silently fall through to 0 — that masking is what
+          // made the pre-review version of this test a tautology.
+          tracker.record('claude-sonnet-4-6', {
+            input_tokens: 1000,
+            output_tokens: 200,
+            cache_creation_input_tokens: 50,
+            cache_read_input_tokens: 30,
+          }, 'phase-1');
+          tracker.record('claude-sonnet-4-6', {
+            input_tokens: 500,
+            output_tokens: 100,
+            cache_creation_input_tokens: 0,
+            cache_read_input_tokens: 80,
+          }, 'phase-2');
+          return 'done';
+        },
       );
+
+      // Sanity guard: this combination must produce an FP-imprecise
+      // total — that's what proves the rounding is exercised. If
+      // pricing math ever lands on a clean 4-dp value, swap to inputs
+      // that don't (e.g. add a cache-read token).
+      expect((tracker.totalCost * 10000) % 1).not.toBe(0);
 
       expect(mockEnd).toHaveBeenCalledWith(
         expect.any(String),
@@ -385,7 +393,6 @@ describe('withPipelineRun', () => {
       const { CostTracker } = await import('../cost-tracker.ts');
 
       const tracker = new CostTracker();
-      tracker.recordExternalCost('perplexity/sonar', 0.42, 'gap-search');
 
       await expect(
         withPipelineRun(
@@ -395,6 +402,10 @@ describe('withPipelineRun', () => {
             heartbeatIntervalMs: 1_000_000_000,
           },
           async () => {
+            // Cost recorded inside the body — withPipelineRun snapshots
+            // the tracker's entry index at start, so only this call's
+            // entry is included in /end's costUsd (QUA-1016).
+            tracker.recordExternalCost('perplexity/sonar', 0.42, 'gap-search');
             throw new Error('mid-run abort');
           },
         ),
@@ -407,6 +418,43 @@ describe('withPipelineRun', () => {
           costUsd: 0.42,
           tokensInput: 0,
           tokensOutput: 0,
+        }),
+      );
+    });
+
+    it('records only the body-added delta when the tracker pre-existing entries (QUA-1016)', async () => {
+      // QUA-1016: nested withPipelineRun calls (e.g. improve-entity →
+      // research-agent) commonly share one CostTracker. Each pipeline_run
+      // row should record only what its body added, not entries the
+      // outer scope had already accumulated. Otherwise the inner row
+      // double-counts parent spend and "by-pipeline" dashboards inflate.
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+      // Caller has already accumulated some spend before entering
+      // withPipelineRun — this is the parent pipeline's cost.
+      tracker.recordExternalCost('parent-search', 1.23, 'parent-phase');
+
+      await withPipelineRun(
+        { pipelineName: 'inner', tracker, heartbeatIntervalMs: 1_000_000_000 },
+        async () => {
+          tracker.recordExternalCost('inner-call', 0.05, 'inner-phase');
+          return 'done';
+        },
+      );
+
+      // The inner pipeline_run row records only its own 0.05 — not the
+      // parent's 1.23. The parent's row, when it ends, will record the
+      // full 1.28 because its own startIndex was 0.
+      expect(mockEnd).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          status: 'committed',
+          costUsd: 0.05,
         }),
       );
     });

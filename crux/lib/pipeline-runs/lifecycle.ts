@@ -107,6 +107,15 @@ export async function withPipelineRun<T>(
 ): Promise<T> {
   const runId = randomUUID();
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
+  // QUA-1016: snapshot the tracker's entry count BEFORE the body runs so
+  // the pipeline_runs row only records the delta added by this body — not
+  // any pre-existing entries the caller already accumulated. This makes
+  // nested usage (e.g. improve-entity → research-agent, both sharing one
+  // CostTracker) attribute cost correctly: the inner row records only the
+  // research-agent spend, the outer row records the full improve-entity
+  // total. Without this, the inner row would double-count parent-spent
+  // costs and `pipeline_runs` "by pipeline" dashboards would be inflated.
+  const trackerStartIndex = options.tracker?.entries.length ?? 0;
 
   // Start the run. Fail-closed by default.
   const startResult = await startPipelineRun({
@@ -209,7 +218,7 @@ export async function withPipelineRun<T>(
       errorCode: overrideErrorCode,
       errorPayload: null,
       followups,
-      costTotals: trackerTotals(options.tracker),
+      costTotals: trackerTotals(options.tracker, trackerStartIndex),
     });
     return result;
   } catch (err: unknown) {
@@ -229,7 +238,7 @@ export async function withPipelineRun<T>(
         errorCode: overrideErrorCode ?? errorCodeFor(err),
         errorPayload: errorPayload(err),
         followups,
-        costTotals: trackerTotals(options.tracker),
+        costTotals: trackerTotals(options.tracker, trackerStartIndex),
       });
     } catch (finalizeErr: unknown) {
       error(
@@ -271,10 +280,16 @@ interface CostTotals {
 }
 
 /**
- * Snapshot the tracker's current totals. Returns null when no tracker is
- * configured so `finalize` can omit the cost fields entirely (preserving
- * the typed-client semantic that omitted ≠ null — see QUA-1012 comment in
- * `EndPipelineRunInput`).
+ * Snapshot the tracker's current totals (delta from `startIndex`). Returns
+ * null when no tracker is configured so `finalize` can omit the cost
+ * fields entirely (preserving the typed-client semantic that omitted ≠
+ * null — see QUA-1012 comment in `EndPipelineRunInput`).
+ *
+ * `startIndex` is the snapshot of `tracker.entries.length` taken before
+ * the body ran (QUA-1016). Only entries added after that index are summed,
+ * so a pipeline_run row records cost added by *this* body — not any cost
+ * the caller's tracker already carried in. Required for nested
+ * withPipelineRun calls that share a single tracker.
  *
  * `costUsd` is rounded to 4 decimal places. The pricing module produces
  * costs like `0.006196500000000001` from per-token math + FP imprecision,
@@ -283,14 +298,15 @@ interface CostTotals {
  * silently truncate, so rounding client-side keeps caller-side and
  * persisted values equal.
  */
-function trackerTotals(tracker: CostTracker | undefined): CostTotals | null {
+function trackerTotals(tracker: CostTracker | undefined, startIndex: number): CostTotals | null {
   if (!tracker) return null;
   let costUsd = 0;
   let tokensInput = 0;
   let tokensOutput = 0;
   let tokensCacheRead = 0;
   let tokensCacheWrite = 0;
-  for (const entry of tracker.entries) {
+  for (let i = startIndex; i < tracker.entries.length; i++) {
+    const entry = tracker.entries[i];
     costUsd += entry.cost;
     tokensInput += entry.inputTokens;
     tokensOutput += entry.outputTokens;

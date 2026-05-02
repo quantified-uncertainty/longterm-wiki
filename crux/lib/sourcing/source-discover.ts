@@ -38,6 +38,9 @@ import { createLlmClient, runLlmAgent, MODELS } from '../llm.ts';
 import { parseAndValidate } from '../json-parsing.ts';
 import { CostTracker } from '../cost-tracker.ts';
 import { sanitizeBatchCustomId, type BatchRequest } from '../anthropic-batch.ts';
+import { withPipelineRun } from '../pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../pipeline-runs/agent-session-id.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -431,22 +434,34 @@ export async function discoverSourceForFact(
   const prompt = buildDiscoveryPrompt(input, threshold);
   const tracker = new CostTracker();
 
-  const text = await runLlmAgent(client, prompt, {
-    model,
-    maxTokens,
-    serverTools: [
-      { type: 'web_search_20250305', name: 'web_search', max_uses: maxWebSearchUses },
-    ],
-    maxToolTurns: DEFAULT_MAX_TOOL_TURNS,
-    retryLabel: `source-discover-${input.fact.id}`,
-    costTracker: tracker,
-  });
+  return withPipelineRun(
+    {
+      pipelineName: 'source-discover',
+      entityId: input.entity.id,
+      shape: input.fact.propertyId,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () => {
+      const text = await runLlmAgent(client, prompt, {
+        model,
+        maxTokens,
+        serverTools: [
+          { type: 'web_search_20250305', name: 'web_search', max_uses: maxWebSearchUses },
+        ],
+        maxToolTurns: DEFAULT_MAX_TOOL_TURNS,
+        retryLabel: `source-discover-${input.fact.id}`,
+        costTracker: tracker,
+      });
 
-  const parsed = parseDiscoveryResponse(text, threshold);
-  return {
-    ...parsed,
-    costUsd: tracker.totalCost,
-  };
+      const parsed = parseDiscoveryResponse(text, threshold);
+      return {
+        ...parsed,
+        costUsd: tracker.totalCost,
+      };
+    },
+  );
 }
 
 // ── Batch API support ────────────────────────────────────────────────

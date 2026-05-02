@@ -22,6 +22,9 @@ import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts
 import { PROJECT_ROOT } from '../../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
+import { withPipelineRun } from '../../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../../lib/pipeline-runs/agent-session-id.ts';
 import { fetchSource } from '../../lib/search/source-fetcher.ts';
 import {
   getVerdictByRecord,
@@ -514,6 +517,19 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   }
   const tracker = new CostTracker();
 
+  return withPipelineRun(
+    {
+      pipelineName: 'auto-verify-stakeholders',
+      entityId: policyFilter ?? null,
+      shape: dryRun ? 'dry-run' : 'apply',
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () => verifyBody(),
+  );
+
+  async function verifyBody(): Promise<CommandResult> {
   // 8. Process each stakeholder
   const results: SourcingResult[] = [...skippedAlreadyChecked];
   let verified = 0;
@@ -715,6 +731,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   }
 
   return { output, exitCode: contradicted > 0 ? 1 : 0 };
+  }
 }
 
 // ── Command Registry ────────────────────────────────────────────────────────

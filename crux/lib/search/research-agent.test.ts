@@ -188,10 +188,15 @@ describe('runResearch', () => {
     mockInitFromPG.mockResolvedValue(undefined);
     mockGetResourceByUrl.mockReturnValue(null);
     mockSaveResources.mockResolvedValue(undefined);
-    mockApiRequest.mockResolvedValue({
-      ok: false,
-      error: 'unavailable',
-      message: 'not configured',
+    // QUA-1016: pipeline_runs uses the same apiRequest. Route /api/pipeline-runs
+    // calls to ok responses; everything else falls through to the per-test
+    // default. Without this, withPipelineRun's /start call would consume the
+    // first `mockResolvedValueOnce` set up for PG search and break tests.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return { ok: false, error: 'unavailable', message: 'not configured' };
     });
   });
 
@@ -470,16 +475,23 @@ describe('runResearch', () => {
   });
 
   it('pre-seeds from PG search results and includes "pg" in sourcesSearched', async () => {
-    // Mock PG search returning results
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        results: [
-          { id: 'abc123', url: 'https://pg-resource.example.com/article', title: 'PG Resource', type: 'web', summary: 'From PG' },
-        ],
-        count: 1,
-        query: 'AI safety',
-      },
+    // Mock PG search returning results.
+    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
+    // don't consume the search mock.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return {
+        ok: true,
+        data: {
+          results: [
+            { id: 'abc123', url: 'https://pg-resource.example.com/article', title: 'PG Resource', type: 'web', summary: 'From PG' },
+          ],
+          count: 1,
+          query: 'AI safety',
+        },
+      };
     });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
@@ -495,16 +507,23 @@ describe('runResearch', () => {
   });
 
   it('counts urlsAlreadyInPG when PG and web search overlap', async () => {
-    // Mock PG search returning a URL that Exa also returns
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        results: [
-          { id: 'shared-id', url: 'https://aisafety.com/overview', title: 'AI Safety Overview (PG)', type: 'web', summary: null },
-        ],
-        count: 1,
-        query: 'AI safety',
-      },
+    // Mock PG search returning a URL that Exa also returns.
+    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
+    // don't consume the search mock.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return {
+        ok: true,
+        data: {
+          results: [
+            { id: 'shared-id', url: 'https://aisafety.com/overview', title: 'AI Safety Overview (PG)', type: 'web', summary: null },
+          ],
+          count: 1,
+          query: 'AI safety',
+        },
+      };
     });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
@@ -518,7 +537,14 @@ describe('runResearch', () => {
   });
 
   it('continues when PG search fails', async () => {
-    mockApiRequest.mockRejectedValueOnce(new Error('PG search timeout'));
+    // QUA-1016: filter by path so withPipelineRun's /api/pipeline-runs calls
+    // don't get rejected (which would abort the run before the body).
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      throw new Error('PG search timeout');
+    });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
     const result = await runResearch({

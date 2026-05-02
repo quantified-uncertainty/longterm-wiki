@@ -22,6 +22,9 @@ import { loadGraphFull } from '../lib/factbase-loader.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getSourcingStats } from '../lib/wiki-server/sourcing-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
@@ -394,84 +397,97 @@ async function verifyEntityCommand(
   // Execute sourcing
   const client = createLlmClient();
   const tracker = new CostTracker();
-  const results: SourcingResult[] = [];
-  const errors: SourcingError[] = [];
 
-  for (let i = 0; i < toVerify.length; i++) {
-    const claim = toVerify[i];
-    const progress = `[${i + 1}/${toVerify.length}]`;
-    process.stdout.write(`  ${progress} ${claim.recordType.padEnd(10)} ${claim.description.slice(0, 70)}... `);
+  return withPipelineRun(
+    {
+      pipelineName: 'verify-entity',
+      entityId,
+      shape: typeFilter ?? 'all',
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () => {
+      const results: SourcingResult[] = [];
+      const errors: SourcingError[] = [];
 
-    // Check budget
-    if (tracker.totalCost > budgetLimit) {
-      console.log(`\n${c.yellow}Budget limit reached ($${tracker.totalCost.toFixed(3)} > $${budgetLimit})${c.reset}`);
-      break;
-    }
+      for (let i = 0; i < toVerify.length; i++) {
+        const claim = toVerify[i];
+        const progress = `[${i + 1}/${toVerify.length}]`;
+        process.stdout.write(`  ${progress} ${claim.recordType.padEnd(10)} ${claim.description.slice(0, 70)}... `);
 
-    // Fetch source
-    const sourceResult = await fetchSourceContent(claim.sourceUrl);
-    if ('error' in sourceResult) {
-      errors.push({ claim, error: sourceResult.error, errorType: sourceResult.errorType });
-      console.log(`${c.yellow}SKIP${c.reset} (${sourceResult.errorType})`);
-      continue;
-    }
+        // Check budget
+        if (tracker.totalCost > budgetLimit) {
+          console.log(`\n${c.yellow}Budget limit reached ($${tracker.totalCost.toFixed(3)} > $${budgetLimit})${c.reset}`);
+          break;
+        }
 
-    // Source-check via LLM
-    const result = await sourcingClaim(claim, sourceResult.text, client, tracker);
-    if ('error' in result) {
-      errors.push(result);
-      console.log(`${c.red}ERROR${c.reset}`);
-      continue;
-    }
+        // Fetch source
+        const sourceResult = await fetchSourceContent(claim.sourceUrl);
+        if ('error' in sourceResult) {
+          errors.push({ claim, error: sourceResult.error, errorType: sourceResult.errorType });
+          console.log(`${c.yellow}SKIP${c.reset} (${sourceResult.errorType})`);
+          continue;
+        }
 
-    results.push(result);
-    const verdictColor = result.verdict === 'confirmed' ? c.green
-      : result.verdict === 'contradicted' ? c.red
-      : c.yellow;
-    console.log(`${verdictColor}${result.verdict}${c.reset} (${(result.confidence * 100).toFixed(0)}%)`);
+        // Source-check via LLM
+        const result = await sourcingClaim(claim, sourceResult.text, client, tracker);
+        if ('error' in result) {
+          errors.push(result);
+          console.log(`${c.red}ERROR${c.reset}`);
+          continue;
+        }
 
-    // Store evidence + aggregate verdict
-    await storeEvidence(result);
-    await storeLocalAggregateVerdict(
-      claim.recordType, claim.recordId, claim.entityId,
-      result.verdict, result.confidence, result.reasoning,
-    );
-  }
+        results.push(result);
+        const verdictColor = result.verdict === 'confirmed' ? c.green
+          : result.verdict === 'contradicted' ? c.red
+          : c.yellow;
+        console.log(`${verdictColor}${result.verdict}${c.reset} (${(result.confidence * 100).toFixed(0)}%)`);
 
-  // Summary
-  const lines: string[] = [];
-  lines.push('');
-  lines.push(`${c.bold}Source-Check Summary${c.reset}`);
-  lines.push(`Entity: ${entityId}`);
-  lines.push(`Verified: ${results.length} | Errors: ${errors.length} | Cost: $${tracker.totalCost.toFixed(3)}`);
-  lines.push('');
+        // Store evidence + aggregate verdict
+        await storeEvidence(result);
+        await storeLocalAggregateVerdict(
+          claim.recordType, claim.recordId, claim.entityId,
+          result.verdict, result.confidence, result.reasoning,
+        );
+      }
 
-  const counts = new Map<string, number>();
-  for (const r of results) counts.set(r.verdict, (counts.get(r.verdict) ?? 0) + 1);
+      // Summary
+      const lines: string[] = [];
+      lines.push('');
+      lines.push(`${c.bold}Source-Check Summary${c.reset}`);
+      lines.push(`Entity: ${entityId}`);
+      lines.push(`Verified: ${results.length} | Errors: ${errors.length} | Cost: $${tracker.totalCost.toFixed(3)}`);
+      lines.push('');
 
-  for (const [verdict, count] of [...counts.entries()].sort(([, a], [, b]) => b - a)) {
-    const color = verdict === 'confirmed' ? c.green : verdict === 'contradicted' ? c.red : c.yellow;
-    lines.push(`  ${color}${verdict.padEnd(15)}${c.reset} ${count}`);
-  }
+      const counts = new Map<string, number>();
+      for (const r of results) counts.set(r.verdict, (counts.get(r.verdict) ?? 0) + 1);
 
-  if (errors.length > 0) {
-    lines.push('');
-    lines.push(`${c.bold}Errors:${c.reset}`);
-    const errorCounts = new Map<string, number>();
-    for (const e of errors) errorCounts.set(e.errorType ?? 'unknown', (errorCounts.get(e.errorType ?? 'unknown') ?? 0) + 1);
-    for (const [type, count] of errorCounts) {
-      lines.push(`  ${c.yellow}${type.padEnd(20)}${c.reset} ${count}`);
-    }
-  }
+      for (const [verdict, count] of [...counts.entries()].sort(([, a], [, b]) => b - a)) {
+        const color = verdict === 'confirmed' ? c.green : verdict === 'contradicted' ? c.red : c.yellow;
+        lines.push(`  ${color}${verdict.padEnd(15)}${c.reset} ${count}`);
+      }
 
-  const avgConfidence = results.length > 0
-    ? results.reduce((s, r) => s + r.confidence, 0) / results.length
-    : 0;
-  lines.push('');
-  lines.push(`Average confidence: ${(avgConfidence * 100).toFixed(0)}%`);
+      if (errors.length > 0) {
+        lines.push('');
+        lines.push(`${c.bold}Errors:${c.reset}`);
+        const errorCounts = new Map<string, number>();
+        for (const e of errors) errorCounts.set(e.errorType ?? 'unknown', (errorCounts.get(e.errorType ?? 'unknown') ?? 0) + 1);
+        for (const [type, count] of errorCounts) {
+          lines.push(`  ${c.yellow}${type.padEnd(20)}${c.reset} ${count}`);
+        }
+      }
 
-  const contradicted = counts.get('contradicted') ?? 0;
-  return { exitCode: contradicted > 0 ? 1 : 0, output: lines.join('\n') };
+      const avgConfidence = results.length > 0
+        ? results.reduce((s, r) => s + r.confidence, 0) / results.length
+        : 0;
+      lines.push('');
+      lines.push(`Average confidence: ${(avgConfidence * 100).toFixed(0)}%`);
+
+      const contradicted = counts.get('contradicted') ?? 0;
+      return { exitCode: contradicted > 0 ? 1 : 0, output: lines.join('\n') };
+    },
+  );
 }
 
 // ── CLI entry point ─────────────────────────────────────────────────

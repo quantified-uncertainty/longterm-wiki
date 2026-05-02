@@ -13,6 +13,9 @@
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { callLlm } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
+import { withPipelineRun } from '../../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../../lib/pipeline-runs/agent-session-id.ts';
 import { getResourcesByPage, upsertResource } from '../../lib/wiki-server/resources.ts';
 import type { ResourceRow } from '../../lib/wiki-server/resources.ts';
 
@@ -109,51 +112,63 @@ export async function classifyStance(args: {
   const tracker = new CostTracker();
   const allResults: ClassificationResult[] = [];
 
-  for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
-    const batch = batches[batchIdx];
-    console.log(`Batch ${batchIdx + 1}/${batches.length} (${batch.length} resources)...`);
+  await withPipelineRun(
+    {
+      pipelineName: 'classify-stance',
+      entityId: page,
+      shape: 'resources',
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () => {
+      for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
+        const batch = batches[batchIdx];
+        console.log(`Batch ${batchIdx + 1}/${batches.length} (${batch.length} resources)...`);
 
-    try {
-      const response = await callLlm(client, {
-        system: SYSTEM_PROMPT,
-        user: buildUserPrompt(batch),
-      }, {
-        model: MODELS.haiku,
-        maxTokens: 4000,
-        tracker,
-        label: 'stance-classification',
-      });
+        try {
+          const response = await callLlm(client, {
+            system: SYSTEM_PROMPT,
+            user: buildUserPrompt(batch),
+          }, {
+            model: MODELS.haiku,
+            maxTokens: 4000,
+            tracker,
+            label: 'stance-classification',
+          });
 
-      const parsed = parseJsonResponse(response.text);
-      if (!Array.isArray(parsed)) {
-        console.error(`  Unexpected response format (not array), skipping batch`);
-        continue;
-      }
+          const parsed = parseJsonResponse(response.text);
+          if (!Array.isArray(parsed)) {
+            console.error(`  Unexpected response format (not array), skipping batch`);
+            continue;
+          }
 
-      for (const item of parsed as any[]) {
-        if (!item.id || !item.stance) continue;
-        if (!VALID_STANCES.includes(item.stance)) {
-          if (verbose) console.log(`  ⚠ Invalid stance "${item.stance}" for ${item.id}, skipping`);
-          continue;
+          for (const item of parsed as any[]) {
+            if (!item.id || !item.stance) continue;
+            if (!VALID_STANCES.includes(item.stance)) {
+              if (verbose) console.log(`  ⚠ Invalid stance "${item.stance}" for ${item.id}, skipping`);
+              continue;
+            }
+            const matchedItem = items.find((r) => r.id === item.id);
+            if (!matchedItem) {
+              if (verbose) console.log(`  ⚠ Unknown resource id "${item.id}", skipping`);
+              continue;
+            }
+            allResults.push({
+              resourceId: item.id,
+              title: matchedItem.title,
+              url: matchedItem.url,
+              stance: item.stance,
+              confidence: item.confidence ?? 'medium',
+              reasoning: item.reasoning ?? '',
+            });
+          }
+        } catch (err) {
+          console.error(`  Batch ${batchIdx + 1} failed:`, err instanceof Error ? err.message : err);
         }
-        const matchedItem = items.find((r) => r.id === item.id);
-        if (!matchedItem) {
-          if (verbose) console.log(`  ⚠ Unknown resource id "${item.id}", skipping`);
-          continue;
-        }
-        allResults.push({
-          resourceId: item.id,
-          title: matchedItem.title,
-          url: matchedItem.url,
-          stance: item.stance,
-          confidence: item.confidence ?? 'medium',
-          reasoning: item.reasoning ?? '',
-        });
       }
-    } catch (err) {
-      console.error(`  Batch ${batchIdx + 1} failed:`, err instanceof Error ? err.message : err);
-    }
-  }
+    },
+  );
 
   // Display results
   console.log(`\n── Results ──────────────────────────────────────`);

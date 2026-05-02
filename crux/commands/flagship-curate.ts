@@ -25,6 +25,9 @@ import type { CommandResult } from '../lib/command-types.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CreditExhaustedError, isCreditExhaustedError } from '../lib/resilience.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 import { parseAndValidateArray } from '../lib/json-parsing.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import { getPersonnelByEntity, syncPersonnel } from '../lib/wiki-server/personnel.ts';
@@ -1140,6 +1143,20 @@ Options:
   console.log('');
 
   const tracker = new CostTracker();
+
+  return withPipelineRun(
+    {
+      pipelineName: 'flagship-curate',
+      entityId: entityId ?? null,
+      shape: isAll ? 'batch' : 'single',
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () => flagshipCurateBody(),
+  );
+
+  async function flagshipCurateBody(): Promise<CommandResult> {
   const results: CurationResult[] = [];
 
   // Resolve entities
@@ -1297,6 +1314,7 @@ Options:
   }
 
   return { exitCode, output };
+  }
 }
 
 // ── Exports ────────────────────────────────────────────────────────────

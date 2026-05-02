@@ -24,6 +24,9 @@ import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
+import { withPipelineRun } from '../../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../../lib/pipeline-runs/agent-session-id.ts';
 
 import {
   type OrchestratorContext,
@@ -31,6 +34,7 @@ import {
   type OrchestratorResult,
   type OrchestratorPageData,
   type OrchestratorTier,
+  type BudgetConfig,
   TIER_BUDGETS,
 } from './types.ts';
 import { renumberFootnotes } from '../../lib/content/section-splitter.ts';
@@ -327,8 +331,68 @@ export async function runOrchestrator(
   // ── Build context ─────────────────────────────────────────────────────────
 
   const tracker = new CostTracker();
-
   const mode = options.mode || 'improve';
+
+  return withPipelineRun(
+    {
+      pipelineName: 'authoring-orchestrator',
+      entityId: page.id,
+      shape: `${mode}:${tier}`,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker,
+    },
+    async () =>
+      runOrchestratorBody({
+        page,
+        filePath,
+        content,
+        options,
+        tier,
+        directions,
+        orchestratorModel,
+        writerModel,
+        budget,
+        signal,
+        startTime,
+        tracker,
+        mode,
+      }),
+  );
+}
+
+interface OrchestratorBodyArgs {
+  page: OrchestratorPageData;
+  filePath: string;
+  content: string;
+  options: OrchestratorOptions;
+  tier: OrchestratorTier;
+  directions: string;
+  orchestratorModel: string;
+  writerModel: string;
+  budget: BudgetConfig;
+  signal: AbortSignal | undefined;
+  startTime: number;
+  tracker: CostTracker;
+  mode: NonNullable<OrchestratorOptions['mode']>;
+}
+
+async function runOrchestratorBody(args: OrchestratorBodyArgs): Promise<OrchestratorResult> {
+  const {
+    page,
+    filePath,
+    content,
+    options,
+    tier,
+    directions,
+    orchestratorModel,
+    writerModel,
+    budget,
+    signal,
+    startTime,
+    tracker,
+    mode,
+  } = args;
 
   const ctx: OrchestratorContext = {
     mode,

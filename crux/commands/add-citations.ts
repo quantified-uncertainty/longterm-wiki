@@ -21,6 +21,9 @@ import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
+import { getCachedAuditSessionId } from '../lib/wiki-server/audit-context.ts';
+import { parseAgentSessionId } from '../lib/pipeline-runs/agent-session-id.ts';
 
 // Reuse from verify-page.ts
 import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
@@ -376,6 +379,29 @@ export async function addCitationsCommand(
   console.log(`\n  Adding citations to: ${page.title} (${page.slug})`);
   console.log(`  Mode: ${dryRun ? 'dry-run' : 'apply'}, limit: ${limit}, budget: $${budget}\n`);
 
+  const costTracker = new CostTracker();
+
+  return withPipelineRun(
+    {
+      pipelineName: 'add-citations',
+      entityId: page.slug,
+      shape: dryRun ? 'dry-run' : 'apply',
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      allowOffline: true,
+      tracker: costTracker,
+    },
+    async () => addCitationsBody(page, dryRun, budget, limit, startTime, costTracker),
+  );
+}
+
+async function addCitationsBody(
+  page: NonNullable<ReturnType<typeof findPageById>>,
+  dryRun: boolean,
+  budget: number,
+  limit: number,
+  startTime: number,
+  costTracker: CostTracker,
+): Promise<CommandResult> {
   // Step 1: Extract claims and classify
   console.log('  [1/4] Extracting claims...');
   const claims = await extractClaims(page.content);
@@ -393,7 +419,6 @@ export async function addCitationsCommand(
 
   // Step 2: Find sources for uncited claims
   console.log('  [2/4] Finding sources...');
-  const costTracker = new CostTracker();
   const client = createLlmClient();
 
   // Collect existing footnote IDs to avoid collisions

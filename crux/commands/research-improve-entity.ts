@@ -67,6 +67,7 @@ import {
   type WithPipelineRunOptions,
 } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
 import {
   assertNoImproveEntityMutexConflict,
   ImproveEntityMutexError,
@@ -1168,17 +1169,11 @@ export function buildImproveEntityRunOptions(
 }
 
 /**
- * Coerce the cached audit session id (a string from
- * `getCachedAuditSessionId()` because that's what's shipped on every
- * X-Agent-Session-Id header) into a number for the bigint
- * `agent_sessions.id` foreign key on `pipeline_runs`. Returns null when
- * the cache is unset or the value is non-numeric.
+ * Re-export for backwards compatibility with callers (improve-entity-suite,
+ * tests) that imported `parseAgentSessionId` from this module before QUA-1016
+ * extracted it to `crux/lib/pipeline-runs/agent-session-id.ts`.
  */
-export function parseAgentSessionId(raw: string | null): number | null {
-  if (raw == null) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : null;
-}
+export { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
 
 /**
  * Inner body of `improveSingleEntity` — runs inside `withPipelineRun` so the
