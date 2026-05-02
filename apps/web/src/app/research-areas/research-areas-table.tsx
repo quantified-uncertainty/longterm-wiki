@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { DirectoryFilterDropdown } from "@/components/directory/DirectoryFilterDropdown";
 import { CoverageDots } from "@/components/coverage/CoverageDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { CLUSTER_COLORS, STATUS_COLORS, formatCluster } from "./research-area-constants";
@@ -101,50 +103,37 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
         <input
           type="text"
           placeholder="Search research areas..."
+          aria-label="Search research areas"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm flex-1 min-w-0"
         />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-        >
-          <option value="all">All statuses</option>
-          {statusOptions.map((s) => (
-            <option key={s} value={s}>
-              {s.charAt(0).toUpperCase() + s.slice(1)}
-            </option>
-          ))}
-        </select>
+        <DirectoryFilterDropdown
+          ariaLabel="Filter by status"
+          allLabel="All statuses"
+          items={statusOptions.map((s) => ({
+            key: s,
+            label: s.charAt(0).toUpperCase() + s.slice(1),
+          }))}
+          selected={statusFilter}
+          onSelect={setStatusFilter}
+        />
       </div>
 
-      {/* Cluster filter pills */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        <button
-          onClick={() => setClusterFilter("all")}
-          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-            clusterFilter === "all"
-              ? "bg-foreground text-background"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
-          }`}
-        >
-          All ({clusterCounts.all})
-        </button>
-        {clusters.map((c) => (
-          <button
-            key={c}
-            onClick={() => setClusterFilter(c)}
-            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-              clusterFilter === c
-                ? "bg-foreground text-background"
-                : CLUSTER_COLORS[c] ?? "bg-muted text-muted-foreground"
-            }`}
-          >
-            {formatCluster(c)} ({clusterCounts[c] ?? 0})
-          </button>
-        ))}
-      </div>
+      {/* Cluster filter chips */}
+      <FilterChips
+        className="mb-4"
+        items={clusters.map((c) => ({
+          key: c,
+          label: formatCluster(c),
+          count: clusterCounts[c] ?? 0,
+        }))}
+        allCount={clusterCounts.all}
+        selected={clusterFilter}
+        onSelect={setClusterFilter}
+        hideTautologyFacets
+        hideWhenTrivial
+      />
 
       <div className="text-xs text-muted-foreground mb-2">
         {filtered.length} of {rows.length} research areas

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "./organizations-table";
 import { OrganizationsGrouped, GROUPS } from "./organizations-grouped";
 import { useDirectoryUrl } from "@/hooks/use-directory-url";
+import { formatFacetTextContent } from "@/components/directory/filter-shared";
 
 type ViewMode = "groups" | "table";
 
@@ -256,6 +257,11 @@ export function OrganizationsView({
   );
 }
 
+// Local ChipButton for /organizations specifically: needs the "click again to
+// scroll/escalate-to-table" UX (see handleChipClick) which the canonical
+// FilterChips deliberately does not model. Visible label uses the same
+// "Label (count)" format as FilterChips so textContent is "Funders (55)"
+// and not "Funders55" (closes the QUA-918 bug class for this surface too).
 function ChipButton({
   label,
   count,
@@ -267,8 +273,8 @@ function ChipButton({
   selected: boolean;
   onClick: () => void;
 }) {
-  // Build a screen-reader label so chips read as "Funders, 55 organizations"
-  // rather than "Funders 55" run together.
+  // Screen-reader label reads "Funders, 55 organizations" — richer than the
+  // canonical "Funders (55)" because this directory's chips count entities.
   const ariaLabel =
     count != null ? `${label}, ${count} organization${count === 1 ? "" : "s"}` : label;
   return (
@@ -277,18 +283,14 @@ function ChipButton({
       onClick={onClick}
       aria-pressed={selected}
       aria-label={ariaLabel}
+      data-testid="filter-chip"
       className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
         selected
           ? "bg-primary/10 border-primary/30 text-primary font-semibold"
           : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
       }`}
     >
-      <span aria-hidden="true">
-        {label}
-        {count != null && (
-          <span className="ml-1 text-[10px] opacity-60">{count}</span>
-        )}
-      </span>
+      <span aria-hidden="true">{formatFacetTextContent(label, count)}</span>
     </button>
   );
 }

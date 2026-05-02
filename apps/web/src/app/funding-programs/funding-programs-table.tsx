@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import type { RecordVerdict } from "@/data/tablebase";
@@ -188,96 +189,40 @@ export function FundingProgramsListTable({
         />
 
         {/* Status filter */}
-        <div className="flex flex-wrap gap-1.5">
-          <span className="text-xs text-muted-foreground mr-1 self-center">
-            Status:
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              setStatusFilter("all");
-              setPage(0);
-            }}
-            aria-pressed={statusFilter === "all"}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              statusFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">
-              {statusCounts.all}
-            </span>
-          </button>
-          {statuses.map((s) => (
-            <button
-              type="button"
-              key={s}
-              onClick={() => {
-                setStatusFilter(statusFilter === s ? "all" : s);
-                setPage(0);
-              }}
-              aria-pressed={statusFilter === s}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                statusFilter === s
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              {s}
-              <span className="ml-1 text-[10px] opacity-60">
-                {statusCounts[s] ?? 0}
-              </span>
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          prefix="Status:"
+          items={statuses.map((s) => ({
+            key: s,
+            label: s,
+            count: statusCounts[s] ?? 0,
+          }))}
+          allCount={statusCounts.all}
+          selected={statusFilter}
+          onSelect={(key) => {
+            setStatusFilter(key);
+            setPage(0);
+          }}
+          hideTautologyFacets
+          hideWhenTrivial
+        />
 
         {/* Type filter */}
-        <div className="flex flex-wrap gap-1.5">
-          <span className="text-xs text-muted-foreground mr-1 self-center">
-            Type:
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              setTypeFilter("all");
-              setPage(0);
-            }}
-            aria-pressed={typeFilter === "all"}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              typeFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">
-              {typeCounts.all}
-            </span>
-          </button>
-          {programTypes.map((t) => (
-            <button
-              type="button"
-              key={t}
-              onClick={() => {
-                setTypeFilter(typeFilter === t ? "all" : t);
-                setPage(0);
-              }}
-              aria-pressed={typeFilter === t}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                typeFilter === t
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              {PROGRAM_TYPE_LABELS[t] ?? t}
-              <span className="ml-1 text-[10px] opacity-60">
-                {typeCounts[t] ?? 0}
-              </span>
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          prefix="Type:"
+          items={programTypes.map((t) => ({
+            key: t,
+            label: PROGRAM_TYPE_LABELS[t] ?? t,
+            count: typeCounts[t] ?? 0,
+          }))}
+          allCount={typeCounts.all}
+          selected={typeFilter}
+          onSelect={(key) => {
+            setTypeFilter(key);
+            setPage(0);
+          }}
+          hideTautologyFacets
+          hideWhenTrivial
+        />
       </div>
 
       {/* Results count + pagination */}

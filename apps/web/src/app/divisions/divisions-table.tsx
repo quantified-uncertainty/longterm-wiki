@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
+import { FilterChips } from "@/components/directory/FilterChips";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
 import { formatCount } from "@/lib/format-compact";
@@ -112,57 +113,22 @@ export function DivisionsTable({
         ))}
       </div>
 
-      {/* By type filter badges */}
+      {/* By type filter */}
       {filteredTypeSummary.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-3">By Type</h2>
-          <div className="flex gap-3 flex-wrap">
-            {/* "All" badge */}
-            <button
-              type="button"
-              aria-pressed={selectedType === null}
-              onClick={() => setSelectedType(null)}
-              className={`rounded-lg border px-4 py-2 flex items-center gap-2 transition-all cursor-pointer ${
-                selectedType === null
-                  ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border/60 hover:border-primary/30"
-              }`}
-            >
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                All
-              </span>
-              <span className="text-sm tabular-nums text-muted-foreground">
-                {showAll ? rows.length : divisionsWithData}
-              </span>
-            </button>
-            {filteredTypeSummary.map((t) => (
-              <button
-                type="button"
-                key={t.type}
-                aria-pressed={selectedType === t.type}
-                onClick={() =>
-                  setSelectedType(selectedType === t.type ? null : t.type)
-                }
-                className={`rounded-lg border px-4 py-2 flex items-center gap-2 transition-all cursor-pointer ${
-                  selectedType === t.type
-                    ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
-                    : "border-border/60 hover:border-primary/30"
-                }`}
-              >
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                    DIVISION_TYPE_COLORS[t.type] ??
-                    "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                  }`}
-                >
-                  {t.label}
-                </span>
-                <span className="text-sm tabular-nums text-muted-foreground">
-                  {t.count}
-                </span>
-              </button>
-            ))}
-          </div>
+          <FilterChips
+            items={filteredTypeSummary.map((t) => ({
+              key: t.type,
+              label: t.label,
+              count: t.count,
+            }))}
+            allCount={showAll ? rows.length : divisionsWithData}
+            selected={selectedType ?? "all"}
+            onSelect={(key) => setSelectedType(key === "all" ? null : key)}
+            hideTautologyFacets
+            hideWhenTrivial
+          />
         </div>
       )}
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { FilterChips } from "@/components/directory/FilterChips";
 import { PoliticianScoresCell } from "@/components/political/politician-scores-cell";
 import type { PoliticalScore } from "@/components/political/types";
 import {
@@ -97,10 +98,6 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
     return [...result].sort((a, b) => compareByValue(a, b, getValue, sortDir));
   }, [rows, search, partyFilter, statusFilter, sortKey, sortDir]);
 
-  const pillBase = "text-xs px-3 py-1.5 rounded-lg border transition-all";
-  const pillActive = "bg-primary/10 border-primary/30 text-primary font-semibold";
-  const pillInactive = "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground";
-
   return (
     <div>
       {/* Filters */}
@@ -115,49 +112,33 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
           {/* Party filter */}
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setPartyFilter("all")}
-              aria-pressed={partyFilter === "all"}
-              className={`${pillBase} ${partyFilter === "all" ? pillActive : pillInactive}`}
-            >
-              All <span className="ml-1 text-[10px] opacity-60">{rows.length}</span>
-            </button>
-            {parties.map(([party, count]) => (
-              <button
-                key={party}
-                onClick={() => setPartyFilter(partyFilter === party ? "all" : party)}
-                aria-pressed={partyFilter === party}
-                className={`${pillBase} capitalize ${partyFilter === party ? pillActive : pillInactive}`}
-              >
-                {party} <span className="ml-1 text-[10px] opacity-60">{count}</span>
-              </button>
-            ))}
-          </div>
+          <FilterChips
+            items={parties.map(([party, count]) => ({
+              key: party,
+              label: party,
+              count,
+            }))}
+            allCount={rows.length}
+            selected={partyFilter}
+            onSelect={setPartyFilter}
+            hideTautologyFacets
+            hideWhenTrivial
+          />
         </div>
         {/* Status filter */}
-        {statuses.length > 1 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-muted-foreground/70 mr-0.5">Status:</span>
-            <button
-              onClick={() => setStatusFilter("all")}
-              aria-pressed={statusFilter === "all"}
-              className={`${pillBase} ${statusFilter === "all" ? pillActive : pillInactive}`}
-            >
-              All
-            </button>
-            {statuses.map(([status, count]) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
-                aria-pressed={statusFilter === status}
-                className={`${pillBase} capitalize ${statusFilter === status ? pillActive : pillInactive}`}
-              >
-                {status} <span className="ml-1 text-[10px] opacity-60">{count}</span>
-              </button>
-            ))}
-          </div>
-        )}
+        <FilterChips
+          prefix="Status:"
+          items={statuses.map(([status, count]) => ({
+            key: status,
+            label: status,
+            count,
+          }))}
+          allCount={rows.length}
+          selected={statusFilter}
+          onSelect={setStatusFilter}
+          hideTautologyFacets
+          hideWhenTrivial
+        />
       </div>
 
       <div className="text-xs text-muted-foreground mb-3">

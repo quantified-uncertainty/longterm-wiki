@@ -26,6 +26,16 @@ export {
   type FilterChipItem,
   type FilterChipsProps,
 } from "./FilterChips";
+export {
+  DirectoryFilterDropdown,
+  type FilterDropdownItem,
+  type DirectoryFilterDropdownProps,
+} from "./DirectoryFilterDropdown";
+export {
+  formatFacetTextContent,
+  filterVisibleFacets,
+  type FilterFacet,
+} from "./filter-shared";
 export { EntityDataPage } from "./EntityDataPage";
 export {
   DirectoryIndexShell,

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingRoundCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
@@ -120,52 +121,22 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
         />
 
         {/* Instrument filter */}
-        {instruments.length > 1 && (
-          <div className="flex flex-wrap gap-1.5">
-            <span className="text-xs text-muted-foreground mr-1 self-center">
-              Instrument:
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                setInstrumentFilter("all");
-                setPage(0);
-              }}
-              aria-pressed={instrumentFilter === "all"}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                instrumentFilter === "all"
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All
-              <span className="ml-1 text-[10px] opacity-60">
-                {instrumentCounts.all}
-              </span>
-            </button>
-            {instruments.map((inst) => (
-              <button
-                type="button"
-                key={inst}
-                onClick={() => {
-                  setInstrumentFilter(instrumentFilter === inst ? "all" : inst);
-                  setPage(0);
-                }}
-                aria-pressed={instrumentFilter === inst}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  instrumentFilter === inst
-                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                {instrumentLabel(inst)}
-                <span className="ml-1 text-[10px] opacity-60">
-                  {instrumentCounts[inst] ?? 0}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
+        <FilterChips
+          prefix="Instrument:"
+          items={instruments.map((inst) => ({
+            key: inst,
+            label: instrumentLabel(inst),
+            count: instrumentCounts[inst] ?? 0,
+          }))}
+          allCount={instrumentCounts.all}
+          selected={instrumentFilter}
+          onSelect={(key) => {
+            setInstrumentFilter(key);
+            setPage(0);
+          }}
+          hideTautologyFacets
+          hideWhenTrivial
+        />
       </div>
 
       {/* Results count + pagination */}
