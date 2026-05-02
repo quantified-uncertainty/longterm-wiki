@@ -203,6 +203,59 @@ export async function fetchJsonWithRetry(url, opts = {}) {
 }
 
 /**
+ * Fetch all pages of a paginated wiki-server endpoint.
+ *
+ * Each page gets its own AbortSignal via {@link fetchJsonWithRetry} — there is
+ * no shared signal across pages or parallel callers, and each page benefits
+ * from the retry helper's exponential-backoff on transient 5xx/429/network
+ * errors. Returns `null` on failure (matches the legacy contract: callers
+ * usually fall back to YAML-only data).
+ *
+ * QUA-1000: pre-fix, the inner `fetchAllPages` helper inside
+ * `mergePGRecordsIntoKB` shared a single 30s `AbortSignal.timeout` across
+ * all 11 parallel paginated fetchers AND across every sequential page fetch
+ * within each fetcher. The 30s timer was a wall-clock budget for the entire
+ * parallel fanout — once it fired, every in-flight request aborted, including
+ * the slowest endpoint (grants), which is what blocked CI.
+ *
+ * @param {string} baseUrl - full URL up to the path; no query string
+ * @param {string} itemsKey - response field containing the array
+ * @param {object} [opts]
+ * @param {number} [opts.pageSize=200]
+ * @param {number} [opts.timeoutMs=60_000] - per-page timeout
+ * @param {HeadersInit} [opts.headers]
+ * @param {typeof fetch} [opts.fetchImpl] - test override
+ * @param {(ms: number) => Promise<void>} [opts.sleepImpl] - test override
+ * @returns {Promise<any[] | null>}
+ */
+export async function fetchPaginatedItems(baseUrl, itemsKey, opts = {}) {
+  const {
+    pageSize = 200,
+    timeoutMs = 60_000,
+    headers,
+    fetchImpl,
+    sleepImpl,
+  } = opts;
+  let allItems = [];
+  let offset = 0;
+  while (true) {
+    const url = `${baseUrl}?limit=${pageSize}&offset=${offset}`;
+    const result = await fetchJsonWithRetry(url, {
+      headers,
+      timeoutMs,
+      fetchImpl,
+      sleepImpl,
+    });
+    if (!result.ok) return null;
+    const items = result.data[itemsKey] || [];
+    allItems = allItems.concat(items);
+    if (items.length < pageSize) break;
+    offset += pageSize;
+  }
+  return allItems;
+}
+
+/**
  * Fetch latest edit dates per page from the wiki-server API.
  * Falls back to an empty map if the server is unavailable.
  */
@@ -599,21 +652,20 @@ export async function fetchResearchAreas() {
   }
 
   const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
   try {
     const pageSize = 200;
     let allItems = [];
     let offset = 0;
     while (true) {
+      // Per-page fresh AbortSignal + retries on transient failures (QUA-1000).
       const url = `${serverUrl}/api/research-areas/enriched?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
-      if (!resp.ok) {
-        logWikiServerWarning('research-areas', `HTTP ${resp.status}`);
+      const result = await fetchJsonWithRetry(url, { headers, timeoutMs: 60_000 });
+      if (!result.ok) {
+        logWikiServerWarning('research-areas', result.reason);
         return [];
       }
-      const data = await resp.json();
-      const items = data.researchAreas || [];
+      const items = result.data.researchAreas || [];
       allItems = allItems.concat(items);
       if (items.length < pageSize) break;
       offset += pageSize;
@@ -1460,28 +1512,8 @@ export async function mergePGRecordsIntoKB(kb) {
 
   if (!kb.records) kb.records = {};
 
-  // Fetch all pages (paginate to avoid truncation at MAX_PAGE_SIZE)
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
-
-  /**
-   * Generic paginated fetcher. `itemsKey` is the response field containing the array.
-   */
-  async function fetchAllPages(endpoint, itemsKey) {
-    const pageSize = 200;
-    let allItems = [];
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}${endpoint}?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const items = data[itemsKey] || [];
-      allItems = allItems.concat(items);
-      if (items.length < pageSize) break; // last page
-      offset += pageSize;
-    }
-    return allItems;
-  }
+  const fetchAllPages = (endpoint, itemsKey) =>
+    fetchPaginatedItems(`${serverUrl}${endpoint}`, itemsKey, { headers });
 
   const [
     personnelResult,
@@ -1933,7 +1965,6 @@ export async function fetchAllEntityStableIds() {
   const serverUrl = getServerUrl();
   if (!serverUrl) return null;
   const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
   // Dedupe at the source — offset-based pagination + concurrent inserts can
   // return the same row twice or skip rows. The downstream Set-merge in
@@ -1945,18 +1976,18 @@ export async function fetchAllEntityStableIds() {
   let offset = 0;
   try {
     while (true) {
+      // Per-page fresh AbortSignal + retries on transient failures (QUA-1000).
       const url = `${serverUrl}/api/entities?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
-      if (!resp.ok) {
+      const result = await fetchJsonWithRetry(url, { headers, timeoutMs: 60_000 });
+      if (!result.ok) {
         // Mid-pagination failure → return null (matches the surrounding
         // fetchAllPages pattern). Caller falls back to the YAML-only set;
         // partial results would be worse than nothing because validators
         // would mis-flag late-page entities as orphans.
-        logWikiServerWarning('allEntityStableIds', `HTTP ${resp.status} at offset=${offset}`);
+        logWikiServerWarning('allEntityStableIds', `${result.reason} at offset=${offset}`);
         return null;
       }
-      const data = await resp.json();
-      const items = data.entities || [];
+      const items = result.data.entities || [];
       for (const e of items) {
         if (e.stableId) stableIds.add(e.stableId);
       }
