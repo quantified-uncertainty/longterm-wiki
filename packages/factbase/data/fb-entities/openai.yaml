@@ -71,6 +71,7 @@ facts:
     property: total-funding
     value: 5.99e+10
     asOf: 2025-03
+    validEnd: 2026-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
     notes: "Cumulative primary funding through SoftBank's $40B round (March 2025)
       at a $300B valuation. Bottom-up sum of documented primary rounds: $1B founding
@@ -81,9 +82,20 @@ facts:
       exclusion of the 2015 founding pledge (most of which was never
       realized) from its cumulative figure. The October 2025 PBC
       restructuring at $500B valuation was a recapitalization /
-      secondary-tender event, not a new primary round, so the total-primary
-      figure is unchanged. As of 2026-04 no further primary rounds have been
-      announced; if a new primary round closes, supersede this fact."
+      secondary-tender event, not a new primary round, so the
+      total-primary figure was unchanged through that event. Superseded
+      by the $122B March 2026 primary round (see f_QNOH7UIrtg)."
+
+  - id: f_QNOH7UIrtg
+    property: total-funding
+    value: 1.819e+11
+    asOf: 2026-03
+    source: https://openai.com/index/accelerating-the-next-phase-ai/
+    notes: "Cumulative primary funding through OpenAI's $122B round closed
+      March 31, 2026 at an $852B post-money valuation, anchored by Amazon,
+      NVIDIA, and SoftBank with co-leads (a16z, D.E. Shaw Ventures, MGX,
+      TPG, T. Rowe Price) and Microsoft participation. Total = $59.9B
+      cumulative through Mar 2025 + $122B Mar 2026 round = $181.9B."
 
   # ── Valuation ──────────────────────────────────────────────────
   - id: f_b56n3kcD2g
