@@ -4,7 +4,7 @@ import {
   filterVisibleFacets,
   formatFacetTextContent,
   type FilterFacet,
-} from "./filter-shared";
+} from "@components/directory/filter-shared";
 
 export type FilterDropdownItem = FilterFacet;
 

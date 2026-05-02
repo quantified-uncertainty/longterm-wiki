@@ -2,7 +2,7 @@
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { FilterChips } from "../FilterChips";
+import { FilterChips } from "@components/directory/FilterChips";
 
 function renderChips(props: Partial<React.ComponentProps<typeof FilterChips>> = {}) {
   const onSelect = vi.fn();

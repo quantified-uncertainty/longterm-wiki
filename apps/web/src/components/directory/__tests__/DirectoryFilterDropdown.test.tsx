@@ -2,7 +2,7 @@
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { DirectoryFilterDropdown } from "../DirectoryFilterDropdown";
+import { DirectoryFilterDropdown } from "@components/directory/DirectoryFilterDropdown";
 
 function renderDropdown(
   props: Partial<React.ComponentProps<typeof DirectoryFilterDropdown>> = {},

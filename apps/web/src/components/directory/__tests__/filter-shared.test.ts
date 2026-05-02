@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   filterVisibleFacets,
   formatFacetTextContent,
-} from "../filter-shared";
+} from "@components/directory/filter-shared";
 
 describe("formatFacetTextContent", () => {
   it("returns just the label when count is undefined", () => {
