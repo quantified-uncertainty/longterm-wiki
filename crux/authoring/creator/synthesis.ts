@@ -10,6 +10,7 @@ import { spawn } from 'child_process';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
 import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
 import { resolveTemplate, formatTemplateForPrompt } from '../../lib/content/page-templates.ts';
+import { prepareClaudeSpawnEnv } from '../../lib/claude-cli.ts';
 import type { SynthesisPhaseContext, CreatorContext } from './types.ts';
 
 type LoadResultContext = Pick<Required<CreatorContext>, 'loadResult'>;
@@ -309,9 +310,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
     const budget = quality === 'quality' ? 3.0 : 2.0;
     const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
-    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
-    const env = { ...process.env };
-    delete env.CLAUDECODE;
+    const env = prepareClaudeSpawnEnv();
 
     const claude = spawn('claude', [
       '-p',

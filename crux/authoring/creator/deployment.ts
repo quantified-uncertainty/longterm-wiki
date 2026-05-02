@@ -10,6 +10,7 @@ import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 import { ENTITY_LINK_RE, WIKI_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
+import { prepareClaudeSpawnEnv } from '../../lib/claude-cli.ts';
 
 let _slugToNumeric: Record<string, string> | null = null;
 
@@ -230,9 +231,7 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
 
   const { spawn } = await import('child_process');
 
-  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
+  const env = prepareClaudeSpawnEnv();
 
   return new Promise((resolve, reject) => {
     const TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes

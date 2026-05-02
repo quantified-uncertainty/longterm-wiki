@@ -28,6 +28,7 @@ import {
   unlinkSync as fsUnlinkSync,
 } from 'fs';
 import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_process';
+import { prepareClaudeSpawnEnv } from '../claude-cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -228,11 +229,14 @@ export function realDispatchEnv(): DispatchEnv {
       }
     },
     spawnDetached: (cmd, args, { cwd, stdoutFd, stderrFd, env: spawnEnv }) => {
+      // Strip CLAUDECODE + ANTHROPIC_API_KEY from the child env so the dispatched
+      // worker uses our OAuth Claude Code subscription rather than silently
+      // switching to API-direct billing. See QUA-1010 / QUA-612.
       const spawnOpts: SpawnOptions = {
         cwd,
         detached: true,
         stdio: ['ignore', stdoutFd, stderrFd],
-        ...(spawnEnv ? { env: spawnEnv } : {}),
+        env: prepareClaudeSpawnEnv(spawnEnv),
       };
       const child: ChildProcess = cpSpawn(cmd, args, spawnOpts);
       if (typeof child.pid !== 'number') {
