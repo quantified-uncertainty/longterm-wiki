@@ -49,25 +49,14 @@ describe("candidateSlugs", () => {
   ]);
   const getOwnerSlug = (id) => ownerSlugs.get(id) ?? null;
 
-  it("for funding-rounds, always namespaces by owner when owner exists", () => {
-    const record = {
-      key: "vjzygxG2V9",
-      ownerEntityId: "sid_anthropic1",
-      fields: { name: "Series G" },
-    };
-    const { base, withOwner } = candidateSlugs(record, "funding-rounds", getOwnerSlug);
-    expect(base).toBe("anthropic-series-g");
-    expect(withOwner).toBe("anthropic-series-g");
-  });
-
-  it("for funding-programs, base is the bare slug when no collision", () => {
+  it("returns both bare and owner-prefixed forms", () => {
     const record = {
       key: "pJ9oHvQ1Bb",
       ownerEntityId: "sid_anthropic1",
       fields: { name: "Rise Global Talent Program" },
     };
-    const { base, withOwner } = candidateSlugs(record, "funding-programs", getOwnerSlug);
-    expect(base).toBe("rise-global-talent-program");
+    const { bare, withOwner } = candidateSlugs(record, getOwnerSlug);
+    expect(bare).toBe("rise-global-talent-program");
     expect(withOwner).toBe("anthropic-rise-global-talent-program");
   });
 
@@ -77,7 +66,8 @@ describe("candidateSlugs", () => {
       ownerEntityId: "sid_anthropic1",
       fields: { name: "Anthropic Series G" },
     };
-    const { withOwner } = candidateSlugs(record, "funding-rounds", getOwnerSlug);
+    const { bare, withOwner } = candidateSlugs(record, getOwnerSlug);
+    expect(bare).toBe("anthropic-series-g");
     expect(withOwner).toBe("anthropic-series-g");
   });
 
@@ -87,8 +77,9 @@ describe("candidateSlugs", () => {
       ownerEntityId: "sid_unknown",
       fields: { name: "Series A" },
     };
-    const { base } = candidateSlugs(record, "funding-rounds", getOwnerSlug);
-    expect(base).toBe("series-a");
+    const { bare, withOwner } = candidateSlugs(record, getOwnerSlug);
+    expect(bare).toBe("series-a");
+    expect(withOwner).toBe("series-a");
   });
 
   it("falls back to record.key when name is missing", () => {
@@ -97,9 +88,20 @@ describe("candidateSlugs", () => {
       ownerEntityId: "sid_anthropic1",
       fields: {},
     };
-    const { base } = candidateSlugs(record, "funding-programs", getOwnerSlug);
-    // slugify("abc1234567") strips nothing — it's already alphanumeric
-    expect(base).toBe("abc1234567");
+    const { bare } = candidateSlugs(record, getOwnerSlug);
+    // slugify("abc1234567") strips nothing — already alphanumeric
+    expect(bare).toBe("abc1234567");
+  });
+
+  it("returns owner slug alone when name is empty after slugifying", () => {
+    const record = {
+      key: "abc1234567",
+      ownerEntityId: "sid_anthropic1",
+      fields: { name: "   " },
+    };
+    const { withOwner } = candidateSlugs(record, getOwnerSlug);
+    // Whitespace-only name → empty bare slug → withOwner falls back to owner
+    expect(withOwner).toBe("anthropic-abc1234567");
   });
 });
 
@@ -152,6 +154,40 @@ describe("assignSlugs", () => {
     const slugs = records.map((r) => r.slug).sort();
     // First wins the un-suffixed slot (sorted by key); second gets suffix.
     expect(slugs).toEqual(["anthropic-series-a", "anthropic-series-a-bbbb"]);
+  });
+
+  it("never assigns a slug that shadows another record's legacy key", () => {
+    // Record B's name slugifies to a string that matches record A's key.
+    // Without the shadowing guard, /funding-programs/aaaaaaaaaa would
+    // resolve to B (slug match) instead of A (legacy key URL).
+    const records = [
+      { key: "aaaaaaaaaa", ownerEntityId: "sid_anthropic1", fields: { name: "Real Program" } },
+      { key: "BBBBBBBBBB", ownerEntityId: "sid_openai0000", fields: { name: "AAAAAAAAAA" } },
+    ];
+    assignSlugs(records, "funding-programs", getOwnerSlug);
+    const aSlug = records.find((r) => r.key === "aaaaaaaaaa").slug;
+    const bSlug = records.find((r) => r.key === "BBBBBBBBBB").slug;
+    expect(bSlug).not.toBe("aaaaaaaaaa");
+    // A keeps its bare slug; B falls through to owner-prefixed or suffixed
+    expect(aSlug).toBe("real-program");
+    expect(bSlug.startsWith("openai-aaaaaaaaaa") || bSlug.startsWith("aaaaaaaaaa-")).toBe(true);
+  });
+
+  it("falls through cleanly when both first and second choice are taken by other records", () => {
+    // Three records in the same collection, all colliding on bare name.
+    const records = [
+      { key: "AAAAAAAAAA", ownerEntityId: "sid_anthropic1", fields: { name: "Open Call" } },
+      { key: "BBBBBBBBBB", ownerEntityId: "sid_openai0000", fields: { name: "Open Call" } },
+      { key: "CCCCCCCCCC", ownerEntityId: "sid_xai1234567", fields: { name: "Open Call" } },
+    ];
+    assignSlugs(records, "funding-programs", getOwnerSlug);
+    const slugs = records.map((r) => r.slug);
+    // All three unique
+    expect(new Set(slugs).size).toBe(3);
+    // Each has the owner prefix (since bare collides 3-way)
+    for (const r of records) {
+      expect(r.slug).toMatch(/^(anthropic|openai|xai)-open-call/);
+    }
   });
 
   it("is deterministic regardless of input order", () => {

@@ -162,7 +162,9 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
   if (!record) notFound();
 
   // Legacy URL: `/funding-rounds/<10-char-key>` redirects to slug URL.
-  if (record.slug && record.slug !== id && record.key === id) {
+  // findRoundRecord prefers slug match, so reaching `record.key === id`
+  // means slug match missed → request was by legacy key.
+  if (record.slug && record.key === id) {
     redirect(`/funding-rounds/${record.slug}`);
   }
 

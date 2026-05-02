@@ -77,7 +77,9 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
   if (!record) return notFound();
 
   // Legacy URL: `/funding-programs/<10-char-key>` redirects to slug URL.
-  if (record.slug && record.slug !== id && record.key === id) {
+  // findProgramRecord prefers slug match, so reaching `record.key === id`
+  // means slug match missed → request was by legacy key.
+  if (record.slug && record.key === id) {
     redirect(`/funding-programs/${record.slug}`);
   }
 
