@@ -29,7 +29,8 @@
 import { join } from 'path';
 import { createServer, type Server } from 'http';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import { getHandler, isKnownType, getRegisteredTypes } from '../lib/job-handlers/index.ts';
+import { getHandler, getRegisteredTypes } from '../lib/job-handlers/index.ts';
+import { assertConfiguredTypesAreRegistered } from './types-guard.ts';
 import {
   claimJob, claimJobWithTypes, startJob, completeJob, failJob, cancelJob,
   createJob, sweepJobs,
@@ -576,12 +577,10 @@ async function runWorker(config: WorkerConfig): Promise<void> {
   console.log(`[worker] Memory limit: ${MAX_RSS_MB}MB`);
   console.log(`[worker] Known handler types: ${getRegisteredTypes().join(', ')}`);
 
-  // Warn about unknown types
-  for (const t of config.types) {
-    if (!isKnownType(t)) {
-      console.warn(`[worker] Warning: type "${t}" has no registered handler`);
-    }
-  }
+  // Fail-fast if --types contains anything not in the handler registry.
+  // QUA-1041: a silent rename otherwise CrashLoops at deploy time instead of
+  // piling up unconsumed jobs in prod (QUA-699 / QUA-1039 incident class).
+  assertConfiguredTypesAreRegistered(config.types, getRegisteredTypes());
 
   // Start health server for K8s probes
   startHealthServer();
