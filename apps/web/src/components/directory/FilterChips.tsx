@@ -59,7 +59,7 @@ export function FilterChips({
     hideTautologyFacets,
   });
 
-  if (hideWhenTrivial && visible.length <= 1) return null;
+  if (hideWhenTrivial && selected === "all" && visible.length <= 1) return null;
 
   return (
     <div

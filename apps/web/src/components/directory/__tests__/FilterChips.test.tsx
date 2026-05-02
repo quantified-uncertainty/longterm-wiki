@@ -114,6 +114,21 @@ describe("FilterChips", () => {
     expect(container.textContent).toBe("");
   });
 
+  it("keeps chip row visible when hideWhenTrivial is true but a non-all filter is active", () => {
+    // If only 1 visible chip but user has selected it, we must render so they can clear it.
+    const { container } = render(
+      <FilterChips
+        items={[{ key: "active", label: "Active", count: 50 }]}
+        selected="active"
+        onSelect={vi.fn()}
+        allCount={50}
+        hideTautologyFacets
+        hideWhenTrivial
+      />,
+    );
+    expect(container.textContent).not.toBe("");
+  });
+
   it("renders without count when chip has no count field", () => {
     renderChips({
       items: [{ key: "all-time", label: "All time" }],
