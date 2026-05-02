@@ -58,6 +58,11 @@ import {
 } from "../lib/research/apply-verdicts.ts";
 import { canonicalSlug } from "../lib/research/canonical-names.ts";
 import {
+  buildInspectionReport,
+  fetchHistoricalRuns,
+  formatInspectionLine,
+} from "../lib/research/inspect.ts";
+import {
   withPipelineRun,
   type WithPipelineRunOptions,
 } from "../lib/pipeline-runs/lifecycle.ts";
@@ -1295,8 +1300,30 @@ async function doImproveSingleEntity(args: {
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]", exitCode: 1 };
+    return { output: "Usage: crux tb improve-entity <slug> [--inspect | --target=N --budget=N --max-iters=N --wait-for-settle --force]", exitCode: 1 };
   }
+
+  // --inspect short-circuits BEFORE any LLM client creation, mutex check,
+  // or pipeline_runs row insertion. True dry-run with zero Anthropic spend.
+  if (options.inspect) {
+    const found = findEntity(slug);
+    if (!found) {
+      return { output: `Entity not found in data/entities/*.yaml: ${slug}`, exitCode: 1 };
+    }
+    if (!SUPPORTED_TYPES.has(found.entity.type)) {
+      return {
+        output: `Unsupported entity type "${found.entity.type}" for ${slug}. Supported: ${[...SUPPORTED_TYPES].join(", ")}.`,
+        exitCode: 1,
+      };
+    }
+    const runs = await fetchHistoricalRuns();
+    const report = buildInspectionReport(found.entity, runs);
+    const out =
+      `inspect: ${slug} (${found.entity.type}) — zero LLM calls\n` +
+      formatInspectionLine(report);
+    return { output: out, exitCode: 0 };
+  }
+
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
@@ -1321,7 +1348,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity <slug> [--target=N] [--budget=N] [--max-iters=N] [--wait-for-settle] [--force]
+    output: `crux tb improve-entity <slug> [--inspect | --target=N --budget=N --max-iters=N --wait-for-settle --force]
 
 Closed-loop iterative entity improver. Discovers sources via runResearch,
 extracts gap-targeted claims with Haiku, pre-filters by token presence,
@@ -1331,6 +1358,15 @@ to the entity's source YAML file under data/entities/.
 Supported entity types: policy, organization.
 
 Options:
+  --inspect            ZERO-COST PRE-FLIGHT (QUA-1034). Loads the entity, runs
+                       the gap analyzer locally, and prints what WOULD be
+                       improved at what estimated cost — making zero LLM calls.
+                       Use this before --dry-run to confirm what the loop will
+                       target. Cost is estimated from prior pipeline_runs for
+                       the same entity (median), or a type-based fallback when
+                       no history exists. Short-circuits before mutex / pipeline
+                       row insertion. Distinct from --dry-run: --inspect = no
+                       LLM, --dry-run = full LLM cost but no YAML writeback.
   --target=N           Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
   --budget=N           Max LLM spend in USD — HARD cap, enforced by a live
                        CostTracker before every streamingCreate call. When the
@@ -1338,8 +1374,10 @@ Options:
                        throws BudgetExhaustedError, exits with reason
                        "budget-exhausted", and the pipeline_runs row is marked
                        aborted with errorCode=budget_exhausted (default: 2.0).
-  --max-iters=N        Max iterations (default: 1)
-  --dry-run            Don't write YAML
+  --max-iters=N        Max iterations (default: 1, lowered from 3 in QUA-1033 — most policies converge in 1)
+  --dry-run            Skip writing YAML changes back to data/entities/. NOTE:
+                       still runs the FULL LLM pipeline at full cost — use
+                       --inspect for a true zero-cost pre-flight.
   --wait-for-settle    After the main loop exits (target/iters/budget), keep
                        polling any unsettled batches until all claims reach a
                        terminal status, applying any newly-verified verdicts

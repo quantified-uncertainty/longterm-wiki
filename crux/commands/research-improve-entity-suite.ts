@@ -32,6 +32,14 @@ import {
 } from "../lib/improve-entity/mutex.ts";
 import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import { loadEntityMap, type EntityWithType } from "../lib/research/entity-loader.ts";
+import { formatCount } from "../lib/output.ts";
+import {
+  buildInspectionReport,
+  fetchHistoricalRuns,
+  formatInspectionSuite,
+  type InspectionReport,
+} from "../lib/research/inspect.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
@@ -176,31 +184,10 @@ export function aggregateResult(slug: string, type: string, result: ImproveResul
   };
 }
 
-/** Median of a numeric list. Linear interpolation between adjacent samples. */
-export function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const sorted = [...xs].sort((a, b) => a - b);
-  const mid = (sorted.length - 1) / 2;
-  const lo = Math.floor(mid);
-  const hi = Math.ceil(mid);
-  return (sorted[lo] + sorted[hi]) / 2;
-}
-
-/**
- * 25th-percentile via the standard linear-interpolation method (the same
- * R-7 / NumPy default behavior). Returns 0 for empty input.
- */
-export function p25(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  if (xs.length === 1) return xs[0];
-  const sorted = [...xs].sort((a, b) => a - b);
-  const idx = (sorted.length - 1) * 0.25;
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo];
-  const frac = idx - lo;
-  return sorted[lo] * (1 - frac) + sorted[hi] * frac;
-}
+// median + p25 moved to ../lib/stats.ts (QUA-1034 review). Re-exported here so
+// existing test imports `from "./research-improve-entity-suite.ts"` keep working.
+import { median, p25 } from "../lib/stats.ts";
+export { median, p25 };
 
 /** Compute aggregate metrics across the per-entity rows. Pure. */
 export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
@@ -456,15 +443,102 @@ async function runSuiteBody(
   return snapshot;
 }
 
+// ── Inspection (zero-cost pre-flight, QUA-1034) ─────────────────────────────
+
+export interface InspectSuiteOptions {
+  /** Path to the suite YAML. Defaults to crux/benchmarks/entity-suite.yaml. */
+  suitePath?: string;
+  /**
+   * Injected for tests — given a slug, returns the entity or null. Defaults
+   * to a one-time `loadEntityMap()` lookup so an N-slug suite triggers ONE
+   * directory scan, not N. The `findEntity(slug)` signature was a tempting
+   * default but causes O(N×M) reads on `data/entities/*.yaml`.
+   */
+  loadEntityFn?: (slug: string) => EntityWithType | null;
+  /** Injected for tests — defaults to the real fetchHistoricalRuns (hits wiki-server). */
+  fetchHistoryFn?: typeof fetchHistoricalRuns;
+}
+
+/**
+ * Inspect every supported entity in the suite. Returns one report per
+ * entity that was found in `data/entities/*.yaml`. Skipped entries are
+ * surfaced under two distinct buckets so the caller can present each
+ * appropriately:
+ *   - `notFound`: slug listed in the suite YAML but missing from
+ *     `data/entities/*.yaml`. Likely a stale suite entry or a typo.
+ *   - `unsupported`: slug present in the suite YAML but its `type`
+ *     doesn't match `filterToSupportedTypes` (today: only `policy`).
+ *     Will be picked up automatically when a new analyzer lands.
+ *
+ * Pure-ish: side effects are limited to the injected `loadEntityFn` and
+ * `fetchHistoryFn` (file reads + one read-only HTTP call). No LLM, no
+ * mutex, no pipeline_runs row insertion.
+ */
+export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
+  reports: InspectionReport[];
+  notFound: string[];
+  unsupported: SuiteEntry[];
+}> {
+  const suitePath = opts.suitePath ?? SUITE_YAML;
+  // Default loader builds a single Map from one directory scan, then closes
+  // over it for O(1) per-slug lookup. Avoids the O(N×M) re-scan that would
+  // happen if `findEntity` were the default (it re-reads every yaml file).
+  const defaultLoader = opts.loadEntityFn
+    ? null
+    : (() => {
+        const map = loadEntityMap();
+        return (slug: string) => map.get(slug) ?? null;
+      })();
+  const loadEntity = opts.loadEntityFn ?? defaultLoader!;
+  const fetchHistory = opts.fetchHistoryFn ?? fetchHistoricalRuns;
+
+  const all = loadSuite(suitePath);
+  const supported = filterToSupportedTypes(all);
+  const unsupported = all.filter((e) => !supported.includes(e));
+  const runs = await fetchHistory();
+
+  const reports: InspectionReport[] = [];
+  const notFound: string[] = [];
+  for (const entry of supported) {
+    const entity = loadEntity(entry.slug);
+    if (!entity) {
+      notFound.push(entry.slug);
+      continue;
+    }
+    reports.push(buildInspectionReport(entity, runs));
+  }
+  return { reports, notFound, unsupported };
+}
+
 // ── CLI entry point ─────────────────────────────────────────────────────────
 
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   void args;
+
+  // --inspect short-circuits BEFORE tag/budget validation, mutex check,
+  // withPipelineRun wrapper, or the suite runner. Pure pre-flight, zero LLM.
+  if (options.inspect) {
+    const { reports, notFound, unsupported } = await inspectSuite();
+    const lines: string[] = [formatInspectionSuite(reports, "Suite (improve-entity)")];
+    if (notFound.length > 0) {
+      lines.push(
+        `\nNote: ${formatCount(notFound.length, "suite entry", "suite entries")} not found in data/entities/*.yaml: ${notFound.join(", ")}`,
+      );
+    }
+    if (unsupported.length > 0) {
+      const labels = unsupported.map((e) => `${e.slug} (${e.type})`).join(", ");
+      lines.push(
+        `\nNote: ${formatCount(unsupported.length, "suite entry", "suite entries")} skipped — type not yet supported by the inspector: ${labels}`,
+      );
+    }
+    return { output: lines.join("\n"), exitCode: 0 };
+  }
+
   const tag = String(options.tag ?? "").trim();
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run] [--force]",
+        "Usage: crux tb improve-entity-suite [--inspect | --tag=<label> --budget=N --max-iters=N --target=N --dry-run --force]",
       exitCode: 1,
     };
   }
@@ -556,7 +630,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity-suite --tag=<label> [--budget=N] [--max-iters=N] [--target=N] [--dry-run] [--force]
+    output: `crux tb improve-entity-suite [--inspect | --tag=<label> --budget=N --max-iters=N --target=N --dry-run --force]
 
 Run the closed-loop improve-entity over every supported entity in
 crux/benchmarks/entity-suite.yaml. Produces a structured snapshot under
@@ -567,12 +641,21 @@ Pair with \`crux tb benchmark-suite --diff=<a>,<b>\` (QUA-873) for the YAML
 state delta.
 
 Options:
-  --tag=<label>     Required. Snapshot label (e.g. baseline, after-X).
+  --inspect         ZERO-COST PRE-FLIGHT (QUA-1034). For every supported entity
+                    in the suite, runs the gap analyzer locally and prints what
+                    WOULD be improved at what estimated cost — making zero LLM
+                    calls. No --tag required (no snapshot is written). Use this
+                    before launching a real suite run to confirm scope and
+                    expected spend. Distinct from --dry-run: --inspect = no LLM,
+                    --dry-run = full LLM cost but no YAML writeback.
+  --tag=<label>     Required for non-inspect runs. Snapshot label (e.g. baseline, after-X).
   --budget=N        Total LLM spend cap across the suite, USD.
                     Default: $${DEFAULT_PER_ENTITY_BUDGET_USD.toFixed(0)} × N supported entities (QUA-1033).
-  --max-iters=N     Max iterations per entity (default 1).
+  --max-iters=N     Max iterations per entity (default 1, lowered from 2 in QUA-1033).
   --target=N        Per-entity (provisions+stakeholders) target (passed through).
-  --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
+  --dry-run         Skip writing YAML changes back to data/entities/responses.yaml.
+                    NOTE: still runs the FULL LLM pipeline at full cost — use
+                    --inspect for a true zero-cost pre-flight.
   --force           Skip the QUA-1032 single-instance mutex check. By default,
                     refuses to start (exit 2) if another improve-entity-suite
                     or improve-entity run is already in flight. Use only for
