@@ -316,6 +316,110 @@ describe('withPipelineRun', () => {
     });
   });
 
+  describe('CostTracker integration (QUA-1013)', () => {
+    it('writes tracker totals to /end on success', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+      // Two recorded LLM calls — pricing module computes the cost; we
+      // only assert that totals match what the tracker reports rather
+      // than hardcoding a price (decoupled from pricing-table churn).
+      tracker.record('claude-sonnet-4-5', {
+        input_tokens: 1000,
+        output_tokens: 200,
+        cache_creation_input_tokens: 50,
+        cache_read_input_tokens: 30,
+      }, 'phase-1');
+      tracker.record('claude-sonnet-4-5', {
+        input_tokens: 500,
+        output_tokens: 100,
+        cache_creation_input_tokens: 0,
+        cache_read_input_tokens: 80,
+      }, 'phase-2');
+
+      await withPipelineRun(
+        {
+          pipelineName: 'improve-page',
+          tracker,
+          heartbeatIntervalMs: 1_000_000_000,
+        },
+        async () => 'done',
+      );
+
+      expect(mockEnd).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          status: 'committed',
+          costUsd: tracker.totalCost,
+          tokensInput: 1500,
+          tokensOutput: 300,
+          tokensCacheRead: 110,
+          tokensCacheWrite: 50,
+        }),
+      );
+    });
+
+    it('writes tracker totals to /end when the body throws', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { CostTracker } = await import('../cost-tracker.ts');
+
+      const tracker = new CostTracker();
+      tracker.recordExternalCost('perplexity/sonar', 0.42, 'gap-search');
+
+      await expect(
+        withPipelineRun(
+          {
+            pipelineName: 'improve-page',
+            tracker,
+            heartbeatIntervalMs: 1_000_000_000,
+          },
+          async () => {
+            throw new Error('mid-run abort');
+          },
+        ),
+      ).rejects.toThrow('mid-run abort');
+
+      expect(mockEnd).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          status: 'aborted',
+          costUsd: 0.42,
+          tokensInput: 0,
+          tokensOutput: 0,
+        }),
+      );
+    });
+
+    it('omits cost fields entirely when no tracker is configured', async () => {
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'improve-page', heartbeatIntervalMs: 1_000_000_000 },
+        async () => 'done',
+      );
+
+      const [, endPayload] = mockEnd.mock.calls[0];
+      // Fields are absent — distinct from `null`. The QUA-1012 typed
+      // client treats omitted as "preserve existing value", which is
+      // what untracked pipelines should produce.
+      expect(endPayload).not.toHaveProperty('costUsd');
+      expect(endPayload).not.toHaveProperty('tokensInput');
+      expect(endPayload).not.toHaveProperty('tokensOutput');
+      expect(endPayload).not.toHaveProperty('tokensCacheRead');
+      expect(endPayload).not.toHaveProperty('tokensCacheWrite');
+    });
+  });
+
   describe('/end failure handling', () => {
     it('logs error but still returns body result on /end failure', async () => {
       mockStart.mockResolvedValue({ ok: true, data: {} });

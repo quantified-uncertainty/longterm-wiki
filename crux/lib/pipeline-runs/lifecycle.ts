@@ -46,6 +46,7 @@ import {
   endPipelineRun,
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
+import type { CostTracker } from '../cost-tracker.ts';
 
 // Crux libs log via console (validate-no-console-log only blocks server
 // code under apps/wiki-server). Structured fields are stringified into
@@ -69,6 +70,13 @@ export interface WithPipelineRunOptions {
   allowOffline?: boolean;
   /** Override the heartbeat interval (ms). Test-only. */
   heartbeatIntervalMs?: number;
+  /**
+   * Optional CostTracker. When provided, totals are written to the
+   * pipeline_runs row on end-of-run (success or throw) — see QUA-1013 /
+   * QUA-1038. The tracker is read once in `finalize`; callers that mutate
+   * it after the body returns will not affect the persisted totals.
+   */
+  tracker?: CostTracker;
 }
 
 export interface PipelineRunCtx {
@@ -191,6 +199,7 @@ export async function withPipelineRun<T>(
       errorCode: overrideErrorCode,
       errorPayload: null,
       followups,
+      costTotals: trackerTotals(options.tracker),
     });
     return result;
   } catch (err: unknown) {
@@ -210,6 +219,7 @@ export async function withPipelineRun<T>(
         errorCode: overrideErrorCode ?? errorCodeFor(err),
         errorPayload: errorPayload(err),
         followups,
+        costTotals: trackerTotals(options.tracker),
       });
     } catch (finalizeErr: unknown) {
       error(
@@ -242,6 +252,41 @@ function makeOfflineCtx(runId: string): PipelineRunCtx {
   };
 }
 
+interface CostTotals {
+  costUsd: number;
+  tokensInput: number;
+  tokensOutput: number;
+  tokensCacheRead: number;
+  tokensCacheWrite: number;
+}
+
+/**
+ * Snapshot the tracker's current totals. Returns null when no tracker is
+ * configured so `finalize` can omit the cost fields entirely (preserving
+ * the typed-client semantic that omitted ≠ null — see QUA-1012 comment in
+ * `EndPipelineRunInput`).
+ */
+function trackerTotals(tracker: CostTracker | undefined): CostTotals | null {
+  if (!tracker) return null;
+  let tokensInput = 0;
+  let tokensOutput = 0;
+  let tokensCacheRead = 0;
+  let tokensCacheWrite = 0;
+  for (const entry of tracker.entries) {
+    tokensInput += entry.inputTokens;
+    tokensOutput += entry.outputTokens;
+    tokensCacheRead += entry.cacheReadInputTokens;
+    tokensCacheWrite += entry.cacheCreationInputTokens;
+  }
+  return {
+    costUsd: tracker.totalCost,
+    tokensInput,
+    tokensOutput,
+    tokensCacheRead,
+    tokensCacheWrite,
+  };
+}
+
 interface FinalizeArgs {
   runId: string;
   pipelineName: string;
@@ -250,6 +295,7 @@ interface FinalizeArgs {
   errorCode: string | null;
   errorPayload: Record<string, unknown> | null;
   followups: Array<Record<string, unknown>>;
+  costTotals: CostTotals | null;
 }
 
 async function finalize(args: FinalizeArgs): Promise<void> {
@@ -259,6 +305,7 @@ async function finalize(args: FinalizeArgs): Promise<void> {
     errorCode: args.errorCode,
     errorPayload: args.errorPayload,
     followupActions: args.followups,
+    ...(args.costTotals ?? {}),
   });
   if (!result.ok) {
     // End-call failure is non-fatal: we already swallowed the body's
