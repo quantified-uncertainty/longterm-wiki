@@ -69,6 +69,8 @@ When you see strong agreement across multiple agent passes on a non-trivial deci
 
 ### 6. Don't ship Phase 0 to lock in framing
 
+(Here "Phase 0" means the *implementation plan's* scaffolding/foundation PRs — distinct from the `/plan-feature` skill's own Phase 0 empirical-archaeology pass.)
+
 **Sunk cost from early shipping is a planning anti-pattern, not just a project-management one.** When ~9 PRs of v4 Phase 0 had merged, reversing the framing meant either (a) defending merged work or (b) absorbing it as "useful foundation we're keeping." Both options preserve a framework that hasn't been validated.
 
 Rules:

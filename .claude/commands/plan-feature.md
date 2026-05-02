@@ -28,13 +28,13 @@ Run these checks before launching any agents. **STOP and ask the user** if any t
 
 3. **Content-only work**: If the feature is primarily adding/improving wiki pages (not engineering), STOP. Say: "This is content work. Use `/review-knowledge-gap` for gap analysis or `pnpm crux w create`/`pnpm crux w improve` for pages. Proceed with full planning anyway?"
 
-4. **Enormous scope**: If the feature would replace an entire subsystem or require >8 implementation phases, STOP. Say: "This scope exceeds what a single plan can cover. Consider breaking into 2-3 independent features. Which sub-problem should we plan first?"
+4. **Enormous scope**: If the feature would replace an entire subsystem or require >8 implementation phases of the resulting plan (not this skill's phases), STOP. Say: "This scope exceeds what a single plan can cover. Consider breaking into 2-3 independent features. Which sub-problem should we plan first?"
 
 ---
 
 ## Phase 0: Empirical Archaeology — quantify the problem
 
-**Run this BEFORE any solution thinking.** A plan whose scope is set without empirical evidence will over-scope by default — see `.claude/rules/agent-planning-discipline.md` § "Empirical evidence before scope" and the QUA-1045 retro for why. The v4 plan that triggered this gate scoped 5 months of work on the assumption that "the YAML pipeline is fragile"; an empirical pass run after Phase 0 had already shipped found the real incident set was 7 across 4 mechanisms — fundamentally changing the plan.
+**Run this BEFORE any solution thinking.** A plan whose scope is set without empirical evidence will over-scope by default — see `.claude/rules/agent-planning-discipline.md` § "Empirical evidence before scope" and the QUA-1045 retro for why. The v4 plan that triggered this gate scoped 5 months of work on the assumption that "the YAML pipeline is fragile"; an empirical pass run after the plan's scaffolding PRs had already shipped found the real incident set was 7 across 4 mechanisms — fundamentally changing the plan. ("Scaffolding PRs" = the resulting plan's own Phase 0 — implementation Phase 0, distinct from this skill's Phase 0 here.)
 
 ### 0a. Skip conditions
 
@@ -84,7 +84,7 @@ Read both agent results. Then write `/tmp/plan-feature-evidence.md` with:
 ═══════════════════════════════════════════
 ```
 
-**Then stop and wait for user response.** The user must explicitly approve the framing in their own words ("yes, plan for the [N]-mechanism case", "narrow to mechanism X only", "halt — this is theoretical") before Phase 1 begins. Silence ≠ approval. "Looks good" ≠ approval. The user paraphrasing the framing or pushing back on it ≠ approval until they say "yes, proceed."
+**Then stop and wait for user response.** The user must explicitly approve the framing in their own words ("yes, plan for the [N]-mechanism case", "narrow to mechanism X only", "halt — this is theoretical") before Phase 1 begins. Paraphrasing or pushback is the *positive signal* that the user has actually engaged with the framing — it is what you want, not a problem to overcome. But engagement alone is not yet approval; the engagement must be followed by an explicit "yes, proceed" before Phase 1 begins. Silence ≠ approval. "Looks good" without paraphrasing or pushback ≠ approval (it could mean the user skimmed without engaging).
 
 If the user wants to proceed despite weak evidence, document the choice in the eventual plan body under "Open Questions" — "Empirical evidence weak; proceeded anyway because [user reason]." This makes the assumption legible to the next reader.
 
@@ -438,7 +438,7 @@ Print:
 | 4. Deep research | 3-6 | Feasibility, precedent, risk (per approach) |
 | 5c. Red team | 4 | Technical, UX, **deletion-only** (constrained mandate), strategic challenger |
 | 6a. Final review | 2 | Revision+reframing, implementability |
-| **Total** | **17-23** | |
+| **Total** | **16-23** | |
 
 All agents within a phase run in parallel. Sequential between phases. **4 user checkpoints** — Phase 0d (framing approval, mandatory), 1d (research synthesis), 3b (approach selection), and 7d (final report).
 
