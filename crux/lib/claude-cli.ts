@@ -36,8 +36,8 @@ export function isInsideClaudeCodeSession(): boolean {
  *
  * See QUA-1010 / QUA-612.
  */
-export function prepareClaudeSpawnEnv(): NodeJS.ProcessEnv {
-  const env = { ...process.env };
+export function prepareClaudeSpawnEnv(base: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  const env = { ...base };
   delete env.CLAUDECODE;
   delete env.ANTHROPIC_API_KEY; // anthropic-billing-key-remap-ok
   return env;
