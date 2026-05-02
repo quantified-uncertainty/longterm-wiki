@@ -23,10 +23,12 @@ describe("SourcingDot", () => {
     expect(link.textContent?.trim()).not.toBe("");
   });
 
-  it("uses the original verdict label in the sr-only text", () => {
+  it("renders the status label as visible (sr-only) link text", () => {
+    // The sr-only span renders the SOURCE_CHECK_STATUS_CONFIG label so
+    // HTML→text converters and tools that strip aria-* see meaningful text.
     render(<SourcingDot status="trouble" href="/sourcing/division/xyz" />);
     const link = screen.getByRole("link");
-    expect(link.textContent?.trim()).toBeTruthy();
+    expect(link).toHaveTextContent(/needs attention/i);
   });
 
   it("renders the dot for unchecked status when href is provided", () => {

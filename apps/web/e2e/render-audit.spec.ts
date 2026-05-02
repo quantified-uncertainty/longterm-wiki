@@ -424,11 +424,14 @@ test.describe("Render audit — entity profile rollup dot present (QUA-901)", ()
     // already used there); included as a positive control.
     "/organizations/anthropic/data",
   ]) {
-    test(`${url} renders an EntityProfileShell rollup sourcing dot`, async ({ page }) => {
+    test(`${url} renders an EntityProfileShell rollup sourcing dot`, async ({ page }, testInfo) => {
       const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-      // Skip if this slug doesn't exist in the build (e.g. PR CI without
-      // PG data → benchmarks/legislation may 404). Prod runs always populate.
-      if (!response || response.status() >= 400) return;
+      // Mark as visibly skipped (not silently passed) when the page 404s in
+      // a CI build without PG data. A genuine routing regression on prod
+      // would still fire the assertion below.
+      if (!response || response.status() >= 400) {
+        testInfo.skip(true, `${url} returned ${response?.status() ?? "no response"}`);
+      }
       await expect(page.locator("main, article, [role='main']").first()).toBeVisible({ timeout: 15000 });
 
       // Scope strictly to the EntityProfileShell title row — the flex
@@ -460,13 +463,14 @@ test.describe("Render audit — sourcing dot links have accessible text (QUA-901
     "/people/dario-amodei",
     "/organizations/openai",
   ]) {
-    test(`${url} has no empty /sourcing/ anchors`, async ({ page }) => {
+    test(`${url} has no empty /sourcing/ anchors`, async ({ page }, testInfo) => {
       const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-      if (!response || response.status() >= 400) return;
+      if (!response || response.status() >= 400) {
+        testInfo.skip(true, `${url} returned ${response?.status() ?? "no response"}`);
+      }
       await expect(page.locator("main, article, [role='main']").first()).toBeVisible({ timeout: 15000 });
-      // Wait for client hydration so the SourcingDot's sr-only span lands
-      // before we read it.
-      await page.waitForTimeout(1000);
+      // SourcingDot's sr-only span is server-rendered, so we don't need to
+      // wait for client hydration before reading it.
 
       const empties = await page.evaluate(() => {
         const links = Array.from(
