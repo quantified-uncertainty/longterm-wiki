@@ -72,7 +72,7 @@ facts:
     value: 5.99e+10
     asOf: 2025-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
-    notes: "Cumulative *primary* funding through SoftBank's $40B round (March 2025)
+    notes: "Cumulative primary funding through SoftBank's $40B round (March 2025)
       at a $300B valuation. Bottom-up sum of documented primary rounds: $1B founding
       pledge (2015) + $1B Microsoft (2019) + $1B Series (2021) + $300M
       Series (2023) + $10B Microsoft (2023) + $6.6B Series (Oct 2024) + $40B

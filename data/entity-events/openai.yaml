@@ -45,6 +45,12 @@ events:
     significance: major
     description: Undisclosed multimodal model; human-level performance on many tasks; dangerous capabilities acknowledged.
 
+  - date: "2023-11-06"
+    title: GPT-4 Turbo released
+    eventType: launch
+    significance: moderate
+    description: Faster, cheaper GPT-4 variant with 128K context window; announced at OpenAI's first DevDay alongside GPTs and the Assistants API.
+
   - date: "2023-11"
     title: Board crisis and Sam Altman ouster/return
     eventType: leadership-change
@@ -81,20 +87,20 @@ events:
     significance: moderate
     description: Efficient reasoning model; broader reasoning availability.
 
-  - date: "2025-04"
+  - date: "2025-04-14"
     title: GPT-4.1 family released
     eventType: launch
     significance: major
     description: GPT-4.1, GPT-4.1 mini, and GPT-4.1 nano launched as the next-generation general-purpose family with longer context windows and improved coding/instruction-following.
 
-  - date: "2025-04"
+  - date: "2025-04-16"
     title: o3 (full) and o4-mini released
     eventType: launch
     significance: major
     description: o3 reasoning model promoted from preview to general availability; o4-mini debuted as a smaller cost-efficient reasoning model.
 
-  - date: "2025"
+  - date: "2025-10"
     title: Converted to Public Benefit Corporation
     eventType: pivot
     significance: major
-    description: Converted from capped-profit LLC; cumulative funding reaches $59.9B (including $11B+ Microsoft and a $40B SoftBank round).
+    description: Completed restructuring into OpenAI Group PBC on 2025-10-28 at a $500B valuation. Nonprofit OpenAI Foundation retains legal control with a 26% equity stake; cumulative primary funding through Mar 2025 reaches $59.9B (including $11B+ Microsoft and a $40B SoftBank round).

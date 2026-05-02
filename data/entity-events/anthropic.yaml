@@ -4,10 +4,10 @@ entityId: sid_mK9pX3rQ7n
 entityDisplayName: Anthropic
 events:
   - date: "2020-12"
-    title: Founded by 9 ex-OpenAI researchers
+    title: Founded by 7 ex-OpenAI researchers
     eventType: founding
     significance: major
-    description: Dario Amodei (CEO), Daniela Amodei (President), Tom Brown, Chris Olah, Jack Clark, Jared Kaplan, Sam McCandlish, Ben Mann, and Tom Henighan departed OpenAI over disagreement about scaling vs. alignment priorities.
+    description: Dario Amodei (CEO), Daniela Amodei (President), Chris Olah, Tom Brown, Jack Clark, Jared Kaplan, and Sam McCandlish departed OpenAI over disagreement about scaling vs. alignment priorities.
 
   - date: "2021"
     title: Series A led by Jaan Tallinn at $550M pre-money valuation
