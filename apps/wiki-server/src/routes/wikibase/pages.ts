@@ -25,6 +25,7 @@ import {
   paginationQuery,
   zv,
   clampedLimit,
+  escapeIlike,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import {
@@ -60,6 +61,12 @@ interface PageSearchRow {
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+// Phase 3 alias-search (QUA-745): bound user input length and rank exact
+// matches above prefix matches within the alias-search result set.
+const MAX_ALIAS_QUERY_LEN = 200;
+const ALIAS_EXACT_RANK = 100.0;
+const ALIAS_PREFIX_RANK = 50.0;
 
 // ---- Schemas (from shared api-types) ----
 
@@ -136,6 +143,60 @@ const pagesApp = new Hono()
         [q, limit - results.length, results.map((r) => r.id)],
       );
       results = [...results, ...trigramResults];
+    }
+
+    // Phase 3 — model alias lookup (QUA-745). Tokenized FTS won't tokenize
+    // hyphenated identifiers like "gpt-4-turbo-2024-04-09" the way model
+    // aliases are stored, so we match against `model_aliases.alias` directly.
+    // Skip when the query has whitespace — aliases are always single-token
+    // identifiers, so multi-word queries can never resolve via this phase.
+    const aliasLower = rawQ.trim().toLowerCase();
+    if (
+      results.length < limit &&
+      aliasLower.length > 0 &&
+      aliasLower.length <= MAX_ALIAS_QUERY_LEN &&
+      !/\s/.test(aliasLower)
+    ) {
+      // DISTINCT ON dedupes when multiple aliases resolve to the same model.
+      // entity_type filter is defense in depth: the FK only enforces that
+      // `model_stable_id` resolves to some entity, not that it's an ai-model.
+      // Prefix LIKE requires ≥3 chars to avoid scanning a wide alias set on
+      // 1-2 char queries; exact match still resolves at any length.
+      const useLike = aliasLower.length >= 3;
+      const aliasResults = await rawDb.unsafe<PageSearchRow[]>(
+        `SELECT * FROM (
+          SELECT DISTINCT ON (wp.slug)
+            wp.slug AS id,
+            wp.wiki_id,
+            wp.title,
+            wp.description,
+            wp.entity_type,
+            wp.category,
+            wp.reader_importance,
+            wp.quality,
+            CASE WHEN ma.alias = $1 THEN ${ALIAS_EXACT_RANK} ELSE ${ALIAS_PREFIX_RANK} END AS rank,
+            wp.description AS snippet
+          FROM model_aliases ma
+          JOIN entities e ON e.stable_id = ma.model_stable_id
+          JOIN wiki_pages wp ON wp.slug = e.id
+          WHERE (ma.alias = $1${useLike ? " OR ma.alias LIKE $2" : ""})
+            AND wp.wiki_id IS NOT NULL
+            AND wp.entity_type = 'ai-model'
+            AND wp.slug NOT IN (SELECT unnest($4::text[]))
+          ORDER BY wp.slug, rank DESC, wp.reader_importance DESC NULLS LAST
+        ) deduped
+        ORDER BY rank DESC, reader_importance DESC NULLS LAST
+        LIMIT $3`,
+        [
+          aliasLower,
+          // escapeIlike: a literal `%` in user input would otherwise act as
+          // a LIKE wildcard and explode the match set.
+          useLike ? `${escapeIlike(aliasLower)}%` : aliasLower,
+          limit - results.length,
+          results.map((r) => r.id),
+        ],
+      );
+      results = [...results, ...aliasResults];
     }
 
     return c.json({
