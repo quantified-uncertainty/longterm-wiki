@@ -122,15 +122,30 @@ export async function buildSessionSyncPayload(
  */
 export async function syncAndCloseSession(
   sessionId: number,
-  updateAgentSession: (id: number, updates: Record<string, unknown>) => Promise<{ ok: boolean; message?: string }>,
+  updateAgentSession: (
+    id: number,
+    updates: Record<string, unknown>,
+  ) => Promise<{ ok: boolean; error?: string; message?: string }>,
   options: BuildPayloadOptions = {},
 ): Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }> {
   const sync = await buildSessionSyncPayload(options);
 
   let fieldsSync: 'ok' | 'failed' | 'noop' = 'noop';
+  let firstFailedTransport = false;
   if (Object.keys(sync).length > 0) {
     const r = await updateAgentSession(sessionId, sync as Record<string, unknown>);
     fieldsSync = r.ok ? 'ok' : 'failed';
+    // If the first PATCH failed at the transport layer (network /
+    // auth / server unavailable), the second one will fail the same
+    // way — skip it to avoid doubling the timeout penalty + log noise.
+    // A 4xx (e.g. validation_error on the close-time fields themselves)
+    // does NOT short-circuit since the status PATCH might still
+    // succeed independently.
+    firstFailedTransport = !r.ok && (r.error === 'unavailable' || r.error === 'timeout');
+  }
+
+  if (firstFailedTransport) {
+    return { fieldsSync, statusSet: false };
   }
 
   const r2 = await updateAgentSession(sessionId, { status: 'completed' });

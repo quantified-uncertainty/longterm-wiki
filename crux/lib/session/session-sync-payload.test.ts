@@ -1,5 +1,5 @@
 /**
- * Tests for buildSessionSyncPayload + buildCloseUpdates (QUA-1073).
+ * Tests for buildSessionSyncPayload + syncAndCloseSession (QUA-1073).
  *
  * Each test sets up a real temp git repo + .claude artifacts so the
  * helper exercises the actual fs / review-marker / checklist code paths
@@ -289,11 +289,45 @@ describe('syncAndCloseSession', () => {
     expect(result.statusSet).toBe(true);
   });
 
-  it('skips the fields PATCH when there is nothing to sync', async () => {
-    // No checklist → buildSessionSyncPayload returns only `reviewed: false`,
-    // so fields IS non-empty. To get a true noop we'd need both no checklist
-    // AND no marker AND no PR. The tmp repo here has no marker by default,
-    // so reviewed=false IS a field. Just verify the return shape contract.
+  it('issues only the status PATCH when the sync payload is empty (noop)', async () => {
+    // Genuine noop case: non-git CWD with a marker file present.
+    // Marker exists → `existsSync` returns true → `parseMarker`
+    // succeeds → `getHeadSha` THROWS (no .git) → `code: 'no-base'`.
+    // The helper omits `reviewed` for no-base. No checklist + no PR
+    // → all three optional fields stay undefined → sync object empty
+    // → fields PATCH is skipped entirely.
+    const nonGit = mkdtempSync(join(tmpdir(), 'sync-noop-'));
+    mkdirSync(join(nonGit, '.claude'), { recursive: true });
+    writeFileSync(
+      join(nonGit, '.claude', 'review-done'),
+      'reviewed 0000000000000000000000000000000000000000 2026-05-03T00:00:00Z 000000000000\n',
+    );
+    const calls: Array<{ id: number; updates: Record<string, unknown> }> = [];
+    const update = async (id: number, updates: Record<string, unknown>) => {
+      calls.push({ id, updates });
+      return { ok: true };
+    };
+
+    try {
+      const result = await syncAndCloseSession(
+        42,
+        update,
+        { cwd: nonGit, branch: 'feature', skipPrLookup: true },
+      );
+      // Only the status PATCH fires — no fields-only call ahead of it.
+      expect(calls).toHaveLength(1);
+      expect(calls[0].updates).toEqual({ status: 'completed' });
+      expect(result.fieldsSync).toBe('noop');
+      expect(result.statusSet).toBe(true);
+    } finally {
+      rmSync(nonGit, { recursive: true, force: true });
+    }
+  });
+
+  it('issues both PATCHes when the marker reports reviewed=false (smallest non-noop case)', async () => {
+    // tmpRepo has no marker but IS a git repo, so `reviewed: false`
+    // is recorded as an explicit field — sync object is non-empty,
+    // both PATCHes fire.
     const calls: Array<{ id: number; updates: Record<string, unknown> }> = [];
     const update = async (id: number, updates: Record<string, unknown>) => {
       calls.push({ id, updates });
@@ -306,17 +340,20 @@ describe('syncAndCloseSession', () => {
       { cwd: tmpRepo, branch: 'feature', skipPrLookup: true },
     );
 
-    // fields PATCH (reviewed) + status PATCH = 2 calls
-    expect(calls.length).toBeGreaterThanOrEqual(1);
+    expect(calls).toHaveLength(2);
+    expect(calls[0].updates).toEqual({ reviewed: false });
+    expect(calls[1].updates).toEqual({ status: 'completed' });
     expect(result.fieldsSync).toBe('ok');
   });
 
   it('reports statusSet=false when the status PATCH fails (e.g. missing title+summary)', async () => {
-    const update = async (_id: number, updates: Record<string, unknown>) => {
-      // Simulate the wiki-server hard-fail when status='completed' is
-      // sent without title+summary on the row.
+    // Simulate the wiki-server hard-fail when status='completed' is
+    // sent without title+summary on the row.
+    const calls: Array<{ id: number; updates: Record<string, unknown> }> = [];
+    const update = async (id: number, updates: Record<string, unknown>) => {
+      calls.push({ id, updates });
       if (updates.status === 'completed') {
-        return { ok: false, message: 'incomplete_session' };
+        return { ok: false, error: 'validation_error', message: 'incomplete_session' };
       }
       return { ok: true };
     };
@@ -328,18 +365,23 @@ describe('syncAndCloseSession', () => {
       { cwd: tmpRepo, branch: 'feature', skipPrLookup: true },
     );
 
-    // Critical: the fields PATCH still succeeded — close-time data
-    // landed even though status promotion failed. This is the QUA-1073
+    // The fields PATCH still succeeded — close-time data landed
+    // even though status promotion failed. This is the QUA-1073
     // contract: don't let validation rollback discard the metadata.
+    expect(calls).toHaveLength(2);
     expect(result.fieldsSync).toBe('ok');
     expect(result.statusSet).toBe(false);
   });
 
-  it('reports fieldsSync=failed when the first PATCH fails', async () => {
-    const update = async (_id: number, _updates: Record<string, unknown>) => ({
-      ok: false,
-      message: 'wiki-server unavailable',
-    });
+  it('short-circuits the status PATCH when the first PATCH fails with a transport error', async () => {
+    // When the wiki-server is unreachable, retrying the second PATCH
+    // doubles the timeout penalty and produces a duplicate noisy log
+    // for no benefit — both calls would fail the same way.
+    const calls: Array<{ id: number; updates: Record<string, unknown> }> = [];
+    const update = async (id: number, updates: Record<string, unknown>) => {
+      calls.push({ id, updates });
+      return { ok: false, error: 'unavailable', message: 'wiki-server unreachable' };
+    };
 
     writeChecklist(SAMPLE_CHECKLIST);
     const result = await syncAndCloseSession(
@@ -348,7 +390,34 @@ describe('syncAndCloseSession', () => {
       { cwd: tmpRepo, branch: 'feature', skipPrLookup: true },
     );
 
+    // Only one PATCH attempted — the second is short-circuited.
+    expect(calls).toHaveLength(1);
     expect(result.fieldsSync).toBe('failed');
     expect(result.statusSet).toBe(false);
+  });
+
+  it('does NOT short-circuit on a non-transport (4xx) failure of the first PATCH', async () => {
+    // A validation error on the close-time fields shouldn't prevent
+    // the status PATCH from being attempted — they're independent.
+    const calls: Array<{ id: number; updates: Record<string, unknown> }> = [];
+    const update = async (id: number, updates: Record<string, unknown>) => {
+      calls.push({ id, updates });
+      // First call: simulated 400 on the fields. Second: success.
+      if (updates.status !== 'completed') {
+        return { ok: false, error: 'validation_error', message: 'bad fields' };
+      }
+      return { ok: true };
+    };
+
+    writeChecklist(SAMPLE_CHECKLIST);
+    const result = await syncAndCloseSession(
+      42,
+      update,
+      { cwd: tmpRepo, branch: 'feature', skipPrLookup: true },
+    );
+
+    expect(calls).toHaveLength(2);
+    expect(result.fieldsSync).toBe('failed');
+    expect(result.statusSet).toBe(true);
   });
 });

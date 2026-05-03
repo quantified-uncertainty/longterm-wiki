@@ -509,11 +509,17 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);
       if (sessionResult.ok && sessionResult.data.status !== 'completed') {
-        await syncAndCloseSession(
+        const result = await syncAndCloseSession(
           sessionResult.data.id,
           updateAgentSession,
           { branch, skipPrLookup: true },
         );
+        // Surface only the fields-sync state — status promotion is
+        // expected to fail at this stage (title+summary not set
+        // until session-finalize fires), so we don't warn about it.
+        if (result.fieldsSync === 'failed') {
+          output += `${c.yellow}⚠ Close-time field sync failed (wiki-server unreachable?)${c.reset}\n`;
+        }
       }
     } catch {
       // Best-effort
