@@ -78,4 +78,62 @@ describe('checkDeployHealth', () => {
     // failingSince should be the earliest consecutive failure
     expect(result.failingSince).toBe('2026-03-06T12:00:00Z');
   });
+
+  it('ignores cancelled runs and uses next-most-recent successful run', async () => {
+    mockApi.mockResolvedValueOnce({
+      workflow_runs: [
+        makeRun({ id: 2, conclusion: 'cancelled', created_at: '2026-03-06T12:00:17Z', head_sha: 'abc123' }),
+        makeRun({ id: 1, conclusion: 'success', created_at: '2026-03-06T12:00:00Z', head_sha: 'abc123' }),
+      ],
+      total_count: 2,
+    });
+    const result = await checkDeployHealth('test/repo');
+    expect(result.healthy).toBe(true);
+    expect(result.lastDeploy?.status).toBe('success');
+  });
+
+  it('ignores cancelled runs and surfaces underlying failure', async () => {
+    mockApi.mockResolvedValueOnce({
+      workflow_runs: [
+        makeRun({ id: 3, conclusion: 'cancelled', created_at: '2026-03-06T14:00:00Z', head_sha: 'ghi789' }),
+        makeRun({ id: 2, conclusion: 'failure', created_at: '2026-03-06T12:00:00Z', head_sha: 'def456' }),
+        makeRun({ id: 1, conclusion: 'success', created_at: '2026-03-06T10:00:00Z' }),
+      ],
+      total_count: 3,
+    });
+    const result = await checkDeployHealth('test/repo');
+    expect(result.healthy).toBe(false);
+    expect(result.lastDeploy?.status).toBe('failure');
+    expect(result.failingSince).toBe('2026-03-06T12:00:00Z');
+  });
+
+  it('returns notAvailable when all runs are cancelled', async () => {
+    mockApi.mockResolvedValueOnce({
+      workflow_runs: [
+        makeRun({ id: 2, conclusion: 'cancelled', created_at: '2026-03-06T12:00:00Z', head_sha: 'abc123' }),
+        makeRun({ id: 1, conclusion: 'cancelled', created_at: '2026-03-06T10:00:00Z', head_sha: 'xyz000' }),
+      ],
+      total_count: 2,
+    });
+    const result = await checkDeployHealth('test/repo');
+    expect(result.healthy).toBe(true);
+    expect(result.lastDeploy).toBeNull();
+  });
+
+  it('failingSince walk skips intervening cancelled runs', async () => {
+    mockApi.mockResolvedValueOnce({
+      workflow_runs: [
+        makeRun({ id: 4, conclusion: 'failure', created_at: '2026-03-06T16:00:00Z', head_sha: 'jkl012' }),
+        makeRun({ id: 3, conclusion: 'cancelled', created_at: '2026-03-06T14:00:00Z', head_sha: 'ghi789' }),
+        makeRun({ id: 2, conclusion: 'failure', created_at: '2026-03-06T12:00:00Z', head_sha: 'def456' }),
+        makeRun({ id: 1, conclusion: 'success', created_at: '2026-03-06T10:00:00Z' }),
+      ],
+      total_count: 4,
+    });
+    const result = await checkDeployHealth('test/repo');
+    expect(result.healthy).toBe(false);
+    // The cancelled run is ignored; consecutive failures are id=4 and id=2,
+    // so failingSince should be the earlier failure's timestamp
+    expect(result.failingSince).toBe('2026-03-06T12:00:00Z');
+  });
 });

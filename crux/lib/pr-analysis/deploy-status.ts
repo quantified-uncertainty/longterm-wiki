@@ -54,9 +54,12 @@ export async function checkDeployHealth(repo?: string): Promise<DeployHealthStat
     );
 
     const runs = resp.workflow_runs ?? [];
-    if (runs.length === 0) return notAvailable;
+    // Cancelled runs did not produce a deployment (concurrency-cancelled, manually
+    // cancelled, or skipped). Skip them — only completed non-cancelled runs matter.
+    const meaningful = runs.filter((r) => r.conclusion !== 'cancelled');
+    if (meaningful.length === 0) return notAvailable;
 
-    const latest = runs[0];
+    const latest = meaningful[0];
     const lastDeploy = {
       status: latest.conclusion ?? 'unknown',
       sha: latest.head_sha,
@@ -68,9 +71,9 @@ export async function checkDeployHealth(repo?: string): Promise<DeployHealthStat
       return { healthy: true, lastDeploy, failingSince: null };
     }
 
-    // Find when consecutive failures started (walk backward through runs)
+    // Find when consecutive failures started (walk backward through meaningful runs)
     let failingSince = latest.created_at;
-    for (const run of runs) {
+    for (const run of meaningful) {
       if (run.conclusion === 'success') break;
       failingSince = run.created_at;
     }
