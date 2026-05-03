@@ -304,14 +304,23 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
     });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
-    if (result.timedOut) {
+    if (result.timedOut || result.budgetExceeded) {
       const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'timeout';
-      reason = `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
-      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`);
+      // QUA-1078: a budget kill is shaped like a timeout (daemon-initiated
+      // SIGTERM, partial work) — fold into the same branch but emit a clearer
+      // reason so operators don't see a meaningless "Exit code: null".
+      reason = result.budgetExceeded
+        ? `Killed after exceeding ${config.inputTokenCap ?? 0} cumulative input_tokens (observed ${result.inputTokens}) — attempt ${failCount}`
+        : `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
+      log(
+        result.budgetExceeded
+          ? `${cl.red}✗ Main branch fix killed for input-token budget (${result.inputTokens})${cl.reset} (attempt ${failCount})`
+          : `${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`,
+      );
 
       if (failCount >= MAIN_BRANCH_ABANDON_THRESHOLD) {
-        reason = `Abandoned after ${failCount} failures (timeout)`;
+        reason = `Abandoned after ${failCount} failures (${result.budgetExceeded ? 'budget' : 'timeout'})`;
         log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
@@ -461,6 +470,11 @@ export function spawnClaude(
     const triggerKill = (reason: 'timeout' | 'budget') => {
       if (killedReason) return;
       killedReason = reason;
+      // If we got here from a close-handler drain (the partial-line buffer
+      // crossing the cap *after* the child has already exited), the child
+      // is gone — calling kill() is harmless but the SIGKILL fallback timer
+      // would leak for 10s and delay clean shutdown. Skip it.
+      if (child.exitCode !== null || child.signalCode !== null) return;
       child.kill('SIGTERM');
       forceKillTimer = setTimeout(() => {
         if (child.exitCode === null && child.signalCode === null) {
@@ -501,11 +515,13 @@ export function spawnClaude(
       }
     });
     child.stderr.on('data', (chunk: Buffer) => {
-      const text = chunk.toString();
-      // Surface stderr to the operator (claude warnings live here) and append
-      // to output so existing substring matchers still see error wording.
-      process.stderr.write(text);
-      state.outputParts.push(text);
+      // Surface stderr to the operator (claude warnings live here) but DO
+      // NOT append to output: stderr can include partial credentials on auth
+      // failure (e.g. truncated `sk-ant-...` echoes), and `output.slice(-500)`
+      // is posted as a public PR comment via buildFixCompleteComment. The
+      // pre-stream-json text mode concatenated stderr too — that was a
+      // pre-existing leak risk we're tightening up here.
+      process.stderr.write(chunk);
     });
 
     child.stdin.write(prompt);
@@ -518,10 +534,11 @@ export function spawnClaude(
       stdoutBuffer = '';
 
       const output = buildOutput(state);
-      // Backward-compat fallback: in the previous text-mode the `Reached max
-      // turns` substring was the canonical signal. Keep it as a safety net in
-      // case stop_reason / subtype don't carry the cue on a future CLI build.
-      const hitMaxTurns = state.hitMaxTurns || output.includes('Reached max turns');
+      // hitMaxTurns is already OR'd from three signals in `handleResult`
+      // (subtype, stop_reason, regex against resultText). No need for a
+      // redundant outer substring check — if the result event carried the
+      // phrase, handleResult set the flag.
+      const hitMaxTurns = state.hitMaxTurns;
 
       if (budgetExceeded) {
         // The kill-signal landed; verify whether the process actually exited
@@ -860,17 +877,26 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     }, { cwd: worktreePath, context: { prNumber: pr.number } });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
-    if (result.timedOut) {
-      // Timeouts count toward abandonment — a PR that times out repeatedly
-      // is likely unfixable and should not keep burning compute.
+    if (result.timedOut || result.budgetExceeded) {
+      // Timeouts AND budget kills count toward abandonment — a PR that
+      // repeatedly times out or repeatedly blows the input-token cap is
+      // likely unfixable and shouldn't keep burning compute. QUA-1078: fold
+      // budget kills into this branch so the reason string doesn't read
+      // "Exit code: null" — operators need to see what actually happened.
       const failCount = recordFailure(pr.number);
       outcome = 'timeout';
-      reason = `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
-      log(`${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`);
+      reason = result.budgetExceeded
+        ? `Killed after exceeding ${config.inputTokenCap ?? 0} cumulative input_tokens (observed ${result.inputTokens}) — attempt ${failCount}`
+        : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
+      log(
+        result.budgetExceeded
+          ? `${cl.red}✗ PR #${pr.number} killed for input-token budget (${result.inputTokens})${cl.reset} (attempt ${failCount})`
+          : `${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`,
+      );
 
       if (failCount >= 2) {
         markAbandoned(pr.number);
-        reason = `Abandoned after ${failCount} failures (timeout)`;
+        reason = `Abandoned after ${failCount} failures (${result.budgetExceeded ? 'budget' : 'timeout'})`;
         log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));

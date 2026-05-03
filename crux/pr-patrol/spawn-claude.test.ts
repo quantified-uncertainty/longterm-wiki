@@ -14,16 +14,37 @@
  */
 
 import { EventEmitter } from 'events';
-import { mkdtempSync, readFileSync, existsSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Readable, Writable } from 'stream';
+import { spawn as nodeSpawn } from 'child_process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Override HOME *before* importing modules that compute JSONL_FILE at load,
-// so writes land in a per-test temp dir we can clean up.
-const tmpHome = mkdtempSync(join(tmpdir(), 'spawn-claude-test-'));
-process.env.HOME = tmpHome;
+// Override JSONL_FILE via vi.mock so writes land in a per-test temp dir.
+// Plain `process.env.HOME = ...` at the top of the file is **not** sufficient
+// because ESM imports are statically hoisted: by the time the assignment
+// runs, `state.ts` has already evaluated `JSONL_FILE = join(HOME, ...)` using
+// the real HOME. Without this mock the integration tests truncate the
+// operator's actual ~/.cache/pr-patrol/runs.jsonl.
+const { TEST_JSONL_FILE } = vi.hoisted(() => {
+  // CJS APIs only — vi.hoisted runs before any ESM imports resolve.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fs = require('fs') as typeof import('fs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const os = require('os') as typeof import('os');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const path = require('path') as typeof import('path');
+  const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'spawn-claude-test-'));
+  const cacheDir = path.join(tmpHome, '.cache', 'pr-patrol');
+  fs.mkdirSync(cacheDir, { recursive: true });
+  return { TEST_JSONL_FILE: path.join(cacheDir, 'runs.jsonl') };
+});
+
+vi.mock('./state.ts', async () => {
+  const actual = await vi.importActual<typeof import('./state.ts')>('./state.ts');
+  return { ...actual, JSONL_FILE: TEST_JSONL_FILE };
+});
 
 interface FakeChild extends EventEmitter {
   stdout: Readable;
@@ -112,9 +133,9 @@ function readJsonlEntries(): Array<Record<string, unknown>> {
 
 beforeEach(() => {
   // Truncate the JSONL between tests so assertions are scoped per-test.
-  if (existsSync(JSONL_FILE)) {
-    require('fs').writeFileSync(JSONL_FILE, '');
-  }
+  // JSONL_FILE here is the mocked path (TEST_JSONL_FILE), guaranteed by the
+  // vi.mock above to point inside our temp dir.
+  if (existsSync(JSONL_FILE)) writeFileSync(JSONL_FILE, '');
 });
 
 afterEach(() => {
@@ -223,6 +244,77 @@ describe('spawnClaude (stream-json + token cap)', () => {
     const result = await promise;
     expect(result.hitMaxTurns).toBe(true);
     expect(result.budgetExceeded).toBe(false);
+  });
+
+  it('passes --output-format stream-json --verbose to claude (regression guard for arg ordering)', async () => {
+    const promise = spawnClaude('test', baseConfig, undefined);
+    queueMicrotask(() => {
+      lastChild.stdout.push(RESULT_OK);
+      setImmediate(() => {
+        lastChild.exitCode = 0;
+        lastChild.emit('close', 0);
+      });
+    });
+    await promise;
+    const spawnMock = vi.mocked(nodeSpawn);
+    const args = spawnMock.mock.calls.at(-1)![1] as string[];
+    expect(args).toContain('--output-format');
+    expect(args[args.indexOf('--output-format') + 1]).toBe('stream-json');
+    expect(args).toContain('--verbose');
+    expect(args).toContain('--print');
+  });
+
+  it('does NOT leak the SIGKILL fallback timer when budget cross fires from the close-handler drain', async () => {
+    // The close handler drains a partial line; if that drain crosses the cap,
+    // triggerKill is called *after* the child has already exited. The
+    // SIGKILL fallback timer would otherwise leak for 10s and delay shutdown.
+    const promise = spawnClaude('test', baseConfig, { context: { prNumber: 1 } });
+    queueMicrotask(() => {
+      // Push a complete event under cap, then a partial line that crosses
+      // the cap with NO trailing newline (drained at close).
+      lastChild.stdout.push(ASSISTANT('part1', 30_000));
+      const partial = JSON.stringify({
+        type: 'assistant',
+        message: {
+          role: 'assistant',
+          usage: { input_tokens: 25_000, output_tokens: 1 },
+          content: [{ type: 'text', text: 'crossing now' }],
+        },
+      });
+      lastChild.stdout.push(partial);
+      setImmediate(() => {
+        // Child has already exited cleanly (close fires here). triggerKill
+        // should detect this and NOT schedule the SIGKILL timer.
+        lastChild.exitCode = 0;
+        lastChild.signalCode = null;
+        lastChild.emit('close', 0);
+      });
+    });
+    const result = await promise;
+    expect(result.budgetExceeded).toBe(true);
+    // kill was NOT invoked — child had exited before triggerKill ran, so the
+    // early-return guard fires and avoids the leaked SIGKILL timer.
+    expect(lastChild.kill).not.toHaveBeenCalled();
+  });
+
+  it('does NOT bleed claude stderr into result.output (avoids credential-leak in PR comments)', async () => {
+    const promise = spawnClaude('test', baseConfig, undefined);
+    queueMicrotask(() => {
+      // Simulate claude writing a partial credential string to stderr (auth
+      // failure echoes the bad token). This must NOT show up in `output`,
+      // since callers post `output.slice(-500)` as a public PR comment.
+      lastChild.stderr.push('Bad token: sk-ant-api03-LEAK-DO-NOT-PUBLISH\n');
+      lastChild.stdout.push(ASSISTANT('I will look at this', 100));
+      lastChild.stdout.push(RESULT_OK);
+      setImmediate(() => {
+        lastChild.exitCode = 0;
+        lastChild.emit('close', 0);
+      });
+    });
+    const result = await promise;
+    expect(result.output).not.toContain('sk-ant-api03');
+    expect(result.output).not.toContain('Bad token');
+    expect(result.output).toContain('I will look at this');
   });
 
   it('emits the budget event even if a partial final line lacks a trailing newline', async () => {

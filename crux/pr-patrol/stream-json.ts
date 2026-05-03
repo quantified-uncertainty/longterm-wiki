@@ -163,26 +163,19 @@ function handleResult(
 }
 
 function handleUserToolResult(
-  evt: Record<string, unknown>,
-  state: StreamJsonState,
+  _evt: Record<string, unknown>,
+  _state: StreamJsonState,
 ): LineEffect {
-  const msg = (evt.message ?? {}) as Record<string, unknown>;
-  const content = Array.isArray(msg.content) ? (msg.content as Array<Record<string, unknown>>) : [];
-  for (const part of content) {
-    if (typeof part.type === 'string' && part.type === 'tool_result') {
-      let text = '';
-      if (typeof part.content === 'string') {
-        text = part.content;
-      } else if (Array.isArray(part.content)) {
-        const first = (part.content as Array<Record<string, unknown>>)[0];
-        if (first && typeof first.text === 'string') text = first.text;
-      }
-      if (text) state.outputParts.push(text);
-      // Tool results aren't echoed to stderr — keep the live tail focused on
-      // the agent's own prose + tool invocations. (Text mode never showed
-      // tool stdout either — claude only printed assistant turns.)
-    }
-  }
+  // Deliberately a no-op: tool_result content is NOT pushed into outputParts.
+  // The regex classifiers (`looksLikeNoOp`, `looksLikeMainRootCause`,
+  // `extractFixPrNumber`, fix-complete tail) are calibrated against the
+  // agent's own prose only. A `gh api /search/issues` tool_result can dump
+  // dozens of github.com/.../pull/N URLs into the buffer and trick
+  // `extractFixPrNumber` into matching a sibling PR instead of the agent's
+  // actual fix-PR. tool_result was never user-visible in text mode either
+  // (claude only emitted assistant turns to stdout), so omitting it here
+  // preserves the prior contract. We also don't render to stderr — keeps the
+  // live `tail -f run.log` focused on the agent's own thinking + tool calls.
   return { stderrText: null, budgetCrossedNow: false };
 }
 

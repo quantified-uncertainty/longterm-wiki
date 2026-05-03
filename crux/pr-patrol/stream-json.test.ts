@@ -165,10 +165,14 @@ describe('processStreamJsonLine', () => {
     expect(buildOutput(state)).toBe('');
   });
 
-  it('captures tool_result text into output for substring matching', () => {
+  it('does NOT capture tool_result text into output (avoids extractFixPrNumber misfires)', () => {
+    // A `gh api /search/issues` tool_result can spray sibling PR URLs into
+    // the buffer; tail-slicing for `extractFixPrNumber` would then match the
+    // wrong PR. Tool_result is intentionally excluded — only the agent's own
+    // prose + result text feed the classifier.
     const state = newStreamJsonState();
     processStreamJsonLine(TOOL_RESULT('PR url: github.com/foo/bar/pull/9876'), state, 0);
-    expect(buildOutput(state)).toContain('pull/9876');
+    expect(buildOutput(state)).toBe('');
   });
 
   it('detects max-turns via subtype error_max_turns', () => {
@@ -238,5 +242,41 @@ describe('processStreamJsonLine', () => {
     const evt = JSON.stringify({ type: 'rate_limit_event', rate_limit_info: {} });
     const effect = processStreamJsonLine(evt, state, 0);
     expect(effect.stderrText).toBeNull();
+  });
+
+  it('tolerates negative or weird input_tokens defensively (no NaN, no crash)', () => {
+    // claude shouldn't emit a negative input_tokens, but if it ever did, the
+    // cap math should still terminate cleanly — not produce NaN or trip the
+    // crossed flag in an undefined way.
+    const state = newStreamJsonState();
+    const evt = JSON.stringify({
+      type: 'assistant',
+      message: {
+        role: 'assistant',
+        usage: { input_tokens: -1000, output_tokens: 5 },
+        content: [{ type: 'text', text: 'weird' }],
+      },
+    });
+    const effect = processStreamJsonLine(evt, state, 50_000);
+    expect(effect.budgetCrossedNow).toBe(false);
+    expect(state.cumulativeInputTokens).toBe(-1000);
+    expect(Number.isNaN(state.cumulativeInputTokens)).toBe(false);
+  });
+
+  it('truncates a >160-char tool_use preview to keep stderr lines bounded', () => {
+    const state = newStreamJsonState();
+    const longCmd = 'a'.repeat(500);
+    const evt = JSON.stringify({
+      type: 'assistant',
+      message: {
+        role: 'assistant',
+        usage: { input_tokens: 10, output_tokens: 1 },
+        content: [{ type: 'tool_use', name: 'Bash', input: { command: longCmd } }],
+      },
+    });
+    const effect = processStreamJsonLine(evt, state, 0);
+    expect(effect.stderrText).toBeTruthy();
+    expect(effect.stderrText!.length).toBeLessThan(200);
+    expect(effect.stderrText).toContain('…');
   });
 });
