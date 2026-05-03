@@ -5,12 +5,13 @@
 #
 # Exit codes:
 #   0 = allow the tool call
-#   2 = block the tool call (stderr is shown to Claude as error)
+#   2 = block the tool call (stderr is shown to the agent as error)
 
-BRANCH=$(git -C "$CLAUDE_PROJECT_DIR" branch --show-current 2>/dev/null)
+REPO_ROOT="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}}"
+BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null)
 
 if [ "$BRANCH" = "main" ]; then
-  echo "BLOCKED: You are on the main branch. Create a feature branch first (git checkout -b claude/<description>). Never edit code directly on main." >&2
+  echo "BLOCKED: You are on the main branch. Create a feature branch first (e.g. \`git checkout -b claude/<description>\` or \`git checkout -b codex/<description>\`). Never edit code directly on main." >&2
   exit 2
 fi
 

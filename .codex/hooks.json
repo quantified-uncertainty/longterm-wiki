@@ -1,0 +1,137 @@
+{
+  "_comment": "Codex agent hooks — point at the canonical .claude/hooks/*.sh scripts so Claude Code and Codex stay in sync. Paths use ${CODEX_PROJECT_DIR:-$PWD} so the hook still resolves if the agent's CWD has drifted (mirrors .claude/settings.json's $CLAUDE_PROJECT_DIR pattern). The hook scripts themselves are agent-neutral (CODEX_PROJECT_DIR is preferred, CLAUDE_PROJECT_DIR is the fallback).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/approve-claude-configs.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-checklist.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/warn-main-branch.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-git-stash.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-branch-switch.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-no-verify.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-tmux-kill.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-other-slots.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-raw-gh-pr.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-cat-polling.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-stage-approved.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/heartbeat.sh\"",
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/recover-cwd.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-start.sh\"",
+            "statusMessage": "Setting up environment..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/cleanup-worktrees.sh\"",
+            "timeout": 60,
+            "async": true
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-finalize.sh\"",
+            "timeout": 30,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/inject-wip-checklist.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/verify-checklist-on-stop.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

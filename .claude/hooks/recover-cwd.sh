@@ -24,7 +24,7 @@
 
 set -uo pipefail
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+PROJECT_DIR="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-}}"
 if [ -z "$PROJECT_DIR" ]; then
   exit 0
 fi
