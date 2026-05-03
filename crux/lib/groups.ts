@@ -105,6 +105,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'improve-entity-suite',
       'benchmark',
       'benchmark-suite',
+      'pipeline-regression-check',
     ],
     flattened: ['tablebase'],
   },

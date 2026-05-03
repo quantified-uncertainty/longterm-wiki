@@ -34,6 +34,7 @@ import { fetchSources } from './source-fetcher.ts';
 import { createLlmClient, streamingCreate, extractText, MODELS } from '../llm.ts';
 import type { SourceCacheEntry } from '../content/section-writer.ts';
 import type { CostTracker } from '../cost-tracker.ts';
+import { withPipelineRun } from '../pipeline-runs/lifecycle.ts';
 import { MODEL_PRICING } from '../pricing.ts';
 import { initFromPG, getResourceByUrl } from './resource-lookup.ts';
 import { saveResources } from '../../resource-io.ts';
@@ -583,6 +584,19 @@ async function registerNewResources(urls: string[], urlTitles: Map<string, strin
  * times out, the agent continues with whatever data it has.
  */
 export async function runResearch(request: ResearchRequest): Promise<ResearchResult> {
+  return withPipelineRun(
+    {
+      pipelineName: 'research-agent',
+      entityId: request.pageContext?.entityId ?? null,
+      shape: request.pageContext?.type ?? null,
+      allowOffline: true,
+      tracker: request.tracker,
+    },
+    async () => runResearchBody(request),
+  );
+}
+
+async function runResearchBody(request: ResearchRequest): Promise<ResearchResult> {
   const startMs = Date.now();
 
   const {

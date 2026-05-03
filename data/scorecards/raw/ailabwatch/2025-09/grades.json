@@ -3,7 +3,7 @@
   "waveLabel": "September 2025 (frozen)",
   "sourceUrl": "https://ailabwatch.org/",
   "methodologyUrl": "https://ailabwatch.org/about",
-  "license": null,
+  "license": "fair-use-citation",
   "notes": "AI Lab Watch (ailabwatch.org) — frozen as of September 2025 per the author. Seven dimensions × seven frontier labs; per-cell scores in 0-100 percent. Overall is the site's published weighted total.",
   "isLatest": true,
   "dimensions": [

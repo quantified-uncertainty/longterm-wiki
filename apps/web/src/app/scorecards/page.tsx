@@ -12,6 +12,7 @@ import {
   DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
+import { getEntityHref } from "@/data/entity-nav";
 
 export const metadata: Metadata = {
   title: "Scorecards",
@@ -236,7 +237,17 @@ export default async function ScorecardsPage() {
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
                   <h3 className="font-semibold">{meta.fullLabel}</h3>
                   <span className="text-xs text-muted-foreground">
-                    by {meta.publisher}
+                    by{" "}
+                    {meta.publisherSlug ? (
+                      <Link
+                        href={getEntityHref(meta.publisherSlug)}
+                        className="text-primary hover:underline"
+                      >
+                        {meta.publisher}
+                      </Link>
+                    ) : (
+                      meta.publisher
+                    )}
                   </span>
                   {!meta.active ? (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">

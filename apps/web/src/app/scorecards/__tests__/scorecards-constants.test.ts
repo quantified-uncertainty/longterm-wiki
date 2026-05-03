@@ -73,6 +73,22 @@ describe("scorecards-constants", () => {
     expect(meta?.active).toBe(false);
   });
 
+  it("every source has a publisherSlug wired for directory linking", () => {
+    // QUA-867 item A: until QUA-836 backfilled the publisher entities,
+    // only fli_index had a publisherSlug. The backfill is now reflected
+    // in the constants — every source must link its publisher.
+    for (const meta of SCORECARD_SOURCES) {
+      expect(meta.publisherSlug, `${meta.source} missing publisherSlug`).toBeTruthy();
+    }
+  });
+
+  it("AI Lab Watch's publisher slug points at the person entity", () => {
+    // Routing must go through getEntityHref (not a hardcoded
+    // /organizations/<slug>) because zach-stein-perlman is a person.
+    const meta = getScorecardSourceMeta("ailabwatch");
+    expect(meta?.publisherSlug).toBe("zach-stein-perlman");
+  });
+
   it("active sources are flagged as active", () => {
     for (const slug of ["fli_index", "saferai", "fmti", "seoul_tracker"]) {
       const meta = getScorecardSourceMeta(slug);

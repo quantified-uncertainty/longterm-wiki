@@ -34,6 +34,7 @@ import {
   fetchFromWikiServer,
   type RpcModelSystemCardsByModelResult,
   type RpcModelSystemCardRow,
+  type RpcModelAliasesAllResult,
 } from "@lib/wiki-server";
 
 export function generateStaticParams() {
@@ -69,19 +70,38 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Fetch system cards (QUA-702) + sourcing rollup in parallel. Both are
-  // best-effort: a wiki-server outage shouldn't break the page.
+  // Fetch system cards (QUA-702), aliases, and sourcing rollup in parallel.
+  // System cards and aliases require stableId; sourcing is unconditional.
+  // All are best-effort: a wiki-server outage shouldn't break the page.
   const systemCardsPromise = entity.stableId
     ? fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
         `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
         { revalidate: 300 },
       )
     : Promise.resolve(null);
-  const [systemCardsResult, sourcingSummary] = await Promise.all([
-    systemCardsPromise,
-    fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
-  ]);
+  const aliasesPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelAliasesAllResult>(
+        `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=20`,
+        { revalidate: 300 },
+      )
+    : Promise.resolve(null);
+  const [systemCardsResult, aliasesResult, sourcingSummary] = await Promise.all(
+    [
+      systemCardsPromise,
+      aliasesPromise,
+      fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
+    ],
+  );
   const systemCards: RpcModelSystemCardRow[] = systemCardsResult?.items ?? [];
+  let aliases: string[] = [];
+  if (aliasesResult?.items) {
+    // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
+    // on the GPT-4 Turbo page is noise.
+    const titleLower = entity.title.toLowerCase();
+    aliases = aliasesResult.items
+      .map((r) => r.alias)
+      .filter((a) => a.toLowerCase() !== titleLower);
+  }
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
@@ -259,6 +279,7 @@ export default async function AiModelDetailPage({
       entityId={entity.id}
       title={entity.title}
       titlePills={titlePills}
+      aliases={aliases}
       coverage={{ score: coverageScore, signals: coverageSignals }}
       verdict={rollupVerdict}
       subtitle={entity.description || undefined}

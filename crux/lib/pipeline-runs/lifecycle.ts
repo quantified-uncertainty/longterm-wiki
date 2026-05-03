@@ -47,6 +47,8 @@ import {
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
 import type { CostTracker } from '../cost-tracker.ts';
+import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
+import { parseAgentSessionId } from './agent-session-id.ts';
 
 // Crux libs log via console (validate-no-console-log only blocks server
 // code under apps/wiki-server). Structured fields are stringified into
@@ -107,14 +109,27 @@ export async function withPipelineRun<T>(
 ): Promise<T> {
   const runId = randomUUID();
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
+  // Snapshot the tracker's entry count BEFORE the body runs so each
+  // pipeline_runs row only records what its body added — not entries the
+  // caller already accumulated. Required for nested wraps (e.g.
+  // improve-entity → research-agent, sharing one tracker) so the inner
+  // row doesn't double-count parent spend.
+  const trackerStartIndex = options.tracker?.entries.length ?? 0;
 
   // Start the run. Fail-closed by default.
+  // Defaults `agentSessionId` to the cached audit session id when callers
+  // don't pass one — covers the common case (a CLI command running inside
+  // an agent session) without duplicating the same coercion at every site.
+  // Tests and explicit callers can still override.
   const startResult = await startPipelineRun({
     runId,
     pipelineName: options.pipelineName,
     entityId: options.entityId ?? null,
     shape: options.shape ?? null,
-    agentSessionId: options.agentSessionId ?? null,
+    agentSessionId:
+      options.agentSessionId === undefined
+        ? parseAgentSessionId(getCachedAuditSessionId())
+        : options.agentSessionId,
   });
 
   if (!startResult.ok) {
@@ -209,7 +224,7 @@ export async function withPipelineRun<T>(
       errorCode: overrideErrorCode,
       errorPayload: null,
       followups,
-      costTotals: trackerTotals(options.tracker),
+      costTotals: trackerTotals(options.tracker, trackerStartIndex),
     });
     return result;
   } catch (err: unknown) {
@@ -229,7 +244,7 @@ export async function withPipelineRun<T>(
         errorCode: overrideErrorCode ?? errorCodeFor(err),
         errorPayload: errorPayload(err),
         followups,
-        costTotals: trackerTotals(options.tracker),
+        costTotals: trackerTotals(options.tracker, trackerStartIndex),
       });
     } catch (finalizeErr: unknown) {
       error(
@@ -271,10 +286,16 @@ interface CostTotals {
 }
 
 /**
- * Snapshot the tracker's current totals. Returns null when no tracker is
- * configured so `finalize` can omit the cost fields entirely (preserving
- * the typed-client semantic that omitted ≠ null — see QUA-1012 comment in
- * `EndPipelineRunInput`).
+ * Snapshot the tracker's current totals (delta from `startIndex`). Returns
+ * null when no tracker is configured so `finalize` can omit the cost
+ * fields entirely (preserving the typed-client semantic that omitted ≠
+ * null — see QUA-1012 comment in `EndPipelineRunInput`).
+ *
+ * `startIndex` is the snapshot of `tracker.entries.length` taken before
+ * the body ran. Only entries added after that index are summed, so a
+ * pipeline_run row records cost added by *this* body — not any cost the
+ * caller's tracker already carried in. Required for nested
+ * withPipelineRun calls that share a single tracker.
  *
  * `costUsd` is rounded to 4 decimal places. The pricing module produces
  * costs like `0.006196500000000001` from per-token math + FP imprecision,
@@ -283,14 +304,15 @@ interface CostTotals {
  * silently truncate, so rounding client-side keeps caller-side and
  * persisted values equal.
  */
-function trackerTotals(tracker: CostTracker | undefined): CostTotals | null {
+function trackerTotals(tracker: CostTracker | undefined, startIndex: number): CostTotals | null {
   if (!tracker) return null;
   let costUsd = 0;
   let tokensInput = 0;
   let tokensOutput = 0;
   let tokensCacheRead = 0;
   let tokensCacheWrite = 0;
-  for (const entry of tracker.entries) {
+  for (let i = startIndex; i < tracker.entries.length; i++) {
+    const entry = tracker.entries[i];
     costUsd += entry.cost;
     tokensInput += entry.inputTokens;
     tokensOutput += entry.outputTokens;

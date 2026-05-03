@@ -164,6 +164,14 @@ describe('flagship-curate', () => {
       usage: { input_tokens: 100, output_tokens: 50 },
       model: 'claude-haiku-4-5-20251001',
     }));
+    // Route /api/pipeline-runs/* through ok responses so withPipelineRun's
+    // start/end calls don't consume per-test `mockResolvedValueOnce`s.
+    mockApiRequest.mockImplementation(async (_method: unknown, path: unknown) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return { ok: false, error: 'unmocked', message: 'no mock for this path' };
+    });
     // Suppress console output during tests
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
