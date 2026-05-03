@@ -126,13 +126,9 @@ export async function getPolicyStakeholdersByStakeholder(
 }
 
 /**
- * Sync policy stakeholders (atomic mode).
+ * Sync policy stakeholders.
  *
- * The sync factory currently rejects the whole batch on the first validation
- * failure. Phase 2 (QUA-955) added an opt-in best-effort mode (`?mode=best_effort`)
- * but `policy-stakeholders` does not yet set `bestEffortAllowed: true` on its
- * route config — see `apps/wiki-server/src/routes/tablebase/policy-stakeholders.ts`.
- * Until that opt-in lands, this client only exposes the atomic shape.
+ * The sync factory rejects the whole batch on the first validation failure.
  */
 export async function syncPolicyStakeholders(
   items: readonly SyncStakeholderItem[],
