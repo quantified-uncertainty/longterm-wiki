@@ -892,7 +892,7 @@ describe('agent-checklist complete', () => {
     expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
       42,
       agentSessions.updateAgentSession,
-      { branch: 'claude/test-branch-ABC', skipPrLookup: true },
+      expect.objectContaining({ branch: 'claude/test-branch-ABC', skipPrLookup: true }),
     );
   });
 
@@ -918,7 +918,7 @@ describe('agent-checklist complete', () => {
     expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
       477,
       expect.any(Function),
-      { branch: 'claude/test-branch-ABC', skipPrLookup: true },
+      expect.objectContaining({ branch: 'claude/test-branch-ABC', skipPrLookup: true }),
     );
   });
 

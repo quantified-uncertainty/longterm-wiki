@@ -265,7 +265,7 @@ describe('close command (agents)', () => {
     expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
       99,
       sessions.updateAgentSession,
-      { branch: 'claude/qua-1073-fix' },
+      expect.objectContaining({ branch: 'claude/qua-1073-fix' }),
     );
   });
 
@@ -285,7 +285,7 @@ describe('close command (agents)', () => {
     expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
       477,
       sessions.updateAgentSession,
-      { branch: 'claude/qua-1073-fix' },
+      expect.objectContaining({ branch: 'claude/qua-1073-fix' }),
     );
   });
 
@@ -323,5 +323,72 @@ describe('close command (agents)', () => {
 
     const result = await commands.close([], {});
     expect(result.output).toMatch(/title\/summary not yet set/);
+  });
+
+  // CodeRabbit finding: a transient lookup failure used to be
+  // swallowed → close path skipped → cleanup still ran → operator
+  // lost .claude/wip-checklist.md and had no retry signal. The fix
+  // distinguishes "thrown" from "not_found" and preserves cleanup
+  // state so the operator can rerun once the wiki-server recovers.
+  it('skips local-file cleanup when getAgentSessionByBranch throws (transport error)', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+
+    const result = await commands.close([], {});
+
+    // Surface the failure + the retry hint.
+    expect(result.output).toMatch(/Failed to look up agent session/);
+    expect(result.output).toMatch(/ECONNREFUSED/);
+    expect(result.output).toMatch(/Skipping cleanup/);
+    expect(result.exitCode).toBe(1);
+    // Cleanup loop must NOT have fired — no `unlinkSync` calls.
+    expect(unlinkSyncMock).not.toHaveBeenCalled();
+    // Sync helper never ran (no session id to sync against).
+    expect(syncAndCloseSessionMock).not.toHaveBeenCalled();
+  });
+
+  it('skips cleanup when fields sync fails (transport error during PATCH)', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 200, status: 'active' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    syncAndCloseSessionMock.mockResolvedValueOnce({
+      fieldsSync: 'failed',
+      statusSet: false,
+    });
+
+    const result = await commands.close([], {});
+
+    expect(result.exitCode).toBe(1);
+    expect(unlinkSyncMock).not.toHaveBeenCalled();
+    expect(result.output).toMatch(/Cleanup skipped/);
+  });
+
+  it('still cleans up when session is already completed (no transport failure)', async () => {
+    // Already-completed sessions don't need a sync, and we
+    // shouldn't punish the operator with cleanup-skip — the close
+    // succeeded conceptually (it was already closed). Also asserts
+    // the cleanup-skip is properly scoped to actual transport failures.
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+    // Make existsSync return true for the local files so unlinkSync
+    // gets called (the loop short-circuits on file-not-exist).
+    existsSyncMock.mockReturnValue(true);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 999, status: 'completed' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    const result = await commands.close([], {});
+
+    expect(result.exitCode).toBe(0);
+    expect(unlinkSyncMock).toHaveBeenCalled();
   });
 });

@@ -512,7 +512,7 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
         const result = await syncAndCloseSession(
           sessionResult.data.id,
           updateAgentSession,
-          { branch, skipPrLookup: true },
+          { cwd: PROJECT_ROOT, branch, skipPrLookup: true },
         );
         // Surface only the fields-sync state — status promotion is
         // expected to fail at this stage (title+summary not set
