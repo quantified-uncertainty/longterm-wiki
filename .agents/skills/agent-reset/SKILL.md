@@ -23,13 +23,20 @@ This command handles the full session transition: DB close + git reset + local c
    pnpm crux sys agents close
    ```
 
-2. **Identify the current state**: Run `git branch --show-current` and `git status --porcelain` to show the current branch and any uncommitted changes.
+2. **Identify the current state**: surface the branch, working-tree state, AND any unpushed commits before asking the user to confirm.
+   ```bash
+   git branch --show-current
+   git status --porcelain
+   git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null \
+     || echo "No upstream configured (so the branch's commits exist only locally)"
+   ```
+   The `rev-list` line surfaces unpushed local commits — without it, step 3 cannot truthfully show the user "what will be lost."
 
 3. **Confirm with the user** if there are uncommitted changes or unpushed commits. Show them what will be lost. If the branch has been merged or the user confirms, proceed.
 
-4. **Discard local changes**:
+4. **Discard local changes** (resets both the index and the working tree, which `git checkout -- .` alone does NOT do — that command leaves staged changes in place):
    ```bash
-   git checkout -- .
+   git reset --hard HEAD
    git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env
    ```
 
@@ -42,7 +49,9 @@ This command handles the full session transition: DB close + git reset + local c
 
 6. **Delete the old feature branch** (if it wasn't main):
    ```bash
-   git branch -D "$BRANCH"
+   if [ -n "$BRANCH" ] && [ "$BRANCH" != "main" ]; then
+     git branch -D "$BRANCH"
+   fi
    ```
 
 7. **Rename tmux window** (if in an agent slot with `.agent-slot`):

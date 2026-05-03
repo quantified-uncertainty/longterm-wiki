@@ -44,7 +44,7 @@ The script **refuses to reuse** an existing worktree if it has either:
 Both cases bail with an actionable message — wiping in-flight work has happened before in slot agents and the cost of a destructive reset isn't worth the convenience. To clear and start over, the user removes the worktree explicitly:
 
 ```bash
-git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/main worktree remove --force /tmp/wt-<sha>
+git -C "$LW_MAIN_CLONE" worktree remove --force /tmp/wt-<sha>   # $LW_MAIN_CLONE = path to the main reference clone (default <workspace>/main)
 ```
 
 ## Example
@@ -68,7 +68,7 @@ Ready:       cd /tmp/wt-ac742e
 Manual:
 
 ```bash
-git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/main worktree remove --force /tmp/wt-<sha>
+git -C "$LW_MAIN_CLONE" worktree remove --force /tmp/wt-<sha>   # $LW_MAIN_CLONE = path to the main reference clone (default <workspace>/main)
 ```
 
 Automatic: `ws refresh` prunes stale worktrees when their branch is merged.

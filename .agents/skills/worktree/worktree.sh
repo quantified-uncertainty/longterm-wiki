@@ -7,8 +7,14 @@
 
 set -euo pipefail
 
-MAIN_CLONE="${LW_MAIN_CLONE:-/Users/ozziegooen/Documents/GitHub.nosync/lw/main}"
-ENV_FILE="${LW_ENV_BASE:-/Users/ozziegooen/Documents/GitHub.nosync/lw/.env.base}"
+# Defaults derived from the script's own location: this script lives at
+# <workspace>/<slot>/.agents/skills/worktree/worktree.sh, so 4 levels up is
+# the workspace root that holds main/, ops/, .env.base, and slot dirs.
+# Override LW_MAIN_CLONE / LW_ENV_BASE if your layout differs.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+MAIN_CLONE="${LW_MAIN_CLONE:-$WORKSPACE_ROOT/main}"
+ENV_FILE="${LW_ENV_BASE:-$WORKSPACE_ROOT/.env.base}"
 
 # ── arg parse ────────────────────────────────────────────────────────────
 NEW_BRANCH=0
@@ -20,6 +26,9 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo "Usage: worktree.sh <branch>           (existing branch)"
       echo "       worktree.sh -b <new-branch>    (new from origin/main)"
+      echo
+      echo "Resolves MAIN_CLONE from \$LW_MAIN_CLONE (default: $MAIN_CLONE)."
+      echo "Resolves ENV_FILE from \$LW_ENV_BASE  (default: $ENV_FILE)."
       exit 0
       ;;
     *)          BRANCH="$1"; shift ;;
@@ -29,6 +38,18 @@ done
 if [[ -z "$BRANCH" ]]; then
   echo "Usage: worktree.sh <branch>            (existing)" >&2
   echo "       worktree.sh -b <new-branch>     (new from origin/main)" >&2
+  exit 1
+fi
+
+# Validate paths now that we've handled --help / no-arg cases.
+if [[ ! -d "$MAIN_CLONE/.git" ]]; then
+  echo "worktree.sh: MAIN_CLONE does not look like a git clone: $MAIN_CLONE" >&2
+  echo "  Set LW_MAIN_CLONE=/path/to/main-clone to override." >&2
+  exit 1
+fi
+if [[ ! -e "$ENV_FILE" ]]; then
+  echo "worktree.sh: ENV_FILE not found: $ENV_FILE" >&2
+  echo "  Set LW_ENV_BASE=/path/to/.env to override (or remove the symlink step if not needed)." >&2
   exit 1
 fi
 

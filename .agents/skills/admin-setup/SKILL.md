@@ -7,9 +7,21 @@ allowed-tools: Bash, Read
 
 # Admin Setup
 
-Initialize an admin/coordinator session. This is the **first thing** to run in a long-lived admin session that will dispatch work to slots, monitor PRs, and run periodic maintenance.
+Initialize an admin/coordinator session. This is the first long-lived setup step for a session that will dispatch work to slots, monitor PRs, and run periodic maintenance.
+
+> **Prerequisite (mandatory, per CLAUDE.md):** run `pnpm crux sys agent-checklist init "admin coordinator session" --type=infrastructure` first. The PreToolUse `require-checklist.sh` hook blocks Edit/Write until the checklist exists, and admin sessions edit slot state and PR metadata. Skip this only if the checklist has already been initialized in the same session.
 
 The skill is **idempotent** — it can be re-run safely. Background loops are only started if not already running. Status checks are read-only.
+
+> **Path convention:** every snippet below assumes `$LW_WORKSPACE` is set to the workspace root (the directory that holds `main/`, `ops/`, `.env.base`, and slot dirs `a1/`–`a20/`). Set it once at the start of the session:
+>
+> ```bash
+> export LW_WORKSPACE="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$PWD}}/.."
+> # Or hand it the workspace root directly:
+> # export LW_WORKSPACE="$HOME/Documents/GitHub.nosync/lw"
+> ```
+>
+> The `..` form works because admin sessions normally launch from `coord/` or a slot — the parent of either is the workspace root. Override explicitly if your layout differs.
 
 ## What this skill does
 
@@ -33,7 +45,7 @@ pgrep -f tmux-rename-loop.sh && echo "✓ rename loop already running" || echo "
 
 If not running, start it:
 ```bash
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw
+cd $LW_WORKSPACE
 nohup ./scripts/tmux-rename-loop.sh > /tmp/lw-fix-tabs.log 2>&1 &
 disown
 echo "Started rename loop, PID $!"
@@ -50,7 +62,7 @@ pgrep -f ws-refresh-loop.sh && echo "✓ ws-refresh loop already running" || ech
 
 If not running, start it:
 ```bash
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw
+cd $LW_WORKSPACE
 nohup ./scripts/ws-refresh-loop.sh > /tmp/lw-ws-refresh.log 2>&1 &
 disown
 echo "Started ws-refresh loop, PID $!"
@@ -67,7 +79,7 @@ pgrep -f "crux gh pr-patrol run" && echo "✓ PR patrol already running" || echo
 
 If not running, start it:
 ```bash
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
+cd $LW_WORKSPACE/main && \
   export GITHUB_TOKEN=$(gh auth token) && \
   nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
 disown
@@ -79,8 +91,8 @@ The daemon itself manages its own PID at `~/.cache/pr-patrol/daemon.pid` (see `c
 ### Section 2: Pull latest + refresh slots
 
 ```bash
-git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/main pull --ff-only
-git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/ops pull --ff-only
+git -C $LW_WORKSPACE/main pull --ff-only
+git -C $LW_WORKSPACE/ops pull --ff-only
 ```
 
 If either pull fails (diverged), report it and ask the user how to proceed — do not auto-resolve.
@@ -88,7 +100,7 @@ If either pull fails (diverged), report it and ask the user how to proceed — d
 Then do a one-shot `./ws refresh` so the coordinator starts with a clean slot map (the loop from Section 1b catches subsequent merges, but the first run gives immediate feedback):
 
 ```bash
-/Users/ozziegooen/Documents/GitHub.nosync/lw/ws refresh 2>&1 | tail -20
+$LW_WORKSPACE/ws refresh 2>&1 | tail -20
 ```
 
 This only resets slots whose PRs have merged; slots with active work are left alone.
@@ -142,7 +154,7 @@ Use `pnpm crux linear audit` (no args) for the full report.
 **4c. Stale agent slots** — slots on a non-main branch with no recent activity.
 
 ```bash
-/Users/ozziegooen/Documents/GitHub.nosync/lw/ws list 2>&1 | tail -25
+$LW_WORKSPACE/ws list 2>&1 | tail -25
 ```
 
 ### Section 5: Production failures
@@ -156,7 +168,7 @@ gh run list -R quantified-uncertainty/longterm-wiki --branch=main --limit=10 \
 
 **5b. Overdue audits**:
 ```bash
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && pnpm crux sys audits list 2>&1 | grep -E "OVERDUE|DUE TODAY" | head -5
+cd $LW_WORKSPACE/main && pnpm crux sys audits list 2>&1 | grep -E "OVERDUE|DUE TODAY" | head -5
 ```
 
 ### Section 6: Print orientation summary
@@ -222,7 +234,7 @@ Restart steps (use only on user confirmation, OR automatically if `--auto-restar
 ```bash
 pkill -f "crux[[:space:]]+(gh[[:space:]]+)?pr-patrol[[:space:]]+(run|parallel)" 2>/dev/null
 sleep 2
-cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
+cd $LW_WORKSPACE/main && \
   export GITHUB_TOKEN=$(gh auth token) && \
   nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
 disown
