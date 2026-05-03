@@ -1,0 +1,105 @@
+{
+  "title": "Claude Code Cost & Usage",
+  "uid": "claude-code-cost",
+  "schemaVersion": 39,
+  "tags": ["claude-code", "cost"],
+  "timezone": "browser",
+  "time": { "from": "now-7d", "to": "now" },
+  "refresh": "1m",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total cost (selected window)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(increase(claude_code_session_cost_usd_total[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 2 } }
+    },
+    {
+      "id": 2,
+      "type": "barchart",
+      "title": "Cost by slot (cwd)",
+      "gridPos": { "h": 8, "w": 12, "x": 6, "y": 0 },
+      "description": "Per-slot spend, derived from the cwd resource attribute.",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum by (cwd) (increase(claude_code_session_cost_usd_total[$__range]))",
+          "legendFormat": "{{cwd}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "currencyUSD" } }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cache hit rate (15m)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 4 },
+      "description": "cache_read / (cache_read + input + cache_creation). Healthy: >= 90%.",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(claude_code_token_usage_tokens_total{type=\"cacheRead\"}[15m])) / (sum(rate(claude_code_token_usage_tokens_total{type=\"cacheRead\"}[15m])) + sum(rate(claude_code_token_usage_tokens_total{type=\"input\"}[15m])) + sum(rate(claude_code_token_usage_tokens_total{type=\"cacheCreation\"}[15m])))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.85 },
+              { "color": "green", "value": 0.9 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Cost p95 per session",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "description": "p95 cost across active sessions in 1h windows.",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "quantile by () (0.95, max by (session_id) (claude_code_session_cost_usd_total))",
+          "legendFormat": "p95",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "max(max by (session_id) (claude_code_session_cost_usd_total))",
+          "legendFormat": "max",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "currencyUSD" } }
+    },
+    {
+      "id": 5,
+      "type": "barchart",
+      "title": "Tool calls by name (24h)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "description": "Tool-call distribution. Highlights expensive tools (Bash, Edit, Write).",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum by (name) (increase(claude_code_tool_calls_total[24h]))",
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

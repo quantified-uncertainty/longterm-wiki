@@ -69,6 +69,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18)
+      ccusage:
+        specifier: ^18.0.11
+        version: 18.0.11
       cheerio:
         specifier: ^1.2.0
         version: 1.2.0
@@ -3262,6 +3265,11 @@ packages:
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
+
+  ccusage@18.0.11:
+    resolution: {integrity: sha512-QIFCY2gh06vjWelND1gDwJxrniAcNkPw0OHUhz985iE7FIEf738YVzxUKQMKhA2fO9CIJCz0dSpnyIufaKdjdA==}
+    engines: {node: '>=20.19.4'}
+    hasBin: true
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -8472,6 +8480,8 @@ snapshots:
   caniuse-lite@1.0.30001791: {}
 
   ccount@2.0.1: {}
+
+  ccusage@18.0.11: {}
 
   chai@6.2.2: {}
 

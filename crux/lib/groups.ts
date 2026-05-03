@@ -143,6 +143,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'wiki-server',
       'quality',
       'agent-reset',
+      'cost',
       'usage-patterns',
       'session-finalize',
       'docs',

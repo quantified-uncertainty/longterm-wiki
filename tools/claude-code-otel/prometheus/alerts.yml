@@ -1,0 +1,69 @@
+# Cost-observability alert rules for Claude Code (QUA-1068).
+#
+# Metric names follow Claude Code's documented OTel schema:
+# https://docs.claude.com/en/docs/claude-code/monitoring-usage
+#
+# Metric names emitted by Claude Code are dotted in OTel but become
+# underscored once Prometheus ingests them.
+groups:
+  - name: claude-code-cost
+    interval: 1m
+    rules:
+      - alert: ClaudeCodeSessionCostHigh
+        # Per-session USD spend over a $50 threshold within the active session.
+        # `claude_code_session_cost_usd_total` is a counter that resets per session.
+        expr: max by (session_id, organization_id) (claude_code_session_cost_usd_total) > 50
+        for: 5m
+        labels:
+          severity: warning
+          ticket: QUA-1068
+        annotations:
+          summary: "Claude Code session has spent > $50"
+          description: |
+            Session {{ $labels.session_id }} has accumulated ${{ printf "%.2f" $value }} in
+            costs. Investigate the slot for runaway tool use, oversized context, or
+            cache misses. See https://www.longtermwiki.com/internal/agent-cost-monitoring
+
+      - alert: ClaudeCodeCacheHitRateLow
+        # Cache hit rate computed as cache_read / (cache_read + input + cache_create).
+        # The 90% floor matches the documented expectation in QUA-1068; a sustained
+        # drop below 90% indicates either a model/version mismatch or sessions
+        # getting too long for the prompt cache TTL (5 minutes).
+        expr: |
+          (
+            sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheRead"}[15m]))
+            /
+            (
+              sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheRead"}[15m]))
+              + sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="input"}[15m]))
+              + sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheCreation"}[15m]))
+            )
+          ) < 0.90
+        for: 30m
+        labels:
+          severity: warning
+          ticket: QUA-1068
+        annotations:
+          summary: "Claude Code cache hit rate has dropped below 90%"
+          description: |
+            Over the last 15 minutes, the read-cache hit rate is
+            {{ printf "%.1f%%" (mulf $value 100) }}. A sustained drop suggests sessions
+            are spilling out of the 5-minute prompt cache TTL or a model upgrade has
+            invalidated cached prefixes.
+
+      - alert: ClaudeCodeBranchCostHigh
+        # Cumulative cost per git branch crossing $200 across resumed sessions.
+        # Requires the `git_branch` resource attribute, which Claude Code emits per
+        # session.
+        expr: sum by (git_branch) (claude_code_session_cost_usd_total) > 200
+        for: 10m
+        labels:
+          severity: high
+          ticket: QUA-1068
+        annotations:
+          summary: "Branch has accumulated > $200 across sessions"
+          description: |
+            Branch {{ $labels.git_branch }} has accumulated ${{ printf "%.2f" $value }}
+            across resumed Claude Code sessions. This often signals a stuck planning
+            loop or repeated re-runs of the same expensive task. Consider closing
+            out the branch or splitting into smaller PRs.
