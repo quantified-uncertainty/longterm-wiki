@@ -3,6 +3,7 @@ import { z } from "zod";
 import { buildPrefixTsquery } from "../../search-utils.js";
 import { logger } from "../../logger.js";
 import {
+  and,
   eq,
   or,
   count,
@@ -16,6 +17,7 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import {
   resources,
   resourceCitations,
+  resourceContentVersions,
   resourcePapers,
   resourceForumPosts,
   resourcePolicyDocs,
@@ -2116,6 +2118,151 @@ const resourcesApp = new Hono()
       citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   })
+
+  // ---- POST /:id/content-versions — QUA-942 archive snapshot for a resource ----
+  //
+  // Creates a `resource_content_versions` row tying a fetched/extracted snapshot
+  // to a resource. Dedups on (url, content_hash) so re-archiving the same byte-
+  // identical content is a no-op. Used by the PDF resource adapter
+  // (`crux/lib/resource-archive/pdf.ts`) to archive PDF snapshots without going
+  // through the citation-content path (which is wikiPage-citation-shaped).
+  //
+  // The :id path param accepts either resources.id (legacy hex16) or stableId.
+  .post(
+    "/:id/content-versions",
+    zv(
+      "json",
+      z.object({
+        url: z.string().url().max(2000),
+        // 16-char truncated SHA-256 prefix is the codebase-wide policy
+        // (resource-ingest.ts CONTENT_HASH_PREFIX_LENGTH, citations dual-write).
+        // Allow up to 64 hex (full SHA-256) for forward-compat callers, but
+        // recommended length is 16 — see docs/agent-rules/source-check-system.md § 9.
+        contentHash: z.string().min(8).max(64).regex(/^[0-9a-f]+$/i),
+        fetchedAt: z.string().datetime(),
+        content: z.string().max(2_000_000).nullable().optional(),
+        // Original byte size of the source content. Capped at 100 MiB to
+        // reject obviously-bogus values without coupling to MAX_PDF_BYTES.
+        contentLength: z.number().int().min(0).max(100 * 1024 * 1024).nullable().optional(),
+        httpStatus: z.number().int().min(0).max(999).nullable().optional(),
+        contentType: z.string().max(200).nullable().optional(),
+        fetchMethod: z.string().max(100).nullable().optional(),
+        metadata: z.record(z.unknown()).nullable().optional(),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const data = c.req.valid("json");
+      const db = getDrizzleDb();
+
+      // Resolve :id → stableId. Path param can be either the hex16 id or the
+      // sid_-prefixed stableId; downstream RCV.resource_id references stableId.
+      const resourceRow = await db
+        .select({ id: resources.id, stableId: resources.stableId })
+        .from(resources)
+        .where(or(eq(resources.id, id), eq(resources.stableId, id)))
+        .limit(1);
+      if (resourceRow.length === 0) {
+        return notFoundError(c, `Resource not found: ${id}`);
+      }
+      const stableId = resourceRow[0].stableId;
+
+      try {
+        const inserted = await db
+          .insert(resourceContentVersions)
+          .values({
+            resourceId: stableId,
+            url: data.url,
+            contentHash: data.contentHash,
+            fetchedAt: new Date(data.fetchedAt),
+            content: data.content ?? null,
+            contentLength: data.contentLength ?? null,
+            httpStatus: data.httpStatus ?? null,
+            contentType: data.contentType ?? null,
+            fetchMethod: data.fetchMethod ?? null,
+            metadata: data.metadata ?? null,
+          })
+          .onConflictDoNothing({
+            target: [resourceContentVersions.url, resourceContentVersions.contentHash],
+          })
+          .returning({ id: resourceContentVersions.id });
+
+        if (inserted.length > 0) {
+          return c.json(
+            { id: inserted[0].id, resourceId: stableId, deduplicated: false },
+            201,
+          );
+        }
+
+        // Conflict path: a row already exists for this (url, contentHash).
+        // Return its id so callers can still link to it.
+        const existing = await db
+          .select({ id: resourceContentVersions.id })
+          .from(resourceContentVersions)
+          .where(
+            and(
+              eq(resourceContentVersions.url, data.url),
+              eq(resourceContentVersions.contentHash, data.contentHash),
+            ),
+          )
+          .limit(1);
+        return c.json({
+          id: existing[0]?.id ?? null,
+          resourceId: stableId,
+          deduplicated: true,
+        });
+      } catch (err) {
+        return dbError(c, "content version insert", err, { id, url: data.url });
+      }
+    },
+  )
+
+  // ---- GET /:id/content-versions — QUA-942 list snapshots for a resource ----
+  .get(
+    "/:id/content-versions",
+    zv(
+      "query",
+      z.object({
+        limit: clampedLimit(200, 50),
+        offset: z.coerce.number().int().min(0).max(10_000).default(0),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const { limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const resourceRow = await db
+        .select({ stableId: resources.stableId })
+        .from(resources)
+        .where(or(eq(resources.id, id), eq(resources.stableId, id)))
+        .limit(1);
+      if (resourceRow.length === 0) {
+        return notFoundError(c, `Resource not found: ${id}`);
+      }
+      const stableId = resourceRow[0].stableId;
+
+      const rows = await db
+        .select({
+          id: resourceContentVersions.id,
+          url: resourceContentVersions.url,
+          contentHash: resourceContentVersions.contentHash,
+          fetchedAt: resourceContentVersions.fetchedAt,
+          contentLength: resourceContentVersions.contentLength,
+          httpStatus: resourceContentVersions.httpStatus,
+          contentType: resourceContentVersions.contentType,
+          fetchMethod: resourceContentVersions.fetchMethod,
+          metadata: resourceContentVersions.metadata,
+        })
+        .from(resourceContentVersions)
+        .where(eq(resourceContentVersions.resourceId, stableId))
+        .orderBy(desc(resourceContentVersions.fetchedAt))
+        .limit(limit)
+        .offset(offset);
+
+      return c.json({ resourceId: stableId, versions: rows, limit, offset });
+    },
+  )
 
   // ---- POST /dedup — QUA-561 one-shot duplicate merge job ----
   //

@@ -225,6 +225,42 @@ const LIVE_RECORDS_CTE = sql`
 
 // ---- Query schemas ----
 
+/**
+ * QUA-942: validated locator shapes for page-addressable evidence.
+ * NULL = whole-source evidence (existing behavior); a locator narrows
+ * the verdict to a specific page, cell, or anchor inside the source.
+ *
+ * Discriminated union keeps the JSONB flexible for future locator kinds
+ * (e.g. transcript timestamps) without breaking writers that don't yet
+ * know about them — pdf-page is shipped first; new kinds add a branch.
+ */
+const PdfPageLocator = z.object({
+  kind: z.literal("pdf-page"),
+  /** 1-based physical page number. */
+  page: z.number().int().min(1).max(100_000),
+  /** Optional table reference within the page (e.g. "2.3"). */
+  table: z.string().max(50).optional(),
+  /** Optional row reference within a table on the page. */
+  row: z.union([z.string().max(50), z.number().int()]).optional(),
+});
+const CsvCellLocator = z.object({
+  kind: z.literal("csv-cell"),
+  /** 1-based row index within the CSV body (header excluded). */
+  row: z.number().int().min(1).max(10_000_000),
+  column: z.string().min(1).max(200),
+});
+const HtmlAnchorLocator = z.object({
+  kind: z.literal("html-anchor"),
+  /** CSS-style selector pinning a fragment of the source HTML. */
+  selector: z.string().min(1).max(500),
+});
+export const EvidenceLocatorSchema = z.discriminatedUnion("kind", [
+  PdfPageLocator,
+  CsvCellLocator,
+  HtmlAnchorLocator,
+]);
+export type EvidenceLocator = z.infer<typeof EvidenceLocatorSchema>;
+
 const EvidenceBody = z.object({
   recordType: z.string().min(1).max(50),
   recordId: z.string().min(1).max(MAX_ID_LENGTH),
@@ -243,6 +279,12 @@ const EvidenceBody = z.object({
    * by the QUA-426 relevance gate when present.
    */
   relevanceScore: z.number().min(0).max(1).nullable().optional(),
+  /**
+   * QUA-942: page/cell/anchor-level locator inside the source. NULL or
+   * absent = whole-source verdict (existing behavior). Validated against
+   * the discriminated EvidenceLocatorSchema.
+   */
+  evidenceLocator: EvidenceLocatorSchema.nullable().optional(),
   isPrimarySource: z.boolean().default(false),
   checkerModel: z.string().max(100).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
@@ -448,6 +490,7 @@ function mapEvidenceRow(e: {
   verdict: string;
   confidence: number | null;
   relevanceScore: number | null;
+  evidenceLocator: { kind: string; [key: string]: unknown } | null;
   isPrimarySource: boolean;
   checkerModel: string | null;
   notes: string | null;
@@ -467,6 +510,7 @@ function mapEvidenceRow(e: {
     verdict: e.verdict,
     confidence: e.confidence,
     relevanceScore: e.relevanceScore,
+    evidenceLocator: e.evidenceLocator,
     isPrimarySource: e.isPrimarySource,
     checkerModel: e.checkerModel,
     isStale: isStaleModel(e.checkerModel),
@@ -1002,6 +1046,7 @@ const sourcingApp = new Hono()
         verdict: body.verdict,
         confidence: body.confidence ?? null,
         relevanceScore: body.relevanceScore ?? null,
+        evidenceLocator: body.evidenceLocator ?? null,
         isPrimarySource: body.isPrimarySource,
         notes: body.notes ?? null,
         checkedAt: now,
@@ -1041,6 +1086,7 @@ const sourcingApp = new Hono()
             verdict: body.verdict,
             confidence: body.confidence ?? null,
             relevanceScore: body.relevanceScore ?? null,
+            evidenceLocator: body.evidenceLocator ?? null,
             isPrimarySource: body.isPrimarySource,
             checkerModel: checkerModelVal,
             notes: body.notes ?? null,
@@ -1069,6 +1115,7 @@ const sourcingApp = new Hono()
               verdict: body.verdict,
               confidence: body.confidence ?? null,
               relevanceScore: body.relevanceScore ?? null,
+              evidenceLocator: body.evidenceLocator ?? null,
               isPrimarySource: body.isPrimarySource,
               notes: body.notes ?? null,
               checkedAt: now,

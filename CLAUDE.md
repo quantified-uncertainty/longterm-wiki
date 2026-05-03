@@ -226,6 +226,7 @@ These live in `docs/agent-rules/`. They are **NOT** auto-loaded — to keep cach
 | TableBase sync routes (`apps/wiki-server/src/routes/tablebase/`) | `docs/agent-rules/tablebase-sync-factory.md` |
 | TableBase / FactBase / WikiBase naming, which layer owns what | `docs/agent-rules/three-bases-architecture.md` |
 | Source-check verdicts, coverage scoring, `/api/sourcing/*`, dot indicators | `docs/agent-rules/source-check-system.md` |
+| Archiving a PDF as a Resource, page-addressable evidence (`evidence_locator`) | `docs/agent-rules/source-check-system.md` § 9 |
 | `numericId` vs `stableId` vs `tableId` — allocation, validation | `docs/agent-rules/id-system.md` |
 | Adding/changing a `crux/validate/` validator or the gate | `docs/agent-rules/validation-gate-system.md` |
 | Entity profile pages (`/organizations/[slug]`, `/people/[slug]`, etc.) | `docs/agent-rules/entity-profile-pages.md` |

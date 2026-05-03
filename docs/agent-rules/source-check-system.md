@@ -126,3 +126,87 @@ Before proposing new work in this subsystem:
 2. If adding a new entity type's coverage score: add scorer to `coverage-score.ts`, dispatch in `entity-coverage.ts`. Don't copy the pattern to a new file.
 3. If adding a new verdict type: update `source-check-status.ts` mapping AND `verdict-styles.ts` — both must stay in sync
 4. If adding a dashboard: use `/internal/entity-source-checks/` as the Pattern A reference; it has entity ID + redirect already wired
+
+## 9. PDF resources & page-addressable evidence (QUA-942)
+
+PDFs (safety reports, scorecards, methodology docs) get archived through the
+**`archivePdfResource()` adapter** — `crux/lib/resource-archive/pdf.ts`. Don't
+roll your own "fetch + extract + insert resource" pipeline; this adapter is the
+shared seam.
+
+**What it does in one call:**
+
+1. Loads the binary (HTTPS fetch with SSRF guard, or accepts a pre-fetched
+   buffer / local file path).
+2. Computes a full SHA-256 over the **binary** — this is the deterministic
+   integrity hash that survives `pdf-parse` upgrades and rendering changes.
+3. Extracts text + Info-dictionary metadata (`pageCount`, `title`, `author`,
+   `creationDate`) via `extractPdfMetadata` (also exported from `pdf-extractor.ts`).
+4. Upserts a `resources` row (`type='paper'`, `resourcePurpose='primary_source'`,
+   `resourceSubtype='pdf_report'`, `contentLifecycle='immutable'` by default).
+5. Posts a snapshot to `resource_content_versions` via
+   `POST /api/resources/:id/content-versions` with the binary hash, extracted
+   text, and PDF metadata in `metadata` JSONB.
+6. Returns `{ resourceStableId, contentHash, pageCount, fromCache }`.
+
+**Schema choice (Phase 1):** PDFs do **not** get a parallel `resource_documents`
+parent table. They use the existing `resources` row + `resource_content_versions`
+with `content_type='application/pdf'`. PDF-specific metadata lives in
+`resource_content_versions.metadata` JSONB. This keeps the surface area small;
+revisit if a future requirement (e.g. table-of-contents JSON, per-table extracts)
+demands typed columns.
+
+**Storage policy:** the binary itself is **not** stored in PG. The hash + size
+are persisted; the canonical binary lives at `data/scorecards/raw/<source>/<wave>/report.pdf`
+(committed to git) with `resources.local_filename` pointing back to it. If
+upstream rots, the committed copy + matching hash is the ground-truth archive.
+
+**Page-addressable evidence:** `source_check_evidence.evidence_locator` (JSONB,
+added in migration `0224`) carries one of three discriminated locator shapes
+validated by `EvidenceLocatorSchema` in `sourcing.ts`:
+
+```json
+{ "kind": "pdf-page",   "page": 14, "table": "2.3" }
+{ "kind": "csv-cell",   "row": 23, "column": "risk-assessment" }
+{ "kind": "html-anchor", "selector": "#table-2" }
+```
+
+`evidence_locator IS NULL` = whole-source verdict (existing behavior; no
+back-fill on existing rows). The column has a partial GIN index covering only
+non-null rows so we don't pay storage for the millions of NULL legacy rows.
+
+**Calling convention:**
+
+```ts
+import { archivePdfResource } from "../lib/resource-archive/pdf.ts";
+
+const result = await archivePdfResource({
+  url: "https://futureoflife.org/.../AI-Safety-Index-2024-Full-Report.pdf",
+  localFilePath: "data/scorecards/raw/fli/2024-12/report.pdf", // optional
+  publisherEntityId: "sid_FliEntity",
+  contextNote: "FLI Dec 2024 wave report",
+  tags: ["scorecard", "fli_index", "wave:2024-12"],
+});
+
+// Then attach evidence with a page locator:
+await postEvidence({
+  recordType: "scorecard_grade",
+  recordId: gradeId,
+  resourceId: result.resourceStableId,
+  evidenceLocator: { kind: "pdf-page", page: 18 },
+  verdict: "confirmed",
+  // ...
+});
+```
+
+**CLI:** `pnpm crux tb import-scorecards archive-pdf --source=fli_index --wave=2024-12`
+is the proof-of-concept consumer; pattern is generalizable to any wave whose
+PDF lives at `data/scorecards/raw/<source>/<wave>/report.pdf`.
+
+**What's not in scope (file follow-up tickets):**
+- OCR for image-only PDFs.
+- Per-table-cell extraction inside PDFs (e.g., FMTI methodology appendix
+  table 4 row 12). The `pdf-page` locator already supports `table` + `row`
+  hints, but the actual extractor is per-source today.
+- Migrating the system-card harvester (QUA-690) and citation pipeline to use
+  this adapter. The adapter exists; the migration is a separate ticket.

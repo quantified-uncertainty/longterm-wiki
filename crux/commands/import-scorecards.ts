@@ -38,6 +38,7 @@ import {
   fetchAndCacheRawWave as fetchFliWave,
   extractWaveFromCache as extractFliWave,
 } from "../lib/scorecard-import/extract/fli.ts";
+import { archivePdfResource } from "../lib/resource-archive/pdf.ts";
 
 const SAFERAI_DEFAULT_URL = "https://ratings.safer-ai.org/comparison/";
 const SAFERAI_RAW_DIR = resolve("data/scorecards/raw/saferai");
@@ -394,6 +395,81 @@ async function cmdFetch(source: string, wave: string, force: boolean): Promise<C
   }
 }
 
+/**
+ * Default URLs for committed scorecard wave PDFs. Used when --url is omitted.
+ * Adding a new entry here makes `archive-pdf --source=X --wave=Y` self-contained.
+ */
+const ARCHIVE_PDF_DEFAULT_URLS: Record<string, Record<string, string>> = {
+  fli_index: {
+    "2024-12":
+      "https://futureoflife.org/wp-content/uploads/2024/12/AI-Safety-Index-2024-Full-Report-27-May-25.pdf",
+  },
+};
+
+function defaultArchivePdfUrl(source: string, wave: string): string | null {
+  return ARCHIVE_PDF_DEFAULT_URLS[source]?.[wave] ?? null;
+}
+
+async function cmdArchivePdf(
+  source: string,
+  wave: string,
+  filePath: string,
+  urlOverride: string,
+): Promise<CommandResult> {
+  // Resolve local file: explicit --file wins, else fall back to the canonical
+  // committed copy at data/scorecards/raw/<source>/<wave>/report.pdf.
+  const resolvedPath = filePath
+    ? resolve(filePath)
+    : resolve(`data/scorecards/raw/${source}/${wave}/report.pdf`);
+  if (!existsSync(resolvedPath)) {
+    return {
+      exitCode: 1,
+      output: `[archive-pdf] Local PDF not found: ${resolvedPath}\nPass --file=path/to/report.pdf or commit the wave PDF first.`,
+    };
+  }
+
+  const url = urlOverride || defaultArchivePdfUrl(source, wave);
+  if (!url) {
+    return {
+      exitCode: 1,
+      output:
+        `[archive-pdf] No canonical URL known for ${source}/${wave}.\n` +
+        "Pass --url=https://... so the resource has a stable upstream pointer.",
+    };
+  }
+
+  console.log(`[archive-pdf] ${source}/${wave}`);
+  console.log(`  url: ${url}`);
+  console.log(`  file: ${resolvedPath}`);
+
+  try {
+    const result = await archivePdfResource({
+      url,
+      localFilePath: resolvedPath,
+      localFilename: resolvedPath.replace(`${process.cwd()}/`, ""),
+      contextNote: `Scorecard wave PDF: ${source}/${wave}`,
+      tags: ["scorecard", source, `wave:${wave}`],
+      contentLifecycle: "immutable",
+    });
+    console.log("");
+    console.log(`✓ Archived PDF as resource`);
+    console.log(`  resourceStableId:  ${result.resourceStableId}`);
+    console.log(`  contentHash:       ${result.contentHash}`);
+    console.log(`  pageCount:         ${result.pageCount}`);
+    console.log(`  byteSize:          ${result.byteSize.toLocaleString()} bytes`);
+    console.log(`  textChars:         ${result.contentLength.toLocaleString()}`);
+    console.log(`  fromCache:         ${result.fromCache ? "yes (dedup)" : "no (new snapshot)"}`);
+    if (result.pdfMetadata?.title) {
+      console.log(`  pdfTitle:          ${result.pdfMetadata.title}`);
+    }
+    return { exitCode: 0 };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`✗ archive-pdf ${source}/${wave}: ${message}`);
+    return { exitCode: 1 };
+  }
+}
+
 async function cmdExtract(source: string, wave: string): Promise<CommandResult> {
   assertFetchExtractSourceSupported(source, "extract");
   console.log(`Extracting FLI wave ${wave} (LLM call — may take ~30s)...`);
@@ -449,6 +525,25 @@ async function extractCommand(
   return cmdExtract(source, wave);
 }
 
+async function archivePdfCommand(
+  _args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const source = (options.source as string) ?? "";
+  const wave = (options.wave as string) ?? "";
+  if (!source || !wave) {
+    return {
+      exitCode: 1,
+      output:
+        "Usage: pnpm crux tb import-scorecards archive-pdf --source=<key> --wave=<slug> [--file=path/to/report.pdf] [--url=https://...]\n" +
+        "Registers a wave's source PDF as a Resource and writes a content-version snapshot (QUA-942).",
+    };
+  }
+  const filePath = (options.file as string) ?? "";
+  const urlOverride = (options.url as string) ?? "";
+  return cmdArchivePdf(source, wave, filePath, urlOverride);
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
@@ -456,6 +551,7 @@ export const commands = {
   scrape: scrapeCommand,
   fetch: fetchCommand,
   extract: extractCommand,
+  "archive-pdf": archivePdfCommand,
   default: analyzeCommand,
 };
 
@@ -473,6 +569,8 @@ Commands:
                        other sources still use manual extraction)
   fetch                Download a wave's source page/PDF into the cache
   extract              Run the LLM extractor on a cached wave -> grades.json
+  archive-pdf          Register a wave's source PDF as a Resource and write
+                       a content-version snapshot (QUA-942 first consumer)
 
 Options:
   --source=<key>       Filter to a single source (fli_index, saferai,

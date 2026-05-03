@@ -1800,6 +1800,16 @@ export const recordSources = pgTable(
      * relevance gate (QUA-426) when present, otherwise defaults to full weight.
      */
     relevanceScore: real("relevance_score"),
+    /**
+     * QUA-942: page-addressable evidence locator. JSONB so new locator kinds
+     * can be added without migrations. NULL = whole-source evidence.
+     * Validated shapes: pdf-page, csv-cell, html-anchor (see EvidenceLocatorSchema
+     * in api-types.ts). Indexed via partial GIN where the column is non-null.
+     */
+    evidenceLocator: jsonb("evidence_locator").$type<{
+      kind: string;
+      [key: string]: unknown;
+    }>(),
     isPrimarySource: boolean("is_primary_source").notNull().default(false),
     checkerModel: text("checker_model"),
     notes: text("notes"),

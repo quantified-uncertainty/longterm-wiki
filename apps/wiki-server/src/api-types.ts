@@ -862,6 +862,8 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  /** Canonical sid_-prefixed identifier returned by `formatResource`. */
+  stableId: string | null;
   /** HTTP reachability of the URL. Distinct from enrichmentStatus (LLM pipeline stage). */
   fetchStatus: "ok" | "dead" | "soft_404" | "not_found" | "timeout" | "unreachable" | "paywall" | "error" | null;
   lastFetchedAt: string | null;

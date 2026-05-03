@@ -164,3 +164,55 @@ export async function updateAuthorEntityIds(
 ): Promise<ApiResult<UpdateAuthorEntityIdsResult>> {
   return apiRequest<UpdateAuthorEntityIdsResult>('PATCH', '/api/resources/author-entity-ids', { items });
 }
+
+// ---------------------------------------------------------------------------
+// Content versions (QUA-942)
+// ---------------------------------------------------------------------------
+
+export interface CreateContentVersionInput {
+  url: string;
+  contentHash: string;
+  fetchedAt: string;
+  content?: string | null;
+  contentLength?: number | null;
+  httpStatus?: number | null;
+  contentType?: string | null;
+  fetchMethod?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+export type CreateContentVersionResult =
+  | InferResponseType<RpcClient[':id']['content-versions']['$post'], 201>
+  | InferResponseType<RpcClient[':id']['content-versions']['$post'], 200>;
+
+/**
+ * Append a snapshot to a resource's content-version history. Dedups on
+ * (url, contentHash) — when the same byte-identical content is archived
+ * again, returns the existing row's id and `deduplicated: true`.
+ */
+export async function createResourceContentVersion(
+  resourceId: string,
+  input: CreateContentVersionInput,
+): Promise<ApiResult<CreateContentVersionResult>> {
+  // Large payloads (PDF text up to 1MB) get the extended timeout from
+  // batchedRequest, matching the existing snapshot endpoint policy.
+  return batchedRequest<CreateContentVersionResult>(
+    'POST',
+    `/api/resources/${encodeURIComponent(resourceId)}/content-versions`,
+    input,
+  );
+}
+
+export type ListContentVersionsResult = InferResponseType<
+  RpcClient[':id']['content-versions']['$get'],
+  200
+>;
+
+export async function listResourceContentVersions(
+  resourceId: string,
+): Promise<ApiResult<ListContentVersionsResult>> {
+  return apiRequest<ListContentVersionsResult>(
+    'GET',
+    `/api/resources/${encodeURIComponent(resourceId)}/content-versions`,
+  );
+}
