@@ -11,7 +11,7 @@ const {
   listActiveAgentsMock,
   getIssueStatesMock,
   isServerAvailableMock,
-  buildCloseUpdatesMock,
+  syncAndCloseSessionMock,
   gitSafeMock,
   existsSyncMock,
   unlinkSyncMock,
@@ -20,9 +20,9 @@ const {
   listActiveAgentsMock: vi.fn(),
   getIssueStatesMock: vi.fn(),
   isServerAvailableMock: vi.fn(),
-  buildCloseUpdatesMock: vi.fn<
-    (...a: unknown[]) => Promise<{ status: 'completed' } & Record<string, unknown>>
-  >(async () => ({ status: 'completed' as const })),
+  syncAndCloseSessionMock: vi.fn<
+    (...a: unknown[]) => Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }>
+  >(async () => ({ fieldsSync: 'ok' as const, statusSet: true })),
   gitSafeMock: vi.fn(() => ({ ok: true, output: 'claude/qua-1073-fix' })),
   // Mocking fs prevents `closeCommand` from `unlinkSync`-ing the real
   // .claude/agent-id, .claude/wip-checklist.md, .agent-task, and
@@ -62,7 +62,7 @@ vi.mock('../lib/linear/issue-states-cache.ts', () => ({
 }));
 
 vi.mock('../lib/session/session-sync-payload.ts', () => ({
-  buildCloseUpdates: buildCloseUpdatesMock,
+  syncAndCloseSession: syncAndCloseSessionMock,
 }));
 
 vi.mock('../lib/git.ts', () => ({
@@ -233,8 +233,8 @@ describe('close command (agents)', () => {
     listActiveAgentsMock.mockReset();
     getIssueStatesMock.mockReset();
     isServerAvailableMock.mockReset();
-    buildCloseUpdatesMock.mockReset();
-    buildCloseUpdatesMock.mockResolvedValue({ status: 'completed' as const });
+    syncAndCloseSessionMock.mockReset();
+    syncAndCloseSessionMock.mockResolvedValue({ fieldsSync: 'ok', statusSet: true });
     gitSafeMock.mockReset();
     gitSafeMock.mockReturnValue({ ok: true, output: 'claude/qua-1073-fix' });
     isServerAvailableMock.mockResolvedValue(true);
@@ -248,9 +248,10 @@ describe('close command (agents)', () => {
     vi.mocked(sessions.updateAgentSession).mockReset();
   });
 
-  it('PATCHes the close-time payload alongside status (QUA-1073)', async () => {
+  // QUA-1073: must call syncAndCloseSession (which split-PATCHes the
+  // close-time fields and the status promotion separately).
+  it('calls syncAndCloseSession on active session (QUA-1073)', async () => {
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(sessions.updateAgentSession);
     const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
 
     getByBranchMock.mockResolvedValueOnce({
@@ -258,52 +259,20 @@ describe('close command (agents)', () => {
       data: { id: 99, status: 'active' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    buildCloseUpdatesMock.mockResolvedValueOnce({
-      status: 'completed',
-      checksYaml: '{"initialized":true,"completed":3}',
-      reviewed: false,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/9999',
-    });
-
     await commands.close([], {});
 
     // No skipPrLookup — `close` runs after the push.
-    expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
-      branch: 'claude/qua-1073-fix',
-    });
-
-    expect(updateMock).toHaveBeenCalledWith(99, {
-      status: 'completed',
-      checksYaml: '{"initialized":true,"completed":3}',
-      reviewed: false,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/9999',
-    });
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      99,
+      sessions.updateAgentSession,
+      { branch: 'claude/qua-1073-fix' },
+    );
   });
 
-  it('still sends just status when no local artifacts exist', async () => {
+  // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'.
+  // `agents close` must still sync close-time fields on explicit close.
+  it('calls syncAndCloseSession when session is stale (not just active)', async () => {
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(sessions.updateAgentSession);
-    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
-
-    getByBranchMock.mockResolvedValueOnce({
-      ok: true,
-      data: { id: 100, status: 'active' },
-    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
-
-    buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
-
-    await commands.close([], {});
-
-    expect(updateMock).toHaveBeenCalledWith(100, { status: 'completed' });
-  });
-
-  // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'
-  // by the periodic sweep. `agents close` must still populate the
-  // close-time fields on explicit close — otherwise any long-running
-  // session lands with NULL writeback even after the QUA-1073 fix.
-  it('PATCHes the close-time payload when session is stale (not just active)', async () => {
-    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(sessions.updateAgentSession);
     const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
 
     getByBranchMock.mockResolvedValueOnce({
@@ -311,26 +280,17 @@ describe('close command (agents)', () => {
       data: { id: 477, status: 'stale' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    buildCloseUpdatesMock.mockResolvedValueOnce({
-      status: 'completed',
-      checksYaml: '{"initialized":true}',
-      reviewed: true,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4854',
-    });
-
     await commands.close([], {});
 
-    expect(updateMock).toHaveBeenCalledWith(477, {
-      status: 'completed',
-      checksYaml: '{"initialized":true}',
-      reviewed: true,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4854',
-    });
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      477,
+      sessions.updateAgentSession,
+      { branch: 'claude/qua-1073-fix' },
+    );
   });
 
-  it('skips PATCH when session is already completed (terminal state)', async () => {
+  it('skips sync when session is already completed (terminal state)', async () => {
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(sessions.updateAgentSession);
     const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
 
     getByBranchMock.mockResolvedValueOnce({
@@ -340,31 +300,28 @@ describe('close command (agents)', () => {
 
     await commands.close([], {});
 
-    expect(updateMock).not.toHaveBeenCalled();
+    expect(syncAndCloseSessionMock).not.toHaveBeenCalled();
   });
 
-  // Speculative `buildCloseUpdates` rejection: the close path must
-  // surface a warning and fall back to `{status:'completed'}` so the
-  // row leaves its prior state. Silently swallowing the error would
-  // re-create the QUA-1073 NULL-writeback failure mode.
-  it('surfaces buildCloseUpdates rejection and falls back to status-only PATCH', async () => {
+  // QUA-1073: when title/summary haven't been set yet (the steady
+  // state for `agents close` since session-finalize hasn't fired),
+  // the status promotion silently 400s. The close path should
+  // still surface this so the operator knows status didn't flip.
+  it('surfaces status-not-set note when statusSet is false', async () => {
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(sessions.updateAgentSession);
     const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
 
     getByBranchMock.mockResolvedValueOnce({
       ok: true,
-      data: { id: 101, status: 'active' },
+      data: { id: 102, status: 'active' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    buildCloseUpdatesMock.mockRejectedValueOnce(
-      new Error('checklist parse failed'),
-    );
+    syncAndCloseSessionMock.mockResolvedValueOnce({
+      fieldsSync: 'ok',
+      statusSet: false,
+    });
 
     const result = await commands.close([], {});
-
-    expect(updateMock).toHaveBeenCalledWith(101, { status: 'completed' });
-    expect(result.output).toMatch(/Failed to build close-time payload/);
-    expect(result.output).toMatch(/checklist parse failed/);
+    expect(result.output).toMatch(/title\/summary not yet set/);
   });
 });

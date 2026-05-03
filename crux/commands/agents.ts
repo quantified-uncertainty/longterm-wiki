@@ -29,7 +29,7 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
-import { buildCloseUpdates } from '../lib/session/session-sync-payload.ts';
+import { syncAndCloseSession } from '../lib/session/session-sync-payload.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { getIssueStates } from '../lib/linear/issue-states-cache.ts';
 
@@ -424,26 +424,10 @@ async function closeCommand(
     const sessionClosePromise = closeable
       ? getAgentSessionByBranch(branch).catch(() => null)
       : null;
-    // Speculatively kick off the close-time PATCH payload build —
-    // it overlaps the GitHub PR lookup with the parallel DB calls
-    // above instead of running serialized after them. The cost of a
-    // wasted lookup when sessionResult ends up missing is one HTTP
-    // call; the save is 100-500 ms when it lands. We capture the
-    // build error rather than swallowing it so the consumer below can
-    // surface it — silently falling back to `{status:'completed'}`
-    // would re-introduce the QUA-1073 NULL-writeback failure mode.
-    let closeUpdatesError: Error | null = null;
-    const closeUpdatesPromise = closeable
-      ? buildCloseUpdates({ branch }).catch((e: unknown) => {
-          closeUpdatesError = e instanceof Error ? e : new Error(String(e));
-          return null;
-        })
-      : null;
 
-    const [agentResults, sessionResult, closeUpdates] = await Promise.all([
+    const [agentResults, sessionResult] = await Promise.all([
       agentClosePromise,
       sessionClosePromise,
-      closeUpdatesPromise,
     ]);
 
     // Process agent close results
@@ -464,22 +448,30 @@ async function closeCommand(
       output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
     }
 
-    // QUA-1073: PATCH carries `checksYaml`, `reviewed`, and `prUrl`
-    // alongside `status` so completed rows stop landing with all three
-    // NULL. If the speculative build threw, surface that and fall
-    // back to status-only — the row at least leaves its prior state,
-    // but the operator sees why the close-time fields didn't sync.
-    // Accept 'stale' too: a long session swept by the periodic
-    // sweep should still get its close-time fields populated on
-    // explicit close (only 'completed' is terminal).
+    // QUA-1073: split-PATCH so the close-time fields land regardless
+    // of whether status promotion to 'completed' succeeds. The combined
+    // PATCH used to roll back the entire UPDATE when title/summary were
+    // missing (validated server-side after status='completed'), but
+    // those fields are only populated by the SessionEnd hook AFTER
+    // this command runs. The split lets `checksYaml`/`reviewed`/`prUrl`
+    // land while letting status promotion fail silently — the next
+    // session-finalize call will populate title/summary and the next
+    // close attempt will succeed in promoting status.
     if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status !== 'completed') {
       try {
-        if (closeUpdatesError) {
-          output += `${c.yellow}⚠ Failed to build close-time payload (QUA-1073 fields will be NULL): ${closeUpdatesError.message}${c.reset}\n`;
-        }
-        const updates = closeUpdates ?? { status: 'completed' as const };
-        await updateAgentSession(sessionResult.data.id, updates);
-        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
+        const result = await syncAndCloseSession(
+          sessionResult.data.id,
+          updateAgentSession,
+          { branch: branch ?? undefined },
+        );
+        const fieldsNote =
+          result.fieldsSync === 'failed'
+            ? ` ${c.yellow}(close-time field sync failed)${c.reset}`
+            : '';
+        const statusNote = result.statusSet
+          ? ' marked completed'
+          : ` ${c.dim}(status stays ${sessionResult.data.status} — title/summary not yet set; will promote on next close after session-finalize)${c.reset}`;
+        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset}${statusNote}${fieldsNote}\n`;
       } catch (e: unknown) {
         output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
       }

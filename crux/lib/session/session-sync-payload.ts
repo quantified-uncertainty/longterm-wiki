@@ -104,13 +104,35 @@ export async function buildSessionSyncPayload(
 }
 
 /**
- * Both `agent-checklist complete` and `agents close` need the same
- * `{ status: 'completed', ... }` shape — keep the contract in one
- * place so the next close-time field doesn't need to land twice.
+ * Sync the close-time fields to a session row, then attempt the status
+ * promotion separately. The endpoint hard-fails the entire UPDATE when
+ * `status='completed'` is sent without `title+summary` already present
+ * — which is the steady state for `agent-checklist complete` and
+ * `agents close`, since those run BEFORE the SessionEnd hook fires
+ * `session-finalize` to populate title/summary from the transcript.
+ *
+ * Splitting the PATCH lets the close-time fields (`checksYaml`,
+ * `reviewed`, `prUrl`) land regardless of whether the status promotion
+ * succeeds. The status PATCH is best-effort and silently 400s when
+ * title/summary are missing — which is fine, the row stays in
+ * `active`/`stale` until the next session-finalize fills them in.
+ *
+ * Returns whether the status promotion succeeded so callers can log
+ * appropriately.
  */
-export async function buildCloseUpdates(
+export async function syncAndCloseSession(
+  sessionId: number,
+  updateAgentSession: (id: number, updates: Record<string, unknown>) => Promise<{ ok: boolean; message?: string }>,
   options: BuildPayloadOptions = {},
-): Promise<{ status: 'completed' } & SessionSyncPayload> {
+): Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }> {
   const sync = await buildSessionSyncPayload(options);
-  return { status: 'completed', ...sync };
+
+  let fieldsSync: 'ok' | 'failed' | 'noop' = 'noop';
+  if (Object.keys(sync).length > 0) {
+    const r = await updateAgentSession(sessionId, sync as Record<string, unknown>);
+    fieldsSync = r.ok ? 'ok' : 'failed';
+  }
+
+  const r2 = await updateAgentSession(sessionId, { status: 'completed' });
+  return { fieldsSync, statusSet: r2.ok };
 }

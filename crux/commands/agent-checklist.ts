@@ -26,7 +26,7 @@ import {
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
-import { buildCloseUpdates } from '../lib/session/session-sync-payload.ts';
+import { syncAndCloseSession } from '../lib/session/session-sync-payload.ts';
 import { syncToMain, safeSyncMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands, checkDedup as linearCheckDedup } from './linear.ts';
@@ -499,19 +499,21 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
   if (s.allPassing) {
     let output = `${c.green}✓ All ${s.totalItems} checklist items complete!${c.reset}\n`;
 
-    // QUA-1073: PATCH must carry close-time fields, not just status.
-    // Skip PR lookup — this runs at /agent-ship Step 7, before the
-    // PR is pushed in Step 8; `agents close` (Step 9) does the lookup.
-    // Accept 'stale' too: a long session (>2h) gets swept to 'stale'
-    // by the periodic sweep before complete runs; we still want to
-    // populate the close-time fields and mark it 'completed' on
-    // explicit close. Only 'completed' rows are off-limits (terminal).
+    // QUA-1073: PATCH the close-time fields and (best-effort) the
+    // status. Skip PR lookup — `complete` runs at /agent-ship Step 7,
+    // before the PR is pushed in Step 8; `agents close` (Step 9) does
+    // the lookup. Accept 'stale' too — a long session swept by the
+    // periodic sweep should still get its fields synced. 'completed'
+    // is terminal and off-limits.
     try {
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);
       if (sessionResult.ok && sessionResult.data.status !== 'completed') {
-        const updates = await buildCloseUpdates({ branch, skipPrLookup: true });
-        await updateAgentSession(sessionResult.data.id, updates);
+        await syncAndCloseSession(
+          sessionResult.data.id,
+          updateAgentSession,
+          { branch, skipPrLookup: true },
+        );
       }
     } catch {
       // Best-effort

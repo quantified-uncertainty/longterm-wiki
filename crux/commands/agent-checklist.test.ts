@@ -72,17 +72,16 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
   getAgentSessionByBranch: vi.fn(async () => ({ ok: false })),
 }));
 
-// Mock the close-time payload builder so the `complete` test can verify
-// the consolidated PATCH body reaches `updateAgentSession` without
-// exercising the real fs / git / API lookups (those are covered by the
-// helper's own tests).
-const { buildCloseUpdatesMock } = vi.hoisted(() => ({
-  buildCloseUpdatesMock: vi.fn<
-    (...a: unknown[]) => Promise<{ status: 'completed' } & Record<string, unknown>>
-  >(async () => ({ status: 'completed' as const })),
+// Mock the close-time sync helper so the `complete` test can verify
+// it's called correctly without exercising the real fs / git / API
+// lookups (those are covered by the helper's own tests).
+const { syncAndCloseSessionMock } = vi.hoisted(() => ({
+  syncAndCloseSessionMock: vi.fn<
+    (...a: unknown[]) => Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }>
+  >(async () => ({ fieldsSync: 'ok' as const, statusSet: true })),
 }));
 vi.mock('../lib/session/session-sync-payload.ts', () => ({
-  buildCloseUpdates: buildCloseUpdatesMock,
+  syncAndCloseSession: syncAndCloseSessionMock,
 }));
 
 // Mock the git sync helpers so we can observe which one init picks (QUA-403)
@@ -868,8 +867,9 @@ describe('agent-checklist complete', () => {
     expect(result.output).toContain('All 2 checklist items complete');
   });
 
-  // QUA-1073: PATCH must include checksYaml/reviewed/prUrl, not just status.
-  it('PATCHes the close updates payload alongside status (QUA-1073)', async () => {
+  // QUA-1073: must call syncAndCloseSession so the helper does the
+  // split-PATCH (close-time fields, then status as best-effort).
+  it('calls syncAndCloseSession with skipPrLookup=true (QUA-1073)', async () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
 2. [x] \`gate-passes\` Gate passes (auto-verify)
 `;
@@ -877,104 +877,59 @@ describe('agent-checklist complete', () => {
     mockReadFileSync.mockReturnValue(md);
 
     const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(agentSessions.updateAgentSession);
     const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
 
-    // Re-init mock to return an active session so the close path runs.
     getByBranchMock.mockResolvedValueOnce({
       ok: true,
       data: { id: 42, status: 'active' },
     } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
 
-    buildCloseUpdatesMock.mockResolvedValueOnce({
-      status: 'completed',
-      checksYaml: '{"initialized":true,"completed":2}',
-      reviewed: true,
-    });
-
     const result = await commands.complete([], {});
     expect(result.exitCode).toBe(0);
 
     // skipPrLookup: true because `complete` runs before the PR is pushed.
-    expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
-      branch: 'claude/test-branch-ABC',
-      skipPrLookup: true,
-    });
-
-    expect(updateMock).toHaveBeenCalledWith(42, {
-      status: 'completed',
-      checksYaml: '{"initialized":true,"completed":2}',
-      reviewed: true,
-    });
-  });
-
-  it('still PATCHes status alone when local artifacts are missing', async () => {
-    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
-2. [x] \`gate-passes\` Gate passes (auto-verify)
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
-    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(agentSessions.updateAgentSession);
-    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
-
-    getByBranchMock.mockResolvedValueOnce({
-      ok: true,
-      data: { id: 7, status: 'active' },
-    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
-
-    buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
-
-    await commands.complete([], {});
-
-    // No spurious nulls — we don't want to overwrite values the
-    // SessionEnd hook (`session-finalize` → title/summary) wrote.
-    expect(updateMock).toHaveBeenCalledWith(7, { status: 'completed' });
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      42,
+      agentSessions.updateAgentSession,
+      { branch: 'claude/test-branch-ABC', skipPrLookup: true },
+    );
   });
 
   // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'
   // by the periodic sweep before complete runs. We must still
-  // populate the close-time fields on explicit close — otherwise
-  // any session over the stale threshold lands with NULL writeback
-  // even after the QUA-1073 fix.
-  it('PATCHes close-time fields even when session is stale (not just active)', async () => {
+  // populate the close-time fields on explicit close.
+  it('calls syncAndCloseSession when session is stale (not just active)', async () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
 
     const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(agentSessions.updateAgentSession);
     const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
 
     getByBranchMock.mockResolvedValueOnce({
       ok: true,
       data: { id: 477, status: 'stale' },
     } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
 
-    buildCloseUpdatesMock.mockResolvedValueOnce({
-      status: 'completed',
-      checksYaml: '{"initialized":true}',
-      reviewed: true,
-    });
-
     await commands.complete([], {});
 
-    expect(updateMock).toHaveBeenCalledWith(477, {
-      status: 'completed',
-      checksYaml: '{"initialized":true}',
-      reviewed: true,
-    });
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      477,
+      expect.any(Function),
+      { branch: 'claude/test-branch-ABC', skipPrLookup: true },
+    );
   });
 
-  it('skips PATCH when session is already completed (terminal state)', async () => {
+  it('skips sync when session is already completed (terminal state)', async () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
 
     const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
-    const updateMock = vi.mocked(agentSessions.updateAgentSession);
     const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
 
     getByBranchMock.mockResolvedValueOnce({
       ok: true,
@@ -983,9 +938,9 @@ describe('agent-checklist complete', () => {
 
     await commands.complete([], {});
 
-    // Re-PATCHing a completed row would be a wasteful no-op and
-    // could overwrite metadata an earlier close already wrote.
-    expect(updateMock).not.toHaveBeenCalled();
+    // Re-syncing a completed row would be wasteful (and the status
+    // PATCH would be a no-op).
+    expect(syncAndCloseSessionMock).not.toHaveBeenCalled();
   });
 });
 
