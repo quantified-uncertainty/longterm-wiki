@@ -21,6 +21,16 @@ describe('truncate', () => {
     it('honors custom fallback', () => {
       expect(truncate(null, 10, { fallback: '—' })).toBe('—');
     });
+
+    it('treats empty string as a non-null value (NOT fallback)', () => {
+      // Wrappers that want '' to map to fallback must guard with !s themselves.
+      // sessions-list's truncate() does this; see its test for the regression.
+      expect(truncate('', 10, { fallback: '—' })).toBe('');
+    });
+
+    it('preserves \\r in oneLine mode (only \\n is collapsed)', () => {
+      expect(truncate('a\r\nb', 10, { oneLine: true })).toBe('a\r b');
+    });
   });
 
   describe('ellipsis option', () => {
@@ -54,6 +64,20 @@ describe('truncate', () => {
       expect(truncate('abcdefghij', 5, { showCount: true, ellipsis: '...' })).toBe(
         'abcde… [truncated, 5 more chars]',
       );
+    });
+
+    it('ignores wordBoundary when showCount is true (showCount cuts at exact max)', () => {
+      // showCount documents content length, so backing up to a word boundary
+      // would break the "5 more chars" math. The cut must land at exactly max.
+      expect(
+        truncate('hello world foo', 5, { showCount: true, wordBoundary: true }),
+      ).toBe('hello… [truncated, 10 more chars]');
+    });
+
+    it('still collapses newlines when oneLine is set with showCount', () => {
+      expect(
+        truncate('a\nb\nc\nd\ne\nf', 3, { showCount: true, oneLine: true }),
+      ).toBe('a b… [truncated, 8 more chars]');
     });
   });
 

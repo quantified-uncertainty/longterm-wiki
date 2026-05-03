@@ -196,7 +196,8 @@ export function sortSessions(rows: MergedSession[]): MergedSession[] {
 // ---------------------------------------------------------------------------
 
 export function truncate(s: string | null | undefined, width: number): string {
-  return truncateText(s, width, { fallback: '—' });
+  if (!s) return '—';
+  return truncateText(s, width);
 }
 
 export function formatAge(minutes: number | null): string {

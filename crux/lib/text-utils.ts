@@ -8,9 +8,18 @@
  * so the result has length <= max. This matches the most common existing
  * helper (e.g. sessions-list, audit, t1-allowlist, url-resolves-verifier).
  *
- * For inline `slice(0, N) + '...'` call sites where the existing output
- * is `N` chars of content + 3 char ellipsis (length N+3), pass
- * `{ ellipsis: '...' }` and a `max` of `N + 3` to preserve identical output.
+ * Migrating an inline `slice(0, N) + '...'` call site:
+ *   - For inputs *strictly longer* than `N + ellipsis.length`, pass
+ *     `max = N + ellipsis.length` and `{ ellipsis }` to get identical output.
+ *   - For inputs in the boundary window `(N, N + ellipsis.length]`, the new
+ *     helper passes the input through unchanged; the old code appended the
+ *     marker even when it pushed length above N. Treat this as a strict
+ *     improvement — short inputs no longer carry a redundant marker.
+ *
+ * Empty-string handling: `''` is treated as a non-null string and returned
+ * unchanged (subject to truncation). For wrappers that want the empty-string
+ * sentinel of an old helper (e.g. sessions-list's `'—'`), check `!s` at the
+ * call site before delegating.
  */
 
 export interface TruncateOptions {
