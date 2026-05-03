@@ -345,10 +345,19 @@ function preflightChecks(config: PatrolConfig): string[] {
 // ── Check cycle ──────────────────────────────────────────────────────────────
 
 /**
- * Outcome of a single check cycle. `didWork = true` means the daemon performed
- * something potentially queue-shrinking (PR fix, main-branch fix, merge enqueue,
- * undraft). The idle-cycle circuit breaker (QUA-1071) uses this to drive
- * exponential backoff after K=20 consecutive `didWork = false` cycles.
+ * Outcome of a single check cycle. `didWork = true` means the cycle should
+ * count against the idle-cycle circuit breaker (QUA-1071), i.e. the breaker
+ * resets and stays at base interval. Two flavors of "work":
+ *
+ *   1. Queue-shrinking work: a PR was processed, a merge was enqueued, or a
+ *      draft was undrafted. Computed at the bottom of `runCheckCycle`.
+ *   2. Active-but-non-queue-shrinking signals: health-gate tripped, main-branch
+ *      fix attempted. Returned via the early-return paths so the daemon keeps
+ *      polling at base interval to detect fleet recovery — backing off when
+ *      the fleet is unhealthy would extend MTTR.
+ *
+ * The breaker drives exponential backoff after K=20 consecutive
+ * `didWork = false` cycles.
  */
 export interface CheckCycleResult {
   didWork: boolean;
@@ -665,8 +674,9 @@ async function runCheckCycle(
 
   // ── Cycle summary ──────────────────────────────────────────────────
 
-  // A cycle "did work" if it actually moved the queue forward. Idle-cycle
-  // breaker (QUA-1071) treats the inverse of this as a no-op.
+  // Queue-shrinking work this cycle. The early-return paths above (health-gate
+  // tripped, main-branch fix) handle their own `didWork` per CheckCycleResult's
+  // contract — see the JSDoc on the interface for the full taxonomy.
   const didWork =
     fixedPr !== null ||
     enqueuedPrs.length > 0 ||
@@ -784,9 +794,16 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       const cycleResult = await runCheckCycle(cycleCount, config);
       didWork = cycleResult.didWork;
     } catch (e) {
-      log(
-        `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,
-      );
+      const msg = e instanceof Error ? e.message : String(e);
+      log(`${cl.red}Check cycle failed: ${msg}${cl.reset}`);
+      // Persist the failure to JSONL so the breaker's eventual engagement is
+      // attributable to a stream of errors rather than a "no work needed"
+      // streak. The normal cycle_summary won't have run when this throws.
+      appendJsonl(JSONL_FILE_INTERNAL, {
+        type: 'cycle_error',
+        cycle_number: cycleCount,
+        error: msg,
+      });
     }
 
     // Periodic reflection
@@ -801,8 +818,11 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     const step = nextIdleCycle(idleState, didWork, idleConfig);
     idleState = step.state;
     if (step.justTripped) {
+      // The engagement cycle itself sleeps at base interval (overshoot=0);
+      // backoff doubles starting on the next idle cycle. Be honest about
+      // that in the log so operators reading it don't expect immediate growth.
       log(
-        `${cl.yellow}⚠ Idle-cycle breaker engaged after ${idleState.noOpStreak} no-op cycles — exponentially backing off (max ${idleConfig.maxSleepSeconds}s).${cl.reset}`,
+        `${cl.yellow}⚠ Idle-cycle breaker engaged after ${idleState.noOpStreak} no-op cycles — sleeping ${step.sleepSeconds}s now; backoff begins next cycle (max ${idleConfig.maxSleepSeconds}s).${cl.reset}`,
       );
       appendJsonl(JSONL_FILE_INTERNAL, {
         type: 'idle_breaker_engaged',
