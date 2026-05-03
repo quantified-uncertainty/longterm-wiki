@@ -26,7 +26,7 @@ import {
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
-import { buildSessionSyncPayload } from '../lib/session/session-sync-payload.ts';
+import { buildCloseUpdates } from '../lib/session/session-sync-payload.ts';
 import { syncToMain, safeSyncMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands, checkDedup as linearCheckDedup } from './linear.ts';
@@ -502,16 +502,16 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
     // Mark session as completed (best-effort) and sync the close-time
     // fields the /agent-ship skill collected — `checksYaml`, `reviewed`,
     // and `prUrl`. Without this spread the row went to status='completed'
-    // with all three columns NULL (QUA-1073).
+    // with all three columns NULL (QUA-1073). PR lookup is skipped here:
+    // in `/agent-ship`, `complete` runs at Step 7 BEFORE the PR is
+    // pushed in Step 8, so any lookup would always miss; `agents close`
+    // (Step 9) does the lookup once the PR exists.
     try {
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);
       if (sessionResult.ok && sessionResult.data.status === 'active') {
-        const syncFields = buildSessionSyncPayload({ branch });
-        await updateAgentSession(sessionResult.data.id, {
-          status: 'completed',
-          ...syncFields,
-        });
+        const updates = await buildCloseUpdates({ branch, skipPrLookup: true });
+        await updateAgentSession(sessionResult.data.id, updates);
       }
     } catch {
       // Best-effort

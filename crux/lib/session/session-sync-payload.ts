@@ -14,37 +14,50 @@
  *
  * Returned fields are all optional: callers spread the result into the
  * PATCH body so missing fields are omitted (the endpoint preserves
- * existing values when a key is `undefined`).
+ * existing values when a key is `undefined`). In particular, the PR
+ * lookup is best-effort: at `complete`-time (Step 7 of `/agent-ship`)
+ * the PR doesn't exist yet so `prUrl` will be omitted; `close` (Step 9,
+ * after push) finds the now-existing PR and overwrites with its URL.
  */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { buildChecklistSnapshot } from './session-checklist.ts';
 import { checkReviewMarker } from '../review-marker.ts';
+import { getOpenPrUrlByBranch } from '../github.ts';
 
 export interface SessionSyncPayload {
   /** JSON-stringified ChecklistSnapshot, or undefined if no checklist exists. */
   checksYaml?: string;
-  /** True when the review marker is fresh against HEAD; false when missing/stale. */
+  /**
+   * True/false from the review marker.
+   *
+   * - `true`  — marker exists, SHA + diff hash both match HEAD.
+   * - `false` — marker is missing OR malformed OR stale (SHA / diff hash drift).
+   * - `undefined` — couldn't determine (no merge-base with main, e.g. fresh
+   *   worktree). We omit rather than guess so the dashboard can distinguish
+   *   "ran without review" from "we have no idea."
+   */
   reviewed?: boolean;
-  /** PR URL discovered via `gh pr view`; undefined when no PR exists for the branch. */
+  /** PR URL discovered via the GitHub API; undefined when no PR exists. */
   prUrl?: string;
 }
 
 export interface BuildPayloadOptions {
   /** Project root. Defaults to `process.cwd()`. */
   cwd?: string;
-  /** Branch to look up a PR for. When omitted, `gh pr view` infers from CWD. */
+  /** Branch to look up a PR for. Required for the prUrl lookup. */
   branch?: string;
   /**
    * Override the PR URL lookup — e.g. callers that already know the URL
-   * (just-pushed-PR flow) can pass it directly to skip the `gh` exec.
+   * (just-pushed-PR flow) can pass it directly to skip the API call.
    */
   prUrl?: string;
   /**
-   * Skip the `gh pr view` shell-out. Tests use this so they don't depend
-   * on a live GitHub CLI; production callers usually want it enabled.
+   * Skip the PR lookup. Used by `agent-checklist complete`, which runs
+   * BEFORE the PR exists in the `/agent-ship` flow (Step 7 → Step 8 push
+   * → Step 9 close). Also useful in tests so the suite doesn't depend on
+   * GITHUB_TOKEN.
    */
   skipPrLookup?: boolean;
 }
@@ -52,26 +65,20 @@ export interface BuildPayloadOptions {
 const CHECKLIST_REL_PATH = '.claude/wip-checklist.md';
 
 /**
- * Look up the PR URL for `branch` via `gh pr view`. Returns undefined if
- * `gh` is missing, the branch has no PR, or the call errors. We never
- * throw — a failed lookup just leaves `prUrl` blank, which preserves
+ * Look up the PR URL for `branch`. Returns undefined on any failure (no
+ * branch, no PR for the branch, network error, missing token). Never
+ * throws — a failed lookup just leaves `prUrl` blank, which preserves
  * whatever the row already had.
  */
-function lookupPrUrl(branch: string | undefined, cwd: string): string | undefined {
+async function lookupPrUrl(branch: string | undefined): Promise<string | undefined> {
+  if (!branch) return undefined;
   try {
-    const args = branch
-      ? ['pr', 'view', branch, '--json', 'url', '-q', '.url']
-      : ['pr', 'view', '--json', 'url', '-q', '.url'];
-    const out = execFileSync('gh', args, {
-      cwd,
-      stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf-8',
-      timeout: 15_000,
-    }).trim();
-    if (!out) return undefined;
-    if (!out.startsWith('http')) return undefined;
-    return out;
+    const url = await getOpenPrUrlByBranch(branch);
+    return url ?? undefined;
   } catch {
+    // Best-effort: a 404 / 401 / network error during close should not
+    // block the status update. The next `close` invocation (or a manual
+    // PATCH) can fill it in.
     return undefined;
   }
 }
@@ -87,9 +94,9 @@ function lookupPrUrl(branch: string | undefined, cwd: string): string | undefine
  * `/internal/agent-sessions` dashboard and `crux sys maintain
  * review-prs` — parse it as JSON via `JSON.parse(row.checksYaml)`).
  */
-export function buildSessionSyncPayload(
+export async function buildSessionSyncPayload(
   options: BuildPayloadOptions = {},
-): SessionSyncPayload {
+): Promise<SessionSyncPayload> {
   const cwd = options.cwd ?? process.cwd();
   const payload: SessionSyncPayload = {};
 
@@ -106,30 +113,41 @@ export function buildSessionSyncPayload(
   }
 
   // reviewed — from .claude/review-done. The marker check returns ok=true
-  // only when both the SHA and diff hash match HEAD. Anything else (no
-  // marker, malformed, stale) is recorded as `reviewed: false` so the
-  // dashboard can distinguish "review never ran" from "review ran but
-  // data is missing." We DO write `reviewed: false` (not undefined) so a
-  // session that genuinely shipped without a review pass shows that fact
-  // — see QUA-849 for why the explicit-false matters.
+  // only when both the SHA and diff hash match HEAD. We treat the discrete
+  // failure modes as `false` (review didn't ship), but `no-base` (couldn't
+  // compute the diff hash, e.g. fresh worktree) is undetermined — omit
+  // rather than guess `false`, so the dashboard can distinguish.
   try {
     const result = checkReviewMarker(cwd);
-    payload.reviewed = result.ok;
+    if (result.code !== 'no-base') payload.reviewed = result.ok;
   } catch {
-    // checkReviewMarker only throws on truly unexpected internal errors
-    // (it normalizes git failures to `code: 'no-base'`). Be defensive
-    // anyway: omit the field rather than guessing.
+    // checkReviewMarker normalizes git failures to `code: 'no-base'`; this
+    // catch is purely defensive against an unexpected internal throw.
   }
 
-  // prUrl — explicit override > gh pr view. We never overwrite an
-  // existing prUrl with undefined: if the lookup fails, the field is
+  // prUrl — explicit override > API lookup > omitted. We never overwrite
+  // an existing prUrl with undefined: if the lookup fails, the field is
   // simply omitted from the spread.
   if (options.prUrl) {
     payload.prUrl = options.prUrl;
   } else if (!options.skipPrLookup) {
-    const url = lookupPrUrl(options.branch, cwd);
+    const url = await lookupPrUrl(options.branch);
     if (url) payload.prUrl = url;
   }
 
   return payload;
+}
+
+/**
+ * Close-time PATCH consolidator. Both `agent-checklist complete` and
+ * `agents close` need the same shape — `{ status: 'completed', ... }` —
+ * so the QUA-1073 contract lives in one place. A future "must-send-at-
+ * close" addition (e.g. `learningsJson` derived from the transcript)
+ * lands here, not in two callsites.
+ */
+export async function buildCloseUpdates(
+  options: BuildPayloadOptions = {},
+): Promise<{ status: 'completed' } & SessionSyncPayload> {
+  const sync = await buildSessionSyncPayload(options);
+  return { status: 'completed', ...sync };
 }

@@ -73,13 +73,16 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
 }));
 
 // Mock the close-time payload builder so the `complete` test can verify
-// the spread reaches `updateAgentSession` without exercising the real
-// fs / gh / git lookups (those are covered by the helper's own tests).
-const { buildSessionSyncPayloadMock } = vi.hoisted(() => ({
-  buildSessionSyncPayloadMock: vi.fn(() => ({})),
+// the consolidated PATCH body reaches `updateAgentSession` without
+// exercising the real fs / git / API lookups (those are covered by the
+// helper's own tests).
+const { buildCloseUpdatesMock } = vi.hoisted(() => ({
+  buildCloseUpdatesMock: vi.fn<
+    (...a: unknown[]) => Promise<{ status: 'completed' } & Record<string, unknown>>
+  >(async () => ({ status: 'completed' as const })),
 }));
 vi.mock('../lib/session/session-sync-payload.ts', () => ({
-  buildSessionSyncPayload: buildSessionSyncPayloadMock,
+  buildCloseUpdates: buildCloseUpdatesMock,
 }));
 
 // Mock the git sync helpers so we can observe which one init picks (QUA-403)
@@ -870,7 +873,7 @@ describe('agent-checklist complete', () => {
   // with all three columns NULL. The previous behavior sent only
   // `{ status: 'completed' }`, leaving the dashboard / maintain-retro
   // / page-changes consumers blind.
-  it('PATCHes checksYaml, reviewed, and prUrl alongside status (QUA-1073)', async () => {
+  it('PATCHes the close updates payload alongside status (QUA-1073)', async () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
 2. [x] \`gate-passes\` Gate passes (auto-verify)
 `;
@@ -887,19 +890,22 @@ describe('agent-checklist complete', () => {
       data: { id: 42, status: 'active' },
     } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
 
-    buildSessionSyncPayloadMock.mockReturnValueOnce({
+    buildCloseUpdatesMock.mockResolvedValueOnce({
+      status: 'completed',
       checksYaml: '{"initialized":true,"completed":2}',
       reviewed: true,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4830',
     });
 
     const result = await commands.complete([], {});
     expect(result.exitCode).toBe(0);
 
-    // The helper was invoked with the current branch — the test mock
-    // returns 'claude/test-branch-ABC' from execSync above.
-    expect(buildSessionSyncPayloadMock).toHaveBeenCalledWith({
+    // `complete` runs at Step 7 of /agent-ship, BEFORE the PR is
+    // pushed in Step 8. Skip the PR lookup so we don't burn a GitHub
+    // API call on every pre-ship validation run that's guaranteed to
+    // miss.
+    expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
       branch: 'claude/test-branch-ABC',
+      skipPrLookup: true,
     });
 
     // Critical assertion: the PATCH body MUST carry the close-time
@@ -909,7 +915,6 @@ describe('agent-checklist complete', () => {
       status: 'completed',
       checksYaml: '{"initialized":true,"completed":2}',
       reviewed: true,
-      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4830',
     });
   });
 
@@ -929,15 +934,16 @@ describe('agent-checklist complete', () => {
       data: { id: 7, status: 'active' },
     } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
 
-    // Empty payload — no checklist, no marker, no PR (e.g. the
-    // session was wrapped before /agent-ship gathered any of those).
-    buildSessionSyncPayloadMock.mockReturnValueOnce({});
+    // Helper returned only status (no checklist, no marker, no PR — e.g.
+    // the session was wrapped before /agent-ship gathered any of those).
+    buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
 
     await commands.complete([], {});
 
-    // Empty spread leaves the body as `{ status: 'completed' }`, which
-    // is the documented fallback. We don't want spurious nulls being
-    // sent for fields the close path couldn't observe.
+    // The body is `{ status: 'completed' }`, which is the documented
+    // fallback. We don't want spurious nulls sent for fields the close
+    // path couldn't observe — those would overwrite values written by
+    // earlier hooks (session-finalize → title/summary).
     expect(updateMock).toHaveBeenCalledWith(7, { status: 'completed' });
   });
 });

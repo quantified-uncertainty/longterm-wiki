@@ -267,7 +267,7 @@ pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 
 Session logs are stored in the wiki-server PostgreSQL database (not committed to git). Both `agent-checklist complete` (Step 7) and `agents close` (Step 9) now auto-collect the close-time fields — `checksYaml` (from the WIP checklist), `reviewed` (from the `.claude/review-done` marker), and `prUrl` (from `gh pr view` for the current branch) — and PATCH them along with `status='completed'` (QUA-1073). You no longer need to read the marker or capture the snapshot by hand.
 
-If you want to inspect what will be sent, `pnpm crux sys agent-checklist snapshot` prints the same JSON that gets serialized into `checksYaml`. If no checklist was initialized, the snapshot outputs `checks: {initialized: false}` — include that honestly in any session summaries.
+If you want to inspect what will be sent, `pnpm crux sys agent-checklist snapshot --ci` prints the same JSON that gets serialized into `checksYaml` (the bare `snapshot` command formats as YAML for human reading; `--ci` is the machine-readable form). If no checklist was initialized, the snapshot outputs `{initialized: false}` — include that honestly in any session summaries.
 
 ## Step 7: Validate completion
 

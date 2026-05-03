@@ -1,16 +1,16 @@
 /**
- * Tests for buildSessionSyncPayload (QUA-1073).
+ * Tests for buildSessionSyncPayload + buildCloseUpdates (QUA-1073).
  *
  * Each test sets up a real temp git repo + .claude artifacts so the
  * helper exercises the actual fs / review-marker / checklist code paths
- * without mocking. PR lookup is skipped via `skipPrLookup` because
- * shelling out to `gh` would make the suite depend on auth + network.
- *
- * The branch+prUrl override path is exercised explicitly so we still
- * cover the URL-passthrough behavior the close commands rely on.
+ * without mocking. The PR lookup goes through `getOpenPrUrlByBranch` in
+ * `lib/github.ts`; we mock that module so the suite doesn't depend on
+ * `GITHUB_TOKEN` or network. The override-and-skip paths assert the
+ * spy was NOT called so a future refactor can't silently start spawning
+ * the lookup behind both gates.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { execSync } from 'node:child_process';
 import {
   mkdtempSync,
@@ -20,7 +20,23 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildSessionSyncPayload } from './session-sync-payload.ts';
+
+// Mock the GitHub helper before importing the module under test, so the
+// import binds to the mocked function rather than the real one.
+const { getOpenPrUrlByBranchMock } = vi.hoisted(() => ({
+  getOpenPrUrlByBranchMock: vi.fn<(branch: string) => Promise<string | null>>(
+    async () => null,
+  ),
+}));
+vi.mock('../github.ts', () => ({
+  getOpenPrUrlByBranch: getOpenPrUrlByBranchMock,
+  REPO: 'quantified-uncertainty/longterm-wiki',
+}));
+
+import {
+  buildSessionSyncPayload,
+  buildCloseUpdates,
+} from './session-sync-payload.ts';
 import { computeDiffHash } from '../review-marker.ts';
 
 let tmpRepo: string;
@@ -73,6 +89,10 @@ beforeEach(() => {
   writeFileSync(join(tmpRepo, 'b.txt'), 'b\n');
   git('add .');
   git('commit -q -m feature');
+  // Default: PR lookup returns null (no PR for branch). Tests that need
+  // a hit override per-call.
+  getOpenPrUrlByBranchMock.mockReset();
+  getOpenPrUrlByBranchMock.mockResolvedValue(null);
 });
 
 afterEach(() => {
@@ -80,19 +100,19 @@ afterEach(() => {
 });
 
 describe('buildSessionSyncPayload', () => {
-  it('returns an empty payload when no artifacts exist', () => {
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+  it('returns a payload with reviewed=false when no checklist or marker exists', async () => {
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
     expect(result.checksYaml).toBeUndefined();
     expect(result.prUrl).toBeUndefined();
-    // No marker → reviewed=false (we deliberately record explicit-false
-    // so the dashboard distinguishes "ran without review" from "ran but
-    // never reported"). See helper comment + QUA-849.
+    // No marker → reviewed=false (the discrete "marker missing" failure
+    // is recorded as explicit-false; only the "couldn't determine"
+    // no-base case is omitted).
     expect(result.reviewed).toBe(false);
   });
 
-  it('serializes the checklist snapshot to JSON in checksYaml', () => {
+  it('serializes the checklist snapshot to JSON in checksYaml', async () => {
     writeChecklist(SAMPLE_CHECKLIST);
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
     expect(result.checksYaml).toBeDefined();
     const parsed = JSON.parse(result.checksYaml!);
     expect(parsed.initialized).toBe(true);
@@ -102,55 +122,122 @@ describe('buildSessionSyncPayload', () => {
     expect(parsed.items).toEqual(['gate-passes', 'tests-written']);
   });
 
-  it('records reviewed=true when the marker matches HEAD + diff hash', () => {
+  it('records reviewed=true when the marker matches HEAD + diff hash', async () => {
     const headSha = git('rev-parse HEAD');
     const diffHash = computeDiffHash(tmpRepo);
     writeReviewMarker(`reviewed ${headSha} 2026-05-02T12:00:00Z ${diffHash}\n`);
 
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
     expect(result.reviewed).toBe(true);
   });
 
-  it('records reviewed=false when the marker SHA is stale', () => {
+  it('records reviewed=false when the marker SHA is stale', async () => {
     const diffHash = computeDiffHash(tmpRepo);
     writeReviewMarker(
       `reviewed 0000000000000000000000000000000000000000 2026-05-02T12:00:00Z ${diffHash}\n`,
     );
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
     expect(result.reviewed).toBe(false);
   });
 
-  it('records reviewed=false when the marker diff hash is stale', () => {
+  it('records reviewed=false when the marker diff hash is stale', async () => {
     const headSha = git('rev-parse HEAD');
     writeReviewMarker(
       `reviewed ${headSha} 2026-05-02T12:00:00Z 000000000000\n`,
     );
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
     expect(result.reviewed).toBe(false);
   });
 
-  it('uses the explicit prUrl override and skips the gh lookup', () => {
+  it('omits reviewed when the marker check returns code=no-base', async () => {
+    // A non-git CWD makes `getHeadSha` throw, which `checkReviewMarker`
+    // surfaces as `code: 'no-base'`. We don't want to record `false`
+    // here because "couldn't determine" is not the same as "review
+    // didn't happen" — the dashboard needs the distinction.
+    const nonGit = mkdtempSync(join(tmpdir(), 'no-git-'));
+    mkdirSync(join(nonGit, '.claude'), { recursive: true });
+    writeFileSync(
+      join(nonGit, '.claude', 'review-done'),
+      'reviewed 0000000000000000000000000000000000000000 2026-05-02T12:00:00Z 000000000000\n',
+    );
+    try {
+      const result = await buildSessionSyncPayload({ cwd: nonGit, skipPrLookup: true });
+      expect(result.reviewed).toBeUndefined();
+    } finally {
+      rmSync(nonGit, { recursive: true, force: true });
+    }
+  });
+
+  it('uses the explicit prUrl override and never calls the API', async () => {
     const explicit = 'https://github.com/example/repo/pull/42';
-    const result = buildSessionSyncPayload({
+    const result = await buildSessionSyncPayload({
       cwd: tmpRepo,
+      branch: 'feature',
       prUrl: explicit,
       // Don't pass skipPrLookup: the override path itself must short-circuit.
     });
     expect(result.prUrl).toBe(explicit);
+    // Structural assertion: a future refactor that ran both paths
+    // would silently regress without this — the test name says "skips
+    // the API," so make sure the API was actually skipped.
+    expect(getOpenPrUrlByBranchMock).not.toHaveBeenCalled();
   });
 
-  it('omits prUrl when skipPrLookup is set and no override is given', () => {
-    const result = buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true });
+  it('skips the API call entirely when skipPrLookup is set', async () => {
+    const result = await buildSessionSyncPayload({
+      cwd: tmpRepo,
+      branch: 'feature',
+      skipPrLookup: true,
+    });
+    expect(result.prUrl).toBeUndefined();
+    expect(getOpenPrUrlByBranchMock).not.toHaveBeenCalled();
+  });
+
+  it('looks up the PR URL via getOpenPrUrlByBranch when not overridden', async () => {
+    getOpenPrUrlByBranchMock.mockResolvedValueOnce(
+      'https://github.com/example/repo/pull/123',
+    );
+    const result = await buildSessionSyncPayload({
+      cwd: tmpRepo,
+      branch: 'feature',
+    });
+    expect(result.prUrl).toBe('https://github.com/example/repo/pull/123');
+    expect(getOpenPrUrlByBranchMock).toHaveBeenCalledWith('feature');
+  });
+
+  it('omits prUrl when the API returns null (no open PR for branch)', async () => {
+    // mock already returns null by default
+    const result = await buildSessionSyncPayload({
+      cwd: tmpRepo,
+      branch: 'feature',
+    });
     expect(result.prUrl).toBeUndefined();
   });
 
-  it('combines all three fields when every artifact is present', () => {
+  it('omits prUrl when the API throws (auth, network, missing token)', async () => {
+    getOpenPrUrlByBranchMock.mockRejectedValueOnce(new Error('GITHUB_TOKEN not set'));
+    const result = await buildSessionSyncPayload({
+      cwd: tmpRepo,
+      branch: 'feature',
+    });
+    // Best-effort: a failed lookup must not throw or set null. Omit
+    // the field so the spread preserves any existing prUrl on the row.
+    expect(result.prUrl).toBeUndefined();
+  });
+
+  it('omits prUrl when no branch is given', async () => {
+    const result = await buildSessionSyncPayload({ cwd: tmpRepo });
+    expect(result.prUrl).toBeUndefined();
+    expect(getOpenPrUrlByBranchMock).not.toHaveBeenCalled();
+  });
+
+  it('combines all three fields when every artifact is present', async () => {
     writeChecklist(SAMPLE_CHECKLIST);
     const headSha = git('rev-parse HEAD');
     const diffHash = computeDiffHash(tmpRepo);
     writeReviewMarker(`reviewed ${headSha} 2026-05-02T12:00:00Z ${diffHash}\n`);
 
-    const result = buildSessionSyncPayload({
+    const result = await buildSessionSyncPayload({
       cwd: tmpRepo,
       prUrl: 'https://github.com/example/repo/pull/99',
     });
@@ -159,13 +246,43 @@ describe('buildSessionSyncPayload', () => {
     expect(result.prUrl).toBe('https://github.com/example/repo/pull/99');
   });
 
-  it('does not throw on a corrupted checklist file', () => {
-    // Write something the parser will choke on but the read won't fail;
-    // an unparseable checklist should leave checksYaml undefined, not
-    // throw and break the whole close path.
+  it('does not throw on a corrupted checklist file', async () => {
+    // The checklist parser is permissive — a non-checklist string still
+    // parses as an empty checklist, so `checksYaml` ends up populated
+    // with `{initialized:true,total:0,completed:0,...}`. The point of
+    // the test is that nothing throws and breaks the close path.
     writeChecklist('this is not a valid checklist');
-    expect(() =>
+    await expect(
       buildSessionSyncPayload({ cwd: tmpRepo, skipPrLookup: true }),
-    ).not.toThrow();
+    ).resolves.toBeDefined();
+  });
+});
+
+describe('buildCloseUpdates', () => {
+  it('always sets status=completed and spreads the sync payload', async () => {
+    writeChecklist(SAMPLE_CHECKLIST);
+    const updates = await buildCloseUpdates({
+      cwd: tmpRepo,
+      branch: 'feature',
+      prUrl: 'https://github.com/example/repo/pull/1',
+      skipPrLookup: true,
+    });
+    expect(updates.status).toBe('completed');
+    expect(updates.checksYaml).toBeDefined();
+    expect(updates.prUrl).toBe('https://github.com/example/repo/pull/1');
+  });
+
+  it('returns just status when no artifacts and no PR exist', async () => {
+    const updates = await buildCloseUpdates({
+      cwd: tmpRepo,
+      branch: 'feature',
+      skipPrLookup: true,
+    });
+    expect(updates.status).toBe('completed');
+    expect(updates.prUrl).toBeUndefined();
+    expect(updates.checksYaml).toBeUndefined();
+    // reviewed=false because the marker is missing in this tmp repo —
+    // see the "no checklist or marker" test for the reviewed=false rationale.
+    expect(updates.reviewed).toBe(false);
   });
 });

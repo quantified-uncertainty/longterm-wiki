@@ -11,14 +11,27 @@ const {
   listActiveAgentsMock,
   getIssueStatesMock,
   isServerAvailableMock,
-  buildSessionSyncPayloadMock,
+  buildCloseUpdatesMock,
   gitSafeMock,
+  existsSyncMock,
+  unlinkSyncMock,
+  readFileSyncMock,
 } = vi.hoisted(() => ({
   listActiveAgentsMock: vi.fn(),
   getIssueStatesMock: vi.fn(),
   isServerAvailableMock: vi.fn(),
-  buildSessionSyncPayloadMock: vi.fn(() => ({})),
+  buildCloseUpdatesMock: vi.fn<
+    (...a: unknown[]) => Promise<{ status: 'completed' } & Record<string, unknown>>
+  >(async () => ({ status: 'completed' as const })),
   gitSafeMock: vi.fn(() => ({ ok: true, output: 'claude/qua-1073-fix' })),
+  // Mocking fs prevents `closeCommand` from `unlinkSync`-ing the real
+  // .claude/agent-id, .claude/wip-checklist.md, .agent-task, and
+  // .claude/last-heartbeat in the project root when this test runs in a
+  // live slot. Without this, every test invocation destroys the running
+  // session's checklist + heartbeat.
+  existsSyncMock: vi.fn(() => false),
+  unlinkSyncMock: vi.fn(),
+  readFileSyncMock: vi.fn(() => ''),
 }));
 
 vi.mock('../lib/wiki-server/active-agents.ts', () => ({
@@ -49,11 +62,17 @@ vi.mock('../lib/linear/issue-states-cache.ts', () => ({
 }));
 
 vi.mock('../lib/session/session-sync-payload.ts', () => ({
-  buildSessionSyncPayload: buildSessionSyncPayloadMock,
+  buildCloseUpdates: buildCloseUpdatesMock,
 }));
 
 vi.mock('../lib/git.ts', () => ({
   gitSafe: gitSafeMock,
+}));
+
+vi.mock('fs', () => ({
+  existsSync: existsSyncMock,
+  unlinkSync: unlinkSyncMock,
+  readFileSync: readFileSyncMock,
 }));
 
 import { commands, collectLinearIds } from './agents.ts';
@@ -217,11 +236,16 @@ describe('close command (agents)', () => {
     listActiveAgentsMock.mockReset();
     getIssueStatesMock.mockReset();
     isServerAvailableMock.mockReset();
-    buildSessionSyncPayloadMock.mockReset();
-    buildSessionSyncPayloadMock.mockReturnValue({});
+    buildCloseUpdatesMock.mockReset();
+    buildCloseUpdatesMock.mockResolvedValue({ status: 'completed' as const });
     gitSafeMock.mockReset();
     gitSafeMock.mockReturnValue({ ok: true, output: 'claude/qua-1073-fix' });
     isServerAvailableMock.mockResolvedValue(true);
+    existsSyncMock.mockReset();
+    existsSyncMock.mockReturnValue(false);
+    unlinkSyncMock.mockReset();
+    readFileSyncMock.mockReset();
+    readFileSyncMock.mockReturnValue('');
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
     vi.mocked(sessions.getAgentSessionByBranch).mockReset();
     vi.mocked(sessions.updateAgentSession).mockReset();
@@ -237,7 +261,8 @@ describe('close command (agents)', () => {
       data: { id: 99, status: 'active' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    buildSessionSyncPayloadMock.mockReturnValueOnce({
+    buildCloseUpdatesMock.mockResolvedValueOnce({
+      status: 'completed',
       checksYaml: '{"initialized":true,"completed":3}',
       reviewed: false,
       prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/9999',
@@ -245,7 +270,10 @@ describe('close command (agents)', () => {
 
     await commands.close([], {});
 
-    expect(buildSessionSyncPayloadMock).toHaveBeenCalledWith({
+    // Unlike `agent-checklist complete`, `agents close` runs AFTER the
+    // push (Step 9 of /agent-ship), so we DO want the PR lookup to
+    // run — no skipPrLookup here.
+    expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
       branch: 'claude/qua-1073-fix',
     });
 
@@ -268,9 +296,10 @@ describe('close command (agents)', () => {
       data: { id: 100, status: 'active' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    // Empty payload — close was called from a session with no checklist
-    // or review marker present (e.g. a quick-fix session).
-    buildSessionSyncPayloadMock.mockReturnValueOnce({});
+    // Helper resolved with just status — no checklist, no marker, no
+    // PR (e.g. a quick-fix session that called /agent-end with nothing
+    // to sync).
+    buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
 
     await commands.close([], {});
 

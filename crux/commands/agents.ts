@@ -29,7 +29,7 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
-import { buildSessionSyncPayload } from '../lib/session/session-sync-payload.ts';
+import { buildCloseUpdates } from '../lib/session/session-sync-payload.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { getIssueStates } from '../lib/linear/issue-states-cache.ts';
 
@@ -451,14 +451,13 @@ async function closeCommand(
     // Process session close result — may need a follow-up call. We
     // gather `checksYaml`, `reviewed`, and `prUrl` from local state and
     // include them in the same PATCH so completed rows stop landing
-    // with all three columns NULL (QUA-1073).
+    // with all three columns NULL (QUA-1073). Unlike `agent-checklist
+    // complete`, this runs AFTER the push so a PR (if any) is real and
+    // worth looking up.
     if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
       try {
-        const syncFields = buildSessionSyncPayload({ branch: branch ?? undefined });
-        await updateAgentSession(sessionResult.data.id, {
-          status: 'completed',
-          ...syncFields,
-        });
+        const updates = await buildCloseUpdates({ branch: branch ?? undefined });
+        await updateAgentSession(sessionResult.data.id, updates);
         output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
       } catch (e: unknown) {
         output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
