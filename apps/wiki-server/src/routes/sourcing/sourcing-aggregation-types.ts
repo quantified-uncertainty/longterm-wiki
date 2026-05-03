@@ -108,9 +108,14 @@ export interface AggregationResult {
    * headline because they were stale (`isStale=true`) AND at least one
    * fresh row was available. When all rows are stale, this is empty and
    * the stale rows feed the headline as before — i.e. stale evidence is
-   * better than nothing. Surfaced for the QUA-792 explainer so a fresh
-   * `confirmed` aggregate can still say "1 stale partial source dissented
-   * (excluded)".
+   * better than nothing.
+   *
+   * Currently consumed by `buildReasoning` (renders the `stale (excluded):
+   * N → verdict` clause that ships in `source_check_verdicts.reasoning`).
+   * The frontend `buildDisagreementExplainer` does NOT yet read this
+   * field — extending the explainer to surface stale dissent alongside
+   * low-relevance dissent is a deliberate follow-up; the persisted
+   * reasoning text is the operator-facing surface for now.
    */
   droppedStale: ContributingVerdict[];
   /** Count of `not_applicable` rows that were filtered out before aggregation. */

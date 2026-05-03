@@ -419,6 +419,57 @@ describe("recomputeVerdict — stale-evidence handling (QUA-991)", () => {
     ]);
   });
 
+  it("reasoning surfaces winner + fresh dissent + stale exclusion in one string", async () => {
+    // Most informative shape: a fresh confirmed wins, a fresh contradicted
+    // dissents, and a stale partial is excluded. The 3-clause format is what
+    // the `/internal/sourcing` UIs parse — pin it so a future format tweak
+    // doesn't silently break those surfaces.
+    const CURRENT = "claude-haiku-4-5-20251001";
+    const OLD = "claude-3-5-sonnet-20241022";
+    dispatch = (q) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        return [
+          {
+            verdict: "confirmed",
+            relevance_score: 1.0,
+            confidence: 0.95,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+          {
+            verdict: "contradicted",
+            relevance_score: 1.0,
+            confidence: 0.7,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+          {
+            verdict: "partial",
+            relevance_score: 1.0,
+            confidence: 0.6,
+            checked_at: new Date("2026-04-01T00:00:00Z"),
+            checker_model: OLD,
+          },
+        ];
+      }
+      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        return [{ record_id: "fact_test" }];
+      }
+      return [];
+    };
+    const result = await recomputeVerdict(getDrizzleDb(), {
+      recordType: "fact",
+      recordId: "fact_test",
+      fieldName: null,
+    });
+    // Headline: contradicted wins via priority(0) over confirmed(4) at equal weight.
+    // Stale partial is excluded because a fresh row exists.
+    expect(result.aggregate.verdict).toBe("contradicted");
+    expect(result.reasoning).toMatch(/1 → contradicted/);
+    expect(result.reasoning).toMatch(/dissent: 1 → confirmed/);
+    expect(result.reasoning).toMatch(/stale \(excluded\): 1 → partial/);
+  });
+
   it("loadEvidenceRows reads checker_model so the staleness filter has the data it needs", async () => {
     // Pin the SELECT shape — if a future refactor drops checker_model
     // from the projection, the staleness filter would silently regress

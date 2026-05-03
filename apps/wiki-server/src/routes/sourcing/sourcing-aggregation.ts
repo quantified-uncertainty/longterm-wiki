@@ -148,20 +148,7 @@ export function aggregateEvidence(
   let droppedStale: ContributingVerdict[];
   if (freshRows.length > 0 && freshRows.length < considered.length) {
     aggregable = freshRows;
-    const staleBuckets = new Map<AggregateVerdict, ContributingVerdict>();
-    for (const r of considered) {
-      if (r.isStale !== true) continue;
-      const v = r.verdict as AggregateVerdict;
-      const w = effectiveWeight(r);
-      const existing = staleBuckets.get(v);
-      if (existing) {
-        existing.weight += w;
-        existing.rowCount += 1;
-      } else {
-        staleBuckets.set(v, { verdict: v, weight: w, rowCount: 1 });
-      }
-    }
-    droppedStale = sortContributing([...staleBuckets.values()]);
+    droppedStale = bucketByVerdict(considered.filter((r) => r.isStale === true));
   } else {
     aggregable = considered;
     droppedStale = [];
@@ -173,23 +160,15 @@ export function aggregateEvidence(
   // dissent. Operates on `aggregable` so dropped-stale rows don't appear
   // in `droppedLowRelevance` (they're already in `droppedStale`).
   const aboveThreshold: EvidenceRow[] = [];
-  const belowThresholdBuckets = new Map<AggregateVerdict, ContributingVerdict>();
+  const belowThresholdRows: EvidenceRow[] = [];
   for (const r of aggregable) {
-    const w = effectiveWeight(r);
-    if (w >= minRelevance) {
+    if (effectiveWeight(r) >= minRelevance) {
       aboveThreshold.push(r);
-      continue;
-    }
-    const v = r.verdict as AggregateVerdict;
-    const existing = belowThresholdBuckets.get(v);
-    if (existing) {
-      existing.weight += w;
-      existing.rowCount += 1;
     } else {
-      belowThresholdBuckets.set(v, { verdict: v, weight: w, rowCount: 1 });
+      belowThresholdRows.push(r);
     }
   }
-  const droppedLowRelevance = sortContributing([...belowThresholdBuckets.values()]);
+  const droppedLowRelevance = bucketByVerdict(belowThresholdRows);
 
   if (aboveThreshold.length === 0) {
     return {
@@ -287,6 +266,42 @@ export function aggregateEvidence(
  * noise from typical `0.x + 0.y` sums.
  */
 const WEIGHT_EQUALITY_EPSILON = 1e-9;
+
+/**
+ * Group rows by verdict, summing weight, counting rows, and tracking the
+ * most-recent `checkedAt` per bucket. Returned list is sorted by
+ * `sortContributing` so callers can render dissent in the canonical order.
+ *
+ * Used for both `droppedStale` and `droppedLowRelevance` — both are
+ * "rows we excluded from the headline, surfaced for the dissent explainer."
+ * Same Map-bucketing idiom that the headline aggregator uses below.
+ */
+function bucketByVerdict(rows: Iterable<EvidenceRow>): ContributingVerdict[] {
+  const buckets = new Map<AggregateVerdict, ContributingVerdict>();
+  for (const r of rows) {
+    const v = r.verdict as AggregateVerdict;
+    const w = effectiveWeight(r);
+    const existing = buckets.get(v);
+    if (existing) {
+      existing.weight += w;
+      existing.rowCount += 1;
+      if (
+        r.checkedAt &&
+        (!existing.latestCheckedAt || r.checkedAt > existing.latestCheckedAt)
+      ) {
+        existing.latestCheckedAt = r.checkedAt;
+      }
+    } else {
+      buckets.set(v, {
+        verdict: v,
+        weight: w,
+        rowCount: 1,
+        latestCheckedAt: r.checkedAt ?? null,
+      });
+    }
+  }
+  return sortContributing([...buckets.values()]);
+}
 
 /**
  * Sort contributing buckets by weight desc, ties broken by recency desc

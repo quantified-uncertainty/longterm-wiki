@@ -100,12 +100,6 @@ const VALID_VERDICTS = [
 
 const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
 
-/**
- * Re-export so existing import sites (`from "./sourcing.js"`) keep working
- * while the canonical declaration lives in `./checker-model.ts`. Used by
- * routes below in SQL filters and response envelopes.
- */
-export { CURRENT_CHECKER_MODEL };
 export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
 
 // ---- Coverage helpers (QUA-928) ----
