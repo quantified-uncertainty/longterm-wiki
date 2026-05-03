@@ -6,7 +6,7 @@
 // (verified-rate, cost, applied counts) the read-only benchmark can't see.
 //
 // Usage:
-//   pnpm crux tb improve-entity-suite --tag=baseline --budget=10 --max-iters=2
+//   pnpm crux tb improve-entity-suite --tag=baseline --max-iters=1
 //   pnpm crux tb improve-entity-suite --tag=after-token-filter --budget=5 --dry-run
 
 import fs from "node:fs";
@@ -17,10 +17,29 @@ import { z } from "zod";
 
 import { type CommandResult } from "../lib/cli.ts";
 import {
+  BUDGET_EXHAUSTED_REASON,
+  BudgetExhaustedError,
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
 } from "./research-improve-entity.ts";
+import { parseAgentSessionId } from "../lib/pipeline-runs/agent-session-id.ts";
+import {
+  assertNoImproveEntityMutexConflict,
+  ImproveEntityMutexError,
+  IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+  type CheckMutexOptions,
+} from "../lib/improve-entity/mutex.ts";
+import { withPipelineRun } from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
+import { loadEntityMap, type EntityWithType } from "../lib/research/entity-loader.ts";
+import { formatCount } from "../lib/output.ts";
+import {
+  buildInspectionReport,
+  fetchHistoricalRuns,
+  formatInspectionSuite,
+  type InspectionReport,
+} from "../lib/research/inspect.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
@@ -43,6 +62,35 @@ const SUPPORTED_TYPES = new Set<string>(["policy"]);
 
 /** Per-entity floor below which the inner loop is guaranteed to no-op. */
 export const MIN_USEFUL_BUDGET_USD = 0.05;
+
+/**
+ * Default per-entity budget allocation, USD. The CLI default total budget
+ * is `DEFAULT_PER_ENTITY_BUDGET_USD * N` where N is the count of
+ * supported entities in the suite YAML. QUA-1033: lowered from a flat
+ * $10 total to $2 per supported entity to cap blast radius from accidental
+ * suite runs (most policies converge in 1 iteration with <$2 in spend).
+ */
+export const DEFAULT_PER_ENTITY_BUDGET_USD = 2.0;
+
+/**
+ * Compute the CLI default `--budget` value: load the suite, count supported
+ * entities, multiply by {@link DEFAULT_PER_ENTITY_BUDGET_USD}. Pure and
+ * exported so the CLI's default-computation path is unit-testable without
+ * having to drive `run()` end-to-end.
+ *
+ * Throws if the suite has zero supported entities — the CLI catches this
+ * and surfaces a friendlier message than "--budget must be a positive number".
+ */
+export function computeDefaultTotalBudgetUsd(suitePath?: string): {
+  totalBudgetUsd: number;
+  supportedCount: number;
+} {
+  const supportedCount = filterToSupportedTypes(loadSuite(suitePath)).length;
+  return {
+    totalBudgetUsd: DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount,
+    supportedCount,
+  };
+}
 
 /**
  * Tag flows into the snapshot filename. Reject anything that could escape
@@ -136,31 +184,10 @@ export function aggregateResult(slug: string, type: string, result: ImproveResul
   };
 }
 
-/** Median of a numeric list. Linear interpolation between adjacent samples. */
-export function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const sorted = [...xs].sort((a, b) => a - b);
-  const mid = (sorted.length - 1) / 2;
-  const lo = Math.floor(mid);
-  const hi = Math.ceil(mid);
-  return (sorted[lo] + sorted[hi]) / 2;
-}
-
-/**
- * 25th-percentile via the standard linear-interpolation method (the same
- * R-7 / NumPy default behavior). Returns 0 for empty input.
- */
-export function p25(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  if (xs.length === 1) return xs[0];
-  const sorted = [...xs].sort((a, b) => a - b);
-  const idx = (sorted.length - 1) * 0.25;
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo];
-  const frac = idx - lo;
-  return sorted[lo] * (1 - frac) + sorted[hi] * frac;
-}
+// median + p25 moved to ../lib/stats.ts (QUA-1034 review). Re-exported here so
+// existing test imports `from "./research-improve-entity-suite.ts"` keep working.
+import { median, p25 } from "../lib/stats.ts";
+export { median, p25 };
 
 /** Compute aggregate metrics across the per-entity rows. Pure. */
 export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
@@ -194,6 +221,12 @@ export interface SuiteRunOptions {
    * Default is the real `improveSingleEntity` from research-improve-entity.ts.
    */
   improver?: (opts: ImproveOptions) => Promise<ImproveResult>;
+  /** When true, skip the QUA-1032 single-instance mutex check on the suite
+   *  and on each per-entity invocation. Default false. */
+  force?: boolean;
+  /** Test injection — passed through to {@link checkImproveEntityMutex} for
+   *  the suite-level mutex check. Production callers leave this undefined. */
+  mutexCheckOverrides?: Pick<CheckMutexOptions, "list" | "nowMs" | "freshnessMs">;
 }
 
 export interface SuiteSnapshot {
@@ -258,6 +291,45 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
     );
   }
 
+  // QUA-1032 single-instance mutex (suite-level). Refuse to start if any
+  // family-member run (single or suite) is already in flight. The
+  // `withPipelineRun` wrapper below registers this suite under
+  // `improve-entity-suite` so a sibling suite started a moment later sees
+  // *this* run as a conflict via the same check.
+  await assertNoImproveEntityMutexConflict({
+    force: opts.force,
+    mutexCheckOverrides: opts.mutexCheckOverrides,
+  });
+
+  // QUA-1032: register the suite as a `pipeline_runs` row so a second suite
+  // started seconds later (i.e. between this suite's per-entity invocations)
+  // sees the suite-family conflict via the mutex check. Without this wrapper
+  // there is no `improve-entity-suite` row anywhere, so suite-vs-suite
+  // blocking would only work coincidentally — when both happen to be inside
+  // a per-entity invocation at the same instant.
+  return withPipelineRun(
+    {
+      pipelineName: IMPROVE_ENTITY_SUITE_PIPELINE_NAME,
+      agentSessionId: parseAgentSessionId(getCachedAuditSessionId()),
+      // Same posture as the per-entity loop: dev sessions without server
+      // creds keep iterating; the helper logs a visible warning.
+      allowOffline: true,
+    },
+    async () => runSuiteBody(opts, suitePath, snapshotDir, improver),
+  );
+}
+
+/**
+ * Inner body of {@link runSuite} — separated so it runs inside the
+ * `pipeline_runs` lifecycle. The pre-flight checks (tag validation, mutex)
+ * stay outside the wrapper so a refused start doesn't write a row.
+ */
+async function runSuiteBody(
+  opts: SuiteRunOptions,
+  suitePath: string,
+  snapshotDir: string,
+  improver: NonNullable<SuiteRunOptions["improver"]>,
+): Promise<SuiteSnapshot> {
   const startedAt = new Date().toISOString();
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
@@ -282,10 +354,9 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
-    // Per-entity soft cap: 2× the equal-share allocation. The inner loop's
-    // own budget guard runs *between* iterations, so a single iteration that
-    // overshoots the cap is allowed to complete — see `improveSingleEntity`.
-    // The post-iter warning below catches actual cap-hits.
+    // Per-entity hard cap: 2× the equal-share allocation. Enforced by the
+    // live CostTracker inside improveSingleEntity; surfaced here as
+    // result.reason === BUDGET_EXHAUSTED_REASON.
     const entityBudget = Math.min(perEntityCap, remaining);
     console.log(
       `\n=== [${records.length + 1}/${N}] improve-entity-suite: ${entry.slug} ` +
@@ -299,7 +370,25 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
         maxIters: opts.maxIters,
         dryRun: opts.dryRun,
         quiet: true,
+        // The per-entity check would otherwise self-conflict on the suite's
+        // own `improve-entity-suite` running row. We already cleared the
+        // family lock at the suite level, so skip the per-entity re-check.
+        force: true,
       });
+      if (result.reason === BUDGET_EXHAUSTED_REASON) {
+        console.warn(
+          `[suite] BUDGET-EXHAUSTED: ${entry.slug} spent $${result.total_cost_usd.toFixed(4)}; stopping suite`,
+        );
+        records.push(
+          emptyRecord(
+            entry,
+            "skipped_budget",
+            `entity hit hard cap mid-iteration: spent $${result.total_cost_usd.toFixed(4)} of $${entityBudget.toFixed(2)}`,
+          ),
+        );
+        totalSpent += result.total_cost_usd;
+        break;
+      }
       const record = aggregateResult(entry.slug, entry.type, result);
       records.push(record);
       totalSpent += result.total_cost_usd;
@@ -311,8 +400,23 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // Defensive: improveSingleEntity normally surfaces budget aborts via
+      // result.reason above. This branch only fires if a future change
+      // re-throws BudgetExhaustedError out of doImproveSingleEntity.
+      if (err instanceof BudgetExhaustedError) {
+        console.warn(`[suite] BUDGET-EXHAUSTED (re-thrown): ${entry.slug}: ${msg}; stopping suite`);
+        records.push(emptyRecord(entry, "skipped_budget", msg));
+        totalSpent += err.spentUsd;
+        break;
+      }
       console.warn(`[suite] FAILED: ${entry.slug}: ${msg}`);
       records.push(emptyRecord(entry, "failed", msg));
+    }
+  }
+  // Backfill remaining entries after a mid-suite break.
+  if (records.length < supported.length) {
+    for (const entry of supported.slice(records.length)) {
+      records.push(emptyRecord(entry, "skipped_budget"));
     }
   }
 
@@ -339,15 +443,102 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
   return snapshot;
 }
 
+// ── Inspection (zero-cost pre-flight, QUA-1034) ─────────────────────────────
+
+export interface InspectSuiteOptions {
+  /** Path to the suite YAML. Defaults to crux/benchmarks/entity-suite.yaml. */
+  suitePath?: string;
+  /**
+   * Injected for tests — given a slug, returns the entity or null. Defaults
+   * to a one-time `loadEntityMap()` lookup so an N-slug suite triggers ONE
+   * directory scan, not N. The `findEntity(slug)` signature was a tempting
+   * default but causes O(N×M) reads on `data/entities/*.yaml`.
+   */
+  loadEntityFn?: (slug: string) => EntityWithType | null;
+  /** Injected for tests — defaults to the real fetchHistoricalRuns (hits wiki-server). */
+  fetchHistoryFn?: typeof fetchHistoricalRuns;
+}
+
+/**
+ * Inspect every supported entity in the suite. Returns one report per
+ * entity that was found in `data/entities/*.yaml`. Skipped entries are
+ * surfaced under two distinct buckets so the caller can present each
+ * appropriately:
+ *   - `notFound`: slug listed in the suite YAML but missing from
+ *     `data/entities/*.yaml`. Likely a stale suite entry or a typo.
+ *   - `unsupported`: slug present in the suite YAML but its `type`
+ *     doesn't match `filterToSupportedTypes` (today: only `policy`).
+ *     Will be picked up automatically when a new analyzer lands.
+ *
+ * Pure-ish: side effects are limited to the injected `loadEntityFn` and
+ * `fetchHistoryFn` (file reads + one read-only HTTP call). No LLM, no
+ * mutex, no pipeline_runs row insertion.
+ */
+export async function inspectSuite(opts: InspectSuiteOptions = {}): Promise<{
+  reports: InspectionReport[];
+  notFound: string[];
+  unsupported: SuiteEntry[];
+}> {
+  const suitePath = opts.suitePath ?? SUITE_YAML;
+  // Default loader builds a single Map from one directory scan, then closes
+  // over it for O(1) per-slug lookup. Avoids the O(N×M) re-scan that would
+  // happen if `findEntity` were the default (it re-reads every yaml file).
+  const defaultLoader = opts.loadEntityFn
+    ? null
+    : (() => {
+        const map = loadEntityMap();
+        return (slug: string) => map.get(slug) ?? null;
+      })();
+  const loadEntity = opts.loadEntityFn ?? defaultLoader!;
+  const fetchHistory = opts.fetchHistoryFn ?? fetchHistoricalRuns;
+
+  const all = loadSuite(suitePath);
+  const supported = filterToSupportedTypes(all);
+  const unsupported = all.filter((e) => !supported.includes(e));
+  const runs = await fetchHistory();
+
+  const reports: InspectionReport[] = [];
+  const notFound: string[] = [];
+  for (const entry of supported) {
+    const entity = loadEntity(entry.slug);
+    if (!entity) {
+      notFound.push(entry.slug);
+      continue;
+    }
+    reports.push(buildInspectionReport(entity, runs));
+  }
+  return { reports, notFound, unsupported };
+}
+
 // ── CLI entry point ─────────────────────────────────────────────────────────
 
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   void args;
+
+  // --inspect short-circuits BEFORE tag/budget validation, mutex check,
+  // withPipelineRun wrapper, or the suite runner. Pure pre-flight, zero LLM.
+  if (options.inspect) {
+    const { reports, notFound, unsupported } = await inspectSuite();
+    const lines: string[] = [formatInspectionSuite(reports, "Suite (improve-entity)")];
+    if (notFound.length > 0) {
+      lines.push(
+        `\nNote: ${formatCount(notFound.length, "suite entry", "suite entries")} not found in data/entities/*.yaml: ${notFound.join(", ")}`,
+      );
+    }
+    if (unsupported.length > 0) {
+      const labels = unsupported.map((e) => `${e.slug} (${e.type})`).join(", ");
+      lines.push(
+        `\nNote: ${formatCount(unsupported.length, "suite entry", "suite entries")} skipped — type not yet supported by the inspector: ${labels}`,
+      );
+    }
+    return { output: lines.join("\n"), exitCode: 0 };
+  }
+
   const tag = String(options.tag ?? "").trim();
   if (!tag) {
     return {
       output:
-        "Usage: crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run]",
+        "Usage: crux tb improve-entity-suite [--inspect | --tag=<label> --budget=N --max-iters=N --target=N --dry-run --force]",
       exitCode: 1,
     };
   }
@@ -358,10 +549,35 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
       exitCode: 1,
     };
   }
-  const totalBudgetUsd = options.budget != null ? parseFloat(options.budget as string) : 10.0;
-  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 2;
+  // QUA-1033: default is $2 × N supported entities (computed at runtime), not
+  // a flat $10. The default scales with suite size; the explicit `--budget`
+  // flag still wins. Helper is `computeDefaultTotalBudgetUsd` so the path is
+  // unit-testable independently from the rest of `run()`.
+  let totalBudgetUsd: number;
+  if (options.budget != null) {
+    totalBudgetUsd = parseFloat(options.budget as string);
+  } else {
+    let computed: { totalBudgetUsd: number; supportedCount: number };
+    try {
+      computed = computeDefaultTotalBudgetUsd();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { output: `Failed to load suite for default budget: ${msg}`, exitCode: 1 };
+    }
+    if (computed.supportedCount === 0) {
+      return {
+        output:
+          "Suite has no supported entities (only `policy` is supported in v1). " +
+          "Either add a policy entry to crux/benchmarks/entity-suite.yaml, or pass --budget=N explicitly.",
+        exitCode: 1,
+      };
+    }
+    totalBudgetUsd = computed.totalBudgetUsd;
+  }
+  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 1;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
   const dryRun = !!options.dryRun;
+  const force = !!options.force;
 
   if (!Number.isFinite(totalBudgetUsd) || totalBudgetUsd <= 0) {
     return { output: `--budget must be a positive number; got ${options.budget}`, exitCode: 1 };
@@ -375,8 +591,13 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
   let snapshot;
   try {
-    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun });
+    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun, force });
   } catch (err) {
+    // QUA-1032: mutex conflicts use exit code 2 to distinguish "another suite
+    // is running" from a generic suite failure (exit 1).
+    if (err instanceof ImproveEntityMutexError) {
+      return { output: err.message, exitCode: 2 };
+    }
     const msg = err instanceof Error ? err.message : String(err);
     return { output: `improve-entity-suite failed: ${msg}`, exitCode: 1 };
   }
@@ -409,7 +630,7 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
 
 export function help(): CommandResult {
   return {
-    output: `crux tb improve-entity-suite --tag=<label> [--budget=10] [--max-iters=2] [--target=N] [--dry-run]
+    output: `crux tb improve-entity-suite [--inspect | --tag=<label> --budget=N --max-iters=N --target=N --dry-run --force]
 
 Run the closed-loop improve-entity over every supported entity in
 crux/benchmarks/entity-suite.yaml. Produces a structured snapshot under
@@ -420,19 +641,34 @@ Pair with \`crux tb benchmark-suite --diff=<a>,<b>\` (QUA-873) for the YAML
 state delta.
 
 Options:
-  --tag=<label>     Required. Snapshot label (e.g. baseline, after-X).
-  --budget=N        Total LLM spend cap across the suite, USD (default 10).
-  --max-iters=N     Max iterations per entity (default 2).
+  --inspect         ZERO-COST PRE-FLIGHT (QUA-1034). For every supported entity
+                    in the suite, runs the gap analyzer locally and prints what
+                    WOULD be improved at what estimated cost — making zero LLM
+                    calls. No --tag required (no snapshot is written). Use this
+                    before launching a real suite run to confirm scope and
+                    expected spend. Distinct from --dry-run: --inspect = no LLM,
+                    --dry-run = full LLM cost but no YAML writeback.
+  --tag=<label>     Required for non-inspect runs. Snapshot label (e.g. baseline, after-X).
+  --budget=N        Total LLM spend cap across the suite, USD.
+                    Default: $${DEFAULT_PER_ENTITY_BUDGET_USD.toFixed(0)} × N supported entities (QUA-1033).
+  --max-iters=N     Max iterations per entity (default 1, lowered from 2 in QUA-1033).
   --target=N        Per-entity (provisions+stakeholders) target (passed through).
-  --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
+  --dry-run         Skip writing YAML changes back to data/entities/responses.yaml.
+                    NOTE: still runs the FULL LLM pipeline at full cost — use
+                    --inspect for a true zero-cost pre-flight.
+  --force           Skip the QUA-1032 single-instance mutex check. By default,
+                    refuses to start (exit 2) if another improve-entity-suite
+                    or improve-entity run is already in flight. Use only for
+                    explicit takeover after a crashed run.
 
 Budget governance:
-  Per-entity soft cap = 2 × (total_budget / N) where N = supported entities.
-  This is a soft cap: a single iteration may overshoot it, since runResearch
-  spends until its own budgetCap. The suite halts mid-run when remaining
-  budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)}; remaining entities
-  are recorded as \`skipped_budget\`. \`--budget\` is therefore a target, not
-  a strict bound.
+  Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.
+  Enforced by a live CostTracker inside improveSingleEntity (QUA-1017): when
+  the tracker total reaches the per-entity cap mid-iteration, the entity
+  throws BudgetExhaustedError. The suite catches it, records the entity as
+  \`skipped_budget\`, and stops dispatching further entities. The suite also
+  short-circuits when remaining < $${MIN_USEFUL_BUDGET_USD.toFixed(2)} before
+  starting an entity. \`--budget\` is now a hard cap on total LLM spend.
 `,
     exitCode: 0,
   };

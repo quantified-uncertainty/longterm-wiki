@@ -5,6 +5,8 @@ import {
   resolveBenchmarkBySlug,
   getBenchmarkSlugs,
   getBenchmarkResultsFromModels,
+  formatTestedBy,
+  formatEvaluationDate,
 } from "../benchmark-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import { ProfileStatCard } from "@/components/directory";
@@ -85,6 +87,20 @@ export default async function BenchmarkDetailPage({
   // Sort by score (higher is better by default)
   const sorted = [...results].sort((a, b) =>
     entity.higherIsBetter ? b.score - a.score : a.score - b.score,
+  );
+
+  // Skip the provenance columns entirely when no row has populated provenance —
+  // every wide screen is needed for the score bars, and 2 perpetually-empty
+  // columns just add visual noise. Re-enabled per-row as ingesters start
+  // supplying real data. Today (2026-05-02) every prod row has tested_by=unknown
+  // and the PG→leaderboard merge silently drops every PG-sourced row anyway
+  // (QUA-1061), so this branch is dormant until both land.
+  const hasProvenance = sorted.some(
+    (r) =>
+      (r.testedBy && r.testedBy !== "unknown") ||
+      r.testedByOrgId ||
+      r.evaluationDate ||
+      r.methodologyNotes,
   );
 
   // Compute score range for bar widths.
@@ -219,9 +235,9 @@ export default async function BenchmarkDetailPage({
         {sorted.length > 0 ? (
           <section>
             <h2 className="text-lg font-bold tracking-tight mb-4">
-              Leaderboard
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                {sorted.length} {sorted.length === 1 ? "model" : "models"}
+              Leaderboard{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                ({sorted.length} {sorted.length === 1 ? "model" : "models"})
               </span>
             </h2>
             <div className="border border-border rounded-xl overflow-x-auto">
@@ -231,7 +247,23 @@ export default async function BenchmarkDetailPage({
                     <th className="py-2.5 px-3 text-center w-12">#</th>
                     <th className="py-2.5 px-3 text-left font-medium">Model</th>
                     <th className="py-2.5 px-3 text-left font-medium">Developer</th>
-                    <th className="py-2.5 px-3 text-left font-medium w-[40%]">Score</th>
+                    <th
+                      className={`py-2.5 px-3 text-left font-medium ${
+                        hasProvenance ? "w-[28%]" : "w-[40%]"
+                      }`}
+                    >
+                      Score
+                    </th>
+                    {hasProvenance && (
+                      <>
+                        <th className="py-2.5 px-3 text-left font-medium">
+                          Tested by
+                        </th>
+                        <th className="py-2.5 px-3 text-left font-medium whitespace-nowrap">
+                          Eval date
+                        </th>
+                      </>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
@@ -308,6 +340,21 @@ export default async function BenchmarkDetailPage({
                             </div>
                           </div>
                         </td>
+                        {hasProvenance && (
+                          <>
+                            <td className="py-2.5 px-3">
+                              <TestedByCell
+                                testedBy={row.testedBy ?? null}
+                                testedByOrgId={row.testedByOrgId ?? null}
+                                testedByOrgName={row.testedByOrgName ?? null}
+                                methodologyNotes={row.methodologyNotes ?? null}
+                              />
+                            </td>
+                            <td className="py-2.5 px-3 text-xs tabular-nums text-muted-foreground whitespace-nowrap">
+                              {formatEvaluationDate(row.evaluationDate)}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     );
                   })}
@@ -333,4 +380,72 @@ function formatScore(score: number, unit?: string): string {
     return `${parseFloat(score.toFixed(2))}%`;
   }
   return String(rounded);
+}
+
+function TestedByCell({
+  testedBy,
+  testedByOrgId,
+  testedByOrgName,
+  methodologyNotes,
+}: {
+  testedBy: string | null;
+  testedByOrgId: string | null;
+  testedByOrgName: string | null;
+  methodologyNotes: string | null;
+}) {
+  // "unknown"/null with no resolved org → em-dash. We still render the chip
+  // when only testedByOrgId resolves (org-only ingester case), since the
+  // hasProvenance gate already includes that as a trigger.
+  const showChip =
+    (testedBy && testedBy !== "unknown") || Boolean(testedByOrgName);
+  const label = showChip
+    ? testedByOrgName ?? (testedBy ? formatTestedBy(testedBy) : null)
+    : null;
+  // Only link when the org actually resolved to an entity (testedByOrgName
+  // is set by the merge function only when entityById.get(testedByOrgId)
+  // returns a hit). Linking on raw testedByOrgId would 404 for stale or
+  // not-yet-imported orgs.
+  const linkable = label && testedByOrgId && testedByOrgName;
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {label ? (
+        linkable ? (
+          <Link
+            href={`/organizations/${testedByOrgId}`}
+            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            title={`Tested by ${label}`}
+          >
+            {label}
+          </Link>
+        ) : (
+          <span
+            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            title={`Tested by ${label}`}
+          >
+            {label}
+          </span>
+        )
+      ) : (
+        <span className="text-xs text-muted-foreground/60">—</span>
+      )}
+      {methodologyNotes && (
+        <details className="relative inline-block">
+          <summary
+            className="cursor-pointer list-none text-muted-foreground hover:text-foreground transition-colors text-xs select-none"
+            title="Show methodology notes"
+            aria-label="Show methodology notes"
+          >
+            ⓘ
+          </summary>
+          <div className="absolute left-0 top-full z-10 mt-1 w-72 rounded-md border border-border bg-card p-3 text-xs text-card-foreground shadow-md">
+            <div className="font-semibold mb-1 text-muted-foreground">
+              Methodology
+            </div>
+            <p className="whitespace-pre-wrap break-words">{methodologyNotes}</p>
+          </div>
+        </details>
+      )}
+    </div>
+  );
 }

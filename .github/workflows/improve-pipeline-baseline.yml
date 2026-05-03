@@ -1,0 +1,129 @@
+name: Improve Pipeline Baseline
+run-name: "Improve Pipeline Baseline${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Nightly cron that runs the closed-loop improve-entity suite + benchmark
+# suite against `main` and uploads both snapshots as artifacts named
+# `main-latest`. The PR gate (improve-pipeline-benchmark.yml) downloads them
+# to compute the regression delta. (QUA-871, paired with QUA-873/QUA-882.)
+#
+# Why both snapshots:
+#   - improve-entity-suite produces median(verified_rate) — pipeline process metric.
+#   - benchmark-suite     produces median(coverage_score) — YAML state metric.
+# The gate fails if either drops beyond threshold (median coverage drop > 0.05
+# OR median verified-rate drop > 5pts).
+#
+# Why the cron runs on `main` rather than just snapshotting on every merge:
+# improve-entity-suite mutates YAML and burns LLM dollars. Running it on
+# every merge would multiply spend and create churn; running it nightly
+# gives a stable rolling baseline with at most one day of staleness.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # Daily 07:00 UTC (after auto-update at ~06:00)
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: 'Total LLM budget (USD)'
+        required: false
+        default: '5'
+        type: string
+      max_iters:
+        description: 'Max iterations per entity'
+        required: false
+        default: '1'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: improve-pipeline-baseline
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    uses: ./.github/workflows/_preflight-wiki-server.yml
+    secrets: inherit
+
+  baseline:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      WIKI_SERVER_ENV: prod
+      ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      INPUT_BUDGET: ${{ inputs.budget || '5' }}
+      INPUT_MAX_ITERS: ${{ inputs.max_iters || '1' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate numeric inputs
+        run: |
+          set -euo pipefail
+          if ! [[ "$INPUT_BUDGET" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "::error::INPUT_BUDGET must be a positive number, got: '$INPUT_BUDGET'"
+            exit 1
+          fi
+          if ! [[ "$INPUT_MAX_ITERS" =~ ^[0-9]+$ ]]; then
+            echo "::error::INPUT_MAX_ITERS must be a non-negative integer, got: '$INPUT_MAX_ITERS'"
+            exit 1
+          fi
+
+      - name: Run improve-entity-suite (mutates working tree only — discarded after run)
+        run: |
+          set -euo pipefail
+          pnpm crux tb improve-entity-suite \
+            --tag=main-latest \
+            --budget="${INPUT_BUDGET}" \
+            --max-iters="${INPUT_MAX_ITERS}"
+
+      - name: Take post-improve benchmark-suite snapshot
+        run: |
+          set -euo pipefail
+          # benchmark-suite reads the YAML state mutated by improve-entity-suite
+          # above. Same tag so artifact names match.
+          pnpm crux tb benchmark-suite --tag=main-latest
+
+      - name: Locate snapshot files
+        id: locate
+        run: |
+          set -euo pipefail
+          # Suite-runner writes <timestamp>__main-latest.json. List by mtime
+          # and pick the most recent so a same-day re-run picks up the new file.
+          IMPROVE=$(ls -t .claude/snapshots/improve-entity-suite/*__main-latest.json | head -n 1)
+          BENCH=$(ls -t .claude/snapshots/benchmark-suite/*__main-latest.json | head -n 1)
+          echo "improve=$IMPROVE" >> "$GITHUB_OUTPUT"
+          echo "bench=$BENCH" >> "$GITHUB_OUTPUT"
+          # Copy to fixed names so the PR-side download doesn't have to glob.
+          cp "$IMPROVE" .claude/snapshots/improve-entity-suite/main-latest.json
+          cp "$BENCH" .claude/snapshots/benchmark-suite/main-latest.json
+
+      - name: Upload main-latest artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: improve-pipeline-baseline-main-latest
+          path: |
+            .claude/snapshots/improve-entity-suite/main-latest.json
+            .claude/snapshots/benchmark-suite/main-latest.json
+          retention-days: 30

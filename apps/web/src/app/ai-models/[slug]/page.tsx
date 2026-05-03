@@ -11,14 +11,18 @@ import { resolveSlugAlias } from "@/data/factbase";
 import {
   DEVELOPER_COLORS,
   SAFETY_LEVEL_COLORS,
-  formatContext,
 } from "../ai-model-constants";
+import { formatCompactNumber } from "@/lib/format-compact";
 import { ProfileStatCard, type ProfileTab } from "@/components/directory";
 import {
   computeAiModelCoverage,
   getAiModelSignals,
 } from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import {
   OverviewTab,
   PricingTab,
@@ -30,6 +34,7 @@ import {
   fetchFromWikiServer,
   type RpcModelSystemCardsByModelResult,
   type RpcModelSystemCardRow,
+  type RpcModelAliasesAllResult,
 } from "@lib/wiki-server";
 
 export function generateStaticParams() {
@@ -65,16 +70,39 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Fetch system cards (QUA-702). Best-effort: a wiki-server outage shouldn't
-  // break the whole page, just hide the tab.
-  let systemCards: RpcModelSystemCardRow[] = [];
-  if (entity.stableId) {
-    const result = await fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
-      `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
-      { revalidate: 300 },
-    );
-    if (result?.items) systemCards = result.items;
+  // Fetch system cards (QUA-702), aliases, and sourcing rollup in parallel.
+  // System cards and aliases require stableId; sourcing is unconditional.
+  // All are best-effort: a wiki-server outage shouldn't break the page.
+  const systemCardsPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
+        `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
+        { revalidate: 300 },
+      )
+    : Promise.resolve(null);
+  const aliasesPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelAliasesAllResult>(
+        `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=20`,
+        { revalidate: 300 },
+      )
+    : Promise.resolve(null);
+  const [systemCardsResult, aliasesResult, sourcingSummary] = await Promise.all(
+    [
+      systemCardsPromise,
+      aliasesPromise,
+      fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
+    ],
+  );
+  const systemCards: RpcModelSystemCardRow[] = systemCardsResult?.items ?? [];
+  let aliases: string[] = [];
+  if (aliasesResult?.items) {
+    // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
+    // on the GPT-4 Turbo page is noise.
+    const titleLower = entity.title.toLowerCase();
+    aliases = aliasesResult.items
+      .map((r) => r.alias)
+      .filter((a) => a.toLowerCase() !== titleLower);
   }
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
   const developerEntity = entity.developer
@@ -115,7 +143,7 @@ export default async function AiModelDetailPage({
   if (entity.contextWindow != null) {
     stats.push({
       label: "Context Window",
-      value: `${formatContext(entity.contextWindow)} tokens`,
+      value: `${formatCompactNumber(entity.contextWindow)} tokens`,
     });
   }
 
@@ -242,55 +270,6 @@ export default async function AiModelDetailPage({
     </div>
   );
 
-  // Sidebar: Details + Tags. Capabilities moved into the Overview tab so
-  // the sidebar stays focused on canonical metadata.
-  const sidebar = (
-    <>
-      <section>
-        <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
-        <div className="border border-border/60 rounded-xl bg-card">
-          <DetailRow label="Model Family" value={entity.modelFamily} />
-          <DetailRow label="Tier" value={entity.modelTier} capitalize />
-          <DetailRow label="Generation" value={entity.generation} />
-          <DetailRow label="Release Date" value={entity.releaseDate} />
-          <DetailRow label="Parameters" value={entity.parameterCount} />
-          <DetailRow
-            label="Context Window"
-            value={
-              entity.contextWindow != null
-                ? `${formatContext(entity.contextWindow)} tokens`
-                : undefined
-            }
-          />
-          <DetailRow label="Training Cutoff" value={entity.trainingCutoff} />
-          <DetailRow
-            label="Open Weight"
-            value={
-              entity.openWeight != null ? (entity.openWeight ? "Yes" : "No") : undefined
-            }
-          />
-          <DetailRow label="Safety Level" value={entity.safetyLevel} />
-        </div>
-      </section>
-
-      {entity.tags.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
-          <div className="flex flex-wrap gap-1.5">
-            {entity.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
-    </>
-  );
-
   return (
     <EntityProfileShell
       breadcrumbs={[
@@ -300,35 +279,16 @@ export default async function AiModelDetailPage({
       entityId={entity.id}
       title={entity.title}
       titlePills={titlePills}
+      aliases={aliases}
       coverage={{ score: coverageScore, signals: coverageSignals }}
+      verdict={rollupVerdict}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}
       tabs={tabs}
       tabsAriaLabel="AI model sections"
-      sidebar={sidebar}
+      tabsLayout="vertical"
     />
   );
 }
 
-function DetailRow({
-  label,
-  value,
-  capitalize,
-}: {
-  label: string;
-  value?: string | null;
-  capitalize?: boolean;
-}) {
-  if (!value) return null;
-  return (
-    <div className="px-4 py-2.5 border-b border-border/40 last:border-b-0 flex items-center justify-between gap-2">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span
-        className={`text-sm font-medium ${capitalize ? "capitalize" : ""}`}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}

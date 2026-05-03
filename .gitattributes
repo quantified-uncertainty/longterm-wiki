@@ -1,0 +1,14 @@
+# Drizzle migration journal — auto-resolve idx-collision conflicts on rebase.
+#
+# Two PRs that both add a migration grab the next sequential idx (e.g. both
+# 221) and conflict on `_journal.json`. The drizzle-journal merge driver
+# (crux/git/drizzle-journal-merge.mjs) resolves these mechanically: union the
+# `entries` arrays, give the migration with the earlier `when` the lower idx,
+# and rename the loser's .sql file to match its new prefix.
+#
+# Activated by the `merge.drizzle-journal.driver` git config (set by
+# scripts/setup.sh). On fresh clones, run `pnpm setup` once to register the
+# driver. Until then, git falls back to the standard 3-way merge — which
+# leaves conflict markers in `_journal.json` exactly as before, so this is
+# additive: no regression for users who haven't run setup.
+apps/wiki-server/drizzle/meta/_journal.json merge=drizzle-journal

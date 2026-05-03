@@ -13,6 +13,7 @@ import {
   AILW_DIMENSIONS,
   AILW_ORGS,
 } from "../parse-ailabwatch.ts";
+import { FAIR_USE_CITATION_LICENSE } from "../types.ts";
 
 /**
  * Build a minimal fixture HTML covering all 7 orgs × 7 dimensions plus
@@ -287,9 +288,13 @@ describe("buildAILabWatchGradesFile", () => {
     }
   });
 
-  it("hardcodes license=null and isLatest=true (single-wave frozen source)", () => {
+  it("hardcodes license=fair-use-citation and isLatest=true (single-wave frozen source)", () => {
+    // QUA-867 item B: ailabwatch.org publishes no explicit Creative Commons
+    // or other license. We label our display "fair-use-citation" so the
+    // /scorecards/ailabwatch snapshot table renders an actual reuse term
+    // instead of an em-dash.
     const out = buildAILabWatchGradesFile(freshParsed(), opts);
-    expect(out.license).toBeNull();
+    expect(out.license).toBe(FAIR_USE_CITATION_LICENSE);
     expect(out.isLatest).toBe(true);
   });
 

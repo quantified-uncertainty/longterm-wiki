@@ -51,6 +51,7 @@ import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
 import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
 import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -350,7 +351,7 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading votes...</div>}>
+      <Suspense fallback={<TableSkeleton rows={5} columns={4} />}>
         <LegislationVotesSection entityId={entity.stableId ?? entity.id} />
       </Suspense>
 
@@ -771,49 +772,6 @@ export default async function LegislationDetailPage({
     </div>
   );
 
-  // Sidebar — Quick Facts, Position Summary, Tags
-  const sidebar = (
-    <>
-      <section className="rounded-xl border border-border p-4 space-y-3">
-        <h3 className="text-sm font-bold">Quick Facts</h3>
-        <dl className="space-y-2 text-sm">
-          {billNumber && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Bill Number</dt><dd className="font-semibold">{billNumber}</dd></div>}
-          {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
-          {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
-          {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
-          {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
-          {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
-          {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
-        </dl>
-      </section>
-      {entity.stakeholders.length > 0 && (
-        <section className="rounded-xl border border-border p-4">
-          <h3 className="text-sm font-bold mb-3">Position Summary</h3>
-          <div className="space-y-2">
-            {supporters.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-green-700 dark:text-green-400 font-medium">Support</span><span className="tabular-nums font-semibold">{supporters.length}</span></div>}
-            {opponents.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-red-700 dark:text-red-400 font-medium">Oppose</span><span className="tabular-nums font-semibold">{opponents.length}</span></div>}
-            {mixed.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-amber-700 dark:text-amber-400 font-medium">Mixed</span><span className="tabular-nums font-semibold">{mixed.length}</span></div>}
-            <div className="flex rounded-full overflow-hidden h-2 mt-1">
-              {supporters.length > 0 && <div className="bg-green-500" style={{ width: `${(supporters.length / entity.stakeholders.length) * 100}%` }} />}
-              {mixed.length > 0 && <div className="bg-amber-500" style={{ width: `${(mixed.length / entity.stakeholders.length) * 100}%` }} />}
-              {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
-            </div>
-          </div>
-        </section>
-      )}
-      {entity.tags.length > 0 && (
-        <section className="rounded-xl border border-border p-4">
-          <h3 className="text-sm font-bold mb-3">Tags</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {entity.tags.map((tag) => (
-              <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">{tag}</span>
-            ))}
-          </div>
-        </section>
-      )}
-    </>
-  );
-
   return (
     <EntityProfileShell
       breadcrumbs={[
@@ -833,7 +791,7 @@ export default async function LegislationDetailPage({
       headerLinks={headerLinks}
       tabs={tabs}
       tabsAriaLabel="Legislation sections"
-      sidebar={sidebar}
+      tabsLayout="vertical"
     />
   );
 }

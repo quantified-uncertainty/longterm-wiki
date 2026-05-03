@@ -1,7 +1,16 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ScorecardsSection } from "./scorecards-section";
+
+// Mock getEntityHref so the publisher-link tests don't depend on the
+// live tablebase being loaded into vitest. The real getEntityHref reads
+// `database.json` and routes to `/people/<slug>` for person entities and
+// `/organizations/<slug>` for orgs; we mirror that contract here.
+vi.mock("@/data/entity-nav", () => ({
+  getEntityHref: (id: string) =>
+    id === "zach-stein-perlman" ? `/people/${id}` : `/organizations/${id}`,
+}));
 
 /**
  * QUA-838: panel headers on the org-tab scorecards section must link to
@@ -19,6 +28,7 @@ interface GradeRow {
   scorecardSource: string | null;
   publishedAt: string | null;
   isLatest: boolean | null;
+  waveLabel: string | null;
   entityId: string;
   entityDisplayName: string;
   dimensionSlug: string;
@@ -37,6 +47,7 @@ function makeRow(overrides: Partial<GradeRow>): GradeRow {
     scorecardSource: "fli_index",
     publishedAt: "2025-12-02",
     isLatest: true,
+    waveLabel: "Winter 2025",
     entityId: "sid_anthropic",
     entityDisplayName: "Anthropic",
     dimensionSlug: "overall",
@@ -59,6 +70,7 @@ describe("ScorecardsSection — internal hyperlinks (QUA-838)", () => {
             source: "fli_index",
             publishedAt: "2025-12-02",
             rows: [makeRow({ scorecardSource: "fli_index" })],
+            history: [],
           },
         ]}
       />,
@@ -76,6 +88,7 @@ describe("ScorecardsSection — internal hyperlinks (QUA-838)", () => {
             source: "fli_index",
             publishedAt: "2025-12-02",
             rows: [makeRow({ scorecardSource: "fli_index" })],
+            history: [],
           },
         ]}
       />,
@@ -88,9 +101,11 @@ describe("ScorecardsSection — internal hyperlinks (QUA-838)", () => {
     expect(publisherLink).toHaveAttribute("href", "/organizations/fli");
   });
 
-  it("renders the publisher as plain text when no slug is configured", () => {
-    // AI Lab Watch has publisher "Zach Stein-Perlman" with no publisherSlug —
-    // the publisher should appear as plain text, not a link.
+  it("links a person-publisher to /people/<slug> via getEntityHref (QUA-867)", () => {
+    // AI Lab Watch's publisher is Zach Stein-Perlman — a *person* entity,
+    // not an organization. Routing through getEntityHref means the link
+    // goes to /people/zach-stein-perlman, not /organizations/<slug> (which
+    // would 404). This is the regression QUA-867 item A guards against.
     render(
       <ScorecardsSection
         groups={[
@@ -98,18 +113,16 @@ describe("ScorecardsSection — internal hyperlinks (QUA-838)", () => {
             source: "ailabwatch",
             publishedAt: "2025-09-01",
             rows: [makeRow({ scorecardSource: "ailabwatch" })],
+            history: [],
           },
         ]}
       />,
     );
 
-    // Publisher name should be present in the document.
-    expect(screen.getByText(/by Zach Stein-Perlman/)).toBeInTheDocument();
-    // But there should be no link with the publisher name.
-    const publisherLinks = screen
-      .queryAllByRole("link")
-      .filter((el) => /Zach Stein-Perlman/.test(el.textContent ?? ""));
-    expect(publisherLinks).toHaveLength(0);
+    const publisherLink = screen.getByRole("link", {
+      name: "Zach Stein-Perlman",
+    });
+    expect(publisherLink).toHaveAttribute("href", "/people/zach-stein-perlman");
   });
 
   it("keeps the external Source ↗ link open in a new tab", () => {
@@ -120,6 +133,7 @@ describe("ScorecardsSection — internal hyperlinks (QUA-838)", () => {
             source: "fli_index",
             publishedAt: "2025-12-02",
             rows: [makeRow({ scorecardSource: "fli_index" })],
+            history: [],
           },
         ]}
       />,
@@ -146,6 +160,7 @@ describe("ScorecardsSection — conditional font on grade values (QUA-861)", () 
                 scoreRaw: "C+",
               }),
             ],
+            history: [],
           },
         ]}
       />,
@@ -171,6 +186,7 @@ describe("ScorecardsSection — conditional font on grade values (QUA-861)", () 
                 scoreRaw: "Fulfilled",
               }),
             ],
+            history: [],
           },
         ]}
       />,
@@ -197,6 +213,7 @@ describe("ScorecardsSection — conditional font on grade values (QUA-861)", () 
                 scoreRaw: "Weak",
               }),
             ],
+            history: [],
           },
         ]}
       />,
@@ -221,6 +238,7 @@ describe("ScorecardsSection — conditional font on grade values (QUA-861)", () 
                 scoreRaw: "B-",
               }),
             ],
+            history: [],
           },
         ]}
       />,
@@ -228,5 +246,147 @@ describe("ScorecardsSection — conditional font on grade values (QUA-861)", () 
 
     const dimensionCell = screen.getByText("B-").closest("dd");
     expect(dimensionCell?.className).toMatch(/font-mono/);
+  });
+});
+
+describe("ScorecardsSection — grade trajectory mini-table (QUA-867 item E)", () => {
+  it("hides the trajectory section when only one wave exists", () => {
+    render(
+      <ScorecardsSection
+        groups={[
+          {
+            source: "saferai",
+            publishedAt: "2025-10-01",
+            rows: [
+              makeRow({
+                scorecardSource: "saferai",
+                dimensionSlug: "overall",
+                scoreLetter: "C",
+                scoreRaw: "C",
+              }),
+            ],
+            // SaferAI has been ingested for one wave only — no history yet.
+            history: [
+              {
+                snapshotId: "saferai-2025-10",
+                publishedAt: "2025-10-01",
+                waveLabel: "October 2025",
+                isLatest: true,
+                scoreLetter: "C",
+                scoreNumeric: null,
+                scoreRaw: "C",
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByText(/Grade trajectory/)).toBeNull();
+  });
+
+  it("renders a collapsed trajectory summary with the wave count when ≥2 waves exist", () => {
+    render(
+      <ScorecardsSection
+        groups={[
+          {
+            source: "fli_index",
+            publishedAt: "2025-12-02",
+            rows: [
+              makeRow({
+                dimensionSlug: "overall",
+                scoreLetter: "C+",
+                scoreRaw: "C+",
+              }),
+            ],
+            history: [
+              {
+                snapshotId: "fli_index-winter-2025",
+                publishedAt: "2025-12-02",
+                waveLabel: "Winter 2025",
+                isLatest: true,
+                scoreLetter: "C+",
+                scoreNumeric: null,
+                scoreRaw: "C+",
+              },
+              {
+                snapshotId: "fli_index-summer-2025",
+                publishedAt: "2025-07-17",
+                waveLabel: "Summer 2025",
+                isLatest: false,
+                scoreLetter: "C-",
+                scoreNumeric: null,
+                scoreRaw: "C-",
+              },
+              {
+                snapshotId: "fli_index-2024-12",
+                publishedAt: "2024-12-11",
+                waveLabel: "December 2024",
+                isLatest: false,
+                scoreLetter: "D",
+                scoreNumeric: null,
+                scoreRaw: "D",
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    // Summary line shows the wave count.
+    expect(screen.getByText(/Grade trajectory \(3 waves\)/)).toBeInTheDocument();
+    // All three wave labels render in the dl, including the latest pill.
+    expect(screen.getByText("Winter 2025")).toBeInTheDocument();
+    expect(screen.getByText("Summer 2025")).toBeInTheDocument();
+    expect(screen.getByText("December 2024")).toBeInTheDocument();
+    expect(screen.getByText("latest")).toBeInTheDocument();
+    // The historical D grade rendered (regression: prior implementation
+    // would only show the latest).
+    expect(screen.getByText("D")).toBeInTheDocument();
+  });
+
+  it("falls back to publishedAt when waveLabel is null", () => {
+    render(
+      <ScorecardsSection
+        groups={[
+          {
+            source: "saferai",
+            publishedAt: "2025-10-01",
+            rows: [
+              makeRow({
+                scorecardSource: "saferai",
+                dimensionSlug: "overall",
+                scoreLetter: "C",
+                scoreRaw: "C",
+              }),
+            ],
+            history: [
+              {
+                snapshotId: "saferai-current",
+                publishedAt: "2025-10-01",
+                waveLabel: null,
+                isLatest: true,
+                scoreLetter: "C",
+                scoreNumeric: null,
+                scoreRaw: "C",
+              },
+              {
+                snapshotId: "saferai-prev",
+                publishedAt: "2025-04-15",
+                waveLabel: null,
+                isLatest: false,
+                scoreLetter: "D",
+                scoreNumeric: null,
+                scoreRaw: "D",
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    // No labels — show the dates instead.
+    expect(screen.getByText("2025-10-01")).toBeInTheDocument();
+    expect(screen.getByText("2025-04-15")).toBeInTheDocument();
   });
 });

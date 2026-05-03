@@ -347,6 +347,27 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-1006: directory tables must use shared formatters from
+    // @/lib/format-compact + @/lib/format. Prevents new ad-hoc
+    // .toLocaleString / Intl.NumberFormat / .toLocaleDateString calls
+    // from drifting back into *-table.tsx components.
+    id: 'table-formatting',
+    name: 'Directory tables use shared formatters (QUA-1006)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-table-formatting.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    // QUA-1008: tables and directory pages must use canonical loading / empty /
+    // error components from @/components/ui/table-states instead of bespoke
+    // "Loading…" strings.
+    id: 'table-states',
+    name: 'Canonical table empty/loading/error states (QUA-1008)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-table-states.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-897: block the non-word "sourcinged" — a mass-rename artifact
     // from QUA-237 that surfaced on /divisions and 4 other pages.
     id: 'no-sourcinged',
@@ -428,15 +449,16 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'entity-schema-drift',
-    name: 'Entity-schema drift in tablebase routes (QUA-943)',
+    name: 'Entity-schema drift in tablebase routes',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-entity-schema-drift.ts'],
     cwd: PROJECT_ROOT,
     // Blocking. Bans new `const VALID_*` and inline `z.enum([` in
     // apps/wiki-server/src/routes/tablebase/ outside the allowlist at
-    // crux/validate/.entity-schema-drift-allowlist.txt. The allowlist length
-    // is the QUA-943 closure metric — entries get removed as routes migrate
-    // to canonical schemas in packages/entity-schemas (Plan v2 PRs 5a/5b).
+    // crux/validate/.entity-schema-drift-allowlist.txt. Existing entries can
+    // be removed when a route is migrated to a shared canonical schema, but
+    // there is no active plan driving the allowlist to zero (the QUA-943 v5
+    // plan that originally drove this was rejected — see QUA-1043).
     // Suppress per-line legitimate uses (e.g., query enums) with
     // `// schema-drift-ok`.
   },
@@ -474,6 +496,18 @@ const PARALLEL_STEPS: Step[] = [
     // bypassing the typed wiki-server client modules. Existing callers
     // are annotated with // typed-client-ok: <reason> as a baseline;
     // see QUA-770 for the migration plan.
+  },
+  {
+    id: 'no-bespoke-filter-chips',
+    name: 'No new bespoke filter-chip rows (QUA-1009) — use <FilterChips> from @/components/directory',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-bespoke-filter-chips.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: locks down the QUA-1009 sweep. Bans the
+    // `ml-1 text-[10px] opacity-60` chip-count signature anywhere
+    // outside the canonical components. Annotate per-line with
+    // `// filter-chip-ok: <reason>` for the rare bespoke chip with
+    // genuinely custom UX (see organizations-view.tsx).
   },
   {
     id: 'factbase-stableid',

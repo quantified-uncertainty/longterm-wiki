@@ -3,6 +3,7 @@
 // type-aware coverage scorer (policy + organization, QUA-936), persists
 // JSON, supports --tag, --diff, --list.
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -209,7 +210,19 @@ export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
 
 // ── Snapshot persistence ────────────────────────────────────────────────────
 
+/**
+ * On-disk snapshot schema version (QUA-890). Bump on any breaking change to
+ * `SuiteSnapshot` shape so `--list` / `--diff` can detect old snapshots and
+ * either migrate or warn instead of silently producing wrong output.
+ *
+ * Pre-QUA-890 snapshots have no `schema_version` field; treat `undefined`
+ * as v0 if a future migration needs to distinguish.
+ */
+export const SNAPSHOT_SCHEMA_VERSION = 1;
+
 export interface SuiteSnapshot {
+  /** On-disk schema version. Absent on pre-QUA-890 snapshots (treat as v0). */
+  schema_version?: number;
   tag: string;
   timestamp: string;
   git_sha: string | null;
@@ -223,6 +236,7 @@ export function buildSnapshot(
   records: PerEntityRecord[],
 ): SuiteSnapshot {
   return {
+    schema_version: SNAPSHOT_SCHEMA_VERSION,
     tag,
     timestamp: new Date().toISOString(),
     git_sha: gitSha(),
@@ -237,20 +251,55 @@ export function snapshotPath(snapshotDir: string, snap: SuiteSnapshot): string {
   return path.join(snapshotDir, `${stamp}__${snap.tag}.json`);
 }
 
+/**
+ * Write `snap` atomically to a uniquely-named JSON file in `snapshotDir`.
+ *
+ * Atomic-write protocol (QUA-890): pick a non-colliding final path, write
+ * the body to a per-PID `.tmp` file in the same directory, then
+ * `fs.renameSync()` to the final path. Same-filesystem rename is atomic on
+ * every OS Node supports, so an interrupt (SIGINT or `kill -9`) leaves
+ * either no destination file or a fully-formed one — never a half-JSON
+ * artifact that would wedge `--list`. The pre-QUA-890 implementation used
+ * `writeFileSync(..., {flag: "wx"})`, which could leave a truncated file
+ * on interrupt.
+ *
+ * The `.tmp` extension keeps any leaked-on-crash tmp files invisible to
+ * `listSnapshotsInDir` (which filters for `.json`), so a hard kill between
+ * `writeFileSync` and `renameSync` is harmless aside from a small disk
+ * leak. Cleaned up explicitly on the error path.
+ *
+ * Collision detection is best-effort via `existsSync` rather than the old
+ * `wx`/`linkSync` exclusivity primitive: this caller is invoked from a CLI
+ * tool with a single writer per process, so the existsSync-then-rename race
+ * window doesn't matter in practice. Picking portability over the stronger
+ * primitive avoids EXDEV/EPERM/ENOSYS failures on FAT/SMB/NFS mounts that
+ * `linkSync` would hit.
+ */
 export function writeSnapshot(snapshotDir: string, snap: SuiteSnapshot): string {
   fs.mkdirSync(snapshotDir, { recursive: true });
-  // Same-millisecond + same-tag would overwrite silently. Open exclusive (wx)
-  // and increment a numeric suffix on EEXIST until we land a unique filename.
   const base = snapshotPath(snapshotDir, snap).replace(/\.json$/, "");
   const body = JSON.stringify(snap, null, 2) + "\n";
-  for (let i = 0; ; i++) {
-    const file = i === 0 ? `${base}.json` : `${base}__${i}.json`;
+
+  let file = `${base}.json`;
+  for (let i = 1; fs.existsSync(file); i++) {
+    file = `${base}__${i}.json`;
+  }
+
+  // Tmp file lives next to the final destination so renameSync is
+  // same-filesystem (atomic). Per-PID + crypto-random suffix prevents tmp
+  // collisions even if two processes pick the same final path.
+  const tmpFile = `${file}.${process.pid}.${crypto.randomBytes(4).toString("hex")}.tmp`;
+  fs.writeFileSync(tmpFile, body);
+  try {
+    fs.renameSync(tmpFile, file);
+    return file;
+  } catch (e) {
     try {
-      fs.writeFileSync(file, body, { flag: "wx" });
-      return file;
-    } catch (e) {
-      if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+      fs.unlinkSync(tmpFile);
+    } catch {
+      /* ignore — original error is the interesting one */
     }
+    throw e;
   }
 }
 

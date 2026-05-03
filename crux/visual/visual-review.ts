@@ -157,7 +157,7 @@ async function takeScreenshot(
   visualIndex: number,
 ): Promise<string | null> {
   try {
-    execSync('node -e "require(\'playwright\')"', {
+    execFileSync('node', ['-e', "require('playwright')"], {
       stdio: 'pipe',
       cwd: PROJECT_ROOT,
     });

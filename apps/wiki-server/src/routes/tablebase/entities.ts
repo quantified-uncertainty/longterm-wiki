@@ -4,7 +4,14 @@ import { eq, and, count, asc, sql, ilike, or, inArray, notInArray, gte } from "d
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { entities, facts, grants, things } from "../../schema.js";
+import {
+  entities,
+  facts,
+  grants,
+  scorecardGrades,
+  scorecardSnapshots,
+  things,
+} from "../../schema.js";
 import { isAnySid, isSid } from "@longterm-wiki/id-utils";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
@@ -21,6 +28,7 @@ import {
   SyncEntitiesBatchSchema,
 } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { applyAuditContext } from "../../middleware/audit-context.js";
 import {
   buildSearchCondition,
@@ -375,6 +383,22 @@ const entitiesApp = new Hono()
         )
     )`;
 
+    // Count of distinct external scorecards (FLI, SaferAI, AI Lab Watch,
+    // FMTI, Seoul Tracker) that have rated this org in the latest wave per
+    // source. QUA-867 item D: feeds `externalScorecardCount` on
+    // computeOrgCoverage so heavily-rated frontier labs missing financial
+    // metadata don't score 1 ("stub"). Counting distinct sources rather
+    // than grade rows avoids double-counting multi-dimension scorecards.
+    const externalScorecardCountExpr = sql<
+      number | null
+    >`(
+      SELECT COUNT(DISTINCT s.scorecard_source)::int
+      FROM ${scorecardGrades} g
+      JOIN ${scorecardSnapshots} s ON s.id = g.snapshot_id
+      WHERE g.entity_id = ${entities.stableId}
+        AND s.is_latest = true
+    )`;
+
     // Build ORDER BY
     const { field, dir } = parseSort(sort, ORG_SORT_ALLOWED, "name", "asc");
     const sortColMap: Record<string, SQL> = {
@@ -422,6 +446,7 @@ const entitiesApp = new Hono()
       totalFundingNum: number | null;
       foundedDate: string | null;
       grantsGivenCount: number | null;
+      externalScorecardCount: number | null;
     }
 
     let rows: OrgRow[] = await db
@@ -441,6 +466,7 @@ const entitiesApp = new Hono()
         totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
         foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
         grantsGivenCount: sql<number | null>`${grantsGivenCountExpr}`,
+        externalScorecardCount: sql<number | null>`${externalScorecardCountExpr}`,
       })
       .from(entities)
       .where(where)
@@ -483,6 +509,7 @@ const entitiesApp = new Hono()
             totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
             foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
             grantsGivenCount: sql<number | null>`${grantsGivenCountExpr}`,
+            externalScorecardCount: sql<number | null>`${externalScorecardCountExpr}`,
           })
           .from(entities)
           .where(trigramWhere)
@@ -511,6 +538,7 @@ const entitiesApp = new Hono()
         // COUNT(*) never returns NULL; the ?? 0 is purely a TypeScript
         // narrow on the Drizzle-inferred `number | null`.
         grantsGivenCount: Number(r.grantsGivenCount ?? 0),
+        externalScorecardCount: Number(r.externalScorecardCount ?? 0),
       })),
       total,
       limit,
@@ -960,6 +988,33 @@ const entitiesApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({ entities: rows, total, limit, offset });
+  })
+
+  // ---- GET /bulk — all entities, no pagination ----
+  // For build-data and other server-side consumers that need the full list
+  // in one round-trip. UI/dashboard callers stay on GET / (paginated).
+  // QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select({
+          id: entities.id,
+          wikiId: entities.wikiId,
+          stableId: entities.stableId,
+          entityType: entities.entityType,
+          title: entities.title,
+          description: entities.description,
+          website: entities.website,
+          tags: entities.tags,
+          status: entities.status,
+          lastUpdated: entities.lastUpdated,
+        })
+        .from(entities)
+        .orderBy(asc(entities.id)),
+      routeName: "entities/bulk",
+    });
+    return c.json({ entities: rows, total });
   })
 
   // ---- POST /sync ----

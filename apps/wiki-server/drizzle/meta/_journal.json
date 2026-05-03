@@ -1555,6 +1555,13 @@
       "when": 1788000000000,
       "tag": "0222_qua_954_pipeline_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 223,
+      "version": "7",
+      "when": 1788000100000,
+      "tag": "0223_qua_1012_pipeline_runs_cost_columns",
+      "breakpoints": true
     }
   ]
 }

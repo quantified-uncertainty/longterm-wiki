@@ -21,6 +21,7 @@ import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
 
 // Reuse from verify-page.ts
 import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
@@ -368,14 +369,20 @@ export async function addCitationsCommand(
   const startTime = Date.now();
 
   // Load page
-  const page = findPageById(pageId);
-  if (!page) {
+  const loadedPage = findPageById(pageId);
+  if (!loadedPage) {
     return { exitCode: 1, output: `Page not found: ${pageId}` };
   }
+  // Narrow to non-null for the closure body — TS doesn't propagate the
+  // `if (!page)` narrowing across a nested function declaration.
+  const page = loadedPage;
 
   console.log(`\n  Adding citations to: ${page.title} (${page.slug})`);
   console.log(`  Mode: ${dryRun ? 'dry-run' : 'apply'}, limit: ${limit}, budget: $${budget}\n`);
 
+  const costTracker = new CostTracker();
+
+  async function addCitationsBody(): Promise<CommandResult> {
   // Step 1: Extract claims and classify
   console.log('  [1/4] Extracting claims...');
   const claims = await extractClaims(page.content);
@@ -393,7 +400,6 @@ export async function addCitationsCommand(
 
   // Step 2: Find sources for uncited claims
   console.log('  [2/4] Finding sources...');
-  const costTracker = new CostTracker();
   const client = createLlmClient();
 
   // Collect existing footnote IDs to avoid collisions
@@ -571,6 +577,18 @@ export async function addCitationsCommand(
   ].join('\n');
 
   return { exitCode: 0, output };
+  }
+
+  return withPipelineRun(
+    {
+      pipelineName: 'add-citations',
+      entityId: page.slug,
+      shape: dryRun ? 'dry-run' : 'apply',
+      allowOffline: true,
+      tracker: costTracker,
+    },
+    addCitationsBody,
+  );
 }
 
 // ── Dry run formatting ───────────────────────────────────────────────

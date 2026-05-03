@@ -52,6 +52,19 @@ export interface EndPipelineRunInput {
   errorPayload?: Record<string, unknown> | null;
   snapshotPath?: string | null;
   followupActions?: Array<Record<string, unknown>>;
+  // QUA-1012 cost telemetry. All optional — pipelines that don't track
+  // cost simply omit them. Caps are enforced server-side (see
+  // `MAX_COST_USD` / `MAX_TOKENS` in `apps/wiki-server/src/api-types.ts`)
+  // — don't restate the numeric values here, they drift.
+  // Distinguish `null` (caller actively cleared the field) from omitted
+  // (caller didn't pass the field — server preserves the existing value
+  // for retry-after-partial-failure). `costUsd: 0` is "tracked at $0",
+  // not "not tracked"; pass `null`/omit for the latter.
+  costUsd?: number | null;
+  tokensInput?: number | null;
+  tokensOutput?: number | null;
+  tokensCacheRead?: number | null;
+  tokensCacheWrite?: number | null;
 }
 
 // ---------------------------------------------------------------------------

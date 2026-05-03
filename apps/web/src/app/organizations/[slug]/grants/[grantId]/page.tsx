@@ -105,6 +105,15 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
   const funderTypedEntity = getTypedEntityById(grant.ownerEntityId);
   const funderWikiPageId = funderTypedEntity?.wikiId ?? null;
 
+  // Link straight to the program's slug to avoid the legacy-key redirect hop.
+  let programHref: string | null = null;
+  if (grant.programId) {
+    const programRecord = getAllKBRecords("funding-programs").find(
+      (p) => p.key === grant.programId,
+    );
+    programHref = `/funding-programs/${programRecord?.slug ?? grant.programId}`;
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Breadcrumbs */}
@@ -184,9 +193,9 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
           {(grant.program || grant.programId) && (
             <DetailSection title="Program">
-              {grant.programId ? (
+              {programHref ? (
                 <Link
-                  href={`/funding-programs/${grant.programId}`}
+                  href={programHref}
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   {grant.program ?? grant.programId}

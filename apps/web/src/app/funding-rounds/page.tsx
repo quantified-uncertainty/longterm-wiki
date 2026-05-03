@@ -39,6 +39,7 @@ export default function FundingRoundsPage() {
 
     return {
       key: record.key,
+      slug: record.slug ?? null,
       name: typeof f.name === "string" ? f.name : record.key,
       companyName: company.name,
       companyHref: company.href,

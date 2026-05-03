@@ -62,9 +62,12 @@ import {
   finalizeIfComplete as finalizeDispatchIfComplete,
   realDispatchEnv,
   isPermissionMode,
+  formatApiKeyWarning,
+  pollForEarlyDispatchError,
   type DispatchOptions,
   type PermissionMode,
 } from '../lib/agent-workspace/dispatch.ts';
+import { ensureSlotTmpDir } from '../lib/agent-workspace/tsx-cache-isolation.ts';
 import { realDoctorEnv } from '../lib/agent-workspace/doctor/env.ts';
 import { SLOTS_CHECKS } from '../lib/agent-workspace/doctor/slots.ts';
 import { RELEASES_CHECKS } from '../lib/agent-workspace/doctor/releases.ts';
@@ -546,12 +549,15 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
   const branch = git(slotDir, 'branch', '--show-current') || 'detached';
   const fullWindowName = sanitizeForTmux(`A${slot}:${branch}`);
 
+  // Isolate tsx compile cache per-slot. tmux's `-e KEY=VALUE` sets the env var
+  // on the new window; the shell + any `pnpm crux ...` invocations inside it
+  // inherit it. See tsx-cache-isolation.ts.
+  const slotTmpDir = ensureSlotTmpDir(slot);
+  const tmuxArgs = ['new-window', '-n', fullWindowName, '-c', slotDir, '-e', `TMPDIR=${slotTmpDir}`];
+  if (withClaude) tmuxArgs.push('claude');
+
   try {
-    if (withClaude) {
-      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir, 'claude'], { stdio: 'inherit' });
-    } else {
-      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir], { stdio: 'inherit' });
-    }
+    execFileSync('tmux', tmuxArgs, { stdio: 'inherit' });
     return { exitCode: 0, output: `Opened tmux window ${fullWindowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
   } catch (e) {
     return { exitCode: 1, output: `Error opening tmux window: ${e instanceof Error ? e.message : String(e)}` };
@@ -956,7 +962,17 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
     appendSystemPrompt: options.appendSystemPrompt,
     permissionMode,
     force: !!options.force,
+    // Isolate tsx compile cache per-slot to eliminate cross-slot fs contention
+    // that has caused 25+ minute hangs under heavy concurrent load.
+    tmpDir: ensureSlotTmpDir(slot),
   };
+
+  // Alarm bell for QUA-1010/QUA-1057: a parent shell with ANTHROPIC_API_KEY set
+  // (e.g., inherited from .env.base) used to make the dispatched worker silently
+  // die in ~160ms with "Credit balance is too low" because claude reads the key
+  // and switches to API-direct billing. We strip it inside spawnDetached, but
+  // also surface a warning so an operator can untangle the env if desired.
+  const apiKeyWarning = formatApiKeyWarning(process.env);
 
   let result;
   try {
@@ -966,7 +982,46 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   }
 
   const { handle } = result;
+  const warnings = apiKeyWarning ? [apiKeyWarning] : [];
+  const basePayload = {
+    slot,
+    runId: handle.runId,
+    sessionId: handle.sessionId,
+    pid: handle.pid,
+    runDir: handle.runDir,
+    cwd,
+    startedAt: handle.startedAt,
+    cmd: handle.cmd,
+  };
+
+  // Briefly poll for early errors so credit-low / auth failures surface as
+  // dispatch failures instead of "Dispatched to slot aN" + silent death. See
+  // QUA-1057 for the original symptom. Healthy workers exit on the first
+  // events.jsonl write (~100ms); cold-spawn-die paths use the pidAlive guard.
+  const earlyError = await pollForEarlyDispatchError(env, handle.eventsFile, { pid: handle.pid });
+  if (earlyError) {
+    const statusSuffix = earlyError.status !== undefined ? ` (HTTP ${earlyError.status})` : '';
+    const stripHint = apiKeyWarning
+      ? `\n  hint: parent env had the API key set; even after stripping, the OAuth subscription itself may have failed (check 'claude /login').`
+      : '';
+    const errorOutput =
+      `Error: dispatched worker exited early on slot a${slot}: ${earlyError.message}${statusSuffix}\n` +
+      `  run:    ${handle.runId}\n` +
+      `  events: ${handle.eventsFile}\n` +
+      `  stderr: ${handle.stderrFile}` +
+      stripHint;
+    if (options.json) {
+      return {
+        exitCode: 2,
+        output: JSON.stringify({ ...basePayload, earlyError, warnings }, null, 2),
+      };
+    }
+    return { exitCode: 2, output: errorOutput };
+  }
+
+  const successHeader = apiKeyWarning ? `${apiKeyWarning}\n\n` : '';
   const output =
+    successHeader +
     `Dispatched to slot a${slot}${cwdNote}\n` +
     `  run:      ${handle.runId}\n` +
     `  session:  ${handle.sessionId}\n` +
@@ -980,20 +1035,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   if (options.json) {
     return {
       exitCode: 0,
-      output: JSON.stringify(
-        {
-          slot,
-          runId: handle.runId,
-          sessionId: handle.sessionId,
-          pid: handle.pid,
-          runDir: handle.runDir,
-          cwd,
-          startedAt: handle.startedAt,
-          cmd: handle.cmd,
-        },
-        null,
-        2,
-      ),
+      output: JSON.stringify({ ...basePayload, warnings }, null, 2),
     };
   }
   return { exitCode: 0, output };

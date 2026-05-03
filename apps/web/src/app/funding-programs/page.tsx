@@ -36,11 +36,14 @@ export default function FundingProgramsPage() {
   const allRecords = getAllKBRecords("funding-programs");
   const programs = allRecords.map(parseFundingProgram);
 
-  // Build enriched rows for the table
+  // Build enriched rows for the table.
+  // `id` is the canonical 10-char key (used for verdict lookups and the React row key).
+  // `slug` is the human-readable URL slug — falls back to id when missing.
   const rows: FundingProgramListRow[] = programs.map((p) => {
     const org = resolveOrg(p.ownerEntityId);
     return {
       id: p.key,
+      slug: p.slug,
       name: p.name,
       orgId: p.ownerEntityId,
       orgName: org.name,

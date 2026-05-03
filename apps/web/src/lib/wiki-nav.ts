@@ -289,6 +289,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Jobs", href: internalHref("jobs-dashboard") },
         { label: "System Cards", href: internalHref("system-cards-dashboard") },
         { label: "Benchmark Quarantine", href: internalHref("benchmark-quarantine-dashboard") },
+        { label: "Model Aliases", href: internalHref("model-aliases-dashboard") },
         { label: "Framework Review", href: internalHref("framework-review-dashboard") },
         { label: "Coverage", href: internalHref("tablebase-coverage-dashboard") },
       ],

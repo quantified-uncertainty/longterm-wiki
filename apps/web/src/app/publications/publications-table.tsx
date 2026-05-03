@@ -13,6 +13,7 @@ import {
 import { Search } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
+import { formatCount } from "@/lib/format-compact";
 import { formatType } from "./publication-utils";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computePublicationCoverage } from "@/components/coverage/coverage-score";
@@ -271,8 +272,8 @@ export function PublicationsTable({
 
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {filtered === total
-            ? `${total.toLocaleString()} publications`
-            : `${filtered.toLocaleString()} of ${total.toLocaleString()} publications`}
+            ? `${formatCount(total)} publications`
+            : `${formatCount(filtered)} of ${formatCount(total)} publications`}
         </span>
       </div>
 

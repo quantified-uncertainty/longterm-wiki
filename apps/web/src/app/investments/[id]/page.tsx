@@ -154,7 +154,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
       (r) => typeof r.fields.name === "string" && r.fields.name === investment.roundName,
     );
     if (matchedRound) {
-      fundingRoundHref = `/funding-rounds/${matchedRound.key}`;
+      fundingRoundHref = `/funding-rounds/${matchedRound.slug ?? matchedRound.key}`;
     }
   }
 

@@ -13,6 +13,7 @@ import {
 } from "../shared/resolve-entity-middleware.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
@@ -72,6 +73,20 @@ const entityAssessmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       countQuery: db.select({ count: count() }).from(entityAssessments),
     });
     return c.json({ assessments, total, limit, offset });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every entity assessment in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows: assessments, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(entityAssessments)
+        .orderBy(entityAssessments.entityId, entityAssessments.dimension),
+      routeName: "entity-assessments/bulk",
+    });
+    return c.json({ assessments, total });
   })
 
   .get(

@@ -8,6 +8,11 @@ import { useServerTable } from "@/hooks/use-server-table";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGrantCoverage } from "@/components/coverage/coverage-score";
 import { inferDataSource } from "@/app/grants/grants-data-source";
+import {
+  TableLoadingRow,
+  TableErrorRow,
+  DEFAULT_LOADING_LABEL,
+} from "@/components/ui/table-states";
 
 // ── Serializable grant row (no JSX, no functions — pure JSON) ───────
 
@@ -477,7 +482,7 @@ export function InteractiveGrantsTable({
   // ── Status text ──
   const statusText = (() => {
     if (serverMode) {
-      if (isLoading) return "Loading...";
+      if (isLoading) return DEFAULT_LOADING_LABEL;
       return `${displayTotal} grants`;
     }
     const shown = filteredTotal === allGrants.length
@@ -579,23 +584,9 @@ export function InteractiveGrantsTable({
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
-              <tr>
-                <td
-                  colSpan={activeCols.length}
-                  className="py-8 text-center text-muted-foreground text-sm"
-                >
-                  Loading grants...
-                </td>
-              </tr>
+              <TableLoadingRow colSpan={activeCols.length} label="Loading grants…" />
             ) : serverError && rows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={activeCols.length}
-                  className="py-8 text-center text-sm"
-                >
-                  <span className="text-destructive">{serverError}</span>
-                </td>
-              </tr>
+              <TableErrorRow colSpan={activeCols.length} error={serverError} />
             ) : (
               <>
                 {rows.map((g) => (

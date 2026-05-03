@@ -3980,13 +3980,22 @@
   type: organization
   orgType: safety-org
   title: SaferAI
-  website: https://saferai.org
+  website: https://www.safer-ai.org
   description: >-
-    Organization focused on AI safety standards and evaluation frameworks.
+    Paris-based nonprofit (French association loi 1901) building risk
+    measurement tools for governments and companies managing frontier AI.
+    Founded by Siméon Campos (chairman); Henry Papadatos serves as
+    executive director. Best known for the SaferAI Ratings — independent
+    evaluations of leading AI developers across four dimensions (risk
+    identification, severity assessment, safeguard implementation, and
+    governance), published under CC BY-SA 4.0. Also contributes to
+    standards work at CEN-CENELEC JTC 21, ISO generative AI red-teaming,
+    the EU Code of Practice, and the OECD Hiroshima AI Process.
   tags:
     - ai-safety
     - ai-governance
-  lastUpdated: 2026-03
+    - ai-evaluation
+  lastUpdated: 2026-05
 
 - id: ai-safety-camp
   stableId: sid_2BUn75004w
@@ -9631,4 +9640,147 @@
     - corporate-accountability
     - transparency
   lastUpdated: 2026-04
+
+# QUA-869 — FMTI-only orgs promoted from PG stubs so /organizations/<slug>
+# resolves. stableIds match the existing PG rows (created by `fmti-ingest
+# --ensure-stubs` in QUA-748) so the scorecard_grades FKs stay valid; that's
+# why they don't carry the canonical sid_ prefix the newer entries use.
+# Migrating these to canonical `sid_`-prefixed format (and fixing the FMTI
+# ingester to emit prefixed IDs by default) is tracked in QUA-1060.
+- id: ai21-labs
+  stableId: JKhtN999IF
+  type: organization
+  orgType: frontier-lab
+  title: AI21 Labs
+  aliases:
+    - AI21
+  website: https://www.ai21.com
+  description: >-
+    Israeli AI lab founded in 2017 by Yoav Shoham, Ori Goshen, and Amnon
+    Shashua. Develops the Jurassic and Jamba families of large language
+    models for enterprise NLP, with a focus on retrieval-augmented and
+    structured-reasoning applications.
+  tags:
+    - llm-developer
+    - foundation-models
+  lastUpdated: 2026-05
+
+- id: midjourney
+  stableId: SbllNiZtTX
+  type: organization
+  orgType: startup
+  title: Midjourney
+  website: https://www.midjourney.com
+  description: >-
+    Independent research lab founded in 2021 by David Holz that operates
+    the Midjourney image-generation service, originally distributed
+    through Discord. Self-funded and known for stylised image outputs
+    used widely in concept art and marketing.
+  tags:
+    - generative-ai
+    - image-generation
+  lastUpdated: 2026-05
+
+- id: writer
+  stableId: MVMR4oL7Wj
+  type: organization
+  orgType: startup
+  title: Writer
+  aliases:
+    - Writer.com
+    - Writer AI
+  website: https://writer.com
+  description: >-
+    San Francisco-based enterprise generative-AI startup founded by May
+    Habib and Waseem AlShikh, who previously co-founded Qordoba (2015)
+    and rebranded to Writer in 2020 around their own large language
+    models. Develops the Palmyra family of domain-specific LLMs and a
+    B2B platform for AI-assisted writing, knowledge work, and agent
+    workflows.
+  tags:
+    - llm-developer
+    - foundation-models
+    - enterprise-ai
+  lastUpdated: 2026-05
+
+- id: adept
+  stableId: vnxlRm3c1P
+  type: organization
+  orgType: startup
+  orgStatus: defunct
+  title: Adept
+  aliases:
+    - Adept AI
+    - Adept AI Labs
+  website: https://www.adept.ai
+  description: >-
+    San Francisco AI lab founded in 2022 by David Luan together with
+    Transformer co-authors Ashish Vaswani and Niki Parmar (among others)
+    to build agent models that drive software interfaces. Best known
+    for the ACT-1 and Fuyu model families. In 2024 most of its
+    leadership and a non-exclusive technology licence were acquired by
+    Amazon, leaving a residual research team.
+  tags:
+    - ai-agents
+    - foundation-models
+  lastUpdated: 2026-05
+
+- id: bigcode
+  stableId: yAMKxvX5Y4
+  type: organization
+  orgType: other
+  title: BigCode
+  aliases:
+    - BigCode Project
+  website: https://www.bigcode-project.org
+  description: >-
+    Open scientific collaboration between Hugging Face and ServiceNow
+    Research focused on the responsible development of large language
+    models for code. Released the StarCoder and StarCoder2 model
+    families along with The Stack training corpus, with explicit
+    attention to data provenance and opt-out tooling.
+  tags:
+    - open-source
+    - code-llm
+    - foundation-models
+  lastUpdated: 2026-05
+
+- id: aleph-alpha
+  stableId: ntEukcEAql
+  type: organization
+  orgType: frontier-lab
+  title: Aleph Alpha
+  website: https://aleph-alpha.com
+  description: >-
+    German AI company founded in 2019 by Jonas Andrulis and Samuel
+    Weinbach, headquartered in Heidelberg. Develops the Luminous family
+    of large language models and positions itself around European data
+    sovereignty, sovereign-AI deployments, and government and industrial
+    customers.
+  tags:
+    - llm-developer
+    - foundation-models
+    - europe
+  lastUpdated: 2026-05
+
+- id: stability-ai
+  stableId: TYBHN35TCA
+  type: organization
+  orgType: frontier-lab
+  title: Stability AI
+  aliases:
+    - Stability
+  website: https://stability.ai
+  description: >-
+    UK-based generative-AI company founded in 2019 by Emad Mostaque.
+    Best known for funding and releasing Stable Diffusion (in
+    collaboration with the CompVis group at LMU Munich and Runway), and
+    for subsequent open-weight image, video, and audio generative model
+    families.
+  tags:
+    - open-source
+    - generative-ai
+    - image-generation
+    - foundation-models
+  lastUpdated: 2026-05
 

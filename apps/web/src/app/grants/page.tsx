@@ -11,6 +11,7 @@ import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { buildProgramNameMap, resolveProgramName } from "./grants-utils";
 import { inferDataSource } from "./grants-data-source";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -219,7 +220,7 @@ export default function GrantsPage() {
 
       {/* Grants table */}
       {totalGrants > 0 ? (
-        <Suspense fallback={<div className="text-sm text-muted-foreground">Loading grants table...</div>}>
+        <Suspense fallback={<TableSkeleton rows={10} columns={7} />}>
           <GrantsTable rows={rows} funders={funderSummaries} />
         </Suspense>
       ) : (

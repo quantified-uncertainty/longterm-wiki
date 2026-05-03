@@ -119,7 +119,7 @@ You cannot end the session until every observation has a disposition. **"I'll re
 
 **If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.
 
-Every session should end with one of these. See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
+Every session should end with one of these. The `/agent-ship` and `/agent-end` skill bodies have the full end-of-session workflow.
 
 ## Rescoping a ticket — MANDATORY enumeration
 

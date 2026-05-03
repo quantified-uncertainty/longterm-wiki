@@ -13,9 +13,11 @@ export interface ScorecardSourceMeta {
   /** Org/maintainer of the scorecard. */
   publisher: string;
   /**
-   * Slug for /organizations/<slug> linking when the publisher has a wiki
-   * entity. Optional — sources whose publisher isn't yet in the catalog
-   * render the publisher as plain text.
+   * Slug for the publisher's wiki entity. Optional — sources whose publisher
+   * isn't yet in the catalog render the publisher as plain text. Resolve to
+   * a URL through `getEntityHref` (not a hardcoded `/organizations/<slug>`):
+   * AI Lab Watch's publisher (`zach-stein-perlman`) is a person, so the
+   * link must route to `/people/<slug>` instead.
    */
   publisherSlug?: string;
   /** Default canonical URL for the source's home page. */
@@ -56,6 +58,7 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
     shortLabel: "SaferAI",
     fullLabel: "SaferAI Ratings",
     publisher: "SaferAI",
+    publisherSlug: "saferai",
     homeUrl: "https://ratings.safer-ai.org",
     description:
       "Continuously-updated risk-management ratings for frontier developers across four pillars: risk identification, analysis & evaluation, treatment, and governance.",
@@ -66,6 +69,7 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
     shortLabel: "AI Lab Watch",
     fullLabel: "AI Lab Watch",
     publisher: "Zach Stein-Perlman",
+    publisherSlug: "zach-stein-perlman",
     homeUrl: "https://ailabwatch.org",
     description:
       "Weighted scorecard across seven categories (risk assessment, scheming prevention, safety research, misuse prevention, security, info sharing, planning).",
@@ -76,6 +80,7 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
     shortLabel: "FMTI",
     fullLabel: "Foundation Model Transparency Index",
     publisher: "Stanford CRFM",
+    publisherSlug: "stanford-crfm",
     homeUrl: "https://crfm.stanford.edu/fmti/",
     description:
       "Transparency-focused index scoring developers on 100 indicators across upstream resources, the model itself, and downstream use.",
@@ -86,6 +91,7 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
     shortLabel: "Seoul Tracker",
     fullLabel: "Seoul Commitment Tracker",
     publisher: "The Midas Project",
+    publisherSlug: "the-midas-project",
     homeUrl: "https://www.seoul-tracker.org",
     description:
       "Tracks adherence to the Seoul Frontier AI Safety Commitments via 'Fulfilled / Partial / Unfulfilled' verdicts on five red-line components.",

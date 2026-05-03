@@ -19,7 +19,8 @@ import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT: string = path.join(__dirname, '../../..');
 
-export const NODE_TSX: string = 'node --import tsx/esm --no-warnings';
+// NODE_TSX dropped (QUA-1053) — unused export. Crux scripts now run from
+// the prebuilt dist/, dispatched via `resolveCruxScriptArgs` in lib/cli.ts.
 export const TEMP_DIR: string = path.join(ROOT, '.claude/temp/page-improver');
 
 export { SCRY_PUBLIC_KEY };

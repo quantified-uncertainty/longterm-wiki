@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { RpcSourcingVerdictRow } from "@/lib/wiki-server";
+import { formatDateDeterministic } from "@/lib/format";
 import {
   VerdictBadge,
   formatRecordType,
@@ -83,7 +84,7 @@ export function SourcingTable({ verdicts, names, hrefs, claims }: SourcingTableP
                   <>
                     {(entityName || recordName) && <span>·</span>}
                     <span className="tabular-nums">
-                      {new Date(v.lastComputedAt).toLocaleDateString()}
+                      {formatDateDeterministic(v.lastComputedAt)}
                     </span>
                   </>
                 )}
@@ -209,7 +210,7 @@ export function SourcingTable({ verdicts, names, hrefs, claims }: SourcingTableP
                   <td className="py-2.5 pr-3">
                     {v.lastComputedAt ? (
                       <span className="text-xs text-muted-foreground tabular-nums">
-                        {new Date(v.lastComputedAt).toLocaleDateString()}
+                        {formatDateDeterministic(v.lastComputedAt)}
                       </span>
                     ) : (
                       <span className="text-xs text-muted-foreground">-</span>

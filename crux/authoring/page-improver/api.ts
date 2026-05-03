@@ -18,7 +18,7 @@ import {
   startHeartbeat, withRetry, type ToolHandler, isOpenRouterMode, streamLlmCall,
 } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
-import { shouldUseApiDirect, isClaudeCliAvailable } from '../../lib/claude-cli.ts';
+import { shouldUseApiDirect, isClaudeCliAvailable, prepareClaudeSpawnEnv } from '../../lib/claude-cli.ts';
 import type { RunAgentOptions } from './types.ts';
 import { ROOT, SCRY_PUBLIC_KEY, log } from './utils.ts';
 
@@ -190,11 +190,7 @@ async function runAgentViaCli(
   const budgetUsd = cliModel === 'haiku' ? '0.50' : '3.00';
 
   return new Promise((resolve, reject) => {
-    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session.
-    // No need to strip ANTHROPIC_API_KEY — this codebase uses
-    // ANTHROPIC_BILLING_KEY, which the claude CLI does not read.
-    const env = { ...process.env };
-    delete env.CLAUDECODE;
+    const env = prepareClaudeSpawnEnv();
 
     const args = [
       '-p',

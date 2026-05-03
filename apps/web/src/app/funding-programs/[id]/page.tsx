@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords } from "@/data/factbase";
+import { getAllKBRecords, findFactBaseRecordBySlugOrKey } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
@@ -30,7 +30,7 @@ import { GrantsAwardedSection } from "./program-sections";
 
 export function generateStaticParams() {
   const allPrograms = getAllKBRecords("funding-programs");
-  return allPrograms.map((record) => ({ id: record.key }));
+  return allPrograms.map((record) => ({ id: record.slug ?? record.key }));
 }
 
 // ── Metadata ───────────────────────────────────────────────────────────
@@ -41,8 +41,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allPrograms = getAllKBRecords("funding-programs");
-  const record = allPrograms.find((r) => r.key === id);
+  const record = findFactBaseRecordBySlugOrKey("funding-programs", id);
   if (!record) {
     return { title: "Funding Program Not Found" };
   }
@@ -62,10 +61,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function FundingProgramDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const allPrograms = getAllKBRecords("funding-programs");
-  const record = allPrograms.find((r) => r.key === id);
+  const record = findFactBaseRecordBySlugOrKey("funding-programs", id);
 
   if (!record) return notFound();
+
+  // Redirect legacy /funding-programs/<key> → /funding-programs/<slug>.
+  if (record.slug && record.key === id) {
+    redirect(`/funding-programs/${record.slug}`);
+  }
 
   const data = loadProgramPageData(record);
   const programVerdict = getRecordVerdict("funding-program", String(data.program.key));

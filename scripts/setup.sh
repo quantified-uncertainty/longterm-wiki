@@ -230,6 +230,21 @@ for hook in pre-push post-merge; do
   fi
 done
 
+# Register the drizzle-journal merge driver — auto-resolves _journal.json
+# conflicts on rebase (QUA-988). The driver is set per-clone via local git
+# config because git refuses to honor `.gitattributes` merge drivers without
+# an opt-in (security: a malicious .gitattributes could otherwise execute
+# arbitrary code on `git pull`). Re-running setup keeps it in sync if the
+# script path or invocation changes.
+DRIVER_CMD='node crux/git/drizzle-journal-merge.mjs %O %A %B %P'
+CURRENT_DRIVER=$(git config --get merge.drizzle-journal.driver 2>/dev/null || echo "")
+if [ "$CURRENT_DRIVER" = "$DRIVER_CMD" ]; then
+  ok "drizzle-journal merge driver registered"
+else
+  git config merge.drizzle-journal.driver "$DRIVER_CMD"
+  ok "drizzle-journal merge driver registered"
+fi
+
 # --- Step 5: Check environment variables ---
 
 step "Checking environment variables"

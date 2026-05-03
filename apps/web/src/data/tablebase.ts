@@ -1027,6 +1027,10 @@ interface PGBenchmarkResult {
   unit: string | null;
   date: string | null;
   sourceUrl: string | null;
+  testedBy: string | null;
+  testedByOrgId: string | null;
+  evaluationDate: string | null;
+  methodologyNotes: string | null;
 }
 
 let _benchmarkResults: Record<string, PGBenchmarkResult[]> | null = null;

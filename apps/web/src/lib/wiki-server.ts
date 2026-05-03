@@ -213,6 +213,7 @@ import type { CampaignFinanceRoute } from "@wiki-server/campaign-finance-route";
 import type { ModelSystemCardsRoute } from "@wiki-server/model-system-cards-route";
 import type { FrameworkReviewRoute } from "@wiki-server/framework-review-route";
 import type { BenchmarkResultsPendingRoute } from "@wiki-server/benchmark-results-pending-route";
+import type { ModelAliasesRoute } from "@wiki-server/model-aliases-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -647,6 +648,27 @@ export type RpcBenchmarkResultsPendingAllResult = InferResponseType<
 
 /** A single quarantine row from the all endpoint */
 export type RpcBenchmarkResultsPendingRow = RpcBenchmarkResultsPendingAllResult['items'][number];
+
+// ============================================================================
+// Hono RPC client — Model Aliases API (QUA-689 / QUA-745)
+// ============================================================================
+
+type ModelAliasesClient = ReturnType<typeof hc<ModelAliasesRoute>>;
+
+/** Inferred response type for GET /api/model-aliases/stats */
+export type RpcModelAliasesStatsResult = InferResponseType<
+  ModelAliasesClient['stats']['$get'],
+  200
+>;
+
+/** Inferred response type for GET /api/model-aliases/all */
+export type RpcModelAliasesAllResult = InferResponseType<
+  ModelAliasesClient['all']['$get'],
+  200
+>;
+
+/** A single alias row from the all endpoint */
+export type RpcModelAliasRow = RpcModelAliasesAllResult['items'][number];
 
 // ============================================================================
 // Hono RPC client — Framework Review API (QUA-710)

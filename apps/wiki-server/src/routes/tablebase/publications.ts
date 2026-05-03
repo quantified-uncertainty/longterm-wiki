@@ -14,6 +14,7 @@ import {
 } from "../shared/resolve-entity-middleware.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
@@ -121,6 +122,20 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every publication in a single response. QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select()
+        .from(publications)
+        .orderBy(desc(publications.publishedDate), publications.id),
+      routeName: "publications/bulk",
+    });
+    return c.json({ publications: rows, total });
   })
 
   .get(

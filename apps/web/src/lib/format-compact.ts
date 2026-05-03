@@ -47,6 +47,18 @@ export function formatCompactCurrency(n: number | null | undefined, currency?: s
   return `${sym}${n.toLocaleString()}`;
 }
 
+/**
+ * Format an integer count for status-line display, with locale grouping but
+ * no compact suffix. Use for "Showing N of M results" strings, stat cards,
+ * and other places where exact precision matters more than visual brevity.
+ * For column cell values (currency, big numbers), prefer formatCompactNumber
+ * or formatCompactCurrency instead.
+ */
+export function formatCount(n: number | null | undefined): string {
+  if (n == null || isNaN(n) || !isFinite(n)) return "";
+  return n.toLocaleString("en-US");
+}
+
 /** Format a number as compact: 1.2T, 850M, 6.6M, 42K (no currency symbol) */
 export function formatCompactNumber(n: number | null | undefined): string {
   if (n == null || isNaN(n) || !isFinite(n)) return "";

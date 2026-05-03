@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTypedEntities, type PersonEntity } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
 import { PoliticiansTable, type PoliticianRow } from "./politicians-table";
+import { TableSkeleton } from "@/components/ui/table-states";
 import { EA_TOPICS, extractStanceLabel } from "./politicians-constants";
 import { fetchPoliticalScores } from "@/components/political";
 
@@ -203,7 +204,7 @@ export default async function PoliticiansPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={6} />}>
         <PoliticiansTable rows={enrichedRows} />
       </Suspense>
     </div>

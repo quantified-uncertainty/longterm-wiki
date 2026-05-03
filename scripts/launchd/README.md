@@ -10,10 +10,12 @@ window after login" pattern.
 | Label | Plist | Purpose | Linear |
 |---|---|---|---|
 | `com.qu.pr-patrol` | `com.qu.pr-patrol.plist` | Keeps `crux gh pr-patrol run` alive — auto-restarts on crash, on logout/login cycle, and after reboot | QUA-987 |
+| `com.qu.health-monitor` | `com.qu.health-monitor.plist` | Coordinator-session degradation alarms — polls `/health` and main-branch CI; raises alerts via `<system-reminder>` injection | QUA-1048 |
 
 The supervisor scripts the agents launch are siblings of this directory:
 
 - `../pr-patrol-supervisor.sh` — runs `pnpm crux gh pr-patrol run` in a 30-second restart loop, with shutdown on `SIGTERM`/`SIGINT` so `launchctl unload` is a graceful stop.
+- `../health-monitor-supervisor.sh` — same loop, runs `pnpm crux sys health-monitor run`. Forces `WIKI_SERVER_ENV=prod` so /health requests target production.
 
 ## Install / status / uninstall
 
@@ -24,6 +26,13 @@ The supervisor scripts the agents launch are siblings of this directory:
 ./scripts/launchd/pr-patrol.sh tail        # tail the run log
 ./scripts/launchd/pr-patrol.sh tcc-check   # probe macOS Full Disk Access (see below)
 ./scripts/launchd/pr-patrol.sh uninstall   # unload + remove
+
+# health-monitor follows the same shape:
+./scripts/launchd/health-monitor.sh install   # install + render + load + TCC probe
+./scripts/launchd/health-monitor.sh status    # launchctl state + monitor process + active alerts
+./scripts/launchd/health-monitor.sh tail
+./scripts/launchd/health-monitor.sh tcc-check
+./scripts/launchd/health-monitor.sh uninstall
 ```
 
 The install script is **idempotent** — re-running is safe. It also reports if
@@ -38,6 +47,13 @@ every 30s until the existing patrol exits.
 ~/.cache/pr-patrol/run.log                             # supervisor's log (tail this)
 ~/.cache/pr-patrol/launchd.{out,err}                   # launchd's own captured output
 ~/.cache/pr-patrol/daemon.pid                          # patrol's singleton lock
+
+~/Library/LaunchAgents/com.qu.health-monitor.plist     # health-monitor (QUA-1048)
+~/.cache/health-monitor/run.log                        # supervisor's log
+~/.cache/health-monitor/launchd.{out,err}              # launchd captured output
+~/.cache/health-monitor/daemon.pid                     # singleton lock
+~/.cache/health-monitor/history.jsonl                  # rolling /health snapshot history
+~/.cache/health-monitor/state/alert-<signal>           # per-signal alert files
 ```
 
 ## One-time macOS Full Disk Access grant

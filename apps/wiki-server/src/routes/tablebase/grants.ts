@@ -22,6 +22,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
+import { bulkQuery } from "../shared/bulk-query.js";
 import { formatMoney } from "../shared/format-currency.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -243,6 +244,27 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /bulk ----
+  // Returns every row in a single response. For build-data and other
+  // server-side consumers; UI/dashboard callers stay on /all (paginated).
+  // Skips per-row field verdicts (callers don't need them) and the COUNT(*).
+  // QUA-1040.
+  .get("/bulk", async (c) => {
+    const db = getDrizzleDb();
+    const { rows, total } = await bulkQuery({
+      query: db
+        .select(joinedSelect)
+        .from(grants)
+        .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
+        .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
+        .leftJoin(sourceVerdicts, verdictJoinCondition("grant", grants.id))
+        .orderBy(desc(grants.syncedAt), grants.id),
+      formatRow,
+      routeName: "grants/bulk",
+    });
+    return c.json({ grants: rows, total });
   })
 
   // ---- GET /by-entity/:entityId ----
