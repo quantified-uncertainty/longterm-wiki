@@ -467,9 +467,12 @@ async function closeCommand(
     // QUA-1073: PATCH carries `checksYaml`, `reviewed`, and `prUrl`
     // alongside `status` so completed rows stop landing with all three
     // NULL. If the speculative build threw, surface that and fall
-    // back to status-only — the row at least leaves `active`, but
-    // the operator sees why the close-time fields didn't sync.
-    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
+    // back to status-only — the row at least leaves its prior state,
+    // but the operator sees why the close-time fields didn't sync.
+    // Accept 'stale' too: a long session swept by the periodic
+    // sweep should still get its close-time fields populated on
+    // explicit close (only 'completed' is terminal).
+    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status !== 'completed') {
       try {
         if (closeUpdatesError) {
           output += `${c.yellow}⚠ Failed to build close-time payload (QUA-1073 fields will be NULL): ${closeUpdatesError.message}${c.reset}\n`;

@@ -297,10 +297,56 @@ describe('close command (agents)', () => {
     expect(updateMock).toHaveBeenCalledWith(100, { status: 'completed' });
   });
 
+  // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'
+  // by the periodic sweep. `agents close` must still populate the
+  // close-time fields on explicit close — otherwise any long-running
+  // session lands with NULL writeback even after the QUA-1073 fix.
+  it('PATCHes the close-time payload when session is stale (not just active)', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(sessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 477, status: 'stale' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    buildCloseUpdatesMock.mockResolvedValueOnce({
+      status: 'completed',
+      checksYaml: '{"initialized":true}',
+      reviewed: true,
+      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4854',
+    });
+
+    await commands.close([], {});
+
+    expect(updateMock).toHaveBeenCalledWith(477, {
+      status: 'completed',
+      checksYaml: '{"initialized":true}',
+      reviewed: true,
+      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4854',
+    });
+  });
+
+  it('skips PATCH when session is already completed (terminal state)', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(sessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 999, status: 'completed' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    await commands.close([], {});
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
   // Speculative `buildCloseUpdates` rejection: the close path must
   // surface a warning and fall back to `{status:'completed'}` so the
-  // row leaves 'active'. Silently swallowing the error would re-create
-  // the QUA-1073 NULL-writeback failure mode.
+  // row leaves its prior state. Silently swallowing the error would
+  // re-create the QUA-1073 NULL-writeback failure mode.
   it('surfaces buildCloseUpdates rejection and falls back to status-only PATCH', async () => {
     const sessions = await import('../lib/wiki-server/agent-sessions.ts');
     const updateMock = vi.mocked(sessions.updateAgentSession);

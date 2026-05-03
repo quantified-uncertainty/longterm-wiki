@@ -932,6 +932,61 @@ describe('agent-checklist complete', () => {
     // SessionEnd hook (`session-finalize` → title/summary) wrote.
     expect(updateMock).toHaveBeenCalledWith(7, { status: 'completed' });
   });
+
+  // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'
+  // by the periodic sweep before complete runs. We must still
+  // populate the close-time fields on explicit close — otherwise
+  // any session over the stale threshold lands with NULL writeback
+  // even after the QUA-1073 fix.
+  it('PATCHes close-time fields even when session is stale (not just active)', async () => {
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(agentSessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 477, status: 'stale' },
+    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
+
+    buildCloseUpdatesMock.mockResolvedValueOnce({
+      status: 'completed',
+      checksYaml: '{"initialized":true}',
+      reviewed: true,
+    });
+
+    await commands.complete([], {});
+
+    expect(updateMock).toHaveBeenCalledWith(477, {
+      status: 'completed',
+      checksYaml: '{"initialized":true}',
+      reviewed: true,
+    });
+  });
+
+  it('skips PATCH when session is already completed (terminal state)', async () => {
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(agentSessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 999, status: 'completed' },
+    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
+
+    await commands.complete([], {});
+
+    // Re-PATCHing a completed row would be a wasteful no-op and
+    // could overwrite metadata an earlier close already wrote.
+    expect(updateMock).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------

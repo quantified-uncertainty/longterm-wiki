@@ -502,10 +502,14 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
     // QUA-1073: PATCH must carry close-time fields, not just status.
     // Skip PR lookup — this runs at /agent-ship Step 7, before the
     // PR is pushed in Step 8; `agents close` (Step 9) does the lookup.
+    // Accept 'stale' too: a long session (>2h) gets swept to 'stale'
+    // by the periodic sweep before complete runs; we still want to
+    // populate the close-time fields and mark it 'completed' on
+    // explicit close. Only 'completed' rows are off-limits (terminal).
     try {
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);
-      if (sessionResult.ok && sessionResult.data.status === 'active') {
+      if (sessionResult.ok && sessionResult.data.status !== 'completed') {
         const updates = await buildCloseUpdates({ branch, skipPrLookup: true });
         await updateAgentSession(sessionResult.data.id, updates);
       }
