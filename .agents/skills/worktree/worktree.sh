@@ -32,9 +32,10 @@ if [[ -z "$BRANCH" ]]; then
   exit 1
 fi
 
-# Auto-prefix `Codex/` if missing (so `worktree qua-665-foo` works).
-if [[ ! "$BRANCH" =~ ^(Codex/|codex/|claude/|main$|production$) ]]; then
-  BRANCH="Codex/$BRANCH"
+# Auto-prefix `codex/` if missing (so `worktree qua-665-foo` works).
+# Lowercase per .claude/rules/agent-session-workflow.md branch convention.
+if [[ ! "$BRANCH" =~ ^(codex/|claude/|main$|production$) ]]; then
+  BRANCH="codex/$BRANCH"
 fi
 
 cd "$MAIN_CLONE"

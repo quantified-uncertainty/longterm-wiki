@@ -16,7 +16,7 @@ Coord sessions can't edit files on `main` (PreToolUse hook blocks it), so every 
 /worktree -b <new-branch>    # create new branch from origin/main
 ```
 
-`<branch>` may be either form (`Codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `Codex/` automatically when missing.
+`<branch>` may be either form (`codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `codex/` automatically when missing. The lowercase prefix matches the convention in `.claude/rules/agent-session-workflow.md`.
 
 ## Implementation
 
@@ -50,9 +50,9 @@ git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/main worktree remove --force
 ## Example
 
 ```text
-$ /worktree Codex/qua-665-wire-t1-importers-to-propose
+$ /worktree codex/qua-665-wire-t1-importers-to-propose
 Worktree:    /tmp/wt-ac742e
-Branch:      Codex/qua-665-wire-t1-importers-to-propose (HEAD ac742e844)
+Branch:      codex/qua-665-wire-t1-importers-to-propose (HEAD ac742e844)
 Symlinked:   node_modules, apps/{web,wiki-server}/node_modules, .env
 Ready:       cd /tmp/wt-ac742e
 ```
@@ -60,7 +60,7 @@ Ready:       cd /tmp/wt-ac742e
 ## When NOT to use this
 
 - For changes to `main` itself (you can't — there's a PreToolUse hook that blocks it).
-- For large multi-file rebases where a slot agent would be more appropriate (use `./ws open <N> --Codex` instead — slots have full Codex sessions).
+- For large multi-file rebases where a slot agent would be more appropriate (use `./ws open <N> --claude` instead — slots have full agent sessions; `--claude` is the existing flag name regardless of which runtime ends up attached).
 - For changes touching `ops/` or release flow (use `coord/` directly via the release session).
 
 ## Cleanup
