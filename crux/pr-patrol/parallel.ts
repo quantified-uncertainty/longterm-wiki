@@ -376,7 +376,7 @@ async function fixPrInWorktree(
             ...config,
             maxTurns: 60,
             timeoutMinutes: 30,
-          }, { cwd: worktreePath });
+          }, { cwd: worktreePath, context: { prNumber: pr.number, label: 'rebase-only' } });
           const elapsedS = Math.floor((Date.now() - startTime) / 1000);
           const claudeOutcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
           if (claudeOutcome === 'fixed') {
@@ -420,7 +420,7 @@ async function fixPrInWorktree(
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: worktreePath });
+    }, { cwd: worktreePath, context: { prNumber: pr.number } });
 
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
@@ -833,6 +833,11 @@ export function buildParallelConfig(
     timeoutMinutes: parseIntOpt(
       options.timeout ?? process.env.PR_PATROL_TIMEOUT_MINUTES,
       60,
+    ),
+    // QUA-1078: inline 50k input-token cap on spawnClaude. 0 disables.
+    inputTokenCap: parseIntOpt(
+      options.inputTokenCap ?? process.env.PR_PATROL_INPUT_TOKEN_CAP,
+      50_000,
     ),
   };
 
