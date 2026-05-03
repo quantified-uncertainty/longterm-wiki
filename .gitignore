@@ -140,3 +140,4 @@ data/archive/
 crux/calibration/data/corpus.json
 crux/calibration/data/results-*.json
 .claude/scratch/
+.claude/research-cache/

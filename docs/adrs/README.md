@@ -34,7 +34,7 @@ Charter → Proposed → Accepted | Rejected
 |-----|-------|--------|------|--------|
 | [0001](0001-crux-package-architecture.md) | Crux package architecture | Charter | 1 | TBD |
 | [0002](0002-three-bases-model-review.md) | Three Bases model review | Charter | 1 | TBD |
-| [0003](0003-validator-economics.md) | Validator economics | Charter | 1 | TBD |
+| [0003](0003-validator-economics.md) | Validator economics | Proposed | 1 | [QUA-1085](https://linear.app/quantifieduncertainty/issue/QUA-1085) |
 | [0004](0004-agent-workflow-roi.md) | Agent workflow infrastructure ROI | Charter | 1 | TBD |
 | [0005](0005-content-quality-trends.md) | Content quality and staleness governance | Charter | 1 | TBD |
 | [0006](0006-wiki-server-decomposition.md) | Wiki-server decomposition | Charter | 2 | TBD |
