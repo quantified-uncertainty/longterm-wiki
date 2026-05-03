@@ -128,7 +128,7 @@ Work through the queue starting with the highest-priority PR.
 
 **IMPORTANT: Never `git checkout` PR branches in the current directory.** This causes branch confusion in multi-session slots. Use one of these isolation strategies:
 
-**Option A (preferred): Spawn a subagent with worktree isolation.**
+**Option A (preferred): Use explicit branch isolation.**
 For each PR fix, use an explicit `/tmp` worktree or a dedicated slot. Do not use subagent worktree isolation; it can corrupt the parent session's working directory.
 
 **Option B: Use git worktrees manually.**

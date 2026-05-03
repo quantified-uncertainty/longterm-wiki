@@ -53,7 +53,7 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\b'; then
   fi
   # Allow (with warning): git checkout main — needed for /agent-reset end-of-session
   if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\s+main\b'; then
-    echo "WARNING: Switching to main. This is only appropriate during /agent-reset (end-of-session cleanup). If you are mid-session, use worktree isolation instead." >&2
+    echo "WARNING: Switching to main. This is only appropriate during /agent-reset (end-of-session cleanup). If you are mid-session, use a slot or explicit /tmp worktree instead." >&2
     exit 0
   fi
   # Block everything else (branch switching)
@@ -72,7 +72,7 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+switch\b'; then
     exit 0
   fi
   # Block everything else
-  echo "BLOCKED: \`git switch <branch>\` is prohibited in agent sessions. Use worktree isolation instead." >&2
+  echo "BLOCKED: \`git switch <branch>\` is prohibited in agent sessions. Use a slot or explicit /tmp worktree instead." >&2
   exit 2
 fi
 
