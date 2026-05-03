@@ -57,6 +57,7 @@ import {
   type AggregationResult,
   type EvidenceRow,
 } from "./sourcing-aggregation.js";
+import { CURRENT_CHECKER_MODEL, isStaleModel } from "./checker-model.js";
 
 // ---- Constants ----
 
@@ -99,12 +100,6 @@ const VALID_VERDICTS = [
 
 const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
 
-/**
- * The current checker model used by the sourcing pipeline.
- * Evidence rows checked with a different model are flagged as stale.
- * Update this when the pipeline switches to a newer model.
- */
-export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
 export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
 
 // ---- Coverage helpers (QUA-928) ----
@@ -426,12 +421,6 @@ const StaleQuery = z.object({
 });
 
 // ---- Helpers ----
-
-/** Check if a checker model is stale (different from the current model). */
-function isStaleModel(checkerModel: string | null): boolean {
-  if (!checkerModel) return true; // No model recorded = stale
-  return checkerModel !== CURRENT_CHECKER_MODEL;
-}
 
 /** Map an evidence DB row to the API response shape with isStale flag. */
 function mapEvidenceRow(e: {
@@ -828,6 +817,10 @@ const sourcingApp = new Hono()
         // QUA-992: aggregation tie-breaker prefers the bucket whose latest
         // evidence is most recent.
         checkedAt: e.checkedAt,
+        // QUA-991: drop stale rows from the headline when a fresh row exists,
+        // so the read-side aggregation on the detail page matches the write
+        // side recomputeVerdict's aggregation.
+        isStale: isStaleModel(e.checkerModel),
       });
     }
     for (const [key, rows] of evidenceByFieldKey) {

@@ -1,24 +1,17 @@
 import { describe, it, expect } from 'vitest';
+import {
+  CURRENT_CHECKER_MODEL,
+  isStaleModel,
+} from '@wiki-server/checker-model';
 
 /**
  * Tests for sourcing evidence deduplication and stale model detection.
  *
- * These test the logic from apps/wiki-server/src/routes/sourcing/sourcing.ts
- * without requiring a database connection. The functions are mirrored here since
- * the route file's helpers are not independently exported.
+ * QUA-991: previously this file inlined a copy of `isStaleModel` and
+ * `CURRENT_CHECKER_MODEL`. Both are now exported from
+ * `apps/wiki-server/src/routes/sourcing/checker-model.ts` and consumed
+ * directly here so the constant cannot drift.
  */
-
-// Current checker model — must match the constant in sourcing.ts
-const CURRENT_CHECKER_MODEL = 'claude-haiku-4-5-20251001';
-
-// ---------------------------------------------------------------------------
-// isStaleModel
-// ---------------------------------------------------------------------------
-
-function isStaleModel(checkerModel: string | null): boolean {
-  if (!checkerModel) return true;
-  return checkerModel !== CURRENT_CHECKER_MODEL;
-}
 
 describe('isStaleModel', () => {
   it('returns true for null checker model', () => {

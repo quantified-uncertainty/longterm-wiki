@@ -98,14 +98,19 @@ interface Bucket {
  *      from the QUA-426 relevance gate and signal "this source is not
  *      about the subject — don't even count it." They contribute nothing.
  *   2. If no rows remain after step 1, return `unchecked`.
- *   3. If every remaining row has `effectiveWeight < minRelevance`,
+ *   3. QUA-991: if at least one fresh row (`isStale != true`) is present,
+ *      drop stale rows from the headline aggregation entirely (surfaced
+ *      separately as `droppedStale` for the dissent explainer). When all
+ *      remaining rows are stale, fall through to current behavior — stale
+ *      evidence is better than nothing.
+ *   4. If every remaining row has `effectiveWeight < minRelevance`,
  *      return `unchecked` — we have looked but nothing is relevant
  *      enough to draw a conclusion.
- *   4. Compute a weighted score per non-`unchecked` verdict bucket.
+ *   5. Compute a weighted score per non-`unchecked` verdict bucket.
  *      Score for verdict V is `sum(effectiveWeight(row) for row.verdict = V)`.
- *   5. Pick the verdict with the highest weighted score. Ties broken by
+ *   6. Pick the verdict with the highest weighted score. Ties broken by
  *      `SOURCE_CHECK_VERDICT_PRIORITY` (more-actionable wins).
- *   6. Confidence: weighted average of `confidence × effectiveWeight`
+ *   7. Confidence: weighted average of `confidence × effectiveWeight`
  *      across all *contributing* rows (rows with the winning verdict),
  *      not the max. Reflects how strongly the contributors agreed, not
  *      just whether one source was certain.
@@ -126,34 +131,44 @@ export function aggregateEvidence(
       sourcesChecked: 0,
       contributing: [],
       droppedLowRelevance: [],
+      droppedStale: [],
       droppedNotApplicable: rows.length,
     };
   }
 
   const droppedNotApplicable = rows.length - considered.length;
 
-  // Step 3: split into above/below threshold. Below-threshold rows are
+  // QUA-991: if there is at least one fresh row, drop stale rows from
+  // headline aggregation. Stale rows still surface separately so the
+  // dissent explainer can say "1 stale partial source excluded". When
+  // every remaining row is stale, fall through to current behavior —
+  // an old reading is better than no reading at all.
+  const freshRows = considered.filter((r) => r.isStale !== true);
+  let aggregable: EvidenceRow[];
+  let droppedStale: ContributingVerdict[];
+  if (freshRows.length > 0 && freshRows.length < considered.length) {
+    aggregable = freshRows;
+    droppedStale = bucketByVerdict(considered.filter((r) => r.isStale === true));
+  } else {
+    aggregable = considered;
+    droppedStale = [];
+  }
+
+  // Step 4: split into above/below threshold. Below-threshold rows are
   // filtered out from the headline but their per-verdict counts are
   // surfaced separately so QUA-792's explainer can mention low-relevance
-  // dissent.
+  // dissent. Operates on `aggregable` so dropped-stale rows don't appear
+  // in `droppedLowRelevance` (they're already in `droppedStale`).
   const aboveThreshold: EvidenceRow[] = [];
-  const belowThresholdBuckets = new Map<AggregateVerdict, ContributingVerdict>();
-  for (const r of considered) {
-    const w = effectiveWeight(r);
-    if (w >= minRelevance) {
+  const belowThresholdRows: EvidenceRow[] = [];
+  for (const r of aggregable) {
+    if (effectiveWeight(r) >= minRelevance) {
       aboveThreshold.push(r);
-      continue;
-    }
-    const v = r.verdict as AggregateVerdict;
-    const existing = belowThresholdBuckets.get(v);
-    if (existing) {
-      existing.weight += w;
-      existing.rowCount += 1;
     } else {
-      belowThresholdBuckets.set(v, { verdict: v, weight: w, rowCount: 1 });
+      belowThresholdRows.push(r);
     }
   }
-  const droppedLowRelevance = sortContributing([...belowThresholdBuckets.values()]);
+  const droppedLowRelevance = bucketByVerdict(belowThresholdRows);
 
   if (aboveThreshold.length === 0) {
     return {
@@ -162,11 +177,12 @@ export function aggregateEvidence(
       sourcesChecked: considered.length,
       contributing: [],
       droppedLowRelevance,
+      droppedStale,
       droppedNotApplicable,
     };
   }
 
-  // Step 4: per-verdict aggregates in one pass. Only rows above the
+  // Step 5: per-verdict aggregates in one pass. Only rows above the
   // threshold get to vote — low-relevance noise shouldn't swing ties.
   // Rows with NULL confidence are skipped from the confidence average
   // (don't drag it down, don't elevate it).
@@ -204,11 +220,12 @@ export function aggregateEvidence(
       sourcesChecked: considered.length,
       contributing: [],
       droppedLowRelevance,
+      droppedStale,
       droppedNotApplicable,
     };
   }
 
-  // Step 5: pick winner. Score desc, then recency desc (QUA-992), then priority asc.
+  // Step 6: pick winner. Score desc, then recency desc (QUA-992), then priority asc.
   const contributing = sortContributing(
     [...buckets.entries()].map(([verdict, b]) => ({
       verdict,
@@ -220,8 +237,8 @@ export function aggregateEvidence(
   const winningVerdict = contributing[0].verdict;
   const winningBucket = buckets.get(winningVerdict)!;
 
-  // Step 6: confidence = weighted average of the winning bucket's rows
-  // that reported a confidence value (computed in step 4).
+  // Step 7: confidence = weighted average of the winning bucket's rows
+  // that reported a confidence value (computed in step 5).
   const confidence =
     winningBucket.confidenceWeightSum > 0
       ? winningBucket.confidenceWeightedSum / winningBucket.confidenceWeightSum
@@ -233,6 +250,7 @@ export function aggregateEvidence(
     sourcesChecked: considered.length,
     contributing,
     droppedLowRelevance,
+    droppedStale,
     droppedNotApplicable,
   };
 }
@@ -248,6 +266,42 @@ export function aggregateEvidence(
  * noise from typical `0.x + 0.y` sums.
  */
 const WEIGHT_EQUALITY_EPSILON = 1e-9;
+
+/**
+ * Group rows by verdict, summing weight, counting rows, and tracking the
+ * most-recent `checkedAt` per bucket. Returned list is sorted by
+ * `sortContributing` so callers can render dissent in the canonical order.
+ *
+ * Used for both `droppedStale` and `droppedLowRelevance` — both are
+ * "rows we excluded from the headline, surfaced for the dissent explainer."
+ * Same Map-bucketing idiom that the headline aggregator uses below.
+ */
+function bucketByVerdict(rows: Iterable<EvidenceRow>): ContributingVerdict[] {
+  const buckets = new Map<AggregateVerdict, ContributingVerdict>();
+  for (const r of rows) {
+    const v = r.verdict as AggregateVerdict;
+    const w = effectiveWeight(r);
+    const existing = buckets.get(v);
+    if (existing) {
+      existing.weight += w;
+      existing.rowCount += 1;
+      if (
+        r.checkedAt &&
+        (!existing.latestCheckedAt || r.checkedAt > existing.latestCheckedAt)
+      ) {
+        existing.latestCheckedAt = r.checkedAt;
+      }
+    } else {
+      buckets.set(v, {
+        verdict: v,
+        weight: w,
+        rowCount: 1,
+        latestCheckedAt: r.checkedAt ?? null,
+      });
+    }
+  }
+  return sortContributing([...buckets.values()]);
+}
 
 /**
  * Sort contributing buckets by weight desc, ties broken by recency desc
