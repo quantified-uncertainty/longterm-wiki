@@ -26,6 +26,10 @@ import {
   type ProfileTab,
 } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
@@ -208,12 +212,14 @@ export default async function PersonProfilePage({
 
   // Political data from wiki-server. Scores/offices/votes/finance are not yet
   // in database.json — see https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
-  const [politicalScores, politicalOffices, campaignFinance, politicalVotes] = await Promise.all([
+  const [politicalScores, politicalOffices, campaignFinance, politicalVotes, sourcingSummary] = await Promise.all([
     fetchPoliticalScores(entity.id),
     fetchPoliticalOffices(entity.id),
     fetchCampaignFinance(entity.id),
     fetchPoliticalVotes(entity.id),
+    fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
   ]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve employer reference
   const employer =
@@ -406,6 +412,7 @@ export default async function PersonProfilePage({
         score: computePersonCoverage(covInput),
         signals: getPersonSignals(covInput),
       }}
+      verdict={rollupVerdict}
       subtitle={subtitle}
       headerLinks={headerLinks}
       statCards={statCards}

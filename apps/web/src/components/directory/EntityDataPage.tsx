@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { Breadcrumbs } from "./Breadcrumbs";
 import { EntityDbPage } from "./EntityDbPage";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
 import { getKBEntity } from "@/data/factbase";
 import { getTypedEntityById } from "@/data";
 import { DataViewTabs } from "./DataViewTabs";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 
 /**
  * EntityDataPage — Two-tab data view for any entity directory page.
@@ -36,6 +39,11 @@ export async function EntityDataPage({
 
   const displayName = fbEntity?.name ?? tbEntity?.title ?? slug;
   const backHref = `${directoryPrefix}/${slug}`;
+  const entityId = fbEntity?.id ?? tbEntity?.stableId ?? tbEntity?.id ?? slug;
+  const stableId = fbEntity?.stableId ?? tbEntity?.stableId ?? "";
+
+  const sourcingSummary = await fetchEntitySourcingSummary([entityId, stableId, slug]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   const structuredContent = <FactBaseEntityBody entityId={slug} skipVerdicts />;
   const databaseContent = (
@@ -48,38 +56,24 @@ export async function EntityDataPage({
   );
 
   return (
-    <div className="max-w-[90rem] mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: `${entityTypeLabel}s`, href: directoryPrefix },
-          { label: displayName, href: backHref },
-          { label: "Data" },
-        ]}
-      />
-
-      <div className="mb-8">
-        <h1 className="text-2xl font-extrabold tracking-tight">
-          {displayName}
-          <span className="font-normal text-muted-foreground/60"> — Data</span>
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Structured facts and database records for this {entityTypeLabel.toLowerCase()}.
-        </p>
-      </div>
-
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: `${entityTypeLabel}s`, href: directoryPrefix },
+        { label: displayName, href: backHref },
+        { label: "Data" },
+      ]}
+      entityId={entityId}
+      title={displayName}
+      verdict={rollupVerdict}
+      subtitle={`Structured facts and database records for this ${entityTypeLabel.toLowerCase()}.`}
+      headerLinks={[
+        { label: `${entityTypeLabel} profile`, href: backHref },
+      ]}
+    >
       <DataViewTabs
         structuredContent={structuredContent}
         databaseContent={databaseContent}
       />
-
-      <div className="mt-10 pt-6 border-t border-border/40">
-        <Link
-          href={backHref}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          &larr; Back to {displayName} profile
-        </Link>
-      </div>
-    </div>
+    </EntityProfileShell>
   );
 }

@@ -20,6 +20,10 @@ import {
 } from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
+import {
   OverviewTab,
   PricingTab,
   BenchmarksTab,
@@ -66,31 +70,39 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Best-effort: a wiki-server outage shouldn't break the page, just hide
-  // the system-card tab and drop the "Also known as" line.
-  let systemCards: RpcModelSystemCardRow[] = [];
-  let aliases: string[] = [];
-  if (entity.stableId) {
-    const [cardsResult, aliasesResult] = await Promise.all([
-      fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
+  // Fetch system cards (QUA-702), aliases, and sourcing rollup in parallel.
+  // System cards and aliases require stableId; sourcing is unconditional.
+  // All are best-effort: a wiki-server outage shouldn't break the page.
+  const systemCardsPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
         `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
         { revalidate: 300 },
-      ),
-      fetchFromWikiServer<RpcModelAliasesAllResult>(
+      )
+    : Promise.resolve(null);
+  const aliasesPromise = entity.stableId
+    ? fetchFromWikiServer<RpcModelAliasesAllResult>(
         `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=20`,
         { revalidate: 300 },
-      ),
-    ]);
-    if (cardsResult?.items) systemCards = cardsResult.items;
-    if (aliasesResult?.items) {
-      // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
-      // on the GPT-4 Turbo page is noise.
-      const titleLower = entity.title.toLowerCase();
-      aliases = aliasesResult.items
-        .map((r) => r.alias)
-        .filter((a) => a.toLowerCase() !== titleLower);
-    }
+      )
+    : Promise.resolve(null);
+  const [systemCardsResult, aliasesResult, sourcingSummary] = await Promise.all(
+    [
+      systemCardsPromise,
+      aliasesPromise,
+      fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
+    ],
+  );
+  const systemCards: RpcModelSystemCardRow[] = systemCardsResult?.items ?? [];
+  let aliases: string[] = [];
+  if (aliasesResult?.items) {
+    // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
+    // on the GPT-4 Turbo page is noise.
+    const titleLower = entity.title.toLowerCase();
+    aliases = aliasesResult.items
+      .map((r) => r.alias)
+      .filter((a) => a.toLowerCase() !== titleLower);
   }
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
   const developerEntity = entity.developer
@@ -269,6 +281,7 @@ export default async function AiModelDetailPage({
       titlePills={titlePills}
       aliases={aliases}
       coverage={{ score: coverageScore, signals: coverageSignals }}
+      verdict={rollupVerdict}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}

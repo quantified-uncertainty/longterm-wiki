@@ -412,6 +412,96 @@ test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
   });
 });
 
+test.describe("Render audit — entity profile rollup dot present (QUA-901)", () => {
+  // EntityProfileShell always renders a rollup SourcingDot in the header.
+  // QUA-901: /people/<slug>, /ai-models/<slug>, and /<dir>/<slug>/data pages
+  // were skipping `verdict={...}` (or skipping the shell entirely), so the
+  // dot was missing on flagship pages. Each URL below MUST render a single
+  // rollup dot (role="img" with aria-label starting with "Sourcing:") inside
+  // the page header.
+  for (const url of [
+    // Detail pages — Defect 1 fix
+    "/people/sam-altman",
+    "/people/dario-amodei",
+    "/ai-models/claude-opus-4-5",
+    "/ai-models/gpt-4o",
+    // Data subpages — Defect 2 fix (EntityDataPage shell migration)
+    "/people/sam-altman/data",
+    "/ai-models/claude-opus-4-5/data",
+    "/benchmarks/mmlu/data",
+    "/legislation/ai-lead-act/data",
+    // Reference: organizations/data already had the dot (the shell was
+    // already used there); included as a positive control.
+    "/organizations/anthropic/data",
+  ]) {
+    test(`${url} renders an EntityProfileShell rollup sourcing dot`, async ({ page }, testInfo) => {
+      const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+      // Mark as visibly skipped (not silently passed) when the page 404s in
+      // a CI build without PG data. A genuine routing regression on prod
+      // would still fire the assertion below.
+      if (!response || response.status() >= 400) {
+        testInfo.skip(true, `${url} returned ${response?.status() ?? "no response"}`);
+      }
+      await expect(page.locator("main, article, [role='main']").first()).toBeVisible({ timeout: 15000 });
+
+      // Scope strictly to the EntityProfileShell title row — the flex
+      // container that holds the <h1>. Many of these pages also render
+      // record-level dots in tables/cards lower in the body, so a
+      // page-wide count would false-pass when the rollup dot is missing.
+      const titleRow = page.locator("h1").first().locator("..");
+      const dots = await titleRow
+        .locator('[role="img"][aria-label^="Sourcing:"]')
+        .count();
+      expect(
+        dots,
+        `${url} should render an EntityProfileShell rollup sourcing dot in the title row`,
+      ).toBeGreaterThan(0);
+    });
+  }
+});
+
+test.describe("Render audit — sourcing dot links have accessible text (QUA-901)", () => {
+  // QA sweep observed empty anchor tags `[](/sourcing/personnel/<id>)` and
+  // `[](/sourcing/division/<id>)` on people / org pages. Cause: SourcingDot
+  // renders `<Link>` with only a colored span inside, so HTML→text converters
+  // (and screen readers that don't honor descendant aria-label) saw an empty
+  // link text. Fix: SourcingDot's Link wrapper now has its own aria-label
+  // and an sr-only label child. Regression check: every <a href="/sourcing/..."
+  // link on these pages must have non-empty accessible text.
+  for (const url of [
+    "/people/sam-altman",
+    "/people/dario-amodei",
+    "/organizations/openai",
+  ]) {
+    test(`${url} has no empty /sourcing/ anchors`, async ({ page }, testInfo) => {
+      const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+      if (!response || response.status() >= 400) {
+        testInfo.skip(true, `${url} returned ${response?.status() ?? "no response"}`);
+      }
+      await expect(page.locator("main, article, [role='main']").first()).toBeVisible({ timeout: 15000 });
+      // SourcingDot's sr-only span is server-rendered, so we don't need to
+      // wait for client hydration before reading it.
+
+      const empties = await page.evaluate(() => {
+        const links = Array.from(
+          document.querySelectorAll<HTMLAnchorElement>('a[href^="/sourcing/"]'),
+        );
+        return links
+          .filter((a) => {
+            const text = (a.textContent ?? "").trim();
+            const aria = a.getAttribute("aria-label") ?? "";
+            return text.length === 0 && aria.length === 0;
+          })
+          .map((a) => a.getAttribute("href"));
+      });
+      expect(
+        empties,
+        `${url} has empty /sourcing/ links (no text and no aria-label): ${empties.slice(0, 3).join(", ")}`,
+      ).toEqual([]);
+    });
+  }
+});
+
 test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => {
   // Entity profile pages render a SourcingDot in the header. It must NOT
   // link to /sourcing/entity/<id> — that path is not a real record_type

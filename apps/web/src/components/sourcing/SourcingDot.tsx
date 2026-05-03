@@ -121,9 +121,12 @@ export function SourcingDot({
     return (
       <Link
         href={href}
+        title={tooltip}
+        aria-label={`Sourcing details: ${config.label}`}
         className="p-0.5 -m-0.5 rounded-full hover:bg-muted/50 transition-colors"
       >
         {dot}
+        <span className="sr-only">{config.label}</span>
       </Link>
     );
   }
