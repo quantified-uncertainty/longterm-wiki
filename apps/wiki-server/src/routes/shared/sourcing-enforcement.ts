@@ -58,9 +58,8 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
 
 /**
  * Resolve whether sourcing is required for this request, given the route's
- * table name and the request's query params. Used by both the atomic
- * `enforceSourcing()` path and the best-effort partitioning path (QUA-955) so
- * the policy decision lives in one place.
+ * table name and the request's query params. Used internally by
+ * {@link enforceSourcing}; exported for direct unit testing.
  *
  *   - `not_required` — neither server config nor client param requests sourcing
  *   - `skipped` — sourcing was required but `?forceSkipSourcing=true` was set
@@ -96,11 +95,7 @@ export function resolveSourcingRequirement(
 
 /**
  * Emit the audit-log warning for the `?forceSkipSourcing=true` escape hatch.
- *
- * Exported so the best-effort partition path (QUA-955) can log the bypass
- * with the same shape the atomic path already does — without duplicating
- * the message string and without forcing the partition path to call the
- * full `enforceSourcing()` (which would also iterate the items).
+ * Used internally by {@link enforceSourcing}.
  *
  * Returns silently if `req.kind !== "skipped"`.
  */

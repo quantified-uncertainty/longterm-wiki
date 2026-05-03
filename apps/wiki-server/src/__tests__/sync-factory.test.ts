@@ -24,28 +24,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { z } from "zod";
 import { mockDbModule, postJson } from "./test-utils.js";
-// Static type-only import — used for `expect(...).toBeInstanceOf(SyncPhaseError)`
-// and `(err as SyncPhaseErrorType)` casts. The runtime value is loaded
-// dynamically below (via `await import`) to keep the vi.mock() ordering correct.
+// Type-only import; runtime value is loaded dynamically below to preserve
+// vi.mock() ordering.
 import type { SyncPhaseError as SyncPhaseErrorType } from "../routes/tablebase/sync-factory.js";
 
 // ---- In-memory stores ----
 
 let entitiesStore: Map<string, Record<string, unknown>>;
-let widgetsStore: Map<string, Record<string, unknown>>;
-let auditLogStore: Array<Record<string, unknown>>;
-// proposedClaimsStore: claim id → status. Tests that need claim partitioning
-// to actually fire seed rows here. Default empty store yields the same
-// behavior as before (validateClaimRefs / classifyClaims see "no rows" and
-// treat every claim as missing — but tests that don't pass claimSupport
-// never query the table, so this is opt-in per test).
-let proposedClaimsStore: Map<number, { id: number; status: string }>;
 
 function resetStores() {
   entitiesStore = new Map();
-  widgetsStore = new Map();
-  auditLogStore = [];
-  proposedClaimsStore = new Map();
 }
 
 // Initialize stores at import time so the mock dispatcher can read them
@@ -70,58 +58,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map((p) => ({ ref: p }));
   }
 
-  // --- widgets: SELECT (existing row pre-fetch for audit) ---
-  // Drizzle generates: select ... from "widgets" where "widgets"."id" in (...)
-  if (q.includes("select") && q.includes('"widgets"') && q.includes("where")) {
-    return params
-      .filter((p) => widgetsStore.has(p as string))
-      .map((p) => ({ ...widgetsStore.get(p as string), id: p }));
-  }
-
-  // --- widgets: INSERT (batch upsert) ---
-  // Track which IDs were upserted by recording in store
-  if (q.includes("insert into") && q.includes('"widgets"')) {
-    // Simulate the upsert: each batch of params is a row.
-    // We can't reliably parse the column count, but for the tests we only
-    // need to know "an upsert happened on these IDs".
-    // The test uses 1-3 columns of data (id + payload), so we extract them.
-    return [];
-  }
-
-  // --- tablebase_audit_log: INSERT ---
-  if (q.includes("insert into") && q.includes("tablebase_audit_log")) {
-    // Each call inserts N rows. Capture for assertions.
-    auditLogStore.push({ insertedAt: Date.now(), paramCount: params.length });
-    return [];
-  }
-
-  // --- proposed_claims: SELECT (validateClaimRefs / classifyClaims) ---
-  // Returns rows for any seeded claim; missing IDs are absent so the caller
-  // treats them as "missing". Status drives the verified/non-verified split.
-  if (q.includes("from proposed_claims") || q.includes("proposed_claims")) {
-    const rows: unknown[] = [];
-    for (const p of params) {
-      // The query uses `id = ANY($1::bigint[])` — Drizzle passes the array
-      // as a single param, so we may see one Array param or N number params
-      // depending on the binding shape. Handle both.
-      if (Array.isArray(p)) {
-        for (const cid of p) {
-          const row = proposedClaimsStore.get(Number(cid));
-          if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
-        }
-      } else {
-        const row = proposedClaimsStore.get(Number(p));
-        if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
-      }
-    }
-    return rows;
-  }
-
-  // --- claim_record_links: INSERT ---
-  if (q.includes("claim_record_links")) {
-    return [];
-  }
-
   return [];
 }
 
@@ -132,7 +68,7 @@ const { createSyncHandler } = await import("../routes/tablebase/sync-factory.js"
 const { SyncPhaseError } = await import("../routes/tablebase/sync-factory.js");
 // Import a real Drizzle table so the factory has something to introspect.
 // We use `entities` because it's small and well-known.
-const { entities, things } = await import("../schema.js");
+const { entities } = await import("../schema.js");
 
 // ---- Test schemas ----
 
@@ -494,20 +430,10 @@ describe("createSyncHandler — happy path", () => {
       claimsLinked: 0,
     });
   });
-});
 
-// ---------------------------------------------------------------------------
-// QUA-955: best-effort partial-success mode
-// ---------------------------------------------------------------------------
-
-describe("createSyncHandler — bestEffortAllowed: false (default)", () => {
-  beforeEach(resetStores);
-
-  it("ignores ?mode=best_effort when bestEffortAllowed is unset", async () => {
-    // Sending the query param to a non-opted-in route MUST behave atomically:
-    // a single Zod failure rejects the whole batch with 400, NOT a 200 with
-    // a partitioned response. This is the server-side guard that prevents
-    // a future contributor from silently re-introducing QUA-941.
+  // Regression guard: the body assertions pin "silently ignored" so a future
+  // contributor can't re-introduce observable behavior on the query param.
+  it("treats ?mode=best_effort as inert (atomic semantics, no partitioned shape)", async () => {
     const handler = createSyncHandler<Item, typeof entities>({
       name: "test",
       table: entities,
@@ -519,455 +445,15 @@ describe("createSyncHandler — bestEffortAllowed: false (default)", () => {
     const res = await postJson(app, "/sync?mode=best_effort", {
       items: [
         { id: "aaaaaaaaaa", title: "alpha" },
-        { id: "bad-id", title: "beta" }, // wrong length, would fail Zod
+        { id: "bad-id", title: "beta" }, // wrong length — fails Zod
       ],
     });
 
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body).toMatchObject({ error: "validation_error" });
-    // Should NOT have a partitioned shape
     expect(body.committed).toBeUndefined();
     expect(body.rejected).toBeUndefined();
   });
-
-  it("ignores ?mode=best_effort when bestEffortAllowed is explicitly false", async () => {
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: false,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [{ id: "bad-id", title: "x" }],
-    });
-
-    expect(res.status).toBe(400);
-  });
 });
 
-describe("createSyncHandler — bestEffortAllowed: true (opt-in)", () => {
-  beforeEach(resetStores);
-
-  it("still runs atomically when ?mode is not set", async () => {
-    // Opting in via config alone is not enough — the query param is also
-    // required. A request without `?mode=best_effort` keeps atomic semantics.
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha" },
-        { id: "bad-id", title: "beta" },
-      ],
-    });
-
-    expect(res.status).toBe(400);
-  });
-
-  it("partitions Zod-invalid items, commits the rest", async () => {
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha" }, // valid
-        { id: "bad-id", title: "x" }, // wrong length
-        { id: "cccccccccc", title: "" }, // empty title
-        { id: "dddddddddd", title: "delta" }, // valid
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
-    expect(body.rejected).toHaveLength(2);
-    expect(body.rejected[0]).toMatchObject({ idx: 1, code: "zod" });
-    expect(body.rejected[1]).toMatchObject({ idx: 2, code: "zod" });
-    // Standard mirrored fields
-    expect(body.verdictsWritten).toBe(0);
-    expect(body.claimsLinked).toBe(0);
-  });
-
-  it("partitions natural-key duplicates, commits first occurrence", async () => {
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      naturalKey: (item) => item.title,
-      naturalKeyError: "Duplicate title",
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha" }, // first → committed
-        { id: "bbbbbbbbbb", title: "alpha" }, // dup → rejected
-        { id: "cccccccccc", title: "beta" }, // unique → committed
-        { id: "dddddddddd", title: "alpha" }, // dup → rejected
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
-    expect(body.rejected).toHaveLength(2);
-    expect(body.rejected[0]).toMatchObject({
-      idx: 1,
-      code: "natural_key",
-      value: "alpha",
-    });
-    expect(body.rejected[0].message).toContain("Duplicate title");
-    expect(body.rejected[1]).toMatchObject({ idx: 3, code: "natural_key" });
-  });
-
-  it("partitions items with missing entity FK refs", async () => {
-    entitiesStore.set("known-org", { id: "known-org", stable_id: "sidKnownOrg" });
-
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      entityRefFields: (items) => [
-        {
-          fieldName: "parentId",
-          ids: items.map((i) => i.parentId).filter((id): id is string => id != null),
-        },
-      ],
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha", parentId: "known-org" }, // committed
-        { id: "bbbbbbbbbb", title: "beta", parentId: "missing-org" }, // rejected
-        { id: "cccccccccc", title: "gamma" }, // no parentId → committed
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
-    expect(body.rejected).toHaveLength(1);
-    expect(body.rejected[0]).toMatchObject({
-      idx: 1,
-      code: "fk_missing",
-      field: "parentId",
-      value: "missing-org",
-    });
-  });
-
-  it("returns committed=[] when every item fails validation", async () => {
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "bad-1", title: "x" },
-        { id: "bad-2", title: "" },
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual([]);
-    expect(body.rejected).toHaveLength(2);
-  });
-
-  it("preserves original input indices across multiple partition phases", async () => {
-    // Mix Zod failures with natural-key duplicates so we can verify `idx`
-    // points at the original input position, not a post-Zod position.
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      naturalKey: (item) => item.title,
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha" }, // idx 0 — committed
-        { id: "bad-len", title: "x" }, // idx 1 — Zod fail
-        { id: "cccccccccc", title: "alpha" }, // idx 2 — natural-key dup
-        { id: "dddddddddd", title: "delta" }, // idx 3 — committed
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
-    const idxByCode = new Map<string, number>(
-      body.rejected.map((r: { idx: number; code: string }) => [r.code, r.idx]),
-    );
-    expect(idxByCode.get("zod")).toBe(1);
-    expect(idxByCode.get("natural_key")).toBe(2);
-  });
-
-  it("partitions items missing required sourcing data", async () => {
-    // Use a tableName that's listed in SOURCE_CHECK_REQUIRED so the server-side
-    // policy fires. `personnel` is enabled there.
-    const SourcedItemSchema = z.object({
-      id: z.string().length(10),
-      title: z.string(),
-      sourcing: z.unknown().optional(),
-    });
-    type SourcedItem = z.infer<typeof SourcedItemSchema>;
-    const handler = createSyncHandler<SourcedItem, typeof entities>({
-      name: "personnel-test",
-      table: entities,
-      enforceSourcing: "personnel", // override tableName lookup
-      syncSchema: SourcedItemSchema,
-      toRow: (item, now) => ({
-        id: item.id,
-        title: item.title,
-        syncedAt: now,
-        updatedAt: now,
-      }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha", sourcing: { url: "x" } }, // committed
-        { id: "bbbbbbbbbb", title: "beta" }, // rejected: no sourcing
-        { id: "cccccccccc", title: "gamma", sourcing: { url: "y" } }, // committed
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "cccccccccc"]);
-    expect(body.rejected).toHaveLength(1);
-    expect(body.rejected[0]).toMatchObject({
-      idx: 1,
-      code: "sourcing_required",
-      field: "sourcing",
-    });
-  });
-
-  it("falls back to atomic Zod when bestEffortAllowed is set but only batchSchema is provided", async () => {
-    // syncSchema is required to per-item-partition Zod failures. With only
-    // batchSchema (which may include batch-level refinements), we can't
-    // disaggregate item failures — so the Zod phase stays atomic and a
-    // batch-level Zod failure still returns 400. Routes that want
-    // partitioned Zod must provide `syncSchema`.
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      batchSchema: BatchSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [{ id: "bad-id", title: "x" }],
-    });
-
-    // Atomic Zod fallback: 400 instead of 200
-    expect(res.status).toBe(400);
-  });
-
-  it("partitions claims that are missing or non-verified", async () => {
-    // Seed a verified claim and a pending claim so partitioning has rows to
-    // classify. Claim id 999 is unseeded → treated as missing.
-    proposedClaimsStore.set(100, { id: 100, status: "verified" });
-    proposedClaimsStore.set(200, { id: 200, status: "pending" });
-
-    type ClaimItem = { id: string; title: string; claimIds: number[] };
-    const ClaimItemSchema = z.object({
-      id: z.string().length(10),
-      title: z.string().min(1),
-      claimIds: z.array(z.number()),
-    });
-    const handler = createSyncHandler<ClaimItem, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ClaimItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      claimSupport: {
-        recordType: "test",
-        getClaimIds: (item) => item.claimIds,
-      },
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha", claimIds: [100] }, // verified → committed
-        { id: "bbbbbbbbbb", title: "beta", claimIds: [999] }, // missing → rejected
-        { id: "cccccccccc", title: "gamma", claimIds: [200] }, // non-verified → rejected
-        { id: "dddddddddd", title: "delta", claimIds: [] }, // no claims → committed
-      ],
-    });
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
-    expect(body.rejected).toHaveLength(2);
-    expect(body.rejected[0]).toMatchObject({
-      idx: 1,
-      code: "claim_invalid",
-      field: "claimIds",
-      value: 999,
-    });
-    expect(body.rejected[0].message).toContain("missing");
-    expect(body.rejected[1]).toMatchObject({
-      idx: 2,
-      code: "claim_invalid",
-      field: "claimIds",
-      value: 200,
-    });
-    expect(body.rejected[1].message).toContain("not verified");
-    expect(body.rejected[1].message).toContain("pending");
-  });
-
-  it("returns the preValidate Response as-is in best-effort mode", async () => {
-    // preValidate is opaque user code; the factory does not partition around
-    // it. A Response from preValidate replaces any partitioned response —
-    // this is the documented "atomic in both modes" contract.
-    const handler = createSyncHandler<Item, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: ItemSchema,
-      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
-      preValidate: async (c) =>
-        c.json({ error: "custom_block", reason: "policy" }, 422),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [
-        { id: "aaaaaaaaaa", title: "alpha" },
-        { id: "bbbbbbbbbb", title: "beta" },
-      ],
-    });
-
-    expect(res.status).toBe(422);
-    const body = await res.json();
-    expect(body).toMatchObject({ error: "custom_block", reason: "policy" });
-    // No partitioned shape — preValidate's Response wins entirely
-    expect(body.committed).toBeUndefined();
-    expect(body.rejected).toBeUndefined();
-  });
-
-  it("logs the forceSkipSourcing audit warning in best-effort mode", async () => {
-    // The atomic enforceSourcing helper emits a logger.warn when
-    // ?forceSkipSourcing=true is used. Best-effort must do the same so
-    // bypass usage is auditable; otherwise compliance drifts silently.
-    const SourcedSchema = z.object({
-      id: z.string().length(10),
-      title: z.string(),
-      sourcing: z.unknown().optional(),
-    });
-    type SourcedItem = z.infer<typeof SourcedSchema>;
-
-    const { logger } = await import("../logger.js");
-    const warnSpy = vi.spyOn(logger.child({ component: "sourcing-enforcement" }), "warn");
-    // The above creates a fresh child logger; the actual call site uses its
-    // own child. Spy on the root logger's child instead by spying directly
-    // on the module-level method. The simplest stable approach: spy on the
-    // base logger's `warn` since pino child loggers inherit.
-    const rootWarnSpy = vi.spyOn(logger, "warn");
-
-    const handler = createSyncHandler<SourcedItem, typeof entities>({
-      name: "personnel-test",
-      table: entities,
-      enforceSourcing: "personnel",
-      syncSchema: SourcedSchema,
-      toRow: (item, now) => ({
-        id: item.id,
-        title: item.title,
-        syncedAt: now,
-        updatedAt: now,
-      }),
-      bestEffortAllowed: true,
-    });
-    const app = buildApp(handler);
-
-    const res = await postJson(
-      app,
-      "/sync?mode=best_effort&forceSkipSourcing=true&reason=test-bypass",
-      {
-        items: [
-          { id: "aaaaaaaaaa", title: "alpha" }, // no sourcing — but bypass active
-          { id: "bbbbbbbbbb", title: "beta", sourcing: { url: "x" } },
-        ],
-      },
-    );
-
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    // Bypass active → both items committed despite no sourcing
-    expect(body.committed).toEqual(["aaaaaaaaaa", "bbbbbbbbbb"]);
-    expect(body.rejected).toEqual([]);
-    // The bypass must have produced an audit-warning. Check that *some* warn
-    // call mentions "forceSkipSourcing" in the message string.
-    const sawAuditWarn = [warnSpy, rootWarnSpy].some((spy) =>
-      spy.mock.calls.some(([_obj, msg]) =>
-        typeof msg === "string" && msg.includes("forceSkipSourcing"),
-      ),
-    );
-    expect(sawAuditWarn).toBe(true);
-  });
-
-  it("throws SyncPhaseError when a surviving item lacks a string id", async () => {
-    // Best-effort mode requires every committed item to have a string id —
-    // otherwise the response shape would silently disagree with itself
-    // (claimsLinked covers all items, committed array is shorter). We fail
-    // loudly so a future composite-PK route opting in catches this in dev.
-    const NoIdSchema = z.object({
-      title: z.string().min(1),
-    });
-    type NoIdItem = z.infer<typeof NoIdSchema>;
-
-    const handler = createSyncHandler<NoIdItem, typeof entities>({
-      name: "test",
-      table: entities,
-      syncSchema: NoIdSchema,
-      toRow: (item, now) => ({ id: "fixed-id", title: item.title, syncedAt: now, updatedAt: now }),
-      bestEffortAllowed: true,
-    });
-    const { app, errors } = buildAppWithErrorCapture(handler);
-
-    const res = await postJson(app, "/sync?mode=best_effort", {
-      items: [{ title: "alpha" }],
-    });
-
-    expect(res.status).toBe(500);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toBeInstanceOf(SyncPhaseError);
-    expect((errors[0] as Error).message).toContain("must produce items with a string 'id' field");
-  });
-});
