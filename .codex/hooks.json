@@ -1,4 +1,5 @@
 {
+  "_comment": "Codex agent hooks — point at the canonical .claude/hooks/*.sh scripts so Claude Code and Codex stay in sync. The hook scripts themselves are agent-neutral (CODEX_PROJECT_DIR is preferred, CLAUDE_PROJECT_DIR is the fallback).",
   "hooks": {
     "PreToolUse": [
       {
@@ -6,15 +7,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/approve-agent-configs.sh'"
+            "command": "bash '.claude/hooks/approve-claude-configs.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/require-checklist.sh'"
+            "command": "bash '.claude/hooks/require-checklist.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/warn-main-branch.sh'"
+            "command": "bash '.claude/hooks/warn-main-branch.sh'"
           }
         ]
       },
@@ -23,31 +24,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-git-stash.sh'"
+            "command": "bash '.claude/hooks/block-git-stash.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-branch-switch.sh'"
+            "command": "bash '.claude/hooks/block-branch-switch.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-no-verify.sh'"
+            "command": "bash '.claude/hooks/block-no-verify.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-tmux-kill.sh'"
+            "command": "bash '.claude/hooks/block-tmux-kill.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-other-slots.sh'"
+            "command": "bash '.claude/hooks/block-other-slots.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/block-raw-gh-pr.sh'"
+            "command": "bash '.claude/hooks/block-raw-gh-pr.sh'"
           },
           {
             "type": "command",
-            "command": "bash '.codex/hooks/require-stage-approved.sh'",
+            "command": "bash '.claude/hooks/require-stage-approved.sh'",
             "timeout": 15
           }
         ]
@@ -59,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/recover-cwd.sh'",
+            "command": "bash '.claude/hooks/recover-cwd.sh'",
             "timeout": 10
           }
         ]
@@ -71,7 +72,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/session-start.sh'",
+            "command": "bash '.claude/hooks/session-start.sh'",
             "statusMessage": "Setting up environment..."
           }
         ]
@@ -82,7 +83,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/inject-wip-checklist.sh'",
+            "command": "bash '.claude/hooks/inject-wip-checklist.sh'",
             "timeout": 5
           }
         ]
@@ -93,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '.codex/hooks/verify-checklist-on-stop.sh'",
+            "command": "bash '.claude/hooks/verify-checklist-on-stop.sh'",
             "timeout": 5
           }
         ]

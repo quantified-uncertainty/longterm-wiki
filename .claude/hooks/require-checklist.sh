@@ -7,7 +7,7 @@
 #
 # Exit codes:
 #   0 = allow the tool call
-#   2 = block the tool call (stderr is shown to Claude as error)
+#   2 = block the tool call (stderr is shown to the agent as error)
 #
 
 set -uo pipefail

@@ -4,9 +4,8 @@
 # into the PR body so issues auto-close on merge.
 #
 # Reads the official stdin JSON protocol (every other hook in this dir does
-# the same). The previous CLAUDE_TOOL_INPUT env-var pattern was unreliable
-# in past Claude Code versions and silently no-op'd; flagged by CodeRabbit
-# on PR #4576.
+# the same). Environment-variable tool-input patterns are unreliable and have
+# silently no-op'd in past agent runtimes; flagged by CodeRabbit on PR #4576.
 
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
