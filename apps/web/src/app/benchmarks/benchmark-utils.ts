@@ -1,4 +1,12 @@
-import { getTypedEntities, isBenchmark, isAiModel, getBenchmarkResults, type BenchmarkEntity, type AnyEntity } from "@/data";
+import {
+  getTypedEntities,
+  getTypedEntityByStableId,
+  isBenchmark,
+  isAiModel,
+  getBenchmarkResults,
+  type BenchmarkEntity,
+  type AnyEntity,
+} from "@/data";
 
 /**
  * Get all benchmark entities.
@@ -209,13 +217,10 @@ function mergeWithPGResults(
 ): Map<string, BenchmarkResultRow[]> {
   // QUA-1061: PG benchmark_results rows reference entities by stableId
   // (sid_*), but `entityById` is keyed by slug. Resolve via either form so
-  // PG rows actually reach the leaderboard.
-  const entityByStableId = new Map<string, AnyEntity>();
-  for (const e of entityById.values()) {
-    if (e.stableId) entityByStableId.set(e.stableId, e);
-  }
+  // PG rows actually reach the leaderboard. `getTypedEntityByStableId` is
+  // a cached lazy index that also handles legacy bare-10-char stableIds.
   const resolveEntity = (key: string): AnyEntity | undefined =>
-    entityById.get(key) ?? entityByStableId.get(key);
+    entityById.get(key) ?? getTypedEntityByStableId(key);
 
   // Deep-copy inline results so we don't mutate the original
   const merged = new Map<string, BenchmarkResultRow[]>();
@@ -257,16 +262,20 @@ function mergeWithPGResults(
 
     for (const s of scores) {
       const orgEntity = s.testedByOrgId ? resolveEntity(s.testedByOrgId) : null;
+      // Normalize references to the canonical slug when an entity resolved.
+      // The leaderboard renderer uses `testedByOrgId` as a URL segment
+      // (`/organizations/${testedByOrgId}`), so leaving a raw `sid_*` here
+      // would render an ugly link that bypasses static generation.
       const row: BenchmarkResultRow = {
         modelId: model.id,
         modelTitle: model.title,
         wikiId: model.wikiId ?? null,
-        developer: developerField ?? null,
+        developer: developerEntity?.id ?? developerField ?? null,
         developerName: developerEntity?.title ?? null,
         score: s.score,
         unit: s.unit ?? undefined,
         testedBy: s.testedBy ?? null,
-        testedByOrgId: s.testedByOrgId ?? null,
+        testedByOrgId: orgEntity?.id ?? s.testedByOrgId ?? null,
         testedByOrgName: orgEntity?.title ?? null,
         evaluationDate: s.evaluationDate ?? null,
         methodologyNotes: s.methodologyNotes ?? null,

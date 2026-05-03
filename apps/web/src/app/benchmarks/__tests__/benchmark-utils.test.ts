@@ -9,12 +9,17 @@ import type { AnyEntity } from "@/data/tablebase";
 // Mock @/data before importing benchmark-utils
 vi.mock("@/data", () => ({
   getTypedEntities: vi.fn(),
+  getTypedEntityByStableId: vi.fn(),
   getBenchmarkResults: vi.fn(),
   isBenchmark: (e: AnyEntity) => (e as { entityType: string }).entityType === "benchmark",
   isAiModel: (e: AnyEntity) => (e as { entityType: string }).entityType === "ai-model",
 }));
 
-import { getTypedEntities, getBenchmarkResults } from "@/data";
+import {
+  getTypedEntities,
+  getTypedEntityByStableId,
+  getBenchmarkResults,
+} from "@/data";
 import {
   getBenchmarkResultsFromModels,
   formatTestedBy,
@@ -22,6 +27,7 @@ import {
 } from "../benchmark-utils";
 
 const mockGetTypedEntities = vi.mocked(getTypedEntities);
+const mockGetTypedEntityByStableId = vi.mocked(getTypedEntityByStableId);
 const mockGetBenchmarkResults = vi.mocked(getBenchmarkResults);
 
 // --- Test data factories ---
@@ -85,9 +91,14 @@ function makePGResult(
 beforeEach(() => {
   vi.clearAllMocks();
 
-  // Default: empty entities and no PG data
+  // Default: empty entities and no PG data. The stableId resolver falls
+  // back to the entity list so it stays consistent with the slug index
+  // mockGetTypedEntities provides.
   mockGetTypedEntities.mockReturnValue([]);
   mockGetBenchmarkResults.mockReturnValue({});
+  mockGetTypedEntityByStableId.mockImplementation((sid: string) =>
+    mockGetTypedEntities().find((e) => e.stableId === sid),
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -372,6 +383,40 @@ describe("getBenchmarkResultsFromModels — PG keyed by stableId (QUA-1061)", ()
     const results = getBenchmarkResultsFromModels();
     const row = results.get("mmlu")![0];
     expect(row.testedByOrgName).toBe("Apollo Research");
+    // testedByOrgId must be normalized to the canonical slug — the leaderboard
+    // renderer uses it as a URL segment (`/organizations/${testedByOrgId}`),
+    // so a raw `sid_*` would render an ugly link bypassing static generation.
+    expect(row.testedByOrgId).toBe("apollo");
+  });
+
+  it("normalizes developer field to slug when developer is referenced by stableId", () => {
+    const openaiOrg = {
+      id: "openai",
+      title: "OpenAI",
+      entityType: "organization" as const,
+      tags: [],
+      wikiId: null,
+      stableId: "sid_OpenAIxyz",
+      relatedEntries: [],
+    } as unknown as AnyEntity;
+
+    const gpt4 = makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123");
+    (gpt4 as unknown as { developer: string }).developer = "sid_OpenAIxyz";
+
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      gpt4,
+      openaiOrg,
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.developer).toBe("openai");
+    expect(row.developerName).toBe("OpenAI");
   });
 
   it("skips PG rows whose stableId does not match any entity", () => {
