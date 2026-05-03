@@ -237,6 +237,7 @@ These live in `docs/agent-rules/`. They are **NOT** auto-loaded — to keep cach
 | LLM prompt construction — escaping user content | `docs/agent-rules/llm-prompt-safety.md` |
 | Dispatching subagents from a coordinator session | `docs/agent-rules/dispatched-agent-review.md` |
 | PR patrol — health gate, fleet-level signals | `docs/agent-rules/patrol-health-gate.md` |
+| Editing the root `package.json` `postinstall` (or any lifecycle script), or adding/changing a sub-app `Dockerfile` | `docs/agent-rules/dockerfile-postinstall-trap.md` |
 
 Plus historical: `docs/audits/things-denormalization-audit.md` (denorm columns dropped in QUA-507 / migration 0204; retained for pre-QUA-507 composer logic per thing_type and for the `*_display_name` sibling pattern audit before proposing a new cache column).
 
