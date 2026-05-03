@@ -11,6 +11,7 @@ import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
 import type { EnrichmentTask, TaskResult } from './types.ts';
 import { getSystemPrompt, getUserPrompt } from './prompts.ts';
 import { getToolDefinitions, buildToolHandlers } from './tools.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 const MAX_TOOL_TURNS = 25;
 
@@ -83,7 +84,7 @@ export async function runEnrichmentAgent(
         heartbeatPhase: 'tablebase-agent',
         costTracker: tracker,
         onToolResult: (toolName, result) => {
-          console.log(`[tablebase]   tool: ${toolName} → ${result.slice(0, 120)}${result.length > 120 ? '...' : ''}`);
+          console.log(`[tablebase]   tool: ${toolName} → ${truncate(result, 123, { ellipsis: '...' })}`);
           // Track records from submit_records calls
           const match = result.match(/Successfully submitted (\d+) records/);
           if (match) totalRecordsCreated += parseInt(match[1], 10);

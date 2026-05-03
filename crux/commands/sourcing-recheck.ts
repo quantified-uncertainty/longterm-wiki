@@ -28,6 +28,7 @@ import {
   SOURCE_CHECK_CONSTANTS,
 } from '../lib/sourcing/index.ts';
 import { SOURCE_CHECK_RESPONSE_FORMAT } from '../lib/sourcing/prompt-guidelines.ts';
+import { truncate } from '../lib/text-utils.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import { extractQid } from '../lib/sourcing/wikidata-matcher.ts';
 
@@ -595,7 +596,7 @@ function formatDryRunOutput(
     const lastChecked = item.lastComputedAt
       ? new Date(item.lastComputedAt).toISOString().slice(0, 10)
       : 'never';
-    const id = item.recordId.length > 28 ? item.recordId.slice(0, 27) + '...' : item.recordId;
+    const id = truncate(item.recordId, 30, { ellipsis: '...' });
     lines.push(
       `${String(item.priority).padEnd(10)} ${item.verdict.padEnd(15)} ${item.recordType.padEnd(20)} ${id.padEnd(30)} ${lastChecked}`,
     );

@@ -18,6 +18,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import type { TaskType } from '../tablebase/types.ts';
 import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
 import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // Consolidated orphan domain imports
 import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
@@ -1447,7 +1448,7 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
       for (const s of result.sources) {
         lines.push(`  ${s.title} (${s.claims.length} claims)`);
         for (const c of s.claims.slice(0, 3)) {
-          lines.push(`    - ${c.claimText.slice(0, 100)}${c.claimText.length > 100 ? '...' : ''}`);
+          lines.push(`    - ${truncate(c.claimText, 103, { ellipsis: '...' })}`);
         }
         if (s.claims.length > 3) {
           lines.push(`    ... and ${s.claims.length - 3} more`);

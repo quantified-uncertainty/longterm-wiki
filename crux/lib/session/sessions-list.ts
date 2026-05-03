@@ -18,6 +18,7 @@
 
 import type { AgentSessionListResponse } from '../wiki-server/agent-sessions.ts';
 import type { ClaudeProcess } from './claude-processes.ts';
+import { truncate as truncateText } from '../text-utils.ts';
 
 type DbSession = AgentSessionListResponse['sessions'][number];
 
@@ -196,8 +197,7 @@ export function sortSessions(rows: MergedSession[]): MergedSession[] {
 
 export function truncate(s: string | null | undefined, width: number): string {
   if (!s) return '—';
-  if (s.length <= width) return s;
-  return s.slice(0, width - 1) + '…';
+  return truncateText(s, width);
 }
 
 export function formatAge(minutes: number | null): string {

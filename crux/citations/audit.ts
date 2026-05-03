@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
 import { DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
@@ -212,10 +213,8 @@ async function main() {
     // Display proposals
     for (const p of proposals) {
       console.log(`  ${c.yellow}[^${p.footnote}]${c.reset} ${p.fixType}: ${p.explanation}`);
-      const origOneLine = p.original.replace(/\n/g, ' ');
-      const replOneLine = p.replacement.replace(/\n/g, ' ');
-      console.log(`    ${c.red}- ${origOneLine.length > 120 ? origOneLine.slice(0, 120) + '...' : origOneLine}${c.reset}`);
-      console.log(`    ${c.green}+ ${replOneLine.length > 120 ? replOneLine.slice(0, 120) + '...' : replOneLine}${c.reset}`);
+      console.log(`    ${c.red}- ${truncate(p.original, 123, { oneLine: true, ellipsis: '...' })}${c.reset}`);
+      console.log(`    ${c.green}+ ${truncate(p.replacement, 123, { oneLine: true, ellipsis: '...' })}${c.reset}`);
     }
 
     if (!apply) {

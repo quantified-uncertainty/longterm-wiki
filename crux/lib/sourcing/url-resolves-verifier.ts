@@ -46,6 +46,7 @@ import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { lookupResourceByUrl, suggestResourcesApi } from '../wiki-server/resources.ts';
 import type { VerifyItem, VerifyResult } from './orchestrator-types.ts';
+import { truncate } from '../text-utils.ts';
 
 const CONFIDENCE_DEFINITE = 0.95;
 const CONFIDENCE_HIGH = 0.85;
@@ -310,6 +311,3 @@ function looksLikeUrl(s: string): boolean {
   return true;
 }
 
-function truncate(s: string, n: number): string {
-  return s.length <= n ? s : `${s.slice(0, n - 1)}…`;
-}

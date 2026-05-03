@@ -5,6 +5,7 @@
 
 import type { CommandResult } from '../command-types.ts';
 import { loadDatabase, loadPages } from '../content-types.ts';
+import { truncate } from '../text-utils.ts';
 import { loadGraphFull } from '../factbase-loader.ts';
 import { createLlmClient } from '../llm.ts';
 import { submitBatch, pollBatch, getBatchResults, extractBatchResultText, sanitizeBatchCustomId } from '../anthropic-batch.ts';
@@ -761,9 +762,9 @@ function formatDryRunOutput(
 
   for (const item of topItems) {
     const status = item.neverVerified ? '\x1b[33mnew\x1b[0m' : 'verified';
-    const desc = item.description.length > 58 ? item.description.slice(0, 57) + '...' : item.description;
+    const desc = truncate(item.description, 60, { ellipsis: '...' });
     const src = item.sourceUrl
-      ? (item.sourceUrl.length > 30 ? item.sourceUrl.slice(0, 29) + '...' : item.sourceUrl)
+      ? truncate(item.sourceUrl, 32, { ellipsis: '...' })
       : '(none)';
     lines.push(
       `${item.kind.padEnd(8)} ${String(item.priority.toFixed(0)).padEnd(10)} ${status.padEnd(12)} ${desc.padEnd(60)} ${src}`,

@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
+import { truncate } from '../lib/text-utils.ts';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -149,7 +150,7 @@ flowchart LR
     diagram += `    subgraph ${safeType}["${type}"]\n`;
     for (const node of typeNodes) {
       // Truncate long labels
-      const shortLabel = node.label.length > 25 ? node.label.slice(0, 22) + '...' : node.label;
+      const shortLabel = truncate(node.label, 25, { ellipsis: '...' });
       diagram += `        ${node.id}["${shortLabel}"]\n`;
     }
     diagram += `    end\n\n`;

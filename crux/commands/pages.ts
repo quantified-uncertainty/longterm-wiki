@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { computeNBABatch, type PageInput } from '../lib/next-best-action.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 interface CommandOptions extends BaseOptions {
   type?: string;
@@ -69,7 +70,7 @@ async function nextActionCommand(_args: string[], options: CommandOptions): Prom
     const s = limited[i];
     const nid = s.wikiId !== s.id ? ` (${s.wikiId})` : '';
     const label = `${s.title}${nid}`;
-    const truncLabel = label.length > 39 ? label.slice(0, 36) + '...' : label;
+    const truncLabel = truncate(label, 39, { ellipsis: '...' });
     const scoreStr = s.priority.toFixed(2);
     const color = s.priority >= 0.8 ? '\x1b[31m' : s.priority >= 0.4 ? '\x1b[33m' : '\x1b[32m';
     const reason = s.reasons.length > 0 ? s.reasons.join(', ') : 'marginal deficit';
