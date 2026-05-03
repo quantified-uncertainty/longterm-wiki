@@ -487,7 +487,9 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
   const c = log.colors;
 
   if (!existsSync(CHECKLIST_PATH)) {
-    return { output: `${c.red}No checklist found.${c.reset}\n`, exitCode: 1 };
+    // Exit 0: /agent-end calls this as a best-effort no-op (`complete 2>/dev/null || true`).
+    // Exiting 1 here pollutes logs and gets miscounted as failures by transcript scanners. See QUA-1074.
+    return { output: `${c.dim}No checklist found — nothing to complete.${c.reset}\n`, exitCode: 0 };
   }
 
   const markdown = readFileSync(CHECKLIST_PATH, 'utf-8');
