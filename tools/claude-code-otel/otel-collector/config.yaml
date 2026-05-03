@@ -11,7 +11,15 @@ processors:
     timeout: 5s
     send_batch_size: 1000
 
-  # Drop high-cardinality / PII attributes that Claude Code emits.
+  # Auto-tag every metric with the host name + OS, so multi-machine
+  # deployments don't collide. Replaces the unsafe `$(hostname)` expansion
+  # that was previously in env.example (it doesn't expand inside .env files).
+  resourcedetection:
+    detectors: [system, env]
+    system:
+      hostname_sources: [os]
+
+  # Drop high-cardinality / PII attributes that Claude Code may emit.
   # Keep slot/branch/model/tool which we want to aggregate by.
   attributes/scrub:
     actions:
@@ -30,16 +38,9 @@ exporters:
     resource_to_telemetry_conversion:
       enabled: true
 
-  debug:
-    verbosity: basic
-
 service:
   pipelines:
     metrics:
       receivers: [otlp]
-      processors: [attributes/scrub, batch]
+      processors: [resourcedetection, attributes/scrub, batch]
       exporters: [prometheus]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]

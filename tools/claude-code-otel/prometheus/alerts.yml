@@ -3,16 +3,22 @@
 # Metric names follow Claude Code's documented OTel schema:
 # https://docs.claude.com/en/docs/claude-code/monitoring-usage
 #
-# Metric names emitted by Claude Code are dotted in OTel but become
-# underscored once Prometheus ingests them.
+# OTel → Prometheus naming: `claude_code.cost.usage` (Counter, USD) becomes
+# `claude_code_cost_usage_total` after the OTel-to-Prometheus translator
+# appends `_total` to monotonic Sum metrics. Same for `claude_code.token.usage`.
+#
+# Verify the actual exposed names on first deploy:
+#   curl localhost:8889/metrics | grep claude_code
+# and adjust if your collector configuration differs (e.g. translation
+# disabled, or attribute key naming convention differs).
 groups:
   - name: claude-code-cost
-    interval: 1m
+    interval: 30s
     rules:
       - alert: ClaudeCodeSessionCostHigh
         # Per-session USD spend over a $50 threshold within the active session.
-        # `claude_code_session_cost_usd_total` is a counter that resets per session.
-        expr: max by (session_id, organization_id) (claude_code_session_cost_usd_total) > 50
+        # `claude_code.cost.usage` is a Counter incremented as the session runs.
+        expr: max by (session_id) (claude_code_cost_usage_total) > 50
         for: 5m
         labels:
           severity: warning
@@ -29,14 +35,17 @@ groups:
         # The 90% floor matches the documented expectation in QUA-1068; a sustained
         # drop below 90% indicates either a model/version mismatch or sessions
         # getting too long for the prompt cache TTL (5 minutes).
+        #
+        # The `type` label values match Claude Code's documented enum:
+        # input | output | cacheRead | cacheCreation. Verify on first deploy.
         expr: |
           (
-            sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheRead"}[15m]))
+            sum(rate(claude_code_token_usage_total{type="cacheRead"}[15m]))
             /
             (
-              sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheRead"}[15m]))
-              + sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="input"}[15m]))
-              + sum by (organization_id) (rate(claude_code_token_usage_tokens_total{type="cacheCreation"}[15m]))
+              sum(rate(claude_code_token_usage_total{type="cacheRead"}[15m]))
+              + sum(rate(claude_code_token_usage_total{type="input"}[15m]))
+              + sum(rate(claude_code_token_usage_total{type="cacheCreation"}[15m]))
             )
           ) < 0.90
         for: 30m
@@ -47,15 +56,15 @@ groups:
           summary: "Claude Code cache hit rate has dropped below 90%"
           description: |
             Over the last 15 minutes, the read-cache hit rate is
-            {{ printf "%.1f%%" (mulf $value 100) }}. A sustained drop suggests sessions
+            {{ humanizePercentage $value }}. A sustained drop suggests sessions
             are spilling out of the 5-minute prompt cache TTL or a model upgrade has
             invalidated cached prefixes.
 
       - alert: ClaudeCodeBranchCostHigh
         # Cumulative cost per git branch crossing $200 across resumed sessions.
         # Requires the `git_branch` resource attribute, which Claude Code emits per
-        # session.
-        expr: sum by (git_branch) (claude_code_session_cost_usd_total) > 200
+        # session. (If your collector strips it, this alert is a no-op.)
+        expr: sum by (git_branch) (claude_code_cost_usage_total) > 200
         for: 10m
         labels:
           severity: high

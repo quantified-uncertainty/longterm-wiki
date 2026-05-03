@@ -15,7 +15,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(increase(claude_code_session_cost_usd_total[$__range]))",
+          "expr": "sum(increase(claude_code_cost_usage_total[$__range]))",
           "refId": "A"
         }
       ],
@@ -30,7 +30,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum by (cwd) (increase(claude_code_session_cost_usd_total[$__range]))",
+          "expr": "sum by (cwd) (increase(claude_code_cost_usage_total[$__range]))",
           "legendFormat": "{{cwd}}",
           "refId": "A"
         }
@@ -46,7 +46,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(rate(claude_code_token_usage_tokens_total{type=\"cacheRead\"}[15m])) / (sum(rate(claude_code_token_usage_tokens_total{type=\"cacheRead\"}[15m])) + sum(rate(claude_code_token_usage_tokens_total{type=\"input\"}[15m])) + sum(rate(claude_code_token_usage_tokens_total{type=\"cacheCreation\"}[15m])))",
+          "expr": "sum(rate(claude_code_token_usage_total{type=\"cacheRead\"}[15m])) / (sum(rate(claude_code_token_usage_total{type=\"cacheRead\"}[15m])) + sum(rate(claude_code_token_usage_total{type=\"input\"}[15m])) + sum(rate(claude_code_token_usage_total{type=\"cacheCreation\"}[15m])))",
           "refId": "A"
         }
       ],
@@ -67,19 +67,19 @@
     {
       "id": 4,
       "type": "timeseries",
-      "title": "Cost p95 per session",
+      "title": "p95 / max session cost (1h windows)",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "description": "p95 cost across active sessions in 1h windows.",
+      "description": "p95 and max of per-session cumulative cost over rolling 1h windows.",
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "quantile by () (0.95, max by (session_id) (claude_code_session_cost_usd_total))",
+          "expr": "quantile_over_time(0.95, max by (session_id) (claude_code_cost_usage_total)[1h:])",
           "legendFormat": "p95",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "max(max by (session_id) (claude_code_session_cost_usd_total))",
+          "expr": "max_over_time(max by (session_id) (claude_code_cost_usage_total)[1h:])",
           "legendFormat": "max",
           "refId": "B"
         }
@@ -95,7 +95,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum by (name) (increase(claude_code_tool_calls_total[24h]))",
+          "expr": "sum by (name) (increase(claude_code_tool_duration_count[24h]))",
           "legendFormat": "{{name}}",
           "refId": "A"
         }

@@ -16,7 +16,6 @@
 
 import { spawn, spawnSync } from 'child_process';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
-import { createLogger } from '../lib/output.ts';
 
 interface CostOptions extends CommandOptions {
   by?: string;
@@ -24,10 +23,13 @@ interface CostOptions extends CommandOptions {
   until?: string;
   json?: boolean;
   breakdown?: boolean;
+  all?: boolean;
+  order?: string;
   ci?: boolean;
 }
 
 const VALID_BY = ['day', 'daily', 'session', 'week', 'weekly', 'month', 'monthly', 'block', 'blocks'] as const;
+const VALID_ORDER = ['asc', 'desc'] as const;
 
 export function normalizeBy(by: string | undefined): string {
   const v = (by ?? 'day').toLowerCase();
@@ -54,11 +56,22 @@ export function normalizeBy(by: string | undefined): string {
 /**
  * Translate friendly period strings to ccusage's YYYYMMDD format.
  * Accepts: "7d", "14d", "30d", "1w", "2w", or a literal YYYYMMDD.
+ *
+ * Validates that YYYYMMDD passthrough is a real calendar date.
  */
-export function resolveDate(input: string | undefined, _now: Date = new Date()): string | undefined {
+export function resolveDate(input: string | undefined, now: Date = new Date()): string | undefined {
   if (!input) return undefined;
   const trimmed = input.trim();
-  if (/^\d{8}$/.test(trimmed)) return trimmed;
+  if (/^\d{8}$/.test(trimmed)) {
+    const yyyy = parseInt(trimmed.slice(0, 4), 10);
+    const mm = parseInt(trimmed.slice(4, 6), 10);
+    const dd = parseInt(trimmed.slice(6, 8), 10);
+    const d = new Date(yyyy, mm - 1, dd);
+    if (d.getFullYear() !== yyyy || d.getMonth() !== mm - 1 || d.getDate() !== dd) {
+      throw new Error(`Invalid date "${input}". YYYYMMDD must be a real calendar date.`);
+    }
+    return trimmed;
+  }
   const m = trimmed.match(/^(\d+)([dw])$/i);
   if (!m) {
     throw new Error(`Invalid date "${input}". Use YYYYMMDD or Nd / Nw (e.g. 7d, 2w).`);
@@ -66,7 +79,7 @@ export function resolveDate(input: string | undefined, _now: Date = new Date()):
   const n = parseInt(m[1], 10);
   const unit = m[2].toLowerCase();
   const days = unit === 'w' ? n * 7 : n;
-  const d = new Date(_now);
+  const d = new Date(now);
   d.setDate(d.getDate() - days);
   const yyyy = d.getFullYear().toString();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -74,9 +87,47 @@ export function resolveDate(input: string | undefined, _now: Date = new Date()):
   return `${yyyy}${mm}${dd}`;
 }
 
+export function validateOrder(order: string | undefined): string | undefined {
+  if (order === undefined) return undefined;
+  const v = order.toLowerCase();
+  if (!(VALID_ORDER as readonly string[]).includes(v)) {
+    throw new Error(`Invalid --order=${order}. Valid: ${VALID_ORDER.join(', ')}`);
+  }
+  return v;
+}
+
+/**
+ * Build the ccusage argv from validated CostOptions.
+ *
+ * Pure function — no subprocess, no I/O. Exported for tests.
+ */
+export function buildCcusageArgs(options: CostOptions, now: Date = new Date()): string[] {
+  const subcommand = normalizeBy(options.by);
+  let since = resolveDate(options.since, now);
+  const until = resolveDate(options.until, now);
+  const order = validateOrder(options.order);
+
+  // Default since=7d when no --since and no --all
+  if (!since && !options.all) {
+    since = resolveDate('7d', now);
+  }
+
+  const args: string[] = [subcommand];
+  if (since) args.push('--since', since);
+  if (until) args.push('--until', until);
+  if (options.json) args.push('--json');
+  if (options.breakdown) args.push('--breakdown');
+  if (order) args.push('--order', order);
+  // Sane default for session view: order desc (highest spend first)
+  if (subcommand === 'session' && !order) args.push('--order', 'desc');
+
+  return args;
+}
+
 /**
  * Run ccusage and stream its output to the parent process.
- * Resolves with the exit code.
+ * Resolves with the exit code; rejects only on spawn-launch failure
+ * (binary missing, EACCES). Caller wraps to convert reject → exit code.
  */
 function runCcusage(args: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -97,6 +148,13 @@ function runCcusageCapture(args: string[]): { stdout: string; stderr: string; ex
     encoding: 'utf-8',
     env: process.env,
   });
+  if (result.error) {
+    return {
+      stdout: '',
+      stderr: `Failed to spawn ccusage: ${result.error.message}\n`,
+      exitCode: 127,
+    };
+  }
   return {
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? '',
@@ -105,33 +163,13 @@ function runCcusageCapture(args: string[]): { stdout: string; stderr: string; ex
 }
 
 async function reportCommand(_args: string[], options: CostOptions): Promise<CommandResult> {
-  const log = createLogger({ ci: options.ci, json: options.json });
-
-  let subcommand: string;
-  let since: string | undefined;
-  let until: string | undefined;
+  let ccArgs: string[];
   try {
-    subcommand = normalizeBy(options.by);
-    since = resolveDate(options.since);
-    until = resolveDate(options.until);
+    ccArgs = buildCcusageArgs(options);
   } catch (e) {
-    log.error((e as Error).message);
+    process.stderr.write(`${(e as Error).message}\n`);
     return { output: '', exitCode: 2 };
   }
-
-  // Default since=7d when no --since given (unless user wants all-time via --all)
-  if (!since && !options.all) {
-    since = resolveDate('7d');
-  }
-
-  const ccArgs: string[] = [subcommand];
-  if (since) ccArgs.push('--since', since);
-  if (until) ccArgs.push('--until', until);
-  if (options.json) ccArgs.push('--json');
-  if (options.breakdown) ccArgs.push('--breakdown');
-  if (options.order) ccArgs.push('--order', String(options.order));
-  // Sane default for session view: order desc (highest spend first)
-  if (subcommand === 'session' && !options.order) ccArgs.push('--order', 'desc');
 
   if (options.json) {
     const { stdout, stderr, exitCode } = runCcusageCapture(ccArgs);
@@ -143,8 +181,13 @@ async function reportCommand(_args: string[], options: CostOptions): Promise<Com
     return { output: stdout, exitCode };
   }
 
-  const exitCode = await runCcusage(ccArgs);
-  return { output: '', exitCode };
+  try {
+    const exitCode = await runCcusage(ccArgs);
+    return { output: '', exitCode };
+  } catch (e) {
+    process.stderr.write(`Failed to launch ccusage: ${(e as Error).message}\n`);
+    return { output: '', exitCode: 127 };
+  }
 }
 
 export const commands: Record<

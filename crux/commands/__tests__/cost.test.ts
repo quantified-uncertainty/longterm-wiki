@@ -1,13 +1,19 @@
 /**
  * Tests for `crux sys cost report` — QUA-1068.
  *
- * Covers the input-translation helpers (period strings → YYYYMMDD,
- * --by aliases). The actual ccusage subprocess is exercised by the
- * integration smoke test (`pnpm crux sys cost report`).
+ * Covers the input-translation helpers and the pure ccusage-argv builder.
+ * The actual subprocess (ccusage) is exercised by the integration smoke
+ * test (`pnpm crux sys cost report`) — wrapping spawn for unit tests
+ * adds little value vs running it once against real `~/.claude` data.
  */
 
 import { describe, it, expect } from 'vitest';
-import { normalizeBy, resolveDate } from '../cost.ts';
+import {
+  normalizeBy,
+  resolveDate,
+  validateOrder,
+  buildCcusageArgs,
+} from '../cost.ts';
 
 describe('normalizeBy', () => {
   it('defaults to daily when undefined', () => {
@@ -54,8 +60,14 @@ describe('resolveDate', () => {
     expect(resolveDate(undefined, FIXED)).toBeUndefined();
   });
 
-  it('passes through a literal YYYYMMDD', () => {
+  it('passes through a literal YYYYMMDD that is a real calendar date', () => {
     expect(resolveDate('20260415', FIXED)).toBe('20260415');
+  });
+
+  it('rejects YYYYMMDD that is not a real calendar date', () => {
+    expect(() => resolveDate('20260230', FIXED)).toThrow(/real calendar date/);
+    expect(() => resolveDate('20260132', FIXED)).toThrow(/real calendar date/);
+    expect(() => resolveDate('20261301', FIXED)).toThrow(/real calendar date/);
   });
 
   it('converts Nd to N-days-ago in YYYYMMDD', () => {
@@ -83,5 +95,93 @@ describe('resolveDate', () => {
   it('rejects unsupported units', () => {
     expect(() => resolveDate('5h', FIXED)).toThrow(/Invalid date/);
     expect(() => resolveDate('5m', FIXED)).toThrow(/Invalid date/);
+  });
+});
+
+describe('validateOrder', () => {
+  it('returns undefined for undefined', () => {
+    expect(validateOrder(undefined)).toBeUndefined();
+  });
+
+  it('lowercases and accepts asc/desc', () => {
+    expect(validateOrder('asc')).toBe('asc');
+    expect(validateOrder('desc')).toBe('desc');
+    expect(validateOrder('DESC')).toBe('desc');
+  });
+
+  it('throws on invalid value', () => {
+    expect(() => validateOrder('garbage')).toThrow(/Invalid --order/);
+  });
+});
+
+describe('buildCcusageArgs', () => {
+  const FIXED = new Date(2026, 4, 2);
+
+  it('defaults to daily + last 7 days', () => {
+    expect(buildCcusageArgs({}, FIXED)).toEqual(['daily', '--since', '20260425']);
+  });
+
+  it('respects --by=session and applies default desc order', () => {
+    expect(buildCcusageArgs({ by: 'session' }, FIXED)).toEqual([
+      'session',
+      '--since',
+      '20260425',
+      '--order',
+      'desc',
+    ]);
+  });
+
+  it('passes through --json and --breakdown', () => {
+    expect(buildCcusageArgs({ json: true, breakdown: true }, FIXED)).toEqual([
+      'daily',
+      '--since',
+      '20260425',
+      '--json',
+      '--breakdown',
+    ]);
+  });
+
+  it('uses explicit --since when given', () => {
+    expect(buildCcusageArgs({ since: '14d' }, FIXED)).toEqual([
+      'daily',
+      '--since',
+      '20260418',
+    ]);
+  });
+
+  it('skips default --since when --all is set', () => {
+    expect(buildCcusageArgs({ all: true }, FIXED)).toEqual(['daily']);
+  });
+
+  it('forwards --order and does not double-add for session', () => {
+    expect(buildCcusageArgs({ by: 'session', order: 'asc' }, FIXED)).toEqual([
+      'session',
+      '--since',
+      '20260425',
+      '--order',
+      'asc',
+    ]);
+  });
+
+  it('forwards --until', () => {
+    expect(buildCcusageArgs({ since: '14d', until: '7d' }, FIXED)).toEqual([
+      'daily',
+      '--since',
+      '20260418',
+      '--until',
+      '20260425',
+    ]);
+  });
+
+  it('throws when --by is invalid (caller catches as exit 2)', () => {
+    expect(() => buildCcusageArgs({ by: 'garbage' }, FIXED)).toThrow(/Invalid --by/);
+  });
+
+  it('throws when --since is invalid', () => {
+    expect(() => buildCcusageArgs({ since: 'xyz' }, FIXED)).toThrow(/Invalid date/);
+  });
+
+  it('throws when --order is invalid', () => {
+    expect(() => buildCcusageArgs({ order: 'sideways' }, FIXED)).toThrow(/Invalid --order/);
   });
 });
