@@ -428,9 +428,16 @@ async function closeCommand(
     // it overlaps the GitHub PR lookup with the parallel DB calls
     // above instead of running serialized after them. The cost of a
     // wasted lookup when sessionResult ends up missing is one HTTP
-    // call; the save is 100-500 ms when it lands.
+    // call; the save is 100-500 ms when it lands. We capture the
+    // build error rather than swallowing it so the consumer below can
+    // surface it — silently falling back to `{status:'completed'}`
+    // would re-introduce the QUA-1073 NULL-writeback failure mode.
+    let closeUpdatesError: Error | null = null;
     const closeUpdatesPromise = closeable
-      ? buildCloseUpdates({ branch }).catch(() => null)
+      ? buildCloseUpdates({ branch }).catch((e: unknown) => {
+          closeUpdatesError = e instanceof Error ? e : new Error(String(e));
+          return null;
+        })
       : null;
 
     const [agentResults, sessionResult, closeUpdates] = await Promise.all([
@@ -459,10 +466,14 @@ async function closeCommand(
 
     // QUA-1073: PATCH carries `checksYaml`, `reviewed`, and `prUrl`
     // alongside `status` so completed rows stop landing with all three
-    // NULL. Falls back to `{status:'completed'}` if the speculative
-    // build above failed.
+    // NULL. If the speculative build threw, surface that and fall
+    // back to status-only — the row at least leaves `active`, but
+    // the operator sees why the close-time fields didn't sync.
     if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
       try {
+        if (closeUpdatesError) {
+          output += `${c.yellow}⚠ Failed to build close-time payload (QUA-1073 fields will be NULL): ${closeUpdatesError.message}${c.reset}\n`;
+        }
         const updates = closeUpdates ?? { status: 'completed' as const };
         await updateAgentSession(sessionResult.data.id, updates);
         output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;

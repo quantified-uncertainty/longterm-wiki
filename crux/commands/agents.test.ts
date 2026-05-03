@@ -296,4 +296,29 @@ describe('close command (agents)', () => {
 
     expect(updateMock).toHaveBeenCalledWith(100, { status: 'completed' });
   });
+
+  // Speculative `buildCloseUpdates` rejection: the close path must
+  // surface a warning and fall back to `{status:'completed'}` so the
+  // row leaves 'active'. Silently swallowing the error would re-create
+  // the QUA-1073 NULL-writeback failure mode.
+  it('surfaces buildCloseUpdates rejection and falls back to status-only PATCH', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(sessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 101, status: 'active' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    buildCloseUpdatesMock.mockRejectedValueOnce(
+      new Error('checklist parse failed'),
+    );
+
+    const result = await commands.close([], {});
+
+    expect(updateMock).toHaveBeenCalledWith(101, { status: 'completed' });
+    expect(result.output).toMatch(/Failed to build close-time payload/);
+    expect(result.output).toMatch(/checklist parse failed/);
+  });
 });
