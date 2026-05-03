@@ -24,9 +24,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { z } from "zod";
 import { mockDbModule, postJson } from "./test-utils.js";
-// Static type-only import — used for `(err as SyncPhaseErrorType)` casts in
-// surviving error-path tests. The runtime value is loaded dynamically below
-// (via `await import`) to keep the vi.mock() ordering correct.
+// Type-only import; runtime value is loaded dynamically below to preserve
+// vi.mock() ordering.
 import type { SyncPhaseError as SyncPhaseErrorType } from "../routes/tablebase/sync-factory.js";
 
 // ---- In-memory stores ----
@@ -432,11 +431,8 @@ describe("createSyncHandler — happy path", () => {
     });
   });
 
-  // QUA-1049 regression guard: the deleted best-effort opt-in honored
-  // `?mode=best_effort` to switch to a partitioned 200 response. After
-  // deletion the query param must be inert — atomic semantics regardless.
-  // This pins down "silently ignored" so a future contributor can't
-  // accidentally re-introduce observable behavior on the param.
+  // Regression guard: the body assertions pin "silently ignored" so a future
+  // contributor can't re-introduce observable behavior on the query param.
   it("treats ?mode=best_effort as inert (atomic semantics, no partitioned shape)", async () => {
     const handler = createSyncHandler<Item, typeof entities>({
       name: "test",
@@ -449,7 +445,7 @@ describe("createSyncHandler — happy path", () => {
     const res = await postJson(app, "/sync?mode=best_effort", {
       items: [
         { id: "aaaaaaaaaa", title: "alpha" },
-        { id: "bad-id", title: "beta" }, // wrong length — would partition under best-effort
+        { id: "bad-id", title: "beta" }, // wrong length — fails Zod
       ],
     });
 
