@@ -160,8 +160,19 @@ async function finalizeCommand(
   }
   if (result.startedAt) updates.date = result.startedAt.slice(0, 10); // YYYY-MM-DD
 
-  // Don't set status to 'completed' here — that's the agent-ship/agent-end skill's job.
-  // We only fill in the metadata fields.
+  // QUA-1073: Mark status='completed' alongside title+summary. The
+  // earlier comment ("agent-ship/agent-end skill's job") was wrong:
+  // those skills run BEFORE SessionEnd fires, so by the time they
+  // call `updateAgentSession({status:'completed'})` the endpoint
+  // hard-fail validation rejects the PATCH because title+summary
+  // aren't set yet — leaving the row stuck in 'active'/'stale'.
+  // session-finalize is the right place because (a) it runs at
+  // session end, (b) it populates the title+summary the validation
+  // requires, and (c) it sees them in the same atomic UPDATE so
+  // validation succeeds.
+  if (result.title && result.summary) {
+    updates.status = 'completed';
+  }
 
   if (Object.keys(updates).length === 0) {
     return {

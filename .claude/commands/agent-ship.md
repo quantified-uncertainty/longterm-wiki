@@ -265,30 +265,9 @@ pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 
 ## Step 6: Session log
 
-Run `pnpm crux sys agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
+Session logs are stored in the wiki-server PostgreSQL database (not committed to git). `agent-checklist complete` (Step 7) syncs the local close-time fields it can know before push — `checksYaml` (from the WIP checklist) and `reviewed` (from the `.claude/review-done` marker). `agents close` (Step 9) then does the GitHub PR lookup and syncs `prUrl` too. Both paths best-effort attempt `status='completed'`, but the row may remain `active`/`stale` until the SessionEnd hook fires `session-finalize` to write `title`+`summary` (which then promotes status atomically). QUA-1073 — you no longer need to read the marker or capture the snapshot by hand.
 
-Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux sys agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
-
-**Record review status**: Check for the marker file, verify both the SHA and diff hash match, and set the `reviewed` field in the session log payload accordingly:
-
-```bash
-# Returns "true" only if SHA matches HEAD AND diff hash matches current diff
-if [ -f .claude/review-done ]; then
-  MARKER_SHA=$(awk '{print $2}' .claude/review-done)
-  MARKER_HASH=$(awk '{print $4}' .claude/review-done)
-  HEAD_SHA=$(git rev-parse HEAD)
-  CURRENT_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
-  if [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -n "$MARKER_HASH" ] && [ "$MARKER_HASH" = "$CURRENT_HASH" ]; then
-    echo "true"
-  else
-    echo "false"
-  fi
-else
-  echo "false"
-fi
-```
-
-Include `reviewed: true` or `reviewed: false` in the session log payload sent to the wiki-server. This enables the `/internal/agent-sessions` dashboard to show review coverage over time. A marker without a diff hash (legacy format) is treated as `reviewed: false`.
+If you want to inspect what will be sent, `pnpm crux sys agent-checklist snapshot --ci` prints the same JSON that gets serialized into `checksYaml` (the bare `snapshot` command formats as YAML for human reading; `--ci` is the machine-readable form). If no checklist was initialized, the snapshot outputs `{initialized: false}` — include that honestly in any session summaries.
 
 ## Step 7: Validate completion
 
