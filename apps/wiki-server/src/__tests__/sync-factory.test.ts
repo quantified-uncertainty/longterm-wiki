@@ -24,28 +24,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { z } from "zod";
 import { mockDbModule, postJson } from "./test-utils.js";
-// Static type-only import — used for `expect(...).toBeInstanceOf(SyncPhaseError)`
-// and `(err as SyncPhaseErrorType)` casts. The runtime value is loaded
-// dynamically below (via `await import`) to keep the vi.mock() ordering correct.
+// Static type-only import — used for `(err as SyncPhaseErrorType)` casts in
+// surviving error-path tests. The runtime value is loaded dynamically below
+// (via `await import`) to keep the vi.mock() ordering correct.
 import type { SyncPhaseError as SyncPhaseErrorType } from "../routes/tablebase/sync-factory.js";
 
 // ---- In-memory stores ----
 
 let entitiesStore: Map<string, Record<string, unknown>>;
-let widgetsStore: Map<string, Record<string, unknown>>;
-let auditLogStore: Array<Record<string, unknown>>;
-// proposedClaimsStore: claim id → status. Tests that need claim partitioning
-// to actually fire seed rows here. Default empty store yields the same
-// behavior as before (validateClaimRefs / classifyClaims see "no rows" and
-// treat every claim as missing — but tests that don't pass claimSupport
-// never query the table, so this is opt-in per test).
-let proposedClaimsStore: Map<number, { id: number; status: string }>;
 
 function resetStores() {
   entitiesStore = new Map();
-  widgetsStore = new Map();
-  auditLogStore = [];
-  proposedClaimsStore = new Map();
 }
 
 // Initialize stores at import time so the mock dispatcher can read them
@@ -68,58 +57,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         return false;
       })
       .map((p) => ({ ref: p }));
-  }
-
-  // --- widgets: SELECT (existing row pre-fetch for audit) ---
-  // Drizzle generates: select ... from "widgets" where "widgets"."id" in (...)
-  if (q.includes("select") && q.includes('"widgets"') && q.includes("where")) {
-    return params
-      .filter((p) => widgetsStore.has(p as string))
-      .map((p) => ({ ...widgetsStore.get(p as string), id: p }));
-  }
-
-  // --- widgets: INSERT (batch upsert) ---
-  // Track which IDs were upserted by recording in store
-  if (q.includes("insert into") && q.includes('"widgets"')) {
-    // Simulate the upsert: each batch of params is a row.
-    // We can't reliably parse the column count, but for the tests we only
-    // need to know "an upsert happened on these IDs".
-    // The test uses 1-3 columns of data (id + payload), so we extract them.
-    return [];
-  }
-
-  // --- tablebase_audit_log: INSERT ---
-  if (q.includes("insert into") && q.includes("tablebase_audit_log")) {
-    // Each call inserts N rows. Capture for assertions.
-    auditLogStore.push({ insertedAt: Date.now(), paramCount: params.length });
-    return [];
-  }
-
-  // --- proposed_claims: SELECT (validateClaimRefs / classifyClaims) ---
-  // Returns rows for any seeded claim; missing IDs are absent so the caller
-  // treats them as "missing". Status drives the verified/non-verified split.
-  if (q.includes("from proposed_claims") || q.includes("proposed_claims")) {
-    const rows: unknown[] = [];
-    for (const p of params) {
-      // The query uses `id = ANY($1::bigint[])` — Drizzle passes the array
-      // as a single param, so we may see one Array param or N number params
-      // depending on the binding shape. Handle both.
-      if (Array.isArray(p)) {
-        for (const cid of p) {
-          const row = proposedClaimsStore.get(Number(cid));
-          if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
-        }
-      } else {
-        const row = proposedClaimsStore.get(Number(p));
-        if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
-      }
-    }
-    return rows;
-  }
-
-  // --- claim_record_links: INSERT ---
-  if (q.includes("claim_record_links")) {
-    return [];
   }
 
   return [];
@@ -493,6 +430,34 @@ describe("createSyncHandler — happy path", () => {
       verdictsWritten: 0,
       claimsLinked: 0,
     });
+  });
+
+  // QUA-1049 regression guard: the deleted best-effort opt-in honored
+  // `?mode=best_effort` to switch to a partitioned 200 response. After
+  // deletion the query param must be inert — atomic semantics regardless.
+  // This pins down "silently ignored" so a future contributor can't
+  // accidentally re-introduce observable behavior on the param.
+  it("treats ?mode=best_effort as inert (atomic semantics, no partitioned shape)", async () => {
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" },
+        { id: "bad-id", title: "beta" }, // wrong length — would partition under best-effort
+      ],
+    });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body).toMatchObject({ error: "validation_error" });
+    expect(body.committed).toBeUndefined();
+    expect(body.rejected).toBeUndefined();
   });
 });
 

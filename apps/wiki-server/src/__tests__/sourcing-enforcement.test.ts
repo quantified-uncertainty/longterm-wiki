@@ -169,7 +169,7 @@ describe('enforceSourcing', () => {
   });
 });
 
-describe('resolveSourcingRequirement (QUA-955)', () => {
+describe('resolveSourcingRequirement', () => {
   // Build a Hono context with the given query string and pass it to the
   // function under test. Avoids spinning up an entire app for a pure
   // policy-decision helper.
