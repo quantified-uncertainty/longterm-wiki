@@ -207,17 +207,31 @@ function mergeWithPGResults(
   pgResults: Record<string, PGRowShape[]>,
   entityById: Map<string, AnyEntity>,
 ): Map<string, BenchmarkResultRow[]> {
+  // QUA-1061: PG benchmark_results rows reference entities by stableId
+  // (sid_*), but `entityById` is keyed by slug. Resolve via either form so
+  // PG rows actually reach the leaderboard.
+  const entityByStableId = new Map<string, AnyEntity>();
+  for (const e of entityById.values()) {
+    if (e.stableId) entityByStableId.set(e.stableId, e);
+  }
+  const resolveEntity = (key: string): AnyEntity | undefined =>
+    entityById.get(key) ?? entityByStableId.get(key);
+
   // Deep-copy inline results so we don't mutate the original
   const merged = new Map<string, BenchmarkResultRow[]>();
   for (const [benchmarkId, rows] of inlineResults) {
     merged.set(benchmarkId, [...rows]);
   }
 
-  // Build a set of (benchmarkId, modelId) pairs covered by PG
+  // Build a set of (benchmarkId, slug) pairs covered by PG. We resolve the
+  // PG key to its canonical slug so the inline filter below — keyed by
+  // slug — actually matches.
   const pgCoveredPairs = new Set<string>();
-  for (const [modelId, scores] of Object.entries(pgResults)) {
+  for (const [modelKey, scores] of Object.entries(pgResults)) {
+    const model = resolveEntity(modelKey);
+    if (!model) continue;
     for (const s of scores) {
-      pgCoveredPairs.add(`${s.benchmarkId}:${modelId}`);
+      pgCoveredPairs.add(`${s.benchmarkId}:${model.id}`);
     }
   }
 
@@ -234,15 +248,15 @@ function mergeWithPGResults(
   }
 
   // Add PG entries
-  for (const [modelId, scores] of Object.entries(pgResults)) {
-    const model = entityById.get(modelId);
+  for (const [modelKey, scores] of Object.entries(pgResults)) {
+    const model = resolveEntity(modelKey);
     if (!model) continue;
 
     const developerField = isAiModel(model) ? model.developer : undefined;
-    const developerEntity = developerField ? entityById.get(developerField) : null;
+    const developerEntity = developerField ? resolveEntity(developerField) : null;
 
     for (const s of scores) {
-      const orgEntity = s.testedByOrgId ? entityById.get(s.testedByOrgId) : null;
+      const orgEntity = s.testedByOrgId ? resolveEntity(s.testedByOrgId) : null;
       const row: BenchmarkResultRow = {
         modelId: model.id,
         modelTitle: model.title,
