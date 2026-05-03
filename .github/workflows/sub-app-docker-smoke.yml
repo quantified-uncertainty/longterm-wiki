@@ -1,0 +1,57 @@
+name: Sub-app Dockerfile smoke test
+
+# Builds one representative sub-app Dockerfile (discord-bot, the smallest) on
+# any PR that could regress the root `postinstall` script's behavior inside a
+# sub-app docker install layer. The three sub-app images
+# (apps/wiki-server, apps/discord-bot, apps/groundskeeper) all COPY the root
+# package.json before crux/ is on disk and then run `pnpm install --filter X`,
+# which fires the root postinstall. If that script references files not yet
+# copied, the build crashes — exactly what broke the 2026-05-03 release
+# (QUA-1053 / postmortem QUA-1081).
+#
+# Discord-bot is chosen because it's the cheapest of the three (smallest image,
+# fewest workspace deps) but exercises the same install layer.
+#
+# See docs/agent-rules/dockerfile-postinstall-trap.md for the full pattern.
+
+on:
+  pull_request:
+    paths:
+      # Root manifest / lockfile changes are the QUA-1053 failure shape — they
+      # affect every sub-app's install layer.
+      - "package.json"
+      - "pnpm-lock.yaml"
+      # Discord-bot's own Dockerfile + workspace package.json — we're building
+      # this image, so changes that affect its install path should be tested.
+      - "apps/discord-bot/Dockerfile"
+      - "apps/discord-bot/package.json"
+      - ".github/workflows/sub-app-docker-smoke.yml"
+
+concurrency:
+  group: sub-app-docker-smoke-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build discord-bot Dockerfile (no push)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build discord-bot image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/discord-bot/Dockerfile
+          push: false
+          # Reuse the same cache scope as the production discord-bot build so
+          # this PR check piggybacks on warm layers when nothing in the install
+          # path has changed.
+          cache-from: type=gha,scope=discord-bot
+          cache-to: type=gha,scope=discord-bot-smoke,mode=max
