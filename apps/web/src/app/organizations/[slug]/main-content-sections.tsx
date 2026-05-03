@@ -81,7 +81,7 @@ export function FundingHistorySection({
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
-                    <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
+                    <Link href={`/funding-rounds/${round.slug ?? round.key}`} className="text-foreground hover:text-primary transition-colors">
                       {name}
                     </Link>
                   </td>

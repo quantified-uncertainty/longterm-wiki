@@ -26,6 +26,8 @@ function instrumentLabel(s: string): string {
 
 export interface FundingRoundRow {
   key: string;
+  /** URL-safe slug; falls back to key when missing. */
+  slug?: string | null;
   name: string;
   companyName: string;
   companyHref: string | null;
@@ -177,7 +179,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3">
                   <span className="flex items-center gap-1.5">
                     <Link
-                      href={`/funding-rounds/${row.key}`}
+                      href={`/funding-rounds/${row.slug ?? row.key}`}
                       className="font-medium text-foreground text-xs hover:text-primary transition-colors"
                     >
                       {row.name}

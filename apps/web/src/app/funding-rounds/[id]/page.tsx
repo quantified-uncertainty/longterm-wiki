@@ -1,12 +1,13 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getAllKBRecords,
   getKBRecords,
+  findFactBaseRecordBySlugOrKey,
+  type KBRecordEntry,
 } from "@/data/factbase";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
-import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
@@ -31,6 +32,7 @@ import {
 
 interface ParsedFundingRound {
   key: string;
+  slug: string | null;
   ownerEntityId: string;
   name: string;
   companyName: string;
@@ -72,6 +74,7 @@ function parseFundingRound(record: KBRecordEntry): ParsedFundingRound {
 
   return {
     key: record.key,
+    slug: record.slug ?? null,
     ownerEntityId: record.ownerEntityId,
     name: typeof f.name === "string" ? f.name : record.key,
     companyName: company.name,
@@ -109,6 +112,13 @@ function parseInvestment(record: KBRecordEntry): ParsedInvestment {
   };
 }
 
+// ── Static params ──────────────────────────────────────────────────────
+
+export function generateStaticParams() {
+  const allRounds = getAllKBRecords("funding-rounds");
+  return allRounds.map((record) => ({ id: record.slug ?? record.key }));
+}
+
 // ── Metadata ───────────────────────────────────────────────────────────
 
 interface PageProps {
@@ -117,8 +127,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allRounds = getAllKBRecords("funding-rounds");
-  const record = allRounds.find((r) => r.key === id);
+  const record = findFactBaseRecordBySlugOrKey("funding-rounds", id);
   if (!record) {
     return { title: "Funding Round Not Found" };
   }
@@ -138,9 +147,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function FundingRoundDetailPage({ params }: PageProps) {
   const { id } = await params;
   const allRounds = getAllKBRecords("funding-rounds");
-  const record = allRounds.find((r) => r.key === id);
+  const record = findFactBaseRecordBySlugOrKey("funding-rounds", id);
 
   if (!record) notFound();
+
+  // Redirect legacy /funding-rounds/<key> → /funding-rounds/<slug>.
+  if (record.slug && record.key === id) {
+    redirect(`/funding-rounds/${record.slug}`);
+  }
 
   const round = parseFundingRound(record);
   const roundVerdict = getRecordVerdict("funding-round", String(round.key));
@@ -345,7 +359,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
                     <tr key={r.key} className="hover:bg-muted/20 transition-colors">
                       <td className="py-2 px-3">
                         <Link
-                          href={`/funding-rounds/${r.key}`}
+                          href={`/funding-rounds/${r.slug ?? r.key}`}
                           className="font-medium text-foreground text-xs hover:text-primary transition-colors"
                         >
                           {r.name}

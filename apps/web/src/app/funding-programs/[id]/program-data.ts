@@ -14,6 +14,8 @@ import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 export interface ParsedFundingProgram {
   key: string;
+  /** URL slug assigned at build-time; falls back to `key` for legacy records. */
+  slug: string | null;
   ownerEntityId: string;
   name: string;
   programType: string;
@@ -58,6 +60,7 @@ export function parseFundingProgram(record: KBRecordEntry): ParsedFundingProgram
   const f = record.fields;
   return {
     key: record.key,
+    slug: record.slug ?? null,
     ownerEntityId: record.ownerEntityId,
     name: (f.name as string) ?? record.key,
     programType: (f.programType as string) ?? "grant-round",

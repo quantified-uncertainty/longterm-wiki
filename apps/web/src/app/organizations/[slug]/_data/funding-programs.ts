@@ -4,6 +4,7 @@ export function parseFundingProgramRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
+    slug: record.slug ?? null,
     name: (f.name as string) ?? record.key,
     programType: (f.programType as string) ?? "grant-round",
     description: (f.description as string) ?? null,
