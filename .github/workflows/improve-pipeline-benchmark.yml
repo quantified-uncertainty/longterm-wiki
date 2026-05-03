@@ -1,0 +1,253 @@
+name: Improve Pipeline Benchmark
+run-name: "Improve Pipeline Benchmark — PR ${{ github.event.pull_request.number }}"
+
+# QUA-871. PR-side regression gate for the closed-loop improve-entity
+# pipeline. Triggered by changes to pipeline source files. Runs the
+# closed-loop suite on the PR's working tree, compares against the
+# nightly main-latest baseline (improve-pipeline-baseline.yml), posts a
+# diff comment, and fails the check on a regression beyond threshold.
+#
+# Override: a `<!-- benchmark-skip: <reason> -->` HTML comment in the PR
+# body lets the gate exit 0 when a regression is intentional. The gate
+# still runs the suite and posts the diff so reviewers can audit.
+#
+# Cost: ≤$5 per run (default). Wall-clock ≤8 min for the policy-only
+# v1 suite (8 entities × ~$0.04 + budget headroom).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'crux/lib/research/**'
+      - 'crux/commands/research-improve-entity.ts'
+      - 'crux/commands/research-improve-entity-suite.ts'
+      - 'crux/commands/research-benchmark.ts'
+      - 'crux/commands/research-benchmark-suite.ts'
+      - 'crux/lib/search/research-agent.ts'
+      - 'crux/lib/job-handlers/claim-sourcing.ts'
+      - 'crux/benchmarks/entity-suite.yaml'
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+concurrency:
+  # One run per PR — superseded runs are cancelled (synchronize fires often).
+  group: improve-pipeline-benchmark-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    # Skip on PRs from forks: the workflow needs LLM keys, prod wiki-server
+    # creds, and pull-requests:write to comment. None of those are passed
+    # to fork PRs by GitHub policy, so the gate would fail confusingly. A
+    # release manager who wants the gate to fire on a fork PR can branch
+    # the change into the canonical repo and re-open.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WIKI_SERVER_ENV: prod
+      ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # PR head — improve-entity-suite needs to run against the candidate
+          # source. Default checkout would give a merge commit, which is fine
+          # for the suite YAML but masks the file paths the gate is testing.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ─── Baseline (main-latest) artifact download ─────────────────────────
+      # Uses GitHub's REST API to find the most recent successful baseline
+      # run, then `actions/download-artifact@v4` with `run-id` for
+      # cross-workflow download. If no baseline exists yet (e.g. before the
+      # cron has ever succeeded), the gate falls through to advisory mode.
+
+      - name: Find latest main-latest baseline run
+        id: baseline-run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'improve-pipeline-baseline.yml',
+              status: 'success',
+              branch: 'main',
+              per_page: 1,
+            });
+            if (runs.data.workflow_runs.length === 0) {
+              core.setOutput('found', 'false');
+              core.warning('No successful improve-pipeline-baseline runs found yet — gate runs in advisory mode.');
+              return;
+            }
+            const run = runs.data.workflow_runs[0];
+            core.setOutput('found', 'true');
+            core.setOutput('run-id', String(run.id));
+            core.info(`Latest baseline: run ${run.id} from ${run.created_at} (sha ${run.head_sha.slice(0, 7)})`);
+
+      - name: Download main-latest baseline artifact
+        if: steps.baseline-run.outputs.found == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: improve-pipeline-baseline-main-latest
+          path: /tmp/baseline
+          run-id: ${{ steps.baseline-run.outputs.run-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ─── Capture PR body (override marker source) ────────────────────────
+
+      - name: Save PR body to file
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Write via env var to avoid shell-injecting $PR_BODY into a
+          # heredoc — GitHub's webhook body is user-controlled.
+          mkdir -p /tmp/pr
+          printf '%s' "$PR_BODY" > /tmp/pr/body.txt
+
+      # ─── Run the closed-loop suite + benchmark on the PR working tree ────
+
+      - name: Run improve-entity-suite (tagged pr-${{ github.event.pull_request.number }})
+        run: |
+          set -euo pipefail
+          # Budget cap is the ticket's stated $5. Bash injection-safe: PR_NUMBER
+          # is a github-set integer.
+          pnpm crux tb improve-entity-suite \
+            --tag="pr-${PR_NUMBER}" \
+            --budget=5 \
+            --max-iters=1
+
+      - name: Take post-improve benchmark-suite snapshot
+        run: |
+          set -euo pipefail
+          pnpm crux tb benchmark-suite --tag="pr-${PR_NUMBER}"
+
+      # ─── Run the regression check ────────────────────────────────────────
+
+      - name: Locate snapshot files
+        id: snaps
+        run: |
+          set -euo pipefail
+          # Bash command-substitution suppresses `set -e` for the inner ls,
+          # so we have to explicit-check both paths after assignment. An
+          # empty value here would silently propagate as `--candidate-X=`
+          # (empty string) into the next step.
+          shopt -s nullglob
+          IMP_LIST=( $(ls -t .claude/snapshots/improve-entity-suite/*__pr-${PR_NUMBER}.json 2>/dev/null) )
+          BENCH_LIST=( $(ls -t .claude/snapshots/benchmark-suite/*__pr-${PR_NUMBER}.json 2>/dev/null) )
+          if [ ${#IMP_LIST[@]} -eq 0 ]; then
+            echo "::error::No improve-entity-suite snapshot found for tag pr-${PR_NUMBER}. The suite step likely failed."
+            exit 1
+          fi
+          if [ ${#BENCH_LIST[@]} -eq 0 ]; then
+            echo "::error::No benchmark-suite snapshot found for tag pr-${PR_NUMBER}. The benchmark step likely failed."
+            exit 1
+          fi
+          echo "candidate-improve=${IMP_LIST[0]}" >> "$GITHUB_OUTPUT"
+          echo "candidate-bench=${BENCH_LIST[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Compute regression verdict
+        id: verdict
+        run: |
+          set +e  # capture exit code; we want to read it before failing
+          ARGS=(
+            --candidate-coverage="${{ steps.snaps.outputs.candidate-bench }}"
+            --candidate-improve="${{ steps.snaps.outputs.candidate-improve }}"
+            --pr-body-file=/tmp/pr/body.txt
+            --write-comment-file=/tmp/comment.md
+          )
+          if [ -f /tmp/baseline/benchmark-suite/main-latest.json ]; then
+            ARGS+=(--baseline-coverage=/tmp/baseline/benchmark-suite/main-latest.json)
+          fi
+          if [ -f /tmp/baseline/improve-entity-suite/main-latest.json ]; then
+            ARGS+=(--baseline-improve=/tmp/baseline/improve-entity-suite/main-latest.json)
+          fi
+          pnpm crux tb pipeline-regression-check "${ARGS[@]}"
+          CHECK_EXIT=$?
+          echo "exit=$CHECK_EXIT" >> "$GITHUB_OUTPUT"
+
+      - name: Upload comment + snapshots as artifacts (debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-benchmark-pr-${{ github.event.pull_request.number }}
+          path: |
+            /tmp/comment.md
+            .claude/snapshots/improve-entity-suite/*.json
+            .claude/snapshots/benchmark-suite/*.json
+          retention-days: 14
+
+      # ─── Post / update PR comment ────────────────────────────────────────
+
+      - name: Post PR comment
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          COMMENT_FILE: /tmp/comment.md
+        with:
+          script: |
+            const fs = require('fs');
+            const file = process.env.COMMENT_FILE;
+            if (!fs.existsSync(file)) {
+              core.warning(`No comment file at ${file} — skipping PR comment.`);
+              return;
+            }
+            const body = fs.readFileSync(file, 'utf8');
+            const MARKER = '<!-- improve-pipeline-benchmark:comment-marker -->';
+            // Paginate — long PRs have >30 comments and the marker may not
+            // be on page 1. listComments without paginate would fail to
+            // find an existing comment and stack a new one on every run.
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              },
+            );
+            const existing = comments.find(c => c.body && c.body.includes(MARKER));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated existing benchmark comment ${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              core.info('Posted new benchmark comment');
+            }
+
+      # ─── Fail the check on regression ────────────────────────────────────
+
+      - name: Fail on regression
+        if: steps.verdict.outputs.exit != '0'
+        run: |
+          echo "::error::Pipeline regression detected (see PR comment for details)."
+          echo "Verdict exit code: ${{ steps.verdict.outputs.exit }}"
+          exit 1

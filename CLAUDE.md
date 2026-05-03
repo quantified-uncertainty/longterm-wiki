@@ -228,6 +228,7 @@ These live in `docs/agent-rules/`. They are **NOT** auto-loaded — to keep cach
 | Source-check verdicts, coverage scoring, `/api/sourcing/*`, dot indicators | `docs/agent-rules/source-check-system.md` |
 | `numericId` vs `stableId` vs `tableId` — allocation, validation | `docs/agent-rules/id-system.md` |
 | Adding/changing a `crux/validate/` validator or the gate | `docs/agent-rules/validation-gate-system.md` |
+| Editing improve-entity pipeline files (research/**, claim-sourcing, entity-suite.yaml) — CI gate fires | `docs/agent-rules/improve-pipeline-benchmark-gate.md` |
 | Entity profile pages (`/organizations/[slug]`, `/people/[slug]`, etc.) | `docs/agent-rules/entity-profile-pages.md` |
 | Adding a new internal dashboard (`/internal/*`) | `docs/agent-rules/internal-dashboards.md` |
 | Auto-update system (cron, news pipeline) | `docs/agent-rules/auto-update-system.md` |
