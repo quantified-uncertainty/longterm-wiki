@@ -29,11 +29,14 @@ vi.mock("../lib/pipeline-runs/lifecycle.ts", () => ({
 }));
 
 import {
+  DEFAULT_PER_ENTITY_BUDGET_USD,
   MIN_USEFUL_BUDGET_USD,
   aggregateResult,
   computeAggregate,
+  computeDefaultTotalBudgetUsd,
   computePerEntityCap,
   filterToSupportedTypes,
+  inspectSuite,
   isValidTag,
   loadSuite,
   median,
@@ -42,6 +45,8 @@ import {
   type PerEntityRecord,
   type SuiteEntry,
 } from "./research-improve-entity-suite.ts";
+import type { EntityWithType } from "../lib/research/entity-loader.ts";
+import type { PipelineRunRow } from "../lib/wiki-server/pipeline-runs.ts";
 import { BudgetExhaustedError } from "./research-improve-entity.ts";
 import type { ImproveResult, IterationMetrics } from "./research-improve-entity.ts";
 import {
@@ -727,5 +732,169 @@ describe("constants", () => {
   it("MIN_USEFUL_BUDGET_USD matches the inner-loop floor in research-improve-entity", () => {
     // Mirrors the `budgetRemaining <= 0.05` guard in research-improve-entity.ts.
     expect(MIN_USEFUL_BUDGET_USD).toBe(0.05);
+  });
+
+  it("DEFAULT_PER_ENTITY_BUDGET_USD is $2 per QUA-1033 spec", () => {
+    // QUA-1033 specifies $2 per supported entity as the suite default. Changing
+    // this constant changes the default total budget for all suite invocations
+    // — keep the test in sync with the constant if we ever revisit the value.
+    expect(DEFAULT_PER_ENTITY_BUDGET_USD).toBe(2.0);
+  });
+
+  it("DEFAULT_PER_ENTITY_BUDGET_USD × N propagates through runSuite as totalBudgetUsd", async () => {
+    // The CLI's default-budget computation passes `DEFAULT_PER_ENTITY_BUDGET_USD * supported.length`
+    // as `totalBudgetUsd`. This test verifies the per-entity inner-budget math
+    // that follows: per-entity cap = (total / N) × 2 = $2 × 2 = $4 with this default.
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "alpha", type: "policy" },
+      { slug: "beta", type: "policy" },
+    );
+    const supportedCount = 2;
+    const defaultTotalBudget = DEFAULT_PER_ENTITY_BUDGET_USD * supportedCount;
+    const budgetsSeen: number[] = [];
+    const improver = async ({ budgetUsd }: { budgetUsd?: number }) => {
+      budgetsSeen.push(budgetUsd ?? -1);
+      return makeResult("x", { iterations: [makeIter({ cost_research_usd: 0, cost_extract_usd: 0 })] });
+    };
+    const snap = await runSuite({
+      tag: "default-budget",
+      totalBudgetUsd: defaultTotalBudget,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(snap.budget_usd).toBe(4.0);
+    expect(snap.per_entity_cap_usd).toBeCloseTo(4.0, 6); // (4/2)*2
+    expect(budgetsSeen).toEqual([4.0, 4.0]);
+  });
+});
+
+// ── computeDefaultTotalBudgetUsd (CLI default-budget path) ──────────────────
+
+describe("computeDefaultTotalBudgetUsd", () => {
+  it("multiplies DEFAULT_PER_ENTITY_BUDGET_USD by the count of supported entities only", () => {
+    // 3 policies + 1 organization (organization is not supported in v1).
+    const { suitePath } = writeFixtureSuite(
+      { slug: "p1", type: "policy" },
+      { slug: "p2", type: "policy" },
+      { slug: "p3", type: "policy" },
+      { slug: "org", type: "organization" },
+    );
+    const r = computeDefaultTotalBudgetUsd(suitePath);
+    expect(r.supportedCount).toBe(3);
+    expect(r.totalBudgetUsd).toBeCloseTo(DEFAULT_PER_ENTITY_BUDGET_USD * 3, 6);
+  });
+
+  it("returns 0 supported and 0 total when the suite has no supported types", () => {
+    // CLI uses the supportedCount=0 signal to return a friendly error rather
+    // than a misleading "--budget must be a positive number".
+    const { suitePath } = writeFixtureSuite({ slug: "x", type: "organization" });
+    const r = computeDefaultTotalBudgetUsd(suitePath);
+    expect(r.supportedCount).toBe(0);
+    expect(r.totalBudgetUsd).toBe(0);
+  });
+
+  it("propagates loadSuite errors (e.g. missing file)", () => {
+    expect(() => computeDefaultTotalBudgetUsd("/nonexistent/path/suite.yaml")).toThrow();
+  });
+});
+
+// ── inspectSuite (QUA-1034) ────────────────────────────────────────────────
+
+describe("inspectSuite", () => {
+  function writeSuite(entries: SuiteEntry[]): string {
+    const dir = tmpdir("inspect-suite");
+    const filePath = path.join(dir, "suite.yaml");
+    fs.writeFileSync(
+      filePath,
+      entries
+        .map((e) =>
+          `- slug: ${e.slug}\n  type: ${e.type}` +
+          (e.expected_min_coverage != null ? `\n  expected_min_coverage: ${e.expected_min_coverage}` : "") +
+          "\n",
+        )
+        .join(""),
+    );
+    return filePath;
+  }
+
+  it("returns one report per supported entity, with cost from injected history", async () => {
+    const suitePath = writeSuite([
+      { slug: "a-policy", type: "policy" },
+      { slug: "b-policy", type: "policy" },
+      { slug: "c-org", type: "organization" }, // filtered out (v1: policy-only)
+    ]);
+    const entitiesById: Record<string, EntityWithType> = {
+      "a-policy": { id: "a-policy", type: "policy", title: "A", stableId: "sid_a" },
+      "b-policy": { id: "b-policy", type: "policy", title: "B", stableId: "sid_b" },
+    };
+    const fakeRuns = [
+      { runId: "r1", pipelineName: "improve-entity", entityId: "sid_a", status: "committed", costUsd: "0.80" },
+    ] as unknown as PipelineRunRow[];
+    const { reports, notFound, unsupported } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn((slug: string) => entitiesById[slug] ?? null),
+      fetchHistoryFn: vi.fn(async () => fakeRuns),
+    });
+    expect(notFound).toEqual([]);
+    // The "c-org" entry in the suite is filtered out as unsupported (v1:
+    // policy-only). It must surface in `unsupported`, NOT be silently dropped.
+    expect(unsupported).toEqual([{ slug: "c-org", type: "organization" }]);
+    expect(reports).toHaveLength(2);
+    expect(reports[0].slug).toBe("a-policy");
+    expect(reports[0].costSource).toBe("history"); // matched the fake run
+    expect(reports[1].slug).toBe("b-policy");
+    expect(reports[1].costSource).toBe("fallback"); // no matching history
+  });
+
+  it("collects slugs that are in the suite YAML but missing from data/entities/", async () => {
+    const suitePath = writeSuite([
+      { slug: "present", type: "policy" },
+      { slug: "missing", type: "policy" },
+    ]);
+    const { reports, notFound, unsupported } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn((slug: string) =>
+        slug === "present"
+          ? ({ id: "present", type: "policy", stableId: "sid_p" } as EntityWithType)
+          : null,
+      ),
+      fetchHistoryFn: vi.fn(async () => []),
+    });
+    expect(reports.map((r) => r.slug)).toEqual(["present"]);
+    expect(notFound).toEqual(["missing"]);
+    expect(unsupported).toEqual([]);
+  });
+
+  it("uses fallback estimates when fetchHistory returns []", async () => {
+    const suitePath = writeSuite([{ slug: "a", type: "policy" }]);
+    const { reports } = await inspectSuite({
+      suitePath,
+      loadEntityFn: vi.fn(() => ({ id: "a", type: "policy", stableId: "sid_a" } as EntityWithType)),
+      fetchHistoryFn: vi.fn(async () => []),
+    });
+    expect(reports[0].costSource).toBe("fallback");
+    expect(reports[0].historicalRunCount).toBe(0);
+  });
+
+  it("invokes loadEntityFn once per supported slug and fetchHistoryFn exactly once", async () => {
+    // The actual "no LLM calls" guarantee is enforced in inspect.test.ts via a
+    // static-source check on inspect.ts imports. This test just confirms that
+    // inspectSuite's only side-effect surface is the two injected hooks (no
+    // hidden calls to a third API/improver) and that fetchHistory is called
+    // ONCE up-front, not per-entity (was a regression risk during the O(N×M)
+    // findEntity → loadEntityMap refactor).
+    const suitePath = writeSuite([
+      { slug: "a", type: "policy" },
+      { slug: "b", type: "policy" },
+    ]);
+    const loadEntityFn = vi.fn((slug: string) =>
+      ({ id: slug, type: "policy", stableId: `sid_${slug}` } as EntityWithType),
+    );
+    const fetchHistoryFn = vi.fn(async () => [] as PipelineRunRow[]);
+    await inspectSuite({ suitePath, loadEntityFn, fetchHistoryFn });
+    expect(loadEntityFn).toHaveBeenCalledTimes(2); // one per supported slug
+    expect(fetchHistoryFn).toHaveBeenCalledTimes(1); // single up-front fetch
   });
 });

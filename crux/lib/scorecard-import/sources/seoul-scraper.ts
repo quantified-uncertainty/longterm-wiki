@@ -39,6 +39,8 @@
  * extraction.
  */
 
+import { FAIR_USE_CITATION_LICENSE } from "../types.ts";
+
 const PAGE_CHUNK_RE = /\/_next\/static\/chunks\/app\/page-[A-Za-z0-9]+\.js/;
 const COMPANIES_NEEDLE = '[{id:"amazon",name:"Amazon"}';
 const DIMENSIONS_NEEDLE = '[{id:"risk-evaluations",name:"Risk Evaluation"}';
@@ -310,7 +312,11 @@ export function scrapeSeoul(
     waveLabel,
     sourceUrl: opts.sourceUrl ?? "https://www.seoul-tracker.org",
     methodologyUrl: "https://www.seoul-tracker.org",
-    license: null,
+    // The Seoul Commitment Tracker publishes no explicit license (verified
+    // 2026-05-02 — only social share links + a Midas Project privacy policy
+    // pointer, no CC / terms-of-use statement). We display verdicts under
+    // fair-use citation; QUA-867 backfilled this label on existing snapshots.
+    license: FAIR_USE_CITATION_LICENSE,
     notes: null,
     isLatest: opts.isLatest ?? true,
     dimensions: dimensions.map((d) => ({ slug: d.id, label: d.name })),

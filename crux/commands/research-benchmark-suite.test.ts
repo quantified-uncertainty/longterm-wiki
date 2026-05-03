@@ -26,6 +26,7 @@ import {
   median,
   p25,
   scoreSuite,
+  SNAPSHOT_SCHEMA_VERSION,
   takeSnapshot,
   writeSnapshot,
   type PerEntityRecord,
@@ -378,6 +379,115 @@ describe("snapshot persistence", () => {
       writeSnapshot(tmp, aOld);
       const list = listSnapshotsInDir(tmp);
       expect(list.map((s) => s.tag)).toEqual(["a", "b"]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  // QUA-890: schema_version + atomic-write protocol.
+  it("buildSnapshot stamps the current SNAPSHOT_SCHEMA_VERSION", () => {
+    const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+    expect(snap.schema_version).toBe(SNAPSHOT_SCHEMA_VERSION);
+  });
+
+  it("writeSnapshot leaves no .tmp artifacts in the snapshot dir on success", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      writeSnapshot(tmp, snap);
+      const remaining = fs.readdirSync(tmp).filter((f) => f.endsWith(".tmp"));
+      expect(remaining).toEqual([]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot leaves no .tmp artifacts when the suffix loop retries", () => {
+    // Pre-existing file at the un-suffixed destination → existsSync probe
+    // skips it and the loop steps to `__1.json`. The per-PID tmp must be
+    // gone after rename succeeds.
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const baseFile = path.join(tmp, snap.timestamp.replace(/[:.]/g, "-") + "__baseline.json");
+      fs.writeFileSync(baseFile, "{}");
+      const written = writeSnapshot(tmp, snap);
+      expect(written).toMatch(/__1\.json$/);
+      const tmpFiles = fs.readdirSync(tmp).filter((f) => f.endsWith(".tmp"));
+      expect(tmpFiles).toEqual([]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot cleans up tmp + propagates on renameSync failure", () => {
+    // QUA-890: the catch branch must (a) unlink the tmp file so we don't
+    // leak `.tmp` artifacts into the snapshot dir, and (b) propagate the
+    // original error (not a secondary failure from the cleanup itself).
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const renameSpy = vi.spyOn(fs, "renameSync").mockImplementationOnce(() => {
+        const err = new Error("simulated EPERM") as NodeJS.ErrnoException;
+        err.code = "EPERM";
+        throw err;
+      });
+      try {
+        expect(() => writeSnapshot(tmp, snap)).toThrow(/simulated EPERM/);
+        // No `.tmp` artifacts left behind despite the failure.
+        const remaining = fs.readdirSync(tmp);
+        expect(remaining).toEqual([]);
+      } finally {
+        renameSpy.mockRestore();
+      }
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot writes valid JSON containing schema_version", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const snap = buildSnapshot("baseline", [makeRecord("x", 0.5)]);
+      const file = writeSnapshot(tmp, snap);
+      const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
+      expect(parsed.schema_version).toBe(SNAPSHOT_SCHEMA_VERSION);
+      expect(parsed.tag).toBe("baseline");
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("listSnapshotsInDir reads pre-QUA-890 snapshots without schema_version", () => {
+    // Backwards-compat: snapshots written before QUA-890 lack schema_version.
+    // listSnapshotsInDir must still parse them — `schema_version` is optional.
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const legacy = {
+        tag: "legacy",
+        timestamp: "2026-01-01T00:00:00.000Z",
+        git_sha: null,
+        suite_size: 1,
+        entities: [makeRecord("x", 0.5)],
+        aggregate: {
+          scored_count: 1,
+          unsupported_count: 0,
+          missing_count: 0,
+          type_mismatch_count: 0,
+          median_coverage_score: 0.5,
+          p25_coverage_score: 0.5,
+          count_below_min: 0,
+          below_min_slugs: [],
+        },
+      };
+      fs.writeFileSync(
+        path.join(tmp, "2026-01-01T00-00-00-000Z__legacy.json"),
+        JSON.stringify(legacy, null, 2),
+      );
+      const list = listSnapshotsInDir(tmp);
+      expect(list).toHaveLength(1);
+      expect(list[0].tag).toBe("legacy");
+      expect(list[0].schema_version).toBeUndefined();
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }

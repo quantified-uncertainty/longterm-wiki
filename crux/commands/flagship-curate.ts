@@ -25,6 +25,7 @@ import type { CommandResult } from '../lib/command-types.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CreditExhaustedError, isCreditExhaustedError } from '../lib/resilience.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
 import { parseAndValidateArray } from '../lib/json-parsing.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import { getPersonnelByEntity, syncPersonnel } from '../lib/wiki-server/personnel.ts';
@@ -1139,10 +1140,9 @@ Options:
   if (dryRun) console.log(`${c.yellow}DRY RUN${c.reset}`);
   console.log('');
 
-  const tracker = new CostTracker();
-  const results: CurationResult[] = [];
-
-  // Resolve entities
+  // Resolve entities BEFORE opening the pipeline_run — these checks
+  // can fail with no LLM work done, so wasting a /start + /end round-trip
+  // on them is pointless.
   let entities: ResolvedEntity[] = [];
 
   if (entityId) {
@@ -1170,6 +1170,11 @@ Options:
       console.log(`  ${e.title} (${e.entityType})`);
     }
   }
+
+  const tracker = new CostTracker();
+
+  async function flagshipCurateBody(): Promise<CommandResult> {
+  const results: CurationResult[] = [];
 
   // Process each entity. A CreditExhaustedError bubbling out of any call
   // path below aborts the whole batch — billing errors aren't transient and
@@ -1297,6 +1302,18 @@ Options:
   }
 
   return { exitCode, output };
+  }
+
+  return withPipelineRun(
+    {
+      pipelineName: 'flagship-curate',
+      entityId: entityId ?? null,
+      shape: isAll ? 'batch' : 'single',
+      allowOffline: true,
+      tracker,
+    },
+    flagshipCurateBody,
+  );
 }
 
 // ── Exports ────────────────────────────────────────────────────────────

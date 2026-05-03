@@ -4,6 +4,7 @@ import { getTypedEntities, getTypedEntityById, isAiModel } from "@/data";
 
 import { AiModelsTable, type AiModelRow } from "./ai-models-table";
 import { isModelFamily } from "./ai-model-utils";
+import { TableSkeleton } from "@/components/ui/table-states";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 
@@ -238,7 +239,7 @@ export default async function AiModelsPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={8} />}>
         <AiModelsTable rows={data.rows} />
       </Suspense>
     </div>

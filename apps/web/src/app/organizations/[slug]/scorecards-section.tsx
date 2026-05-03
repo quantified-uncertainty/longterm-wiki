@@ -16,6 +16,7 @@ import {
   DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
+import { getEntityHref } from "@/data/entity-nav";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
@@ -25,6 +26,8 @@ interface GradeRow {
   scorecardSource: string | null;
   publishedAt: string | null;
   isLatest: boolean | null;
+  /** Wave label from the parent snapshot (QUA-867 item E). */
+  waveLabel: string | null;
   entityId: string;
   entityDisplayName: string;
   dimensionSlug: string;
@@ -48,10 +51,31 @@ interface ByEntityResponse {
   total: number;
 }
 
+/**
+ * Historical overall grade for a scorecard source — one row per wave per
+ * source. Powers the per-panel grade trajectory mini-table (QUA-867 item
+ * E). Hidden when only one wave is present.
+ */
+interface OverallHistoryRow {
+  snapshotId: string;
+  publishedAt: string | null;
+  waveLabel: string | null;
+  isLatest: boolean | null;
+  scoreLetter: string | null;
+  scoreNumeric: number | null;
+  scoreRaw: string;
+}
+
 interface SourceGroup {
   source: ScorecardSourceKey;
   rows: GradeRow[];
   publishedAt: string | null;
+  /**
+   * Overall-grade history across all waves for this source, ordered newest
+   * first. Empty when only one wave exists (the latest, already shown by
+   * the panel's "Overall:" line).
+   */
+  history: OverallHistoryRow[];
 }
 
 /**
@@ -67,15 +91,28 @@ export type ScorecardsLoadResult =
 export async function loadScorecardsForEntity(
   entityStableId: string,
 ): Promise<ScorecardsLoadResult | null> {
-  const result = await fetchDetailed<ByEntityResponse>(
-    `/api/scorecard-grades/by-entity/${encodeURIComponent(entityStableId)}`,
-    { revalidate: 300 },
-  );
-  if (!result.ok) return { fetchError: true };
-  if (result.data.items.length === 0) return null;
+  const enc = encodeURIComponent(entityStableId);
+  // Two requests in parallel: the existing latest-wave fetch (with all
+  // dimension rows) and a narrow overall-only history fetch for the
+  // trajectory mini-table. Splitting them keeps the latest-wave payload
+  // small and the history payload bounded (5 sources × ~3 waves = ~15
+  // rows) — adding history to the main response would tack on an
+  // extra wave-multiplier on every dimension row.
+  const [latestRes, historyRes] = await Promise.all([
+    fetchDetailed<ByEntityResponse>(
+      `/api/scorecard-grades/by-entity/${enc}`,
+      { revalidate: 300 },
+    ),
+    fetchDetailed<ByEntityResponse>(
+      `/api/scorecard-grades/by-entity/${enc}?includeHistory=true&dimension=overall`,
+      { revalidate: 300 },
+    ),
+  ]);
+  if (!latestRes.ok) return { fetchError: true };
+  if (latestRes.data.items.length === 0) return null;
 
   const groupsBySource = new Map<string, SourceGroup>();
-  for (const r of result.data.items) {
+  for (const r of latestRes.data.items) {
     if (!r.scorecardSource) continue;
     const existing = groupsBySource.get(r.scorecardSource);
     if (existing) {
@@ -85,6 +122,28 @@ export async function loadScorecardsForEntity(
         source: r.scorecardSource as ScorecardSourceKey,
         rows: [r],
         publishedAt: r.publishedAt,
+        history: [],
+      });
+    }
+  }
+
+  // Layer history rows onto the source groups. A history-fetch failure is
+  // non-fatal: we still render latest-wave panels, just without the
+  // trajectory mini-table. Each source's history is sorted newest-first
+  // by the API; we keep that order so the latest wave shows on top.
+  if (historyRes.ok) {
+    for (const r of historyRes.data.items) {
+      if (!r.scorecardSource) continue;
+      const group = groupsBySource.get(r.scorecardSource);
+      if (!group) continue;
+      group.history.push({
+        snapshotId: r.snapshotId,
+        publishedAt: r.publishedAt,
+        waveLabel: r.waveLabel,
+        isLatest: r.isLatest,
+        scoreLetter: r.scoreLetter,
+        scoreNumeric: r.scoreNumeric,
+        scoreRaw: r.scoreRaw,
       });
     }
   }
@@ -96,7 +155,7 @@ export async function loadScorecardsForEntity(
     if (group) groups.push(group);
   }
 
-  return { groups, totalRows: result.data.items.length };
+  return { groups, totalRows: latestRes.data.items.length };
 }
 
 export function ScorecardsSection({
@@ -166,7 +225,7 @@ export function ScorecardsSection({
                   by{" "}
                   {meta.publisherSlug ? (
                     <Link
-                      href={`/organizations/${meta.publisherSlug}`}
+                      href={getEntityHref(meta.publisherSlug)}
                       className="text-primary hover:underline"
                     >
                       {meta.publisher}
@@ -235,6 +294,45 @@ export function ScorecardsSection({
                   );
                 })}
               </dl>
+            ) : null}
+
+            {/*
+              Grade trajectory across waves (QUA-867 item E). Suppressed
+              when a source has only one wave because the panel header
+              already shows the latest grade. Today only FLI has multiple
+              waves; the markup is generic so any source that lands a
+              second wave gets the trajectory automatically.
+            */}
+            {group.history.length > 1 ? (
+              <details className="mt-3 border-t border-border/30 pt-3">
+                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                  Grade trajectory ({group.history.length} waves)
+                </summary>
+                <dl className="w-full text-xs grid grid-cols-[1fr_auto] gap-x-3 mt-2">
+                  {group.history.map((h) => {
+                    const formatted = formatScoreCell(h);
+                    const label = h.waveLabel ?? h.publishedAt ?? "—";
+                    return (
+                      <div
+                        key={h.snapshotId}
+                        className="contents border-b border-border/20 last:border-b-0"
+                      >
+                        <dt className="py-1 text-muted-foreground">
+                          {label}
+                          {h.isLatest ? (
+                            <span className="ml-1.5 inline-flex items-center px-1 py-px rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 align-middle">
+                              latest
+                            </span>
+                          ) : null}
+                        </dt>
+                        <dd className={`py-1 text-right ${gradeCellFontClass(formatted)}`}>
+                          {formatted}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </details>
             ) : null}
           </article>
         );

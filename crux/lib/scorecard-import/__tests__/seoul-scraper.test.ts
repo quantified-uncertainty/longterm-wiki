@@ -16,6 +16,7 @@ import {
   numericToVerdict,
   scrapeSeoul,
 } from "../sources/seoul-scraper.ts";
+import { FAIR_USE_CITATION_LICENSE } from "../types.ts";
 
 const COMPANIES = [
   { id: "amazon", name: "Amazon" },
@@ -220,6 +221,15 @@ describe("scrapeSeoul", () => {
     const counts: Record<string, number> = { Fulfilled: 0, Partial: 0, Unfulfilled: 0 };
     for (const g of wave.grades) counts[g.scores.overall]++;
     expect(counts).toEqual({ Fulfilled: 6, Partial: 4, Unfulfilled: 6 });
+  });
+
+  it("hardcodes license=fair-use-citation (no explicit license on seoul-tracker.org) — QUA-867", () => {
+    // Seoul Commitment Tracker pages publish no Creative Commons or other
+    // explicit license. We display verdicts under fair-use citation so the
+    // /scorecards/seoul_tracker snapshot history table shows an actual term
+    // instead of the em-dash placeholder it had before QUA-867.
+    const wave = scrapeSeoul(buildHtml(), buildChunk(), {});
+    expect(wave.license).toBe(FAIR_USE_CITATION_LICENSE);
   });
 
   it("respects publishedAt + waveLabel overrides", () => {

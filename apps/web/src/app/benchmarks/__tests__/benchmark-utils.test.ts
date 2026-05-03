@@ -15,7 +15,11 @@ vi.mock("@/data", () => ({
 }));
 
 import { getTypedEntities, getBenchmarkResults } from "@/data";
-import { getBenchmarkResultsFromModels } from "../benchmark-utils";
+import {
+  getBenchmarkResultsFromModels,
+  formatTestedBy,
+  formatEvaluationDate,
+} from "../benchmark-utils";
 
 const mockGetTypedEntities = vi.mocked(getTypedEntities);
 const mockGetBenchmarkResults = vi.mocked(getBenchmarkResults);
@@ -52,8 +56,28 @@ function makeBenchmark(id: string, title: string): AnyEntity {
   } as unknown as AnyEntity;
 }
 
-function makePGResult(benchmarkId: string, score: number, unit: string | null = null) {
-  return { benchmarkId, score, unit, date: null, sourceUrl: null };
+function makePGResult(
+  benchmarkId: string,
+  score: number,
+  unit: string | null = null,
+  provenance: Partial<{
+    testedBy: string;
+    testedByOrgId: string | null;
+    evaluationDate: string | null;
+    methodologyNotes: string | null;
+  }> = {},
+) {
+  return {
+    benchmarkId,
+    score,
+    unit,
+    date: null,
+    sourceUrl: null,
+    testedBy: provenance.testedBy ?? "unknown",
+    testedByOrgId: provenance.testedByOrgId ?? null,
+    evaluationDate: provenance.evaluationDate ?? null,
+    methodologyNotes: provenance.methodologyNotes ?? null,
+  };
 }
 
 beforeEach(() => {
@@ -240,6 +264,100 @@ describe("getBenchmarkResultsFromModels — PG data takes priority", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Provenance fields are threaded from PG into BenchmarkResultRow (QUA-743)
+// ---------------------------------------------------------------------------
+describe("getBenchmarkResultsFromModels — provenance threading", () => {
+  it("copies testedBy, evaluationDate, methodologyNotes from PG rows into output", () => {
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", []),
+    ]);
+    mockGetBenchmarkResults.mockReturnValue({
+      "gpt-4": [
+        makePGResult("mmlu", 87.5, "%", {
+          testedBy: "metr",
+          evaluationDate: "2025-08-15",
+          methodologyNotes: "Ran with temperature=0, 5-shot prompt.",
+        }),
+      ],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.testedBy).toBe("metr");
+    expect(row.evaluationDate).toBe("2025-08-15");
+    expect(row.methodologyNotes).toBe("Ran with temperature=0, 5-shot prompt.");
+  });
+
+  it("resolves testedByOrgId to a name when the org entity exists", () => {
+    const apolloOrg = {
+      id: "apollo",
+      title: "Apollo Research",
+      entityType: "organization" as const,
+      tags: [],
+      wikiId: null,
+      relatedEntries: [],
+    } as unknown as AnyEntity;
+
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", []),
+      apolloOrg,
+    ]);
+    mockGetBenchmarkResults.mockReturnValue({
+      "gpt-4": [
+        makePGResult("mmlu", 87.5, "%", {
+          testedBy: "apollo",
+          testedByOrgId: "apollo",
+        }),
+      ],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.testedByOrgId).toBe("apollo");
+    expect(row.testedByOrgName).toBe("Apollo Research");
+  });
+
+  it("leaves testedByOrgName null when the org entity is missing", () => {
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", []),
+    ]);
+    mockGetBenchmarkResults.mockReturnValue({
+      "gpt-4": [
+        makePGResult("mmlu", 87.5, "%", {
+          testedBy: "metr",
+          testedByOrgId: "metr-not-yet-imported",
+        }),
+      ],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.testedByOrgId).toBe("metr-not-yet-imported");
+    expect(row.testedByOrgName).toBeNull();
+  });
+
+  it("defaults provenance fields to null when not in PG", () => {
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", []),
+    ]);
+    mockGetBenchmarkResults.mockReturnValue({
+      "gpt-4": [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.testedBy).toBe("unknown");
+    expect(row.testedByOrgId).toBeNull();
+    expect(row.evaluationDate).toBeNull();
+    expect(row.methodologyNotes).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Alias resolution still works
 // ---------------------------------------------------------------------------
 describe("getBenchmarkResultsFromModels — alias resolution", () => {
@@ -263,5 +381,48 @@ describe("getBenchmarkResultsFromModels — alias resolution", () => {
 
     const results = getBenchmarkResultsFromModels();
     expect(results.get("chatbot-arena-elo")).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Provenance display helpers (QUA-743)
+// ---------------------------------------------------------------------------
+describe("formatTestedBy", () => {
+  it("maps known enum values to friendly labels", () => {
+    expect(formatTestedBy("self-report")).toBe("Self-report");
+    expect(formatTestedBy("aisi-uk")).toBe("AISI UK");
+    expect(formatTestedBy("metr")).toBe("METR");
+    expect(formatTestedBy("third-party-paper")).toBe("Third-party paper");
+    expect(formatTestedBy("epoch-ai")).toBe("Epoch AI");
+  });
+
+  it("falls back to raw value for unrecognized inputs (forwards-compatible)", () => {
+    // If a new VALID_TESTED_BY value lands in the schema before the labels
+    // map is updated, render the raw value rather than crashing/blanking.
+    expect(formatTestedBy("future-evaluator")).toBe("future-evaluator");
+  });
+});
+
+describe("formatEvaluationDate", () => {
+  it("collapses YYYY-MM-DD to YYYY-MM", () => {
+    expect(formatEvaluationDate("2025-08-15")).toBe("2025-08");
+  });
+
+  it("preserves YYYY-MM unchanged", () => {
+    expect(formatEvaluationDate("2025-08")).toBe("2025-08");
+  });
+
+  it("renders a year-only string as YYYY", () => {
+    expect(formatEvaluationDate("2025")).toBe("2025");
+  });
+
+  it("returns em-dash for null/undefined/empty", () => {
+    expect(formatEvaluationDate(null)).toBe("—");
+    expect(formatEvaluationDate(undefined)).toBe("—");
+    expect(formatEvaluationDate("")).toBe("—");
+  });
+
+  it("falls through to raw value for unparseable strings", () => {
+    expect(formatEvaluationDate("Q3 2025")).toBe("Q3 2025");
   });
 });

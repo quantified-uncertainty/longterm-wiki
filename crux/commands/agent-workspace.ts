@@ -62,6 +62,8 @@ import {
   finalizeIfComplete as finalizeDispatchIfComplete,
   realDispatchEnv,
   isPermissionMode,
+  formatApiKeyWarning,
+  pollForEarlyDispatchError,
   type DispatchOptions,
   type PermissionMode,
 } from '../lib/agent-workspace/dispatch.ts';
@@ -965,6 +967,13 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
     tmpDir: ensureSlotTmpDir(slot),
   };
 
+  // Alarm bell for QUA-1010/QUA-1057: a parent shell with ANTHROPIC_API_KEY set
+  // (e.g., inherited from .env.base) used to make the dispatched worker silently
+  // die in ~160ms with "Credit balance is too low" because claude reads the key
+  // and switches to API-direct billing. We strip it inside spawnDetached, but
+  // also surface a warning so an operator can untangle the env if desired.
+  const apiKeyWarning = formatApiKeyWarning(process.env);
+
   let result;
   try {
     result = spawnDispatch(env, paths, dispatchOpts);
@@ -973,7 +982,46 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   }
 
   const { handle } = result;
+  const warnings = apiKeyWarning ? [apiKeyWarning] : [];
+  const basePayload = {
+    slot,
+    runId: handle.runId,
+    sessionId: handle.sessionId,
+    pid: handle.pid,
+    runDir: handle.runDir,
+    cwd,
+    startedAt: handle.startedAt,
+    cmd: handle.cmd,
+  };
+
+  // Briefly poll for early errors so credit-low / auth failures surface as
+  // dispatch failures instead of "Dispatched to slot aN" + silent death. See
+  // QUA-1057 for the original symptom. Healthy workers exit on the first
+  // events.jsonl write (~100ms); cold-spawn-die paths use the pidAlive guard.
+  const earlyError = await pollForEarlyDispatchError(env, handle.eventsFile, { pid: handle.pid });
+  if (earlyError) {
+    const statusSuffix = earlyError.status !== undefined ? ` (HTTP ${earlyError.status})` : '';
+    const stripHint = apiKeyWarning
+      ? `\n  hint: parent env had the API key set; even after stripping, the OAuth subscription itself may have failed (check 'claude /login').`
+      : '';
+    const errorOutput =
+      `Error: dispatched worker exited early on slot a${slot}: ${earlyError.message}${statusSuffix}\n` +
+      `  run:    ${handle.runId}\n` +
+      `  events: ${handle.eventsFile}\n` +
+      `  stderr: ${handle.stderrFile}` +
+      stripHint;
+    if (options.json) {
+      return {
+        exitCode: 2,
+        output: JSON.stringify({ ...basePayload, earlyError, warnings }, null, 2),
+      };
+    }
+    return { exitCode: 2, output: errorOutput };
+  }
+
+  const successHeader = apiKeyWarning ? `${apiKeyWarning}\n\n` : '';
   const output =
+    successHeader +
     `Dispatched to slot a${slot}${cwdNote}\n` +
     `  run:      ${handle.runId}\n` +
     `  session:  ${handle.sessionId}\n` +
@@ -987,20 +1035,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   if (options.json) {
     return {
       exitCode: 0,
-      output: JSON.stringify(
-        {
-          slot,
-          runId: handle.runId,
-          sessionId: handle.sessionId,
-          pid: handle.pid,
-          runDir: handle.runDir,
-          cwd,
-          startedAt: handle.startedAt,
-          cmd: handle.cmd,
-        },
-        null,
-        2,
-      ),
+      output: JSON.stringify({ ...basePayload, warnings }, null, 2),
     };
   }
   return { exitCode: 0, output };

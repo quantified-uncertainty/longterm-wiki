@@ -188,10 +188,13 @@ describe('runResearch', () => {
     mockInitFromPG.mockResolvedValue(undefined);
     mockGetResourceByUrl.mockReturnValue(null);
     mockSaveResources.mockResolvedValue(undefined);
-    mockApiRequest.mockResolvedValue({
-      ok: false,
-      error: 'unavailable',
-      message: 'not configured',
+    // Route /api/pipeline-runs/* through ok responses so withPipelineRun's
+    // start/end calls don't consume per-test `mockResolvedValueOnce`s.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return { ok: false, error: 'unavailable', message: 'not configured' };
     });
   });
 
@@ -470,16 +473,22 @@ describe('runResearch', () => {
   });
 
   it('pre-seeds from PG search results and includes "pg" in sourcesSearched', async () => {
-    // Mock PG search returning results
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        results: [
-          { id: 'abc123', url: 'https://pg-resource.example.com/article', title: 'PG Resource', type: 'web', summary: 'From PG' },
-        ],
-        count: 1,
-        query: 'AI safety',
-      },
+    // Mock PG search returning results.
+    // Pass /api/pipeline-runs through ok so the search mock isn't consumed.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return {
+        ok: true,
+        data: {
+          results: [
+            { id: 'abc123', url: 'https://pg-resource.example.com/article', title: 'PG Resource', type: 'web', summary: 'From PG' },
+          ],
+          count: 1,
+          query: 'AI safety',
+        },
+      };
     });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
@@ -495,16 +504,22 @@ describe('runResearch', () => {
   });
 
   it('counts urlsAlreadyInPG when PG and web search overlap', async () => {
-    // Mock PG search returning a URL that Exa also returns
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        results: [
-          { id: 'shared-id', url: 'https://aisafety.com/overview', title: 'AI Safety Overview (PG)', type: 'web', summary: null },
-        ],
-        count: 1,
-        query: 'AI safety',
-      },
+    // Mock PG search returning a URL that Exa also returns.
+    // Pass /api/pipeline-runs through ok so the search mock isn't consumed.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      return {
+        ok: true,
+        data: {
+          results: [
+            { id: 'shared-id', url: 'https://aisafety.com/overview', title: 'AI Safety Overview (PG)', type: 'web', summary: null },
+          ],
+          count: 1,
+          query: 'AI safety',
+        },
+      };
     });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
@@ -518,7 +533,14 @@ describe('runResearch', () => {
   });
 
   it('continues when PG search fails', async () => {
-    mockApiRequest.mockRejectedValueOnce(new Error('PG search timeout'));
+    // Pass /api/pipeline-runs through ok so withPipelineRun's start call
+    // isn't rejected — only the PG search itself should reject.
+    mockApiRequest.mockImplementation(async (_method: string, path: string) => {
+      if (typeof path === 'string' && path.startsWith('/api/pipeline-runs')) {
+        return { ok: true, data: {} };
+      }
+      throw new Error('PG search timeout');
+    });
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
     const result = await runResearch({

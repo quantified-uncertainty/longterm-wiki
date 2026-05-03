@@ -20,6 +20,8 @@ import {
   finalizeIfComplete,
   isPermissionMode,
   PERMISSION_MODES,
+  formatApiKeyWarning,
+  pollForEarlyDispatchError,
   type DispatchEnv,
   type RunMeta,
 } from '../dispatch.ts';
@@ -794,5 +796,219 @@ describe('finalizeIfComplete', () => {
     const out = finalizeIfComplete(env, paths, rp, BASE_META);
     expect(out.completedAt).toBeUndefined();
     expect(readCurrent(env, paths)).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatApiKeyWarning + pollForEarlyDispatchError (QUA-1010 / QUA-1057)
+// ---------------------------------------------------------------------------
+
+describe('formatApiKeyWarning', () => {
+  it('returns null when ANTHROPIC_API_KEY is not set', () => {
+    expect(formatApiKeyWarning({})).toBeNull();
+    expect(formatApiKeyWarning({ PATH: '/usr/bin', HOME: '/root' })).toBeNull();
+  });
+
+  it('returns a warning string referencing both QUA tickets when the key is set', () => {
+    const warning = formatApiKeyWarning({ ANTHROPIC_API_KEY: 'fake-key-for-test' });
+    expect(warning).not.toBeNull();
+    expect(warning).toContain('ANTHROPIC_API_KEY');
+    expect(warning).toContain('OAuth');
+    // Cross-link both tickets so future-grep can find this codepath.
+    expect(warning).toContain('QUA-1010');
+    expect(warning).toContain('QUA-1057');
+  });
+
+  it('treats an empty-string key as "not set" (matches the operator workaround)', () => {
+    // The documented workaround is `ANTHROPIC_API_KEY="" ./ws dispatch ...`,
+    // which leaves the env var present-but-empty. Empty string is falsy in
+    // `claude` itself (it falls back to OAuth), so the warning should not fire.
+    expect(formatApiKeyWarning({ ANTHROPIC_API_KEY: '' })).toBeNull();
+  });
+});
+
+describe('pollForEarlyDispatchError', () => {
+  /** Synchronous wait shim for the poll loop. */
+  const noWait = async (_ms: number) => { /* no-op */ };
+  const HEALTHY_PID = 99;
+
+  function setupFakeEnv(opts?: { pidAlive?: boolean }): { env: FakeEnv; eventsFile: string } {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    if (opts?.pidAlive ?? true) env.alivePids.add(HEALTHY_PID);
+    return { env, eventsFile: rp.eventsFile };
+  }
+
+  it('returns null when no events have been written and the worker is still alive', async () => {
+    // Slow boot scenario — pid is alive, just hasn't emitted yet. Don't flag.
+    const { env, eventsFile } = setupFakeEnv();
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+
+  it('returns synthetic error when worker died before emitting any events', async () => {
+    // Cold-spawn-die: binary missing, OAuth expired with no API fallback, etc.
+    // No events.jsonl content + dead pid at deadline → flag it.
+    const { env, eventsFile } = setupFakeEnv({ pidAlive: false });
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: 99,
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).not.toBeNull();
+    expect(r?.message).toContain('exited before emitting any events');
+    expect(r?.status).toBeUndefined();
+  });
+
+  it('returns null on the first poll once the worker emits an init event (healthy fast path)', async () => {
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({ type: 'system', subtype: 'init', model: 'sonnet' }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+
+  it('returns null when the latest event is a non-error assistant message', async () => {
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({ type: 'system', subtype: 'init', model: 'sonnet' }) + '\n' +
+        JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'working' }] } }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+
+  it('surfaces a credit-low error result with both message and HTTP status', async () => {
+    // The exact shape we observe in events.jsonl when ANTHROPIC_API_KEY has zero credits.
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({
+        type: 'result',
+        is_error: true,
+        api_error_status: 400,
+        result: 'Credit balance is too low',
+        duration_ms: 160,
+      }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'Credit balance is too low', status: 400 });
+  });
+
+  it('surfaces an error without status when api_error_status is absent', async () => {
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({ type: 'result', is_error: true, result: 'something else broke' }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'something else broke' });
+  });
+
+  it('drops a non-numeric api_error_status rather than passing it through unsanitized', async () => {
+    // Defensive: tolerate stream-json malformations without surfacing a wrongly-typed status.
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({ type: 'result', is_error: true, result: 'broke', api_error_status: '500' }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'broke' });
+  });
+
+  it('falls back to "unknown error" when the error result has no `result` string', async () => {
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(eventsFile, JSON.stringify({ type: 'result', is_error: true }) + '\n');
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 50,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toEqual({ message: 'unknown error' });
+  });
+
+  it('returns null when the result event reports success (is_error: false)', async () => {
+    // A worker that completed successfully in <1s during the poll window
+    // should NOT be flagged as an early error.
+    const { env, eventsFile } = setupFakeEnv();
+    env.files.set(
+      eventsFile,
+      JSON.stringify({
+        type: 'result',
+        is_error: false,
+        stop_reason: 'end_turn',
+        num_turns: 1,
+        duration_ms: 200,
+        total_cost_usd: 0.01,
+      }) + '\n',
+    );
+    const r = await pollForEarlyDispatchError(env, eventsFile, {
+      pid: HEALTHY_PID,
+      deadlineMs: 5,
+      intervalMs: 1,
+      wait: noWait,
+    });
+    expect(r).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression: realDispatchEnv must call prepareClaudeSpawnEnv (QUA-1010)
+// ---------------------------------------------------------------------------
+
+describe('realDispatchEnv ANTHROPIC_API_KEY stripping (QUA-1010 / QUA-1057)', () => {
+  it('strips ANTHROPIC_API_KEY from the env passed to the underlying spawn', async () => {
+    // We can't easily mock `child_process.spawn` without a module-level mock,
+    // so instead we exercise the same code path through the helper that
+    // realDispatchEnv uses (`prepareClaudeSpawnEnv`) and assert the contract
+    // that dispatch.ts depends on. The TypeScript import in dispatch.ts is
+    // the structural enforcement; this test confirms behavior.
+    const { prepareClaudeSpawnEnv } = await import('../../claude-cli.ts');
+    const stripped = prepareClaudeSpawnEnv({
+      ANTHROPIC_API_KEY: 'fake-key-for-test',
+      CLAUDECODE: '1',
+      PATH: '/usr/bin',
+      TMPDIR: '/tmp/tsx-slot-a3',
+    });
+    expect(stripped.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(stripped.CLAUDECODE).toBeUndefined();
+    expect(stripped.PATH).toBe('/usr/bin');
+    expect(stripped.TMPDIR).toBe('/tmp/tsx-slot-a3');
   });
 });

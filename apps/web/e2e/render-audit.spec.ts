@@ -135,6 +135,16 @@ const SIMPLE_PAGES = [
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
+  // QUA-869 — FMTI stub orgs promoted to YAML so /scorecards row links resolve.
+  // Loading these confirms the YAML entries persist; if YAML is removed
+  // and the entity reverts to a PG-only stub, the directory page returns 404.
+  "/organizations/ai21-labs",
+  "/organizations/midjourney",
+  "/organizations/writer",
+  "/organizations/adept",
+  "/organizations/bigcode",
+  "/organizations/aleph-alpha",
+  "/organizations/stability-ai",
   "/divisions",  // QUA-897 sourcing-summary header
   // NOTE: /things/[id] was migrated to EntityProfileShell in QUA-489 but is
   // not in this list — its records live only in PG, so the page 404s in the
@@ -515,4 +525,45 @@ test.describe("Render audit — filter chip labels have a separator (QUA-1009)",
       ).toEqual([]);
     });
   }
+});
+
+// ─── Canonical table states (QUA-1008 / QUA-916) ──────────────────────────────
+
+test.describe("Render audit — canonical table states", () => {
+  /**
+   * QUA-916 regression check: directory index pages used to render only the
+   * SSR string "Loading..." for crawlers and accessibility tools. After
+   * QUA-1008 the Suspense fallback is `<TableSkeleton>`, which renders an
+   * aria-busy region with structured rows so the page never bottoms out at a
+   * bare placeholder string.
+   */
+  for (const url of [
+    "/organizations",
+    "/people",
+    "/benchmarks",
+    "/grants",
+    "/ai-models",
+    "/projects",
+    "/approaches",
+    "/events",
+    "/legislation",
+    "/politicians",
+  ]) {
+    test(`${url} SSR has no bare 'Loading...' string`, async ({ request }) => {
+      const response = await request.get(url);
+      expect(response.status(), `${url} returned ${response.status()}`).toBeLessThan(400);
+      const html = await response.text();
+
+      // The validator-banned string. After QUA-1008, server-rendered HTML
+      // must never include bare "Loading..." — either the data resolved
+      // synchronously, or the Suspense fallback is the structured
+      // <TableSkeleton> (which uses the unicode ellipsis only inside an
+      // sr-only span, not a bare <div>Loading...</div>).
+      expect(
+        html,
+        `${url} SSR includes "<div>Loading...</div>" — QUA-916 regression`,
+      ).not.toContain("<div>Loading...</div>");
+    });
+  }
+
 });

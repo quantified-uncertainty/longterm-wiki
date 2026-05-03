@@ -4,6 +4,7 @@ import { getTypedEntities, isEvent } from "@/data";
 
 import { ProfileStatCard } from "@/components/directory";
 import { EventsTable, type EventRow } from "./events-table";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -66,7 +67,7 @@ export default function EventsPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={7} />}>
         <EventsTable rows={rows} />
       </Suspense>
     </div>

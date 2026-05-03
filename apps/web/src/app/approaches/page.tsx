@@ -4,6 +4,7 @@ import { getTypedEntities, isApproach } from "@/data";
 
 import { ProfileStatCard } from "@/components/directory";
 import { ApproachesTable, type ApproachRow } from "./approaches-table";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export const metadata: Metadata = {
   title: "Approaches",
@@ -57,7 +58,7 @@ export default function ApproachesPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={5} />}>
         <ApproachesTable rows={rows} />
       </Suspense>
     </div>

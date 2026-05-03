@@ -6,6 +6,7 @@ import { getEntityHref } from "@/data/entity-nav";
 import { ProfileStatCard } from "@/components/directory";
 import { getKBLatest } from "@/data/factbase";
 import { ProjectsTable, type ProjectRow } from "./projects-table";
+import { TableSkeleton } from "@/components/ui/table-states";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 
@@ -248,7 +249,7 @@ export default async function ProjectsPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={5} />}>
         <ProjectsTable rows={data.rows} />
       </Suspense>
     </div>

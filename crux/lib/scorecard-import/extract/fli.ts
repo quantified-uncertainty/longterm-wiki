@@ -180,7 +180,7 @@ Return a single JSON object matching this exact schema (no prose, no markdown fe
   "waveLabel": "string (e.g. 'Summer 2025')",
   "sourceUrl": "string",
   "methodologyUrl": "string | null",
-  "license": "string | null (e.g. 'CC BY 4.0')",
+  "license": "string (e.g. 'CC BY 4.0', or 'fair-use-citation' when the page has no explicit license — FLI's index pages declare no Creative Commons terms, so this is the expected value for FLI waves)",
   "notes": "string | null",
   "dimensions": [
     {"slug": "kebab-case", "label": "Display Name", "weight": null}

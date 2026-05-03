@@ -30,6 +30,7 @@ import {
   fetchFromWikiServer,
   type RpcModelSystemCardsByModelResult,
   type RpcModelSystemCardRow,
+  type RpcModelAliasesAllResult,
 } from "@lib/wiki-server";
 
 export function generateStaticParams() {
@@ -65,15 +66,30 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  // Fetch system cards (QUA-702). Best-effort: a wiki-server outage shouldn't
-  // break the whole page, just hide the tab.
+  // Best-effort: a wiki-server outage shouldn't break the page, just hide
+  // the system-card tab and drop the "Also known as" line.
   let systemCards: RpcModelSystemCardRow[] = [];
+  let aliases: string[] = [];
   if (entity.stableId) {
-    const result = await fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
-      `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
-      { revalidate: 300 },
-    );
-    if (result?.items) systemCards = result.items;
+    const [cardsResult, aliasesResult] = await Promise.all([
+      fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
+        `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
+        { revalidate: 300 },
+      ),
+      fetchFromWikiServer<RpcModelAliasesAllResult>(
+        `/api/model-aliases/all?modelStableId=${encodeURIComponent(entity.stableId)}&limit=20`,
+        { revalidate: 300 },
+      ),
+    ]);
+    if (cardsResult?.items) systemCards = cardsResult.items;
+    if (aliasesResult?.items) {
+      // Skip aliases that match the entity title — "Also known as: gpt-4 turbo"
+      // on the GPT-4 Turbo page is noise.
+      const titleLower = entity.title.toLowerCase();
+      aliases = aliasesResult.items
+        .map((r) => r.alias)
+        .filter((a) => a.toLowerCase() !== titleLower);
+    }
   }
 
   // Resolve developer
@@ -251,6 +267,7 @@ export default async function AiModelDetailPage({
       entityId={entity.id}
       title={entity.title}
       titlePills={titlePills}
+      aliases={aliases}
       coverage={{ score: coverageScore, signals: coverageSignals }}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}

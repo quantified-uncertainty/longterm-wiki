@@ -358,6 +358,16 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-1008: tables and directory pages must use canonical loading / empty /
+    // error components from @/components/ui/table-states instead of bespoke
+    // "Loading…" strings.
+    id: 'table-states',
+    name: 'Canonical table empty/loading/error states (QUA-1008)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-table-states.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-897: block the non-word "sourcinged" — a mass-rename artifact
     // from QUA-237 that surfaced on /divisions and 4 other pages.
     id: 'no-sourcinged',

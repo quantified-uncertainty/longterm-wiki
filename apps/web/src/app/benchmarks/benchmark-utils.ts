@@ -33,6 +33,11 @@ export interface BenchmarkResultRow {
   developerName: string | null;
   score: number;
   unit?: string;
+  testedBy?: string | null;
+  testedByOrgId?: string | null;
+  testedByOrgName?: string | null;
+  evaluationDate?: string | null;
+  methodologyNotes?: string | null;
 }
 
 // Common name aliases for benchmark resolution
@@ -76,6 +81,39 @@ const BENCHMARK_ALIASES: Record<string, string> = {
   "codeforces": "codeforces-rating",
   "codeforces rating": "codeforces-rating",
 };
+
+/**
+ * Display labels for `benchmark_results.tested_by` enum values
+ * (defined in apps/wiki-server/src/routes/tablebase/benchmark-shared.ts).
+ *
+ * "unknown" is intentionally absent — the leaderboard renders an em-dash
+ * for unknown rows rather than the literal word.
+ */
+export const TESTED_BY_LABELS: Record<string, string> = {
+  "self-report": "Self-report",
+  leaderboard: "Leaderboard",
+  "aisi-uk": "AISI UK",
+  "aisi-us": "AISI US",
+  metr: "METR",
+  apollo: "Apollo",
+  "third-party-paper": "Third-party paper",
+  "epoch-ai": "Epoch AI",
+};
+
+export function formatTestedBy(value: string): string {
+  return TESTED_BY_LABELS[value] ?? value;
+}
+
+/**
+ * Render an ISO-ish date as YYYY-MM, accepting "2025-08-15", "2025-08", "2025".
+ * Returns "—" for null/empty input.
+ */
+export function formatEvaluationDate(value: string | null | undefined): string {
+  if (!value) return "—";
+  const match = value.match(/^(\d{4})(?:-(\d{2}))?/);
+  if (!match) return value;
+  return match[2] ? `${match[1]}-${match[2]}` : match[1];
+}
 
 /**
  * Build the full name→slug lookup map (benchmark titles + aliases).
@@ -154,9 +192,19 @@ export function getBenchmarkResultsFromModels(): Map<string, BenchmarkResultRow[
  * - Benchmarks fully absent from PG still show inline data (fixing the bug)
  * - PG data wins for benchmarks it does cover (more authoritative/recent)
  */
+interface PGRowShape {
+  benchmarkId: string;
+  score: number;
+  unit: string | null;
+  testedBy?: string | null;
+  testedByOrgId?: string | null;
+  evaluationDate?: string | null;
+  methodologyNotes?: string | null;
+}
+
 function mergeWithPGResults(
   inlineResults: Map<string, BenchmarkResultRow[]>,
-  pgResults: Record<string, Array<{ benchmarkId: string; score: number; unit: string | null }>>,
+  pgResults: Record<string, PGRowShape[]>,
   entityById: Map<string, AnyEntity>,
 ): Map<string, BenchmarkResultRow[]> {
   // Deep-copy inline results so we don't mutate the original
@@ -194,6 +242,7 @@ function mergeWithPGResults(
     const developerEntity = developerField ? entityById.get(developerField) : null;
 
     for (const s of scores) {
+      const orgEntity = s.testedByOrgId ? entityById.get(s.testedByOrgId) : null;
       const row: BenchmarkResultRow = {
         modelId: model.id,
         modelTitle: model.title,
@@ -202,6 +251,11 @@ function mergeWithPGResults(
         developerName: developerEntity?.title ?? null,
         score: s.score,
         unit: s.unit ?? undefined,
+        testedBy: s.testedBy ?? null,
+        testedByOrgId: s.testedByOrgId ?? null,
+        testedByOrgName: orgEntity?.title ?? null,
+        evaluationDate: s.evaluationDate ?? null,
+        methodologyNotes: s.methodologyNotes ?? null,
       };
 
       const arr = merged.get(s.benchmarkId) ?? [];
