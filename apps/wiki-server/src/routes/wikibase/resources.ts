@@ -2140,7 +2140,11 @@ const resourcesApp = new Hono()
         // content would silently produce duplicate rows. See
         // resource-ingest.ts CONTENT_HASH_PREFIX_LENGTH and the citation
         // dual-write in citations.ts for the canonical sites.
-        contentHash: z.string().length(16).regex(/^[0-9a-f]{16}$/i),
+        contentHash: z
+          .string()
+          .length(16)
+          .regex(/^[0-9a-f]{16}$/i)
+          .transform((value) => value.toLowerCase()),
         fetchedAt: z.string().datetime(),
         content: z.string().max(2_000_000).nullable().optional(),
         // Original byte size of the source content. Capped at 100 MiB to
@@ -2258,7 +2262,7 @@ const resourcesApp = new Hono()
         })
         .from(resourceContentVersions)
         .where(eq(resourceContentVersions.resourceId, stableId))
-        .orderBy(desc(resourceContentVersions.fetchedAt))
+        .orderBy(desc(resourceContentVersions.fetchedAt), desc(resourceContentVersions.id))
         .limit(limit)
         .offset(offset);
 

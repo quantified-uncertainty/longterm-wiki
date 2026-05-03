@@ -123,7 +123,7 @@ describe("archivePdfResource", () => {
     expect(call.contentLifecycle).toBe("immutable");
     expect(call.contentHash).toBe(SAMPLE_HASH);
     expect(call.title).toBe("AI Safety Index 2024 Full Report");
-    expect(call.publishedDate).toBe("2024-12-11");
+    expect(call.publishedDate).toBeNull();
     expect(call.typeMetadata?.pdf?.pageCount).toBe(60);
     expect(call.typeMetadata?.pdf?.byteSize).toBe(SAMPLE_BYTES.byteLength);
   });

@@ -87,6 +87,12 @@ describe("EvidenceLocatorSchema (QUA-942)", () => {
         EvidenceLocatorSchema.parse({ kind: "csv-cell", row: 0, column: "x" }),
       ).toThrow();
     });
+
+    it("rejects missing row", () => {
+      expect(() =>
+        EvidenceLocatorSchema.parse({ kind: "csv-cell", column: "x" }),
+      ).toThrow();
+    });
   });
 
   describe("html-anchor locator", () => {

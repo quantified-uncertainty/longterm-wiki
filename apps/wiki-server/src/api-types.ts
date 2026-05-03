@@ -1924,7 +1924,7 @@ const PdfPageLocator = z.object({
   /** Optional table reference within the page (e.g. "2.3"). */
   table: z.string().max(50).optional(),
   /** Optional row reference within a table on the page. */
-  row: z.union([z.string().max(50), z.number().int()]).optional(),
+  row: z.union([z.string().max(50), z.number().int().min(1)]).optional(),
 });
 const CsvCellLocator = z.object({
   kind: z.literal("csv-cell"),

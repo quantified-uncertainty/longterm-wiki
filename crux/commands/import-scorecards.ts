@@ -402,7 +402,7 @@ async function cmdFetch(source: string, wave: string, force: boolean): Promise<C
 const ARCHIVE_PDF_DEFAULT_URLS: Record<string, Record<string, string>> = {
   fli_index: {
     "2024-12":
-      "https://futureoflife.org/wp-content/uploads/2024/12/AI-Safety-Index-2024-Full-Report-27-May-25.pdf",
+      "https://futureoflife.org/wp-content/uploads/2024/12/AI-Safety-Index-2024-Full-Report-11-Dec-24.pdf",
   },
 };
 

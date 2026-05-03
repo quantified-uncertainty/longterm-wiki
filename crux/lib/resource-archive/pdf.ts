@@ -91,6 +91,11 @@ export interface ArchivePdfResourceOptions {
   tags?: string[];
   /** Free-form context note (e.g., "FLI Dec 2024 wave report"). */
   contextNote?: string | null;
+  /** Optional ISO date (YYYY-MM-DD) for `resources.published_date`.
+   *  PDF Info `CreationDate` is file/export metadata and not a reliable
+   *  publication date, so it is no longer inferred — callers must pass this
+   *  explicitly when known. */
+  publishedDate?: string | null;
 }
 
 export interface ArchivePdfResourceResult {
@@ -142,6 +147,17 @@ function basenameFromUrl(url: string): string {
   }
 }
 
+function assertSafeUrl(target: URL): void {
+  if (target.protocol !== "https:") {
+    throw new Error(`Unsupported protocol: ${target.protocol} (HTTPS only)`);
+  }
+  if (isPrivateHost(target.hostname.toLowerCase())) {
+    throw new Error(`Private host blocked (SSRF protection): ${target.hostname}`);
+  }
+}
+
+const MAX_REDIRECTS = 5;
+
 async function fetchPdf(url: string): Promise<ArrayBuffer> {
   let parsed: URL;
   try {
@@ -149,37 +165,83 @@ async function fetchPdf(url: string): Promise<ArrayBuffer> {
   } catch {
     throw new Error(`Malformed URL: ${url}`);
   }
-  if (parsed.protocol !== "https:") {
-    throw new Error(`Unsupported protocol: ${parsed.protocol} (HTTPS only)`);
+  assertSafeUrl(parsed);
+
+  let currentUrl = parsed;
+  let response: Response | null = null;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    const hopResponse = await fetch(currentUrl, {
+      headers: {
+        "User-Agent": FETCH_USER_AGENT,
+        Accept: "application/pdf,*/*;q=0.5",
+      },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      redirect: "manual",
+    });
+    if (hopResponse.status >= 300 && hopResponse.status < 400) {
+      const location = hopResponse.headers.get("location");
+      if (!location) {
+        throw new Error(`Redirect ${hopResponse.status} missing Location header from ${currentUrl}`);
+      }
+      let next: URL;
+      try {
+        next = new URL(location, currentUrl);
+      } catch {
+        throw new Error(`Malformed redirect Location: ${location}`);
+      }
+      assertSafeUrl(next);
+      currentUrl = next;
+      continue;
+    }
+    response = hopResponse;
+    break;
   }
-  if (isPrivateHost(parsed.hostname.toLowerCase())) {
-    throw new Error(`Private host blocked (SSRF protection): ${parsed.hostname}`);
+  if (!response) {
+    throw new Error(`Too many redirects (>${MAX_REDIRECTS}) starting at ${url}`);
   }
 
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": FETCH_USER_AGENT,
-      Accept: "application/pdf,*/*;q=0.5",
-    },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    redirect: "follow",
-  });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} fetching ${url}`);
+    throw new Error(`HTTP ${response.status} fetching ${currentUrl}`);
   }
   const ct = response.headers.get("content-type") ?? "";
   if (!ct.includes("application/pdf") && !ct.includes("octet-stream")) {
-    throw new Error(`Expected application/pdf, got ${ct} for ${url}`);
+    throw new Error(`Expected application/pdf, got ${ct} for ${currentUrl}`);
   }
 
-  // Buffer the response so we can enforce the size cap before extraction.
-  const buf = await response.arrayBuffer();
-  if (buf.byteLength > MAX_PDF_BYTES) {
-    throw new Error(
-      `PDF too large: ${buf.byteLength} bytes (limit ${MAX_PDF_BYTES})`,
-    );
+  // Stream the body so an oversized response trips the cap before exhausting
+  // memory. We can't trust Content-Length to be present or honest.
+  const body = response.body;
+  if (!body) {
+    throw new Error(`Response body missing for ${currentUrl}`);
   }
-  return buf;
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+      total += value.byteLength;
+      if (total > MAX_PDF_BYTES) {
+        await reader.cancel().catch(() => {}); // catch-ok: stream already aborted; cancel() failure is moot
+        throw new Error(
+          `PDF too large: >${MAX_PDF_BYTES} bytes (limit ${MAX_PDF_BYTES})`,
+        );
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const merged = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return merged.buffer.slice(merged.byteOffset, merged.byteOffset + merged.byteLength) as ArrayBuffer;
 }
 
 async function loadBinary(opts: ArchivePdfResourceOptions): Promise<ArrayBuffer> {
@@ -193,8 +255,12 @@ async function loadBinary(opts: ArchivePdfResourceOptions): Promise<ArrayBuffer>
     return ab;
   }
   if (opts.localFilePath) {
-    // stat() throws ENOENT if the file is missing — fall through to URL fetch.
-    const fileStat = await stat(opts.localFilePath).catch(() => null);
+    // Only ENOENT falls through to URL fetch — permission/IO errors must surface
+    // so callers see the real failure instead of a silent network re-fetch.
+    const fileStat = await stat(opts.localFilePath).catch((err: NodeJS.ErrnoException) => {
+      if (err && err.code === "ENOENT") return null;
+      throw err;
+    });
     if (fileStat) {
       if (fileStat.size > MAX_PDF_BYTES) {
         throw new Error(
@@ -254,9 +320,7 @@ export async function archivePdfResource(
     contentHash, // resources.content_hash mirrors the latest snapshot hash
     fetchedAt,
     publisherEntityId: opts.publisherEntityId ?? null,
-    publishedDate: meta?.creationDate
-      ? meta.creationDate.slice(0, 10)
-      : null,
+    publishedDate: opts.publishedDate ?? null,
     authors: meta?.author ? [meta.author] : null,
     resourcePurpose: opts.resourcePurpose ?? "primary_source",
     resourceSubtype: opts.resourceSubtype ?? "pdf_report",
