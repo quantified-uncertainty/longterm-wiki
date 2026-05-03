@@ -3980,13 +3980,22 @@
   type: organization
   orgType: safety-org
   title: SaferAI
-  website: https://saferai.org
+  website: https://www.safer-ai.org
   description: >-
-    Organization focused on AI safety standards and evaluation frameworks.
+    Paris-based nonprofit (French association loi 1901) building risk
+    measurement tools for governments and companies managing frontier AI.
+    Founded by Siméon Campos (chairman); Henry Papadatos serves as
+    executive director. Best known for the SaferAI Ratings — independent
+    evaluations of leading AI developers across four dimensions (risk
+    identification, severity assessment, safeguard implementation, and
+    governance), published under CC BY-SA 4.0. Also contributes to
+    standards work at CEN-CENELEC JTC 21, ISO generative AI red-teaming,
+    the EU Code of Practice, and the OECD Hiroshima AI Process.
   tags:
     - ai-safety
     - ai-governance
-  lastUpdated: 2026-03
+    - ai-evaluation
+  lastUpdated: 2026-05
 
 - id: ai-safety-camp
   stableId: sid_2BUn75004w

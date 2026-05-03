@@ -117,6 +117,8 @@ interface ApiOrg {
   totalFundingNum: number | null;
   foundedDate: string | null;
   grantsGivenCount?: number | null;
+  /** QUA-867 item D — distinct latest-wave scorecards rating this org. */
+  externalScorecardCount?: number | null;
 }
 
 interface ApiOrgsResponse {
