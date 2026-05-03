@@ -10,6 +10,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { bulkQuery } from "../shared/bulk-query.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
@@ -129,22 +130,21 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select(joinedSelect)
-      .from(equityPositions)
-      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
-      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
-      .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(equityPositions);
-    const total = countResult[0].count;
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select(joinedSelect)
+        .from(equityPositions)
+        .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+        .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
+        .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(equityPositions),
+      formatRow,
+    });
 
     return c.json({
-      equityPositions: rows.map(formatRow),
+      equityPositions: rows,
       total,
       limit,
       offset,
@@ -173,25 +173,26 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
-    const rows = await db
-      .select(joinedSelect)
-      .from(equityPositions)
-      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
-      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
-      .where(eq(equityPositions.companyId, resolvedId))
-      .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
-      .limit(limit)
-      .offset(offset);
 
-    const countResult = await db
-      .select({ count: count() })
-      .from(equityPositions)
-      .where(eq(equityPositions.companyId, resolvedId));
-    const total = countResult[0].count;
+    const where = eq(equityPositions.companyId, resolvedId);
+
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select(joinedSelect)
+        .from(equityPositions)
+        .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+        .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
+        .where(where)
+        .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(equityPositions).where(where),
+      formatRow,
+    });
 
     return c.json({
       entityId: resolvedId,
-      equityPositions: rows.map(formatRow),
+      equityPositions: rows,
       total,
       limit,
       offset,
@@ -204,25 +205,25 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select(joinedSelect)
-      .from(equityPositions)
-      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
-      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
-      .where(eq(equityPositions.holderId, holderId))
-      .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
-      .limit(limit)
-      .offset(offset);
+    const where = eq(equityPositions.holderId, holderId);
 
-    const countResult = await db
-      .select({ count: count() })
-      .from(equityPositions)
-      .where(eq(equityPositions.holderId, holderId));
-    const total = countResult[0].count;
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select(joinedSelect)
+        .from(equityPositions)
+        .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+        .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
+        .where(where)
+        .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(equityPositions).where(where),
+      formatRow,
+    });
 
     return c.json({
       holderId,
-      equityPositions: rows.map(formatRow),
+      equityPositions: rows,
       total,
       limit,
       offset,

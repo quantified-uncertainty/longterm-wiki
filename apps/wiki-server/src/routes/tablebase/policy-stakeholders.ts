@@ -10,6 +10,7 @@ import {
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 import {
   SyncStakeholderItemSchema,
   VALID_POSITIONS,
@@ -44,11 +45,10 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db.select().from(policyStakeholders)
-      .limit(limit)
-      .offset(offset);
-
-    const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders);
+    const { rows, total } = await paginatedQuery({
+      query: db.select().from(policyStakeholders).limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(policyStakeholders),
+    });
 
     return c.json({ policyStakeholders: rows, total, limit, offset });
   })
@@ -63,13 +63,10 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
       ? and(eq(policyStakeholders.policyEntityId, resolvedId), eq(policyStakeholders.position, position))
       : eq(policyStakeholders.policyEntityId, resolvedId);
 
-    const rows = await db.select().from(policyStakeholders)
-      .where(whereClause)
-      .limit(limit)
-      .offset(offset);
-
-    const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders)
-      .where(whereClause);
+    const { rows, total } = await paginatedQuery({
+      query: db.select().from(policyStakeholders).where(whereClause).limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(policyStakeholders).where(whereClause),
+    });
 
     return c.json({ stakeholders: rows, total });
   })
@@ -80,13 +77,12 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db.select().from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId))
-      .limit(limit)
-      .offset(offset);
+    const whereClause = eq(policyStakeholders.stakeholderEntityId, resolvedId);
 
-    const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId));
+    const { rows, total } = await paginatedQuery({
+      query: db.select().from(policyStakeholders).where(whereClause).limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(policyStakeholders).where(whereClause),
+    });
 
     return c.json({ positions: rows, total });
   })
