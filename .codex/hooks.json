@@ -1,0 +1,103 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/approve-agent-configs.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/require-checklist.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/warn-main-branch.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-git-stash.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-branch-switch.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-no-verify.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-tmux-kill.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-other-slots.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/block-raw-gh-pr.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/require-stage-approved.sh'",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/recover-cwd.sh'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/session-start.sh'",
+            "statusMessage": "Setting up environment..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/inject-wip-checklist.sh'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '.codex/hooks/verify-checklist-on-stop.sh'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
