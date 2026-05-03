@@ -20,7 +20,7 @@
     "setup": "bash scripts/setup.sh",
     "setup:quick": "bash scripts/setup.sh --quick",
     "setup:check": "bash scripts/setup.sh --check",
-    "postinstall": "node -e \"try{require('fs').accessSync('crux/build.mjs');require.resolve('esbuild')}catch{process.exit(0)}\" && node crux/build.mjs",
+    "postinstall": "if [ -f crux/build.mjs ]; then node crux/build.mjs; fi",
     "prepare": "git config core.hooksPath .githooks || true; git config merge.drizzle-journal.driver 'node crux/git/drizzle-journal-merge.mjs %O %A %B %P' || true"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/proper-lockfile": "^4.1.4",
     "@vitest/coverage-v8": "4.0.18",
+    "ccusage": "^18.0.11",
     "cheerio": "^1.2.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.2.1",

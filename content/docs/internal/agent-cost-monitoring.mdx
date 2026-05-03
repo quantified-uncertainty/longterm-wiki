@@ -1,0 +1,67 @@
+---
+wikiId: E2558
+title: "Agent Cost Monitoring"
+description: "How to inspect Claude Code agent spend from the terminal with `crux sys cost report` (wraps ccusage)."
+subcategory: dashboards
+contentFormat: article
+lastEdited: "2026-05-02"
+update_frequency: 90
+---
+
+We run ≈\$8-9k/week of Claude Code list-price spend across slots `a1`-`a10`. Cost incidents — runaway patrol sessions, broken cache eviction, accidental Opus usage — used to surface manually weeks late by parsing JSONL transcripts. `pnpm crux sys cost report` is the on-demand terminal view that catches them in days, not weeks.
+
+## Quick reference
+
+```bash
+# Default: last 7 days, daily totals
+pnpm crux sys cost report
+
+# Rank slots by spend over last 14 days
+pnpm crux sys cost report --by=session --since=14d
+
+# 5-hour billing-block view (matches Claude's rate-limit windows)
+pnpm crux sys cost report --by=blocks
+
+# Per-model breakdown — useful for "is this Opus or Sonnet?"
+pnpm crux sys cost report --by=session --breakdown
+
+# Machine-readable for piping into another tool
+pnpm crux sys cost report --by=session --json | jq '.sessions[0]'
+```
+
+Wrapper around [`ccusage`](https://github.com/ryoppippi/ccusage), which parses the same JSONL transcripts (`~/.claude/projects/*.jsonl`) we used to grep manually. Cost numbers match list-price billing (Opus 4.7 = \$5/\$25 per Mtok input/output, Sonnet 4.6 = \$3/\$15, etc.).
+
+## What `--by` means
+
+| `--by` | Grouping | Useful for |
+|--------|---------|-----------|
+| `daily` (default) | Per-day totals                                  | Spotting day-over-day spikes |
+| `session` | Per project directory (= per slot for us)       | "Which slot is burning the most?" |
+| `weekly`  | Per ISO week                                    | Weekly trend |
+| `monthly` | Per calendar month                              | Budget review |
+| `blocks`  | Per 5-hour billing window                       | Matches Claude's rate-limit semantics |
+
+Note: `ccusage` calls a slot a "session" because it groups by project directory; an actual Claude Code conversation has its own UUID JSONL file. For per-conversation breakdowns, raw `~/.claude/projects/<slot>/<uuid>.jsonl` is the source — there's no first-class command for that yet.
+
+## Detecting an incident — playbook
+
+When you suspect a cost spike (Discord ping, monthly bill review, gut feel):
+
+1. `pnpm crux sys cost report --by=session --since=7d` to rank slots.
+2. If one slot is way ahead, drill in: `pnpm crux sys cost report --by=blocks --since=2d --breakdown`.
+3. Check the slot's tmux window or `crux sys sessions list --slot=N` to see what's running.
+4. Common causes:
+    - Opus on a refactor that should be Sonnet — kill, swap model, restart.
+    - Re-read/re-summarize loop — kill, file a Linear ticket on the looping pattern.
+    - A patrol session with a stuck loop — see `.claude/rules/agent-planning-discipline.md`.
+
+## What's deliberately out of scope
+
+- **Live dashboards / alerts** — we run Grafana in the production k8s cluster already. If we ever want live cost dashboards, the right move is to wire Claude Code's built-in OTel exporter (`CLAUDE_CODE_ENABLE_TELEMETRY=1`) to the existing prod Prometheus, not to run a parallel docker stack on each workstation.
+- **Per-PR / per-Linear-ticket cost attribution** — needs a join with `agent_sessions`. Separate ticket if it becomes useful.
+- **Cost-by-user attribution** — single-user setup, not worth the labels.
+
+## References
+
+- [ccusage docs](https://ccusage.com/guide/)
+- [Claude Code: Manage costs](https://docs.claude.com/en/docs/claude-code/costs)
