@@ -32,6 +32,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT, CONTENT_DIR_ABS, loadIdRegistry } from '../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { withPipelineRun } from '../lib/pipeline-runs/lifecycle.ts';
 import { fetchSource } from '../lib/search/source-fetcher.ts';
 import { createLogger } from '../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../lib/cli.ts';
@@ -1509,6 +1510,7 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
   }
   const tracker = new CostTracker();
 
+  async function extractBody(): Promise<CommandResult> {
   // Process each entity
   const results: ExtractionResult[] = [];
 
@@ -1680,6 +1682,18 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
   }
 
   return { output, exitCode: 0 };
+  }
+
+  return withPipelineRun(
+    {
+      pipelineName: 'extract-structured-data',
+      entityId: entityIdArg ?? null,
+      shape: effectiveEntityType ?? 'mixed',
+      allowOffline: true,
+      tracker,
+    },
+    extractBody,
+  );
 }
 
 // ---------------------------------------------------------------------------

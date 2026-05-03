@@ -24,6 +24,7 @@ import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
+import { withPipelineRun } from '../../lib/pipeline-runs/lifecycle.ts';
 
 import {
   type OrchestratorContext,
@@ -327,9 +328,9 @@ export async function runOrchestrator(
   // ── Build context ─────────────────────────────────────────────────────────
 
   const tracker = new CostTracker();
-
   const mode = options.mode || 'improve';
 
+  async function runOrchestratorBody(): Promise<OrchestratorResult> {
   const ctx: OrchestratorContext = {
     mode,
     page,
@@ -532,4 +533,16 @@ export async function runOrchestrator(
     outputPath: '', // Set by caller
     finalContent: ctx.currentContent,
   };
+  }
+
+  return withPipelineRun(
+    {
+      pipelineName: 'authoring-orchestrator',
+      entityId: page.id,
+      shape: `${mode}:${tier}`,
+      allowOffline: true,
+      tracker,
+    },
+    runOrchestratorBody,
+  );
 }
