@@ -499,13 +499,9 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
   if (s.allPassing) {
     let output = `${c.green}✓ All ${s.totalItems} checklist items complete!${c.reset}\n`;
 
-    // Mark session as completed (best-effort) and sync the close-time
-    // fields the /agent-ship skill collected — `checksYaml`, `reviewed`,
-    // and `prUrl`. Without this spread the row went to status='completed'
-    // with all three columns NULL (QUA-1073). PR lookup is skipped here:
-    // in `/agent-ship`, `complete` runs at Step 7 BEFORE the PR is
-    // pushed in Step 8, so any lookup would always miss; `agents close`
-    // (Step 9) does the lookup once the PR exists.
+    // QUA-1073: PATCH must carry close-time fields, not just status.
+    // Skip PR lookup — this runs at /agent-ship Step 7, before the
+    // PR is pushed in Step 8; `agents close` (Step 9) does the lookup.
     try {
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);

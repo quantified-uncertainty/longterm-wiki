@@ -420,14 +420,23 @@ async function closeCommand(
         ])
       : null;
 
-    const sessionClosePromise = (branch && branch !== 'main' && branch !== 'detached')
+    const closeable = branch && branch !== 'main' && branch !== 'detached';
+    const sessionClosePromise = closeable
       ? getAgentSessionByBranch(branch).catch(() => null)
       : null;
+    // Speculatively kick off the close-time PATCH payload build —
+    // it overlaps the GitHub PR lookup with the parallel DB calls
+    // above instead of running serialized after them. The cost of a
+    // wasted lookup when sessionResult ends up missing is one HTTP
+    // call; the save is 100-500 ms when it lands.
+    const closeUpdatesPromise = closeable
+      ? buildCloseUpdates({ branch }).catch(() => null)
+      : null;
 
-    // Await all parallel calls
-    const [agentResults, sessionResult] = await Promise.all([
+    const [agentResults, sessionResult, closeUpdates] = await Promise.all([
       agentClosePromise,
       sessionClosePromise,
+      closeUpdatesPromise,
     ]);
 
     // Process agent close results
@@ -448,15 +457,13 @@ async function closeCommand(
       output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
     }
 
-    // Process session close result — may need a follow-up call. We
-    // gather `checksYaml`, `reviewed`, and `prUrl` from local state and
-    // include them in the same PATCH so completed rows stop landing
-    // with all three columns NULL (QUA-1073). Unlike `agent-checklist
-    // complete`, this runs AFTER the push so a PR (if any) is real and
-    // worth looking up.
+    // QUA-1073: PATCH carries `checksYaml`, `reviewed`, and `prUrl`
+    // alongside `status` so completed rows stop landing with all three
+    // NULL. Falls back to `{status:'completed'}` if the speculative
+    // build above failed.
     if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
       try {
-        const updates = await buildCloseUpdates({ branch: branch ?? undefined });
+        const updates = closeUpdates ?? { status: 'completed' as const };
         await updateAgentSession(sessionResult.data.id, updates);
         output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
       } catch (e: unknown) {

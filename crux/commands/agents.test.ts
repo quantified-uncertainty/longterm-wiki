@@ -227,10 +227,7 @@ describe('status command (agents)', () => {
   });
 });
 
-// QUA-1073: closing a session must PATCH `checksYaml`, `reviewed`, and
-// `prUrl` along with `status='completed'`. Previously the close command
-// sent only `{ status: 'completed' }`, leaving every completed row with
-// NULL writeback fields.
+// QUA-1073: PATCH must include checksYaml/reviewed/prUrl, not just status.
 describe('close command (agents)', () => {
   beforeEach(async () => {
     listActiveAgentsMock.mockReset();
@@ -270,14 +267,11 @@ describe('close command (agents)', () => {
 
     await commands.close([], {});
 
-    // Unlike `agent-checklist complete`, `agents close` runs AFTER the
-    // push (Step 9 of /agent-ship), so we DO want the PR lookup to
-    // run — no skipPrLookup here.
+    // No skipPrLookup — `close` runs after the push.
     expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
       branch: 'claude/qua-1073-fix',
     });
 
-    // Critical: PATCH must include the sync fields, not just status.
     expect(updateMock).toHaveBeenCalledWith(99, {
       status: 'completed',
       checksYaml: '{"initialized":true,"completed":3}',
@@ -296,9 +290,6 @@ describe('close command (agents)', () => {
       data: { id: 100, status: 'active' },
     } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
 
-    // Helper resolved with just status — no checklist, no marker, no
-    // PR (e.g. a quick-fix session that called /agent-end with nothing
-    // to sync).
     buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
 
     await commands.close([], {});

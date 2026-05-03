@@ -427,15 +427,11 @@ export async function listRecentOpenIssues(limit = 30): Promise<GitHubIssue[]> {
 }
 
 /**
- * Look up the open PR URL for a branch (`html_url` of the first match).
- * Returns null when no open PR exists for the branch — callers spread the
- * absence into PATCH bodies, so undefined-vs-null doesn't matter, but we
- * normalize to null here for the type to be honest about "lookup ran, no
- * result." Throws on auth failure / network error so callers can decide
- * whether to fail loud or swallow.
- *
- * Single source of truth for the `pulls?head=quantified-uncertainty:<branch>`
- * pattern that previously appeared 5 times in `crux/commands/pr.ts`.
+ * Look up the open PR URL for a branch. Returns null when no open PR
+ * exists. Throws on auth / network error — callers decide whether to
+ * swallow. (Existing `pulls?head=...` callsites in `crux/commands/pr.ts`
+ * still hand-roll the URL and want the full `GitHubPR` shape; this
+ * helper is the URL-only fast path used by session close.)
  */
 export async function getOpenPrUrlByBranch(branch: string): Promise<string | null> {
   if (!branch) return null;

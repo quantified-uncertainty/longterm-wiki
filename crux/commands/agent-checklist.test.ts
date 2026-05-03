@@ -868,11 +868,7 @@ describe('agent-checklist complete', () => {
     expect(result.output).toContain('All 2 checklist items complete');
   });
 
-  // QUA-1073: completing a session must PATCH `checksYaml`, `reviewed`,
-  // and `prUrl` alongside `status='completed'` so the row stops landing
-  // with all three columns NULL. The previous behavior sent only
-  // `{ status: 'completed' }`, leaving the dashboard / maintain-retro
-  // / page-changes consumers blind.
+  // QUA-1073: PATCH must include checksYaml/reviewed/prUrl, not just status.
   it('PATCHes the close updates payload alongside status (QUA-1073)', async () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
 2. [x] \`gate-passes\` Gate passes (auto-verify)
@@ -899,18 +895,12 @@ describe('agent-checklist complete', () => {
     const result = await commands.complete([], {});
     expect(result.exitCode).toBe(0);
 
-    // `complete` runs at Step 7 of /agent-ship, BEFORE the PR is
-    // pushed in Step 8. Skip the PR lookup so we don't burn a GitHub
-    // API call on every pre-ship validation run that's guaranteed to
-    // miss.
+    // skipPrLookup: true because `complete` runs before the PR is pushed.
     expect(buildCloseUpdatesMock).toHaveBeenCalledWith({
       branch: 'claude/test-branch-ABC',
       skipPrLookup: true,
     });
 
-    // Critical assertion: the PATCH body MUST carry the close-time
-    // fields, not just `{ status: 'completed' }`. A regression here
-    // re-introduces the QUA-1073 NULL writeback.
     expect(updateMock).toHaveBeenCalledWith(42, {
       status: 'completed',
       checksYaml: '{"initialized":true,"completed":2}',
@@ -934,16 +924,12 @@ describe('agent-checklist complete', () => {
       data: { id: 7, status: 'active' },
     } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
 
-    // Helper returned only status (no checklist, no marker, no PR — e.g.
-    // the session was wrapped before /agent-ship gathered any of those).
     buildCloseUpdatesMock.mockResolvedValueOnce({ status: 'completed' });
 
     await commands.complete([], {});
 
-    // The body is `{ status: 'completed' }`, which is the documented
-    // fallback. We don't want spurious nulls sent for fields the close
-    // path couldn't observe — those would overwrite values written by
-    // earlier hooks (session-finalize → title/summary).
+    // No spurious nulls — we don't want to overwrite values the
+    // SessionEnd hook (`session-finalize` → title/summary) wrote.
     expect(updateMock).toHaveBeenCalledWith(7, { status: 'completed' });
   });
 });
