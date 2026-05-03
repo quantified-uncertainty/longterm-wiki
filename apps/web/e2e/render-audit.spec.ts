@@ -135,6 +135,16 @@ const SIMPLE_PAGES = [
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
+  // QUA-869 — FMTI stub orgs promoted to YAML so /scorecards row links resolve.
+  // Loading these confirms the YAML entries persist; if YAML is removed
+  // and the entity reverts to a PG-only stub, the directory page returns 404.
+  "/organizations/ai21-labs",
+  "/organizations/midjourney",
+  "/organizations/writer",
+  "/organizations/adept",
+  "/organizations/bigcode",
+  "/organizations/aleph-alpha",
+  "/organizations/stability-ai",
   "/divisions",  // QUA-897 sourcing-summary header
   // NOTE: /things/[id] was migrated to EntityProfileShell in QUA-489 but is
   // not in this list — its records live only in PG, so the page 404s in the
