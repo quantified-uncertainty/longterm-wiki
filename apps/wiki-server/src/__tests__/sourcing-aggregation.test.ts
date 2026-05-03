@@ -22,6 +22,24 @@ function row(
   return { verdict, relevanceScore, confidence, checkedAt };
 }
 
+function staleRow(
+  verdict: EvidenceRow["verdict"],
+  relevanceScore: number | null = 1.0,
+  confidence: number | null = null,
+  checkedAt: Date | null = null,
+): EvidenceRow {
+  return { verdict, relevanceScore, confidence, checkedAt, isStale: true };
+}
+
+function freshRow(
+  verdict: EvidenceRow["verdict"],
+  relevanceScore: number | null = 1.0,
+  confidence: number | null = null,
+  checkedAt: Date | null = null,
+): EvidenceRow {
+  return { verdict, relevanceScore, confidence, checkedAt, isStale: false };
+}
+
 describe("aggregateEvidence — empty / degenerate input", () => {
   it("returns 'unchecked' for an empty evidence list", () => {
     const r = aggregateEvidence([]);
@@ -407,5 +425,163 @@ describe("aggregateEvidence — droppedLowRelevance (QUA-792)", () => {
     expect(r.droppedLowRelevance.map((c) => c.verdict)).toEqual([
       "contradicted",
     ]);
+  });
+});
+
+describe("aggregateEvidence — droppedStale (QUA-991)", () => {
+  // Real-world scenario from QUA-991: ~500 records on prod (sampled
+  // 2026-05-01) sit at `partial` because a stale `partial` row from an
+  // older checker model (or a QUA-650 retro-scan's "subject mismatch"
+  // sweep) ties weight with a fresh `confirmed` row from the current
+  // model — and `partial` outranks `confirmed` in the priority tiebreak,
+  // so re-verification can never lift the aggregate. The fix excludes
+  // stale rows from the headline when at least one fresh row exists.
+  it("fresh confirmed beats stale partial — the canonical QUA-991 case", () => {
+    const r = aggregateEvidence([
+      freshRow("confirmed", 1.0, 0.95),
+      staleRow("partial", 1.0, 0.6),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.contributing.map((c) => c.verdict)).toEqual(["confirmed"]);
+    expect(r.droppedStale.map((c) => c.verdict)).toEqual(["partial"]);
+    expect(r.droppedStale[0].rowCount).toBe(1);
+  });
+
+  it("falls back to current behavior when every row is stale", () => {
+    // No fresh row → stale rows feed the headline as before. This is the
+    // ticket's case (b): re-verification didn't happen, so an old reading
+    // is better than nothing.
+    const r = aggregateEvidence([
+      staleRow("partial", 1.0, 0.6),
+      staleRow("partial", 1.0, 0.7),
+    ]);
+    expect(r.verdict).toBe("partial");
+    expect(r.droppedStale).toEqual([]);
+    expect(r.contributing[0].rowCount).toBe(2);
+  });
+
+  it("priority tiebreak still applies between two fresh rows", () => {
+    // Ticket's case (c): if both contributors are fresh, nothing changes —
+    // contradicted (priority 0) still wins over confirmed (priority 4) at
+    // equal weight, the same as before QUA-991.
+    const r = aggregateEvidence([
+      freshRow("contradicted", 0.8),
+      freshRow("confirmed", 0.8),
+    ]);
+    expect(r.verdict).toBe("contradicted");
+    expect(r.droppedStale).toEqual([]);
+  });
+
+  it("treats undefined isStale as fresh (back-compat for legacy callers)", () => {
+    // Tests written before QUA-991 don't supply isStale. Those rows must
+    // still aggregate, otherwise the existing test corpus regresses to
+    // unchecked/empty behavior.
+    const r = aggregateEvidence([
+      row("confirmed", 1.0, 0.9), // isStale undefined
+      row("partial", 1.0, 0.7), // isStale undefined
+    ]);
+    expect(r.verdict).toBe("partial"); // priority tiebreak: partial(2) < confirmed(4)
+    expect(r.droppedStale).toEqual([]);
+  });
+
+  it("treats null isStale as fresh", () => {
+    // Defensive: explicit null behaves the same as undefined.
+    const r = aggregateEvidence([
+      { verdict: "confirmed", relevanceScore: 1.0, confidence: 0.9, isStale: null },
+      staleRow("partial", 1.0, 0.6),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.droppedStale.map((c) => c.verdict)).toEqual(["partial"]);
+  });
+
+  it("aggregates stale-row counts per verdict for the dissent breakdown", () => {
+    const r = aggregateEvidence([
+      freshRow("confirmed", 0.9, 0.9),
+      staleRow("partial", 1.0, 0.5),
+      staleRow("partial", 0.8, 0.4),
+      staleRow("contradicted", 0.7, 0.6),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    const stalePartial = r.droppedStale.find((c) => c.verdict === "partial");
+    const staleContradicted = r.droppedStale.find(
+      (c) => c.verdict === "contradicted",
+    );
+    expect(stalePartial?.rowCount).toBe(2);
+    expect(stalePartial?.weight).toBeCloseTo(1.8, 5);
+    expect(staleContradicted?.rowCount).toBe(1);
+    expect(staleContradicted?.weight).toBeCloseTo(0.7, 5);
+  });
+
+  it("excludes stale rows even when their weight would dominate", () => {
+    // Without the QUA-991 filter, three stale partials (weight 3.0) would
+    // beat one fresh confirmed (weight 1.0). The fresh row alone now wins.
+    const r = aggregateEvidence([
+      freshRow("confirmed", 1.0, 0.95),
+      staleRow("partial", 1.0, 0.4),
+      staleRow("partial", 1.0, 0.5),
+      staleRow("partial", 1.0, 0.6),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.droppedStale[0].rowCount).toBe(3);
+  });
+
+  it("returns 'unchecked' when all stale rows are excluded and the lone fresh row is below threshold", () => {
+    // Edge case: when the sole fresh row is sub-relevance, the headline
+    // becomes 'unchecked' — we don't fall back to stale rows just because
+    // the fresh row was weak. Documents this so a future tweak doesn't
+    // silently re-introduce the QUA-991 bug for low-relevance fresh rows.
+    const r = aggregateEvidence([
+      freshRow("confirmed", 0.1), // below DEFAULT_MIN_RELEVANCE = 0.3
+      staleRow("partial", 1.0, 0.6),
+    ]);
+    expect(r.verdict).toBe("unchecked");
+    expect(r.droppedStale.map((c) => c.verdict)).toEqual(["partial"]);
+    expect(r.droppedLowRelevance.map((c) => c.verdict)).toEqual(["confirmed"]);
+  });
+
+  it("excludes not_applicable stale rows the same way fresh ones are excluded (never voting)", () => {
+    // not_applicable always wins the drop, regardless of staleness.
+    const r = aggregateEvidence([
+      freshRow("confirmed", 0.9, 0.9),
+      { verdict: "not_applicable", relevanceScore: 0.9, confidence: 0.99, isStale: true },
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.droppedNotApplicable).toBe(1);
+    expect(r.droppedStale).toEqual([]); // not_applicable was filtered before stale check
+  });
+
+  it("recency tie-break (QUA-992) cannot rescue a stale row in the presence of a fresh row", () => {
+    // Stale + recent (e.g. a recent re-check by an old model that's been
+    // demoted) still loses to fresh — the staleness filter runs before the
+    // recency tie-break.
+    const old = new Date("2026-04-01T00:00:00Z");
+    const evenOlder = new Date("2026-01-01T00:00:00Z");
+    const r = aggregateEvidence([
+      freshRow("confirmed", 1.0, 0.9, evenOlder),
+      staleRow("partial", 1.0, 0.6, old), // recent but stale
+    ]);
+    expect(r.verdict).toBe("confirmed");
+  });
+});
+
+describe("buildReasoning surfacing droppedStale (QUA-991)", () => {
+  // The `reasoning` string is persisted to source_check_verdicts.reasoning;
+  // it is what an operator sees in `/api/sourcing/verdicts/...`. It must
+  // mention stale exclusion so a previously-`partial` record's flip to
+  // `confirmed` is auditable.
+  it("includes a 'stale (excluded)' clause when stale rows were dropped", async () => {
+    // Re-import here so we don't leak the helper into other test files.
+    // It's an internal helper; we go through aggregateEvidence + a tiny
+    // reasoning shim because recompute-verdict.ts owns the canonical impl.
+    const aggregate = aggregateEvidence([
+      freshRow("confirmed", 1.0, 0.95),
+      staleRow("partial", 1.0, 0.6),
+    ]);
+    expect(aggregate.droppedStale).toHaveLength(1);
+    // The integration-level reasoning string is exercised in
+    // recompute-verdict.test.ts; this test pins the contributing/droppedStale
+    // shape that the reasoning builder reads from.
+    expect(aggregate.contributing[0].verdict).toBe("confirmed");
+    expect(aggregate.droppedStale[0].verdict).toBe("partial");
   });
 });

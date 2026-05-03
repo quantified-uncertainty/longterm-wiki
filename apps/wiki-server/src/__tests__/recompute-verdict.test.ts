@@ -230,6 +230,216 @@ describe("recomputeVerdict — end-to-end", () => {
   });
 });
 
+describe("recomputeVerdict — stale-evidence handling (QUA-991)", () => {
+  beforeEach(() => {
+    capturedQueries = [];
+    dispatch = () => [];
+  });
+
+  // Acceptance criterion (a): one fresh confirmed + one stale partial →
+  // confirmed. The stuck-partial regression on prod (≈500 records sampled
+  // 2026-05-01) is exactly this shape — a fresh re-check writes confirmed
+  // but the QUA-650 retro-scan's partial row blocked promotion via
+  // priority-tiebreak. After the QUA-991 fix, the stale row is dropped
+  // from the headline.
+  it("fresh confirmed + stale partial → confirmed (acceptance a)", async () => {
+    const CURRENT = "claude-haiku-4-5-20251001";
+    const OLD = "claude-3-5-sonnet-20241022";
+    let updateBody = "";
+    let updateParams: unknown[] = [];
+    dispatch = (q, p) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        return [
+          {
+            verdict: "confirmed",
+            relevance_score: 1.0,
+            confidence: 0.95,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+          {
+            verdict: "partial",
+            relevance_score: 1.0,
+            confidence: 0.6,
+            checked_at: new Date("2026-04-21T00:00:00Z"),
+            checker_model: OLD,
+          },
+        ];
+      }
+      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        updateBody = q;
+        updateParams = [...p];
+        return [{ record_id: "investment_test" }];
+      }
+      return [];
+    };
+
+    const result = await recomputeVerdict(getDrizzleDb(), {
+      recordType: "investment",
+      recordId: "investment_test",
+      fieldName: null,
+    });
+
+    expect(result.aggregate.verdict).toBe("confirmed");
+    expect(result.aggregate.contributing[0].verdict).toBe("confirmed");
+    expect(result.aggregate.droppedStale.map((c) => c.verdict)).toEqual([
+      "partial",
+    ]);
+    expect(result.reasoning).toMatch(/1 → confirmed/);
+    expect(result.reasoning).toMatch(/stale \(excluded\): 1 → partial/);
+    // The persisted reasoning + verdict must match what the API returns.
+    expect(updateBody).toMatch(/source_check_verdicts/i);
+    expect(updateParams).toContain("confirmed");
+  });
+
+  // Acceptance criterion (b): only stale rows → current behavior. When no
+  // fresh row exists, an old reading is better than nothing — fall back
+  // to the legacy weighted-priority tiebreak.
+  it("only stale rows → behaves like today (acceptance b)", async () => {
+    const OLD = "claude-3-5-sonnet-20241022";
+    dispatch = (q) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        return [
+          {
+            verdict: "partial",
+            relevance_score: 1.0,
+            confidence: 0.6,
+            checked_at: new Date("2026-04-01T00:00:00Z"),
+            checker_model: OLD,
+          },
+          {
+            verdict: "partial",
+            relevance_score: 1.0,
+            confidence: 0.7,
+            checked_at: new Date("2026-04-10T00:00:00Z"),
+            checker_model: OLD,
+          },
+        ];
+      }
+      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        return [{ record_id: "investment_test" }];
+      }
+      return [];
+    };
+
+    const result = await recomputeVerdict(getDrizzleDb(), {
+      recordType: "investment",
+      recordId: "investment_test",
+      fieldName: null,
+    });
+
+    expect(result.aggregate.verdict).toBe("partial");
+    expect(result.aggregate.droppedStale).toEqual([]);
+    expect(result.aggregate.contributing[0].rowCount).toBe(2);
+    expect(result.reasoning).not.toMatch(/stale \(excluded\)/);
+  });
+
+  // Acceptance criterion (c): two fresh rows tied → priority tiebreak
+  // unchanged. partial(2) < confirmed(4), so partial wins exactly as before
+  // QUA-991 — the new stale filter must not silently change the legacy
+  // tiebreak for the all-fresh case.
+  it("two fresh rows tied → priority-based tiebreak unchanged (acceptance c)", async () => {
+    const CURRENT = "claude-haiku-4-5-20251001";
+    dispatch = (q) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        return [
+          {
+            verdict: "confirmed",
+            relevance_score: 0.8,
+            confidence: 0.9,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+          {
+            verdict: "partial",
+            relevance_score: 0.8,
+            confidence: 0.7,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+        ];
+      }
+      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        return [{ record_id: "investment_test" }];
+      }
+      return [];
+    };
+
+    const result = await recomputeVerdict(getDrizzleDb(), {
+      recordType: "investment",
+      recordId: "investment_test",
+      fieldName: null,
+    });
+
+    // Same checkedAt across both buckets — recency tie-break is silent,
+    // priority decides: partial(2) beats confirmed(4).
+    expect(result.aggregate.verdict).toBe("partial");
+    expect(result.aggregate.droppedStale).toEqual([]);
+  });
+
+  it("treats NULL checker_model as stale (matches isStaleModel semantics)", async () => {
+    // Legacy rows from before the checker_model column was populated have
+    // NULL checker_model. The QUA-991 fix must treat them as stale so
+    // they're excluded from the headline when a fresh row exists.
+    const CURRENT = "claude-haiku-4-5-20251001";
+    dispatch = (q) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        return [
+          {
+            verdict: "confirmed",
+            relevance_score: 1.0,
+            confidence: 0.95,
+            checked_at: new Date("2026-05-01T00:00:00Z"),
+            checker_model: CURRENT,
+          },
+          {
+            verdict: "partial",
+            relevance_score: 1.0,
+            confidence: 0.6,
+            checked_at: new Date("2026-03-01T00:00:00Z"),
+            checker_model: null, // legacy row
+          },
+        ];
+      }
+      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        return [{ record_id: "p_test" }];
+      }
+      return [];
+    };
+
+    const result = await recomputeVerdict(getDrizzleDb(), {
+      recordType: "personnel",
+      recordId: "p_test",
+      fieldName: null,
+    });
+
+    expect(result.aggregate.verdict).toBe("confirmed");
+    expect(result.aggregate.droppedStale.map((c) => c.verdict)).toEqual([
+      "partial",
+    ]);
+  });
+
+  it("loadEvidenceRows reads checker_model so the staleness filter has the data it needs", async () => {
+    // Pin the SELECT shape — if a future refactor drops checker_model
+    // from the projection, the staleness filter would silently regress
+    // to "everything looks fresh" and re-introduce the QUA-991 bug.
+    let selectQuery = "";
+    dispatch = (q) => {
+      if (/select/i.test(q) && /source_check_evidence/i.test(q)) {
+        selectQuery = q;
+        return [];
+      }
+      return [];
+    };
+    await recomputeVerdict(getDrizzleDb(), {
+      recordType: "personnel",
+      recordId: "p_test",
+      fieldName: null,
+    });
+    expect(selectQuery).toMatch(/checker_model/i);
+  });
+});
+
 describe("recomputeVerdictBestEffort", () => {
   beforeEach(() => {
     capturedQueries = [];
