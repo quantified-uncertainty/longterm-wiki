@@ -41,10 +41,80 @@ export interface CostBreakdown {
   rankCost: number;
 }
 
+/**
+ * Per-source detail captured during verification. One CandidateRecord per
+ * URL the pipeline considered for a record — both rejected and accepted —
+ * so reports can be triaged after the fact without re-running the search.
+ *
+ * Both judges' observations are stored when the dual-judge wrapper is
+ * enabled; vLLM fields are null when it's disabled or unreachable. The
+ * Haiku-side fields drive every accept/reject and DB write; the vLLM
+ * fields exist only for offline comparison.
+ */
+export interface CandidateRecord {
+  url: string;
+  provider?: string;
+  title?: string;
+  decision: 'accepted' | 'rejected';
+  /** Set when decision === 'rejected'. */
+  rejection_reason: string | null;
+  /** Slots the entity-mention check reported as missing (debug aid). */
+  missing_slots?: string[][];
+  /** sha256 of the exact page text passed to the judges. The text itself is
+   *  written under that hash to BACKFILL_CONTENT_CACHE_DIR (default
+   *  `dev/backfill-content-cache/`) so any candidate can be replayed
+   *  byte-for-byte after the run. Null when no LLM call was made (cheap
+   *  pre-checks rejected the candidate before content ever reached a model). */
+  content_sha256: string | null;
+  /** Length of the page text passed to the judges (chars). */
+  content_chars: number | null;
+  /** Quote-extraction stage observations. Both judges saw the same prompt
+   *  (built from claim + entity + content); raw responses captured verbatim. */
+  quote_extraction: {
+    haiku: {
+      raw_text: string;
+      quotes: string[];
+      duration_ms: number;
+    };
+    vllm: {
+      raw_text: string;
+      quotes: string[];
+      verified_quotes: string[];
+      duration_ms: number;
+    } | null;
+    /** The subset of haiku.quotes that actually appear verbatim in the page. */
+    haiku_verified_quotes: string[];
+  } | null;
+  /** Entailment stage observations. Only populated when quote-extraction
+   *  produced verbatim quotes (otherwise verification rejected before this
+   *  stage). The verified_quotes that drove this call are reproducible from
+   *  the quote_extraction.haiku_verified_quotes field. */
+  entailment: {
+    sonnet: {
+      raw_text: string;
+      supports: boolean;
+      duration_ms: number;
+    };
+    vllm: {
+      raw_text: string;
+      decision: 'supports' | 'no-support' | 'unparseable';
+      duration_ms: number;
+    } | null;
+  } | null;
+}
+
 /** Per-record outcome captured for the summary + JSON report. */
 export type Outcome =
-  | { kind: 'matched'; url: string; provider?: string; quotes?: string[]; updated?: boolean; cost: CostBreakdown }
-  | { kind: 'no-match'; reason: string; cost: CostBreakdown }
+  | {
+      kind: 'matched';
+      url: string;
+      provider?: string;
+      quotes?: string[];
+      updated?: boolean;
+      cost: CostBreakdown;
+      candidates: CandidateRecord[];
+    }
+  | { kind: 'no-match'; reason: string; cost: CostBreakdown; candidates: CandidateRecord[] }
   | { kind: 'skipped'; reason: string };
 
 export interface RecordOutcome {

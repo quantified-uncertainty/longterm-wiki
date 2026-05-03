@@ -227,7 +227,15 @@ async function processAllRecords(
     addCost(run.totalBreakdown, result.cost);
 
     if (!result.matched) {
-      run.outcomes.push({ record, outcome: { kind: 'no-match', reason: result.reason, cost: result.cost } });
+      run.outcomes.push({
+        record,
+        outcome: {
+          kind: 'no-match',
+          reason: result.reason,
+          cost: result.cost,
+          candidates: result.candidates,
+        },
+      });
       continue;
     }
 
@@ -251,6 +259,7 @@ async function processAllRecords(
         quotes: result.quotes,
         updated,
         cost: result.cost,
+        candidates: result.candidates,
       },
     });
   }

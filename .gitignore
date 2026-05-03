@@ -2,6 +2,11 @@
 dev/sql/
 dev/reports/
 
+# backfill-sources analysis outputs (large, per-run, non-deterministic)
+dev/cache/
+dev/audits/
+dev/backfill-content-cache/
+
 # build output
 dist/
 

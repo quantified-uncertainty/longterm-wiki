@@ -187,6 +187,7 @@ function serializeOutcome({ record, outcome }: RecordOutcome) {
       // human can spot-check for false positives without re-running.
       quotes: outcome.quotes ?? [],
       cost_usd: totalOf(outcome.cost),
+      candidates: outcome.candidates,
     };
   }
   if (outcome.kind === 'no-match') {
@@ -195,6 +196,7 @@ function serializeOutcome({ record, outcome }: RecordOutcome) {
       outcome: 'no-match' as const,
       reason: outcome.reason,
       cost_usd: totalOf(outcome.cost),
+      candidates: outcome.candidates,
     };
   }
   return { ...base, outcome: 'skipped' as const, reason: outcome.reason, cost_usd: 0 };
