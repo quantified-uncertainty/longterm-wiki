@@ -98,6 +98,16 @@
         ]
       },
       {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/cap-edit-churn.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Agent",
         "hooks": [
           {

@@ -7,6 +7,20 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 - When stuck after 3 approaches, stop and document what failed. Research alternatives or file a Linear issue with findings and ask the user — do not ship a broken version.
 - If scope is too large to do thoroughly, split into independently-shippable pieces. A thorough version of a smaller thing beats a shallow version of the whole thing.
 
+## Edit-Churn Discipline
+
+Before editing any file in response to a validator/test failure: **(a)** run the full validator/typechecker once to capture the *complete* error set, **(b)** edit-batch against that list — do not loop "edit → re-run validator → edit." After **5 edits to the same file in one session** without the validator going green, **STOP.** Do not edit again.
+
+Latent-class framing applies here too: if your 6th edit's justification is "this should fix the remaining cases," that is the degeneration-of-thought signal — stop. Industry pathology data (QUA-1070): 13 of 19 long sessions sampled had ≥10 edits to a single file; worst case was 28 edits to one file. More iterations of a confident-but-wrong fix entrench it, not fix it.
+
+When the cap is hit (the `cap-edit-churn.sh` PostToolUse hook will surface this automatically):
+
+1. **Revert all session edits to that file** with `git checkout -- <file>`. Do not "fix" the in-flight edit. The accumulated diff is the symptom, not the bug.
+2. **Write a 3-line revert/replan note** in `.claude/wip-checklist.md`: what the validator wanted (verbatim output), what was tried (the approach class, not each edit), the suspected wrong assumption.
+3. **Dispatch a fresh subagent** (`./ws dispatch <slot> "<task + revert note>"`) with the note as input — not your chat history. Or escalate to the user with the symptom + wrong assumption + the next approach class.
+
+The cap applies per-file per-session and is intentionally aggressive (5, not 10). It is configurable via `CLAUDE_EDIT_CHURN_CAP=N` and bypassable via `CLAUDE_EDIT_CHURN_DISABLE=1` for emergencies, but bypassing it on a real iteration loop is the same as not having it. Source: Cursor's "revert and refine over iterate", Reflexion (arXiv 2305.19118).
+
 ## Testing Depth
 
 **Test core functionality first.** Before writing any test, ask: "What is the one thing this code absolutely must do?" Write that test first, then edge cases. Do not write peripheral tests while skipping the main behavior.

@@ -44,6 +44,11 @@ if [ -f ".claude/wip-checklist.md" ]; then
   CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux sys agent-checklist init\` before editing code.")
 fi
 
+# Clear stale per-file edit counts (QUA-1070 cap-edit-churn state).
+# Same lifecycle as wip-checklist.md: per-session, per-slot, fresh on startup
+# so a new task starts with a clean budget.
+rm -f ".claude/.edit-counts.json"
+
 # ─── 0a. Stale stash detection ──────────────────────────────────────────────────
 # Stale stashes cause branch confusion when a later session does `git stash pop`
 # and restores state from a completely different branch/task. (#3200 incident)

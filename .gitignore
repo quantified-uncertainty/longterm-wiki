@@ -75,6 +75,7 @@ crux/coverage/
 .claude/session.pid
 .claude/last-heartbeat
 .claude/.poll-counts/
+.claude/.edit-counts.json
 .claude/review-done
 .claude/review-phases-done
 .claude/simplify-done
