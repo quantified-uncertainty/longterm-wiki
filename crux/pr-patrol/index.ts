@@ -122,6 +122,12 @@ import { checkDeployHealth as libCheckDeployHealth } from '../lib/pr-analysis/de
 import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 import { runHealthGate } from './health-gate.ts';
 import { runReflection } from './reflection.ts';
+import {
+  createIdleState,
+  nextCycle as nextIdleCycle,
+  DEFAULT_TRIP_THRESHOLD,
+  DEFAULT_MAX_SLEEP_SECONDS,
+} from './idle-tracker.ts';
 
 const cl = getColors();
 
@@ -338,10 +344,29 @@ function preflightChecks(config: PatrolConfig): string[] {
 
 // ── Check cycle ──────────────────────────────────────────────────────────────
 
+/**
+ * Outcome of a single check cycle. `didWork = true` means the cycle should
+ * count against the idle-cycle circuit breaker (QUA-1071), i.e. the breaker
+ * resets and stays at base interval. Two flavors of "work":
+ *
+ *   1. Queue-shrinking work: a PR was processed, a merge was enqueued, or a
+ *      draft was undrafted. Computed at the bottom of `runCheckCycle`.
+ *   2. Active-but-non-queue-shrinking signals: health-gate tripped, main-branch
+ *      fix attempted. Returned via the early-return paths so the daemon keeps
+ *      polling at base interval to detect fleet recovery — backing off when
+ *      the fleet is unhealthy would extend MTTR.
+ *
+ * The breaker drives exponential backoff after K=20 consecutive
+ * `didWork = false` cycles.
+ */
+export interface CheckCycleResult {
+  didWork: boolean;
+}
+
 async function runCheckCycle(
   cycleCount: number,
   config: PatrolConfig,
-): Promise<void> {
+): Promise<CheckCycleResult> {
   logHeader(`Check cycle #${cycleCount}`);
 
   // 0. Health gate (QUA-300 Phase 3) — check fleet-level signals FIRST.
@@ -360,7 +385,9 @@ async function runCheckCycle(
       health_gate_tripped: true,
       health_gate_reason: gate.reason,
     });
-    return;
+    // Health-gate halts the queue but is itself a real signal — count as work
+    // so the idle breaker doesn't back off when the fleet is actively unhealthy.
+    return { didWork: true };
   }
 
   // 0a. Check if a tracked main-branch fix PR has been merged
@@ -402,7 +429,7 @@ async function runCheckCycle(
       pr_processed: null,
       main_branch_fix: true,
     });
-    return; // Main takes the whole cycle; PRs wait
+    return { didWork: true }; // Main takes the whole cycle; PRs wait
   }
 
   // 0b. Check deploy health
@@ -647,6 +674,14 @@ async function runCheckCycle(
 
   // ── Cycle summary ──────────────────────────────────────────────────
 
+  // Queue-shrinking work this cycle. The early-return paths above (health-gate
+  // tripped, main-branch fix) handle their own `didWork` per CheckCycleResult's
+  // contract — see the JSDoc on the interface for the full taxonomy.
+  const didWork =
+    fixedPr !== null ||
+    enqueuedPrs.length > 0 ||
+    undraftedNumbers.size > 0;
+
   appendJsonl(JSONL_FILE_INTERNAL, {
     type: 'cycle_summary',
     cycle_number: cycleCount,
@@ -662,7 +697,9 @@ async function runCheckCycle(
     merge_eligible: eligibleForMerge.length,
     deploy_healthy: deployHealth.healthy,
     deploy_failing_since: deployHealth.failingSince ?? undefined,
+    did_work: didWork,
   });
+  return { didWork };
 }
 
 // ── Daemon loop ─────────────────────────────────────────────────────────────
@@ -740,14 +777,33 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   }
 
   let cycleCount = 0;
+  let idleState = createIdleState();
+  const idleConfig = {
+    tripThreshold: DEFAULT_TRIP_THRESHOLD,
+    baseSleepSeconds: config.intervalSeconds,
+    maxSleepSeconds: DEFAULT_MAX_SLEEP_SECONDS,
+  };
+
   while (!shuttingDown) {
     cycleCount++;
+    // A check-cycle exception is treated as no-op so a persistent error
+    // (e.g. GitHub auth dropped) progresses the breaker toward backoff
+    // rather than spinning at base interval forever.
+    let didWork = false;
     try {
-      await runCheckCycle(cycleCount, config);
+      const cycleResult = await runCheckCycle(cycleCount, config);
+      didWork = cycleResult.didWork;
     } catch (e) {
-      log(
-        `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,
-      );
+      const msg = e instanceof Error ? e.message : String(e);
+      log(`${cl.red}Check cycle failed: ${msg}${cl.reset}`);
+      // Persist the failure to JSONL so the breaker's eventual engagement is
+      // attributable to a stream of errors rather than a "no work needed"
+      // streak. The normal cycle_summary won't have run when this throws.
+      appendJsonl(JSONL_FILE_INTERNAL, {
+        type: 'cycle_error',
+        cycle_number: cycleCount,
+        error: msg,
+      });
     }
 
     // Periodic reflection
@@ -759,8 +815,29 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       }
     }
 
-    log(`${cl.dim}Sleeping ${config.intervalSeconds}s until next check...${cl.reset}`);
-    await new Promise((r) => setTimeout(r, config.intervalSeconds * 1000));
+    const step = nextIdleCycle(idleState, didWork, idleConfig);
+    idleState = step.state;
+    if (step.justTripped) {
+      // The engagement cycle itself sleeps at base interval (overshoot=0);
+      // backoff doubles starting on the next idle cycle. Be honest about
+      // that in the log so operators reading it don't expect immediate growth.
+      log(
+        `${cl.yellow}⚠ Idle-cycle breaker engaged after ${idleState.noOpStreak} no-op cycles — sleeping ${step.sleepSeconds}s now; backoff begins next cycle (max ${idleConfig.maxSleepSeconds}s).${cl.reset}`,
+      );
+      appendJsonl(JSONL_FILE_INTERNAL, {
+        type: 'idle_breaker_engaged',
+        cycle_number: cycleCount,
+        no_op_streak: idleState.noOpStreak,
+        next_sleep_seconds: step.sleepSeconds,
+      });
+    } else if (idleState.noOpStreak > idleConfig.tripThreshold) {
+      log(
+        `${cl.dim}Idle ${idleState.noOpStreak} cycles — sleeping ${step.sleepSeconds}s.${cl.reset}`,
+      );
+    } else {
+      log(`${cl.dim}Sleeping ${step.sleepSeconds}s until next check...${cl.reset}`);
+    }
+    await new Promise((r) => setTimeout(r, step.sleepSeconds * 1000));
   }
 }
 

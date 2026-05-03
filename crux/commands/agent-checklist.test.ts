@@ -809,11 +809,13 @@ describe('agent-checklist complete', () => {
     vi.clearAllMocks();
   });
 
-  it('returns error when no checklist file exists', async () => {
+  it('exits 0 with a friendly no-op note when no checklist file exists (QUA-1074)', async () => {
+    // /agent-end calls `agent-checklist complete 2>/dev/null || true` — exit 1 here pollutes
+    // logs and was getting miscounted as a 10× failure spike by transcript scanners.
     mockExistsSync.mockReturnValue(false);
     const result = await commands.complete([], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('No checklist found');
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('nothing to complete');
   });
 
   it('exits 1 when unchecked items remain', async () => {

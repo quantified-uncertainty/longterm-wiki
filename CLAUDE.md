@@ -205,6 +205,7 @@ These cover the session lifecycle and the always-applicable conventions. They au
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/slot-isolation.md` — Don't touch other agent slots
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+- `.claude/rules/wait-on-subagents.md` — Use `Monitor` to wait on dispatched subagents; `cat`-polling is hook-blocked at 3 occurrences (QUA-1069)
 
 Phase-loaded guidance (only fires when the corresponding skill runs):
 
