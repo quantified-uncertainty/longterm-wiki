@@ -37,6 +37,7 @@ import dotenv from 'dotenv';
 
 // Sub-modules
 import { checkForExistingPage } from './creator/duplicate-detection.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { findCanonicalLinks } from './creator/canonical-links.ts';
 import { runPerplexityResearch, runScryResearch } from './creator/research.ts';
 import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.ts';
@@ -197,7 +198,7 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
     console.log(`Source file: ${sourceFilePath}`);
   }
   if (directions) {
-    console.log(`Directions: ${directions.slice(0, 80)}${directions.length > 80 ? '...' : ''}`);
+    console.log(`Directions: ${truncate(directions, 83, { ellipsis: '...' })}`);
   }
   if (pageType) {
     console.log(`Type: ${pageType}`);

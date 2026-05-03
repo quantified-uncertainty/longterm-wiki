@@ -36,6 +36,7 @@ import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { contentHash } from "../../packages/factbase/src/ids.ts";
+import { truncate } from "../lib/text-utils.ts";
 import { batchSync } from "./sync-common.ts";
 import {
   asString,
@@ -243,7 +244,7 @@ async function main() {
     },
     getEntityId: (a) => a.entityId,
     formatDryRun: (a) =>
-      `${a.entityId} [${a.assessor}] ${a.dimension}: ${a.rating.slice(0, 60)}${a.rating.length > 60 ? "…" : ""}`,
+      `${a.entityId} [${a.assessor}] ${a.dimension}: ${truncate(a.rating, 61)}`,
     sync: syncEntityAssessments,
     defaultBatchSize: DEFAULT_BATCH_SIZE,
   });

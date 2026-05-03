@@ -35,6 +35,7 @@ import { join } from "path";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
 import type { Resource } from "../resource-types.ts";
+import { truncate } from "../lib/text-utils.ts";
 
 const SNAPSHOT_FILE = join(PROJECT_ROOT, "data/resources-snapshot.json");
 
@@ -339,7 +340,7 @@ export function checkResource(resource: Resource): ResourceQualityIssue[] {
       resourceId: resource.id,
       url,
       field: "title",
-      message: `Title contains HTML tags: "${title.slice(0, 100)}${title.length > 100 ? "..." : ""}"`,
+      message: `Title contains HTML tags: "${truncate(title, 103, { ellipsis: "..." })}"`,
       severity: "error",
     });
   }

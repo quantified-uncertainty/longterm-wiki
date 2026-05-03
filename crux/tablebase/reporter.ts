@@ -5,6 +5,7 @@
  */
 
 import type { ScanSummary, EnrichmentTask, FieldGapReport } from './types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
@@ -59,9 +60,7 @@ export function formatGaps(tasks: EnrichmentTask[], options?: { limit?: number }
   ];
 
   limited.forEach((task, i) => {
-    const name = task.entityName.length > 31
-      ? task.entityName.slice(0, 28) + '...'
-      : task.entityName;
+    const name = truncate(task.entityName, 31, { ellipsis: '...' });
     const impactColor = task.impactScore >= 100 ? RED : task.impactScore >= 50 ? YELLOW : GREEN;
 
     lines.push(

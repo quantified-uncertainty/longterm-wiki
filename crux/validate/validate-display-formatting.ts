@@ -21,6 +21,7 @@ import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data/entities');
 
@@ -129,7 +130,7 @@ function checkEntity(entity: YamlEntity, file: string): DisplayFormattingViolati
       file,
       entityId,
       field: hit.field,
-      value: hit.value.length > 80 ? hit.value.slice(0, 80) + '...' : hit.value,
+      value: truncate(hit.value, 83, { ellipsis: '...' }),
       reason: 'Contains "[object Object]" (serialization bug)',
     });
   }

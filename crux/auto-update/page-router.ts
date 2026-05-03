@@ -19,6 +19,7 @@ import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import type { NewsDigest, DigestItem, UpdatePlan, PageUpdate, NewPageSuggestion } from './types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ── Page Index ──────────────────────────────────────────────────────────────
 
@@ -248,9 +249,7 @@ export function deduplicatePageUpdates(updates: PageUpdate[]): PageUpdate[] {
 
   // Truncate directions that exceed the artifacts API limit
   for (const update of seen.values()) {
-    if (update.directions.length > MAX_DIRECTIONS_LENGTH) {
-      update.directions = update.directions.slice(0, MAX_DIRECTIONS_LENGTH - 3) + '...';
-    }
+    update.directions = truncate(update.directions, MAX_DIRECTIONS_LENGTH, { ellipsis: '...' });
   }
 
   return [...seen.values()];

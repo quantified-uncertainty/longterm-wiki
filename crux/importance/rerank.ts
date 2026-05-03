@@ -21,6 +21,7 @@ import { createLogger, createProgress } from '../lib/output.ts';
 import { loadPages } from '../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { sleep } from '../lib/anthropic.ts';
+import { truncate } from '../lib/text-utils.ts';
 import {
   loadRanking,
   saveRanking,
@@ -163,9 +164,7 @@ interface PageInfo {
 function formatPageForBatch(page: PageInfo): string {
   let line = `- ${page.id}: "${page.title}"`;
   if (page.description) {
-    const desc = page.description.length > 120
-      ? page.description.slice(0, 117) + '...'
-      : page.description;
+    const desc = truncate(page.description, 120, { ellipsis: '...' });
     line += ` — ${desc}`;
   }
   if (page.category) {

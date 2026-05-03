@@ -6,6 +6,7 @@
 
 import type { InlineSourcing } from "../../../apps/wiki-server/src/routes/tablebase/sourcing-schema.ts";
 import { listVerdicts } from "./sourcing-client.ts";
+import { truncate } from "../text-utils.ts";
 
 export type { InlineSourcing };
 
@@ -73,7 +74,5 @@ function isAttachableVerdict(v: string): v is InlineSourcing["verdict"] {
 }
 
 function truncateEvidence(s: string): string {
-  if (s.length <= EVIDENCE_MAX_LENGTH) return s;
-  const head = s.slice(0, EVIDENCE_MAX_LENGTH - TRUNCATION_SUFFIX.length);
-  return head + TRUNCATION_SUFFIX;
+  return truncate(s, EVIDENCE_MAX_LENGTH, { ellipsis: TRUNCATION_SUFFIX });
 }

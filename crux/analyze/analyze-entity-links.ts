@@ -21,6 +21,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, type Entity, type PathRegistry } from '../lib/content-types.ts';
 import { ENTITY_LINK_RE } from '../lib/patterns.ts';
@@ -344,7 +345,7 @@ function main(): void {
       console.log(`  ${colors.dim}[${page.readerImportance}]${colors.reset} ${page.title}`);
       if (page.context) {
         // Truncate context and highlight the matched term
-        let ctx = page.context.length > 80 ? page.context.slice(0, 80) + '...' : page.context;
+        let ctx = truncate(page.context, 83, { ellipsis: '...' });
         console.log(`    ${colors.dim}"${ctx}"${colors.reset}`);
       }
     }

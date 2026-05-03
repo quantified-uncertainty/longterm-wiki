@@ -33,6 +33,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
+import { truncate } from '../lib/text-utils.ts';
 
 import {
   fetchFramework,
@@ -437,8 +438,7 @@ async function main(): Promise<void> {
   }
 
   // Human-readable table.
-  const pad = (s: string, w: number) =>
-    s.length >= w ? s.slice(0, w - 1) + '…' : s.padEnd(w);
+  const pad = (s: string, w: number) => truncate(s, w).padEnd(w);
   console.log(
     `\nFramework refresh — ${summary.total} frameworks${dryRun ? ' (dry-run)' : ''}\n`,
   );
@@ -447,7 +447,7 @@ async function main(): Promise<void> {
   );
   console.log('  ' + '─'.repeat(30 + 24 + 16 + 6 + 3));
   for (const r of summary.results) {
-    const hash = r.contentHash ? r.contentHash.slice(0, 14) + '…' : '—';
+    const hash = truncate(r.contentHash, 15, { fallback: '—' });
     console.log(
       `  ${pad(r.frameworkKey, 30)} ${pad(r.status, 24)} ${pad(hash, 16)} ${pad(r.alertDelivered ? 'sent' : '—', 6)}`,
     );

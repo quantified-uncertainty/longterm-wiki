@@ -15,6 +15,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { truncate } from '../lib/text-utils.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
   loadPages,
@@ -786,7 +787,7 @@ function formatDryRunOutput(
     const { page } = selectedPages[i];
     const slug = extractPageSlug(page);
     const importance = String(page.readerImportance ?? 0);
-    const title = page.title.length > 50 ? page.title.slice(0, 49) + '...' : page.title;
+    const title = truncate(page.title, 52, { ellipsis: '...' });
     lines.push(
       `${String(i + 1).padEnd(4)} ${slug.padEnd(30)} ${importance.padEnd(12)} ${title}`,
     );
@@ -846,7 +847,7 @@ function formatSummaryOutput(
     lines.push('-'.repeat(75));
 
     for (const r of results) {
-      const name = r.pageSlug.length > 28 ? r.pageSlug.slice(0, 27) + '...' : r.pageSlug;
+      const name = truncate(r.pageSlug, 30, { ellipsis: '...' });
       lines.push(
         `${name.padEnd(30)} ${String(r.totalClaims).padEnd(8)} ${String(r.confirmed).padEnd(5)} ${String(r.contradicted).padEnd(5)} ${String(r.outdated + r.staleClaims).padEnd(6)} ${String(r.unfootnotedClaims).padEnd(6)} ${String(r.errors).padEnd(5)}`,
       );

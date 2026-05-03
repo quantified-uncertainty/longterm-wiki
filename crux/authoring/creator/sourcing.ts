@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { getFetchedSourceContent } from './source-fetching.ts';
 import type { TopicPhaseContext } from './types.ts';
+import { truncate } from '../../lib/text-utils.ts';
 
 type SourcingContext = TopicPhaseContext;
 
@@ -148,7 +149,7 @@ export async function runSourcing(topic: string, { log, saveResult, getTopicDir 
       warnings.push({
         type: 'unverified-quote',
         person,
-        quote: quote.length > 60 ? quote.slice(0, 60) + '...' : quote,
+        quote: truncate(quote, 63, { ellipsis: '...' }),
         message: `Quote attributed to "${person}" not found in research - possible hallucination: "${quote.slice(0, 50)}..."`,
       });
     }

@@ -25,6 +25,7 @@
  */
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
+import { truncate } from '../text-utils.ts';
 
 /** Matches a footnote definition line: `[^N]: <rest>` */
 const FOOTNOTE_DEF_RE = /^\[\^(\d+)\]:\s*(.+)/;
@@ -88,9 +89,10 @@ export const noUrlFootnotesRule = {
         lowerBody.includes(phrase)
       );
 
+      const truncatedBody = truncate(body, 81);
       const message = isExplicitPlaceholder
-        ? `Footnote [^${footnoteNum}] has no URL and contains a placeholder: "${body.slice(0, 80)}${body.length > 80 ? '…' : ''}". Replace with a real source or remove the footnote.`
-        : `Footnote [^${footnoteNum}] has no URL: "${body.slice(0, 80)}${body.length > 80 ? '…' : ''}". Add a markdown link [Title](https://...) or a bare URL.`;
+        ? `Footnote [^${footnoteNum}] has no URL and contains a placeholder: "${truncatedBody}". Replace with a real source or remove the footnote.`
+        : `Footnote [^${footnoteNum}] has no URL: "${truncatedBody}". Add a markdown link [Title](https://...) or a bare URL.`;
 
       issues.push(
         new Issue({

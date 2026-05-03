@@ -17,6 +17,7 @@ import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest, COST_MAP, BATCH_COST_MAP } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
 import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server/auto-update.ts';
+import { truncate } from '../lib/text-utils.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { executeBatchImprove } from './batch-improve.ts';
@@ -353,7 +354,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
         // Merge directions into the existing news-driven entry
         const existing = plan.pageUpdates.find(u => u.pageId === wu.pageId)!;
         const merged = wu.directions + '\n\nAlso from news routing: ' + existing.directions;
-        existing.directions = merged.length > 5000 ? merged.slice(0, 4997) + '...' : merged;
+        existing.directions = truncate(merged, 5000, { ellipsis: '...' });
         const tierRank: Record<string, number> = { polish: 1, standard: 2, deep: 3 };
         if (tierRank[wu.suggestedTier] > tierRank[existing.suggestedTier]) {
           existing.suggestedTier = wu.suggestedTier;

@@ -40,6 +40,7 @@ import { getAllEditLogs } from '../lib/wiki-server/edit-logs.ts';
 import { getCitationBrokenQuotes } from '../lib/wiki-server/citations.ts';
 import { getRiskHistory, getRiskLatest } from '../lib/wiki-server/risk.ts';
 import { getHealth } from '../lib/wiki-server/health.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -91,7 +92,7 @@ export async function search(args: string[], options: Record<string, unknown>): 
     output += `${c.bold}${String(i + 1).padStart(2)}.${c.reset} ${c.cyan}${r.id}${c.reset}${typeStr}\n`;
     output += `    ${c.bold}${r.title}${c.reset} ${c.dim}(score: ${scoreStr})${c.reset}\n`;
     if (r.description) {
-      output += `    ${c.dim}${r.description.slice(0, 120)}${r.description.length > 120 ? '…' : ''}${c.reset}\n`;
+      output += `    ${c.dim}${truncate(r.description, 121)}${c.reset}\n`;
     }
     output += '\n';
   }
@@ -128,7 +129,7 @@ export async function entity(args: string[], options: Record<string, unknown>): 
   let output = `${c.bold}${c.blue}Entity: ${e.id}${c.reset}\n\n`;
   output += `  ${c.bold}Type:${c.reset}    ${e.entityType}\n`;
   output += `  ${c.bold}Title:${c.reset}   ${e.title}\n`;
-  if (e.description) output += `  ${c.bold}Desc:${c.reset}    ${e.description.slice(0, 200)}${e.description.length > 200 ? '…' : ''}\n`;
+  if (e.description) output += `  ${c.bold}Desc:${c.reset}    ${truncate(e.description, 201)}\n`;
   if (e.website) output += `  ${c.bold}Website:${c.reset} ${e.website}\n`;
   if (e.status) output += `  ${c.bold}Status:${c.reset}  ${e.status}\n`;
   if (e.tags?.length) output += `  ${c.bold}Tags:${c.reset}    ${e.tags.join(', ')}\n`;
@@ -356,11 +357,11 @@ export async function page(args: string[], options: Record<string, unknown>): Pr
   if (p.tags) output += `  ${c.bold}Tags:${c.reset}        ${p.tags}\n`;
   if (p.description) {
     output += `\n  ${c.bold}Description:${c.reset}\n`;
-    output += `  ${p.description.slice(0, 400)}${p.description.length > 400 ? '…' : ''}\n`;
+    output += `  ${truncate(p.description, 401)}\n`;
   }
   if (p.summary && options.summary) {
     output += `\n  ${c.bold}Summary:${c.reset}\n`;
-    output += `  ${p.summary.slice(0, 600)}${p.summary.length > 600 ? '…' : ''}\n`;
+    output += `  ${truncate(p.summary, 601)}\n`;
   }
 
   output += `\n  ${c.dim}Synced: ${p.syncedAt}${c.reset}`;
@@ -489,8 +490,8 @@ export async function citations(args: string[], options: Record<string, unknown>
       const scoreStr = b.verificationScore !== null ? ` (score: ${b.verificationScore.toFixed(2)})` : '';
       output += `${c.bold}${b.pageId}${c.reset} — footnote ${b.footnote}${scoreStr}\n`;
       if ('sourceTitle' in b && (b as Record<string, unknown>).sourceTitle) output += `  Source: ${(b as Record<string, unknown>).sourceTitle}\n`;
-      if (b.url) output += `  URL: ${c.dim}${b.url.slice(0, 80)}${b.url.length > 80 ? '…' : ''}${c.reset}\n`;
-      output += `  ${c.dim}${b.claimText.slice(0, 100)}${b.claimText.length > 100 ? '…' : ''}${c.reset}\n\n`;
+      if (b.url) output += `  URL: ${c.dim}${truncate(b.url, 81)}${c.reset}\n`;
+      output += `  ${c.dim}${truncate(b.claimText, 101)}${c.reset}\n\n`;
     }
 
     return { output: output.trimEnd(), exitCode: 0 };
@@ -534,7 +535,7 @@ export async function citations(args: string[], options: Record<string, unknown>
     if (q.verificationScore !== null) output += ` ${c.dim}(${q.verificationScore.toFixed(2)})${c.reset}`;
     output += '\n';
     if (q.sourceTitle) output += `  ${c.dim}Source: ${q.sourceTitle}${c.reset}\n`;
-    output += `  ${q.claimText.slice(0, 120)}${q.claimText.length > 120 ? '…' : ''}\n\n`;
+    output += `  ${truncate(q.claimText, 121)}\n\n`;
   }
 
   if (total > quotes.length) {
