@@ -44,9 +44,7 @@ if [ -f ".claude/wip-checklist.md" ]; then
   CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux sys agent-checklist init\` before editing code.")
 fi
 
-# Clear stale per-file edit counts (QUA-1070 cap-edit-churn state).
-# Same lifecycle as wip-checklist.md: per-session, per-slot, fresh on startup
-# so a new task starts with a clean budget.
+# Reset per-file edit counts (QUA-1070, same lifecycle as wip-checklist.md).
 rm -f ".claude/.edit-counts.json"
 
 # ─── 0a. Stale stash detection ──────────────────────────────────────────────────
