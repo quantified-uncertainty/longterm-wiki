@@ -29,6 +29,7 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
+import { buildSessionSyncPayload } from '../lib/session/session-sync-payload.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { getIssueStates } from '../lib/linear/issue-states-cache.ts';
 
@@ -447,10 +448,17 @@ async function closeCommand(
       output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
     }
 
-    // Process session close result — may need a follow-up call
+    // Process session close result — may need a follow-up call. We
+    // gather `checksYaml`, `reviewed`, and `prUrl` from local state and
+    // include them in the same PATCH so completed rows stop landing
+    // with all three columns NULL (QUA-1073).
     if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
       try {
-        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
+        const syncFields = buildSessionSyncPayload({ branch: branch ?? undefined });
+        await updateAgentSession(sessionResult.data.id, {
+          status: 'completed',
+          ...syncFields,
+        });
         output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
       } catch (e: unknown) {
         output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;

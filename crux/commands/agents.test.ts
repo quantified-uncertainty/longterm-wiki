@@ -11,10 +11,14 @@ const {
   listActiveAgentsMock,
   getIssueStatesMock,
   isServerAvailableMock,
+  buildSessionSyncPayloadMock,
+  gitSafeMock,
 } = vi.hoisted(() => ({
   listActiveAgentsMock: vi.fn(),
   getIssueStatesMock: vi.fn(),
   isServerAvailableMock: vi.fn(),
+  buildSessionSyncPayloadMock: vi.fn(() => ({})),
+  gitSafeMock: vi.fn(() => ({ ok: true, output: 'claude/qua-1073-fix' })),
 }));
 
 vi.mock('../lib/wiki-server/active-agents.ts', () => ({
@@ -42,6 +46,14 @@ vi.mock('../lib/wiki-server/agent-session-events.ts', () => ({
 
 vi.mock('../lib/linear/issue-states-cache.ts', () => ({
   getIssueStates: getIssueStatesMock,
+}));
+
+vi.mock('../lib/session/session-sync-payload.ts', () => ({
+  buildSessionSyncPayload: buildSessionSyncPayloadMock,
+}));
+
+vi.mock('../lib/git.ts', () => ({
+  gitSafe: gitSafeMock,
 }));
 
 import { commands, collectLinearIds } from './agents.ts';
@@ -193,5 +205,75 @@ describe('status command (agents)', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toMatch(/not reachable/i);
     expect(getIssueStatesMock).not.toHaveBeenCalled();
+  });
+});
+
+// QUA-1073: closing a session must PATCH `checksYaml`, `reviewed`, and
+// `prUrl` along with `status='completed'`. Previously the close command
+// sent only `{ status: 'completed' }`, leaving every completed row with
+// NULL writeback fields.
+describe('close command (agents)', () => {
+  beforeEach(async () => {
+    listActiveAgentsMock.mockReset();
+    getIssueStatesMock.mockReset();
+    isServerAvailableMock.mockReset();
+    buildSessionSyncPayloadMock.mockReset();
+    buildSessionSyncPayloadMock.mockReturnValue({});
+    gitSafeMock.mockReset();
+    gitSafeMock.mockReturnValue({ ok: true, output: 'claude/qua-1073-fix' });
+    isServerAvailableMock.mockResolvedValue(true);
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    vi.mocked(sessions.getAgentSessionByBranch).mockReset();
+    vi.mocked(sessions.updateAgentSession).mockReset();
+  });
+
+  it('PATCHes the close-time payload alongside status (QUA-1073)', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(sessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 99, status: 'active' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    buildSessionSyncPayloadMock.mockReturnValueOnce({
+      checksYaml: '{"initialized":true,"completed":3}',
+      reviewed: false,
+      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/9999',
+    });
+
+    await commands.close([], {});
+
+    expect(buildSessionSyncPayloadMock).toHaveBeenCalledWith({
+      branch: 'claude/qua-1073-fix',
+    });
+
+    // Critical: PATCH must include the sync fields, not just status.
+    expect(updateMock).toHaveBeenCalledWith(99, {
+      status: 'completed',
+      checksYaml: '{"initialized":true,"completed":3}',
+      reviewed: false,
+      prUrl: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/9999',
+    });
+  });
+
+  it('still sends just status when no local artifacts exist', async () => {
+    const sessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const updateMock = vi.mocked(sessions.updateAgentSession);
+    const getByBranchMock = vi.mocked(sessions.getAgentSessionByBranch);
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 100, status: 'active' },
+    } as Awaited<ReturnType<typeof sessions.getAgentSessionByBranch>>);
+
+    // Empty payload — close was called from a session with no checklist
+    // or review marker present (e.g. a quick-fix session).
+    buildSessionSyncPayloadMock.mockReturnValueOnce({});
+
+    await commands.close([], {});
+
+    expect(updateMock).toHaveBeenCalledWith(100, { status: 'completed' });
   });
 });

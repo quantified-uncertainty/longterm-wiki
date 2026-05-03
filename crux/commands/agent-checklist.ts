@@ -26,6 +26,7 @@ import {
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
+import { buildSessionSyncPayload } from '../lib/session/session-sync-payload.ts';
 import { syncToMain, safeSyncMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands, checkDedup as linearCheckDedup } from './linear.ts';
@@ -498,12 +499,19 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
   if (s.allPassing) {
     let output = `${c.green}✓ All ${s.totalItems} checklist items complete!${c.reset}\n`;
 
-    // Mark session as completed (best-effort)
+    // Mark session as completed (best-effort) and sync the close-time
+    // fields the /agent-ship skill collected — `checksYaml`, `reviewed`,
+    // and `prUrl`. Without this spread the row went to status='completed'
+    // with all three columns NULL (QUA-1073).
     try {
       const branch = currentBranch();
       const sessionResult = await getAgentSessionByBranch(branch);
       if (sessionResult.ok && sessionResult.data.status === 'active') {
-        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
+        const syncFields = buildSessionSyncPayload({ branch });
+        await updateAgentSession(sessionResult.data.id, {
+          status: 'completed',
+          ...syncFields,
+        });
       }
     } catch {
       // Best-effort
