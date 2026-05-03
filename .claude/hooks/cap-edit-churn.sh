@@ -65,7 +65,10 @@ if [ -z "$NEW" ]; then
   exit 0
 fi
 
-COUNT=$(jq -r --arg f "$FILE_PATH" '.[$f]' <<<"$NEW")
+COUNT=$(jq -r --arg f "$FILE_PATH" '.[$f]' <<<"$NEW" 2>/dev/null)
+# Guard against jq failure — without this an empty COUNT errors `[ -le ]` and
+# short-circuits past the silent `exit 0`, falsely emitting BLOCKED.
+[[ "$COUNT" =~ ^[0-9]+$ ]] || exit 0
 
 if ! { printf '%s\n' "$NEW" > "$TMP" && mv "$TMP" "$COUNTS_FILE"; }; then
   echo "cap-edit-churn: could not write $COUNTS_FILE — hook disabled for this turn" >&2
