@@ -1,23 +1,16 @@
 ---
 wikiId: E2558
 title: "Agent Cost Monitoring"
-description: "How to monitor Claude Code agent spend with ccusage (on-demand $ rankings) and the local Grafana stack (OTel-fed dashboards + alerts)."
+description: "How to inspect Claude Code agent spend from the terminal with `crux sys cost report` (wraps ccusage)."
 subcategory: dashboards
 contentFormat: article
 lastEdited: "2026-05-02"
 update_frequency: 90
 ---
 
-We run ≈\$8-9k/week of Claude Code list-price spend across slots `a1`-`a10`. Cost incidents — runaway patrol sessions, broken cache eviction, accidental Opus usage — used to surface manually weeks late by parsing JSONL transcripts. This page documents the two tools that catch them in days, not weeks.
+We run ≈\$8-9k/week of Claude Code list-price spend across slots `a1`-`a10`. Cost incidents — runaway patrol sessions, broken cache eviction, accidental Opus usage — used to surface manually weeks late by parsing JSONL transcripts. `pnpm crux sys cost report` is the on-demand terminal view that catches them in days, not weeks.
 
-| Tool | What it answers | Where it runs |
-|------|----------------|---------------|
-| `pnpm crux sys cost report` (ccusage) | "Which slot/day spent the most last week?" | On-demand, any shell |
-| OTel → Prometheus → Grafana | "Alert me when a session crosses \$50 right now" | Local docker-compose stack |
-
-The two are complementary. ccusage reads `~/.claude/projects/*.jsonl` after the fact; OTel emits live metrics during the session.
-
-## On-demand: `crux sys cost report`
+## Quick reference
 
 ```bash
 # Default: last 7 days, daily totals
@@ -29,100 +22,46 @@ pnpm crux sys cost report --by=session --since=14d
 # 5-hour billing-block view (matches Claude's rate-limit windows)
 pnpm crux sys cost report --by=blocks
 
+# Per-model breakdown — useful for "is this Opus or Sonnet?"
+pnpm crux sys cost report --by=session --breakdown
+
 # Machine-readable for piping into another tool
 pnpm crux sys cost report --by=session --json | jq '.sessions[0]'
 ```
 
-Wrapper around [`ccusage`](https://github.com/ryoppippi/ccusage), which parses the same JSONL transcripts we used to grep manually. Cost numbers match list-price billing (Opus 4.7 = \$5/\$25 per Mtok input/output, Sonnet 4.6 = \$3/\$15, etc.).
+Wrapper around [`ccusage`](https://github.com/ryoppippi/ccusage), which parses the same JSONL transcripts (`~/.claude/projects/*.jsonl`) we used to grep manually. Cost numbers match list-price billing (Opus 4.7 = \$5/\$25 per Mtok input/output, Sonnet 4.6 = \$3/\$15, etc.).
 
-`ccusage` calls a slot a "session" because it groups by project directory; an actual Claude Code conversation has its own UUID JSONL file. For per-conversation breakdowns use `--breakdown` or query the JSONLs directly — that's intentionally outside this PR (deferred to a follow-up that joins with the `agent_sessions` table for ticket-level attribution).
+## What `--by` means
 
 | `--by` | Grouping | Useful for |
 |--------|---------|-----------|
-| `daily`   | Per-day totals                                  | Spotting day-over-day spikes |
+| `daily` (default) | Per-day totals                                  | Spotting day-over-day spikes |
 | `session` | Per project directory (= per slot for us)       | "Which slot is burning the most?" |
 | `weekly`  | Per ISO week                                    | Weekly trend |
 | `monthly` | Per calendar month                              | Budget review |
 | `blocks`  | Per 5-hour billing window                       | Matches Claude's rate-limit semantics |
 
-## Live: OTel + Grafana
-
-Claude Code ships with built-in OpenTelemetry support
-([reference](https://docs.claude.com/en/docs/claude-code/monitoring-usage)).
-When `CLAUDE_CODE_ENABLE_TELEMETRY=1`, every session emits:
-
-- `claude_code.session.cost.usd` (counter, USD)
-- `claude_code.token.usage` (counter, with `type=input|output|cacheRead|cacheCreation`)
-- `claude_code.tool.calls` (counter, by `name`)
-- `claude_code.session.count`, `pull_request.count`, `commit.count`
-- Resource attrs: `cwd` (slot path), `git_branch`, `model`, `session.id`
-
-These pipe through a local OTel Collector → Prometheus → Grafana stack
-vendored at `tools/claude-code-otel/`.
-
-### One-time setup
-
-```bash
-# 1. Append OTel env vars to whichever .env your Claude Code reads.
-#    For lw/ workspace, that's the workspace-level .env.base.
-cat tools/claude-code-otel/env.example >> ../.env.base
-
-# 2. Bring up the stack
-cd tools/claude-code-otel
-docker compose up -d
-
-# 3. Restart any running Claude Code sessions so they re-read env vars.
-#    New sessions automatically pick them up.
-
-# 4. Open Grafana — datasource and dashboard are pre-provisioned.
-open http://localhost:3000
-```
-
-Dashboard `Claude Code → Claude Code Cost & Usage` covers all four AC2 panels:
-
-1. **Total cost (selected window)** — single-stat for the dashboard's time range.
-2. **Cost by slot (cwd)** — bar chart of which slot is burning the most.
-3. **Cache hit rate (15m)** — `cache_read / (cache_read + input + cache_creation)`. Healthy ≥ 90%.
-4. **Cost p95 per session** + **Tool calls by name** — outlier detection and tool-mix.
-
-### Alert thresholds
-
-Three alert rules ship in `prometheus/alerts.yml`. They fire to Prometheus's
-internal alert state by default; routing to Slack/email/Linear requires
-adding an `alerting:` block to `prometheus.yml` — see Prometheus docs.
-
-| Alert | Trigger | Why this threshold |
-|-------|--------|--------------------|
-| `ClaudeCodeSessionCostHigh` | Any session > \$50, sustained 5m | Caps a single runaway session before it hits \$200+ |
-| `ClaudeCodeCacheHitRateLow` | < 90% over 15m, sustained 30m | The 5-min prompt cache TTL means a healthy session reads cache far more than it creates |
-| `ClaudeCodeBranchCostHigh`  | Sum of per-branch cost > \$200, sustained 10m | Catches stuck planning loops across resumed sessions on the same branch |
-
-Tune in `tools/claude-code-otel/prometheus/alerts.yml` — promql is the only configuration.
+Note: `ccusage` calls a slot a "session" because it groups by project directory; an actual Claude Code conversation has its own UUID JSONL file. For per-conversation breakdowns, raw `~/.claude/projects/<slot>/<uuid>.jsonl` is the source — there's no first-class command for that yet.
 
 ## Detecting an incident — playbook
 
-When `ClaudeCodeSessionCostHigh` fires:
+When you suspect a cost spike (Discord ping, monthly bill review, gut feel):
 
-1. `pnpm crux sys cost report --by=session --since=1d --order=desc` to confirm.
-2. Check the slot's tmux window or `crux sys sessions list --slot=N` to see what's running.
-3. If Opus on a refactor that should be Sonnet — kill, swap model, restart.
-4. If the agent is in a re-read/re-summarize loop — kill, file a Linear ticket on the looping pattern.
-
-When `ClaudeCodeCacheHitRateLow` fires:
-
-1. Check `crux sys cost report --by=blocks --breakdown` — sustained drops usually map to a model upgrade (cache invalidation).
-2. If a model upgrade just happened, the alert silences itself within 30 minutes as new caches warm.
-3. If it persists, sessions are spilling out of the 5-min TTL — see `.claude/rules/agent-planning-discipline.md` for "compact prompts vs long ones."
+1. `pnpm crux sys cost report --by=session --since=7d` to rank slots.
+2. If one slot is way ahead, drill in: `pnpm crux sys cost report --by=blocks --since=2d --breakdown`.
+3. Check the slot's tmux window or `crux sys sessions list --slot=N` to see what's running.
+4. Common causes:
+    - Opus on a refactor that should be Sonnet — kill, swap model, restart.
+    - Re-read/re-summarize loop — kill, file a Linear ticket on the looping pattern.
+    - A patrol session with a stuck loop — see `.claude/rules/agent-planning-discipline.md`.
 
 ## What's deliberately out of scope
 
-- **Per-PR / per-Linear-ticket cost attribution** — needs a join with `agent_sessions` (see QUA-1068 description). Separate ticket.
+- **Live dashboards / alerts** — we run Grafana in the production k8s cluster already. If we ever want live cost dashboards, the right move is to wire Claude Code's built-in OTel exporter (`CLAUDE_CODE_ENABLE_TELEMETRY=1`) to the existing prod Prometheus, not to run a parallel docker stack on each workstation.
+- **Per-PR / per-Linear-ticket cost attribution** — needs a join with `agent_sessions`. Separate ticket if it becomes useful.
 - **Cost-by-user attribution** — single-user setup, not worth the labels.
-- **Helicone / Langfuse / LangSmith** — those are SDK-instrumented-app tools; Claude Code's built-in OTel is richer. Don't pay.
 
 ## References
 
 - [ccusage docs](https://ccusage.com/guide/)
 - [Claude Code: Manage costs](https://docs.claude.com/en/docs/claude-code/costs)
-- [Claude Code: Monitoring & Telemetry](https://docs.claude.com/en/docs/claude-code/monitoring-usage)
-- [ColeMurray/claude-code-otel](https://github.com/ColeMurray/claude-code-otel) — the upstream reference stack our `tools/claude-code-otel/` was inspired by.
