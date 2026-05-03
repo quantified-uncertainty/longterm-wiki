@@ -46,6 +46,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/proper-lockfile": "^4.1.4",
     "@vitest/coverage-v8": "4.0.18",
+    "ccusage": "^18.0.11",
     "cheerio": "^1.2.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.2.1",
