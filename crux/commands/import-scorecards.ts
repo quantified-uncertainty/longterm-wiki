@@ -23,7 +23,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { join, resolve } from "path";
+import { join, relative, resolve } from "path";
 import { ALL_SOURCES, getAdapter, listSourceKeys } from "../lib/scorecard-import/sources/index.ts";
 import { buildOrgResolver } from "../lib/scorecard-import/org-aliases.ts";
 import { scrapeSaferaiHtml } from "../lib/scorecard-import/sources/saferai-scraper.ts";
@@ -443,10 +443,14 @@ async function cmdArchivePdf(
   console.log(`  file: ${resolvedPath}`);
 
   try {
+    // Store the path relative to the repo root so the resources row points at
+    // a portable location (the file is committed under data/ — see ticket).
+    // path.relative handles symlinks and absolute paths outside cwd correctly.
+    const relativePath = relative(process.cwd(), resolvedPath);
     const result = await archivePdfResource({
       url,
       localFilePath: resolvedPath,
-      localFilename: resolvedPath.replace(`${process.cwd()}/`, ""),
+      localFilename: relativePath.startsWith("..") ? null : relativePath,
       contextNote: `Scorecard wave PDF: ${source}/${wave}`,
       tags: ["scorecard", source, `wave:${wave}`],
       contentLifecycle: "immutable",

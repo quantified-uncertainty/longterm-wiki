@@ -1906,3 +1906,41 @@ export const IdFormatAuditSchema = z.object({
 export type IdFormatAudit = z.infer<typeof IdFormatAuditSchema>;
 export type IdFormatBucketName = (typeof ID_FORMAT_BUCKET_NAMES)[number];
 export type IdFormatSourceTableName = (typeof ID_FORMAT_SOURCE_TABLES)[number];
+
+// -- QUA-942: page-addressable evidence locator --------------------------------
+
+/**
+ * Locator for sourcing evidence stored in `source_check_evidence.evidence_locator`
+ * (table name preserved from earlier schema; the conceptual layer is "sourcing").
+ * NULL/absent = whole-source verdict (existing behavior); a locator narrows the
+ * verdict to a specific page/cell/anchor inside the source. The DB column is
+ * JSONB so new locator kinds add a Zod branch here, not a migration. See the
+ * sourcing-system docs § 9 for the semantics (QUA-942).
+ */
+const PdfPageLocator = z.object({
+  kind: z.literal("pdf-page"),
+  /** 1-based physical page number. */
+  page: z.number().int().min(1).max(100_000),
+  /** Optional table reference within the page (e.g. "2.3"). */
+  table: z.string().max(50).optional(),
+  /** Optional row reference within a table on the page. */
+  row: z.union([z.string().max(50), z.number().int()]).optional(),
+});
+const CsvCellLocator = z.object({
+  kind: z.literal("csv-cell"),
+  /** 1-based row index within the CSV body (header excluded). */
+  row: z.number().int().min(1).max(10_000_000),
+  column: z.string().min(1).max(200),
+});
+const HtmlAnchorLocator = z.object({
+  kind: z.literal("html-anchor"),
+  /** CSS-style selector pinning a fragment of the source HTML. */
+  selector: z.string().min(1).max(500),
+});
+
+export const EvidenceLocatorSchema = z.discriminatedUnion("kind", [
+  PdfPageLocator,
+  CsvCellLocator,
+  HtmlAnchorLocator,
+]);
+export type EvidenceLocator = z.infer<typeof EvidenceLocatorSchema>;

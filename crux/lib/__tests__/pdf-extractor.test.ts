@@ -9,7 +9,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockGetText = vi.fn();
 const mockGetInfo = vi.fn();
-const mockGetDateNode = vi.fn();
 
 class FakePDFParse {
   // The constructor matters only as long as it doesn't throw — we don't
@@ -32,8 +31,6 @@ import { extractPdfMetadata, extractPdfText } from "../pdf-extractor.ts";
 beforeEach(() => {
   mockGetText.mockReset();
   mockGetInfo.mockReset();
-  mockGetDateNode.mockReset();
-  mockGetDateNode.mockReturnValue({});
 });
 
 const SAMPLE_BUFFER = new TextEncoder().encode("%PDF-1.4 fake content").buffer;
@@ -135,6 +132,29 @@ describe("extractPdfMetadata (QUA-942)", () => {
 
     const out = await extractPdfMetadata(SAMPLE_BUFFER, 5000);
     expect(out!.text).toHaveLength(5000);
+  });
+
+  it("tolerates getDateNode() throwing (returns metadata with null dates)", async () => {
+    // pdf-parse's date parser throws on malformed XMP date strings. The
+    // earlier code path called info.getDateNode() outside any try/catch, so a
+    // single bad date killed the whole extract — even though text + pageCount
+    // had already been recovered. Defensive try/catch lets us degrade gracefully.
+    mockGetText.mockResolvedValue({ text: "body" });
+    mockGetInfo.mockResolvedValue({
+      total: 5,
+      info: { Title: "ok" },
+      getDateNode: () => {
+        throw new Error("malformed XMP date");
+      },
+    });
+
+    const out = await extractPdfMetadata(SAMPLE_BUFFER);
+    expect(out).not.toBeNull();
+    expect(out!.text).toBe("body");
+    expect(out!.pageCount).toBe(5);
+    expect(out!.title).toBe("ok");
+    expect(out!.creationDate).toBeNull();
+    expect(out!.modDate).toBeNull();
   });
 
   it("prefers CreationDate, falls back to XmpCreateDate", async () => {

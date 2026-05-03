@@ -28,14 +28,27 @@ export interface PdfMetadata {
 }
 
 /**
+ * Lazy-load pdf-parse and return a parser bound to the supplied buffer.
+ * Returns null on import or constructor failure (logged once per call).
+ */
+async function loadParser(buffer: ArrayBuffer): Promise<unknown | null> {
+  try {
+    const { PDFParse } = await import('pdf-parse');
+    return new PDFParse({ data: Buffer.from(buffer) });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[pdf-extractor] pdf-parse load failed: ${msg.slice(0, 200)}`);
+    return null;
+  }
+}
+
+/**
  * Extract text from a PDF ArrayBuffer using the pdf-parse library.
  * Returns null on failure (logs a warning).
  *
- * Implemented as a thin wrapper over `extractPdfMetadata` so we don't
- * maintain two parallel pdf-parse load paths. The extra `getInfo()` call
- * is wrapped in its own try/catch and tolerates failure, so the cost on
- * the text-only path is at most one PDF info parse — negligible relative
- * to the text extraction itself.
+ * Text-only path: skips `getInfo()` so the source-fetcher hot path stays at
+ * a single parse pass. Use `extractPdfMetadata` when document metadata
+ * (page count, Info dictionary, dates) is also needed.
  *
  * @param buffer - The raw PDF data as an ArrayBuffer
  * @param maxChars - Maximum characters to return (default: 100_000)
@@ -44,8 +57,16 @@ export async function extractPdfText(
   buffer: ArrayBuffer,
   maxChars = 100_000,
 ): Promise<string | null> {
-  const meta = await extractPdfMetadata(buffer, maxChars);
-  return meta?.text || null;
+  const parser = await loadParser(buffer);
+  if (!parser) return null;
+  try {
+    const result = await (parser as { getText: () => Promise<{ text: string }> }).getText();
+    return result.text.slice(0, maxChars) || null;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[pdf-extractor] pdf-parse failed: ${msg.slice(0, 200)}`);
+    return null;
+  }
 }
 
 function readInfoString(info: unknown, key: string): string | null {
@@ -75,15 +96,8 @@ export async function extractPdfMetadata(
   buffer: ArrayBuffer,
   maxChars = 1_000_000,
 ): Promise<PdfMetadata | null> {
-  let parser: unknown = null;
-  try {
-    const { PDFParse } = await import('pdf-parse');
-    parser = new PDFParse({ data: Buffer.from(buffer) });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[pdf-extractor] pdf-parse load failed: ${msg.slice(0, 200)}`);
-    return null;
-  }
+  const parser = await loadParser(buffer);
+  if (!parser) return null;
 
   // Cast once to a minimal shape we depend on; the full type is in pdf-parse.
   const p = parser as {
@@ -115,7 +129,16 @@ export async function extractPdfMetadata(
     console.warn(`[pdf-extractor] getInfo failed (continuing with text-only): ${msg.slice(0, 200)}`);
   }
 
-  const dates = info?.getDateNode();
+  // pdf-parse can throw inside `getDateNode()` itself when XMP date parsing
+  // hits a malformed date string. Wrap defensively so a partial PDF doesn't
+  // sink the whole extract — we still want text + pageCount + Info-dict text.
+  let dates: Record<string, Date | null | undefined> | null = null;
+  try {
+    dates = info?.getDateNode() ?? null;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[pdf-extractor] getDateNode failed (dropping dates): ${msg.slice(0, 200)}`);
+  }
 
   return {
     text,

@@ -32,7 +32,6 @@ import { extractPdfMetadata, type PdfMetadata } from "../pdf-extractor.ts";
 import {
   upsertResource,
   createResourceContentVersion,
-  lookupResourceByUrl,
 } from "../wiki-server/resources.ts";
 
 // ---------------------------------------------------------------------------
@@ -235,6 +234,11 @@ export async function archivePdfResource(
     basenameFromUrl(opts.url) ||
     null;
 
+  // Capture one timestamp so resources.fetched_at and the snapshot's fetchedAt
+  // agree exactly (otherwise they drift by milliseconds, breaking "snapshot
+  // timestamp == resource timestamp" reasoning for consumers).
+  const fetchedAt = new Date().toISOString();
+
   // Upsert the resource row, keying by `id = hashId(url)`. The server will
   // ON CONFLICT-resolve to the existing row when one exists for this URL, and
   // its COALESCE policy preserves any previously-set fields the caller didn't
@@ -248,7 +252,7 @@ export async function archivePdfResource(
     type: "paper",
     summary: opts.summary ?? null,
     contentHash, // resources.content_hash mirrors the latest snapshot hash
-    fetchedAt: new Date().toISOString(),
+    fetchedAt,
     publisherEntityId: opts.publisherEntityId ?? null,
     publishedDate: meta?.creationDate
       ? meta.creationDate.slice(0, 10)
@@ -286,7 +290,7 @@ export async function archivePdfResource(
   const versionResult = await createResourceContentVersion(stableId, {
     url: opts.url,
     contentHash,
-    fetchedAt: new Date().toISOString(),
+    fetchedAt,
     content: text || null,
     contentLength: bytes.byteLength,
     httpStatus: 200,

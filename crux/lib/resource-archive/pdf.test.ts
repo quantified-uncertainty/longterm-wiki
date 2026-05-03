@@ -25,12 +25,10 @@ import { createHash } from "crypto";
 
 const mockUpsertResource = vi.fn();
 const mockCreateContentVersion = vi.fn();
-const mockLookupByUrl = vi.fn();
 
 vi.mock("../wiki-server/resources.ts", () => ({
   upsertResource: (...args: unknown[]) => mockUpsertResource(...args),
   createResourceContentVersion: (...args: unknown[]) => mockCreateContentVersion(...args),
-  lookupResourceByUrl: (...args: unknown[]) => mockLookupByUrl(...args),
 }));
 
 const mockExtractPdfMetadata = vi.fn();
@@ -70,7 +68,6 @@ const SAMPLE_HASH = truncSha256("%PDF-1.4 fake PDF content for tests");
 beforeEach(() => {
   mockUpsertResource.mockReset();
   mockCreateContentVersion.mockReset();
-  mockLookupByUrl.mockReset();
   mockExtractPdfMetadata.mockReset();
 
   // Sensible defaults — upsert returns the canonical stableId (the adapter
@@ -83,8 +80,6 @@ beforeEach(() => {
     ok: true,
     data: { id: 42, deduplicated: false, resourceId: "sid_TestStable1" },
   });
-  // Adapter no longer pre-looks-up — keep mock harmless if any future test pings it.
-  mockLookupByUrl.mockResolvedValue({ ok: false });
   mockExtractPdfMetadata.mockResolvedValue({
     text: "Page 1 text\n\nPage 2 text",
     pageCount: 60,
@@ -196,8 +191,6 @@ describe("archivePdfResource", () => {
     expect(result.resourceStableId).toBe("sid_existing");
     // Upsert is called with id derived from hashId(url) — stable across retries
     expect(mockUpsertResource.mock.calls[0][0].id).toMatch(/^[0-9a-f]{16}$/);
-    // No GET /lookup round trips — the upsert RETURNING gives us stableId
-    expect(mockLookupByUrl).not.toHaveBeenCalled();
   });
 
   it("throws if upsert response is missing stableId (server invariant violation)", async () => {

@@ -210,9 +210,12 @@ export type ListContentVersionsResult = InferResponseType<
 
 export async function listResourceContentVersions(
   resourceId: string,
+  opts: { limit?: number; offset?: number } = {},
 ): Promise<ApiResult<ListContentVersionsResult>> {
-  return apiRequest<ListContentVersionsResult>(
-    'GET',
-    `/api/resources/${encodeURIComponent(resourceId)}/content-versions`,
-  );
+  const params = new URLSearchParams();
+  if (opts.limit != null) params.set('limit', String(opts.limit));
+  if (opts.offset != null) params.set('offset', String(opts.offset));
+  const qs = params.toString();
+  const path = `/api/resources/${encodeURIComponent(resourceId)}/content-versions${qs ? `?${qs}` : ''}`;
+  return apiRequest<ListContentVersionsResult>('GET', path);
 }

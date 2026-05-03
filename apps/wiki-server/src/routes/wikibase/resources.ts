@@ -2134,11 +2134,13 @@ const resourcesApp = new Hono()
       "json",
       z.object({
         url: z.string().url().max(2000),
-        // 16-char truncated SHA-256 prefix is the codebase-wide policy
-        // (resource-ingest.ts CONTENT_HASH_PREFIX_LENGTH, citations dual-write).
-        // Allow up to 64 hex (full SHA-256) for forward-compat callers, but
-        // recommended length is 16 — see docs/agent-rules/source-check-system.md § 9.
-        contentHash: z.string().min(8).max(64).regex(/^[0-9a-f]+$/i),
+        // 16-char truncated SHA-256 prefix — codebase-wide policy. Enforced
+        // strictly here so the (url, content_hash) dedup index actually
+        // dedups across writers; mixed-length hashes for byte-identical
+        // content would silently produce duplicate rows. See
+        // resource-ingest.ts CONTENT_HASH_PREFIX_LENGTH and the citation
+        // dual-write in citations.ts for the canonical sites.
+        contentHash: z.string().length(16).regex(/^[0-9a-f]{16}$/i),
         fetchedAt: z.string().datetime(),
         content: z.string().max(2_000_000).nullable().optional(),
         // Original byte size of the source content. Capped at 100 MiB to

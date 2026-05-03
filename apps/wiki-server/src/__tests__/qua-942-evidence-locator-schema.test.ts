@@ -126,5 +126,64 @@ describe("EvidenceLocatorSchema (QUA-942)", () => {
         EvidenceLocatorSchema.parse({ kind: "csv-cell", page: 14 }),
       ).toThrow();
     });
+
+    it("strips extra keys from valid locators (Zod default)", () => {
+      // The DB column is JSONB so the ONLY thing protecting downstream
+      // consumers from arbitrary extra-key pollution is Zod's default-strip
+      // behavior. If a future config switches schemas to .passthrough(),
+      // this test breaks loudly so we notice.
+      const parsed = EvidenceLocatorSchema.parse({
+        kind: "pdf-page",
+        page: 14,
+        injectedKey: "should not survive",
+        anotherInjection: { nested: true },
+      });
+      expect(parsed).toEqual({ kind: "pdf-page", page: 14 });
+      expect((parsed as Record<string, unknown>).injectedKey).toBeUndefined();
+      expect((parsed as Record<string, unknown>).anotherInjection).toBeUndefined();
+    });
+  });
+
+  describe("field length caps", () => {
+    it("rejects pdf-page table > 50 chars", () => {
+      expect(() =>
+        EvidenceLocatorSchema.parse({
+          kind: "pdf-page",
+          page: 1,
+          table: "x".repeat(51),
+        }),
+      ).toThrow();
+    });
+    it("accepts pdf-page row as string or number", () => {
+      const a = EvidenceLocatorSchema.parse({
+        kind: "pdf-page",
+        page: 1,
+        row: "header-row",
+      });
+      const b = EvidenceLocatorSchema.parse({
+        kind: "pdf-page",
+        page: 1,
+        row: 12,
+      });
+      expect(a.kind).toBe("pdf-page");
+      expect(b.kind).toBe("pdf-page");
+    });
+    it("rejects csv-cell column > 200 chars", () => {
+      expect(() =>
+        EvidenceLocatorSchema.parse({
+          kind: "csv-cell",
+          row: 1,
+          column: "x".repeat(201),
+        }),
+      ).toThrow();
+    });
+    it("rejects html-anchor selector > 500 chars", () => {
+      expect(() =>
+        EvidenceLocatorSchema.parse({
+          kind: "html-anchor",
+          selector: "#" + "x".repeat(500),
+        }),
+      ).toThrow();
+    });
   });
 });
