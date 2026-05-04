@@ -5,11 +5,12 @@ effort: low
 
 # Agent End
 
-Close out a session that does not need `/agent-ship`.
+Close out a session that does not need `/agent-ship` (research, abandoned work,
+maintenance, or a quick fix already pushed by hand).
 
-Follow the canonical workflow in
-[`docs/agent-workflows/agent-end.md`](../../docs/agent-workflows/agent-end.md).
+**Read `docs/agent-workflows/agent-end.md` and execute every step in order.**
+That file is the single source of truth and is shared across agent runtimes.
 
 Claude-specific final step: after the workflow finishes, tell the user to run
-`/clear` and `/rename`. Those are Claude Code built-ins and cannot be invoked
-from this command file.
+`/clear` (wipe context) and `/rename` (clear the Claude Code session name).
+Both are Claude Code built-ins and cannot be invoked from this command file.

@@ -2,21 +2,47 @@
 
 Use this workflow when an agent session is done but there is no PR to ship:
 research, abandoned work, maintenance, or a quick fix that was already handled.
-For sessions that ship code through a PR, use the ship workflow instead.
+For sessions that ship code through a PR, use `/agent-ship` / the
+`source-command-agent-push-and-verify` skill instead.
 
 This is the canonical cross-agent close-out workflow. Tool-specific slash
 commands or skills should stay thin and point here.
 
+## 0. Choose the Right Workflow
+
+| Scenario | Use |
+| --- | --- |
+| Shipping a PR | `/agent-ship` / `source-command-agent-push-and-verify` |
+| Research or investigation only | `agent-end` |
+| Work abandoned or folded into another session | `agent-end` |
+| Quick fix already pushed by hand | `agent-end` |
+| PR patrol or maintenance with no PR from this slot | `agent-end` |
+
+Before running this workflow, enumerate every problem observed during the
+session and give each a disposition: `fixed`, `filed:QUA-NNN`, or
+`deferred:<reason>`.
+
 ## 1. Complete the Checklist
 
-Validate the session checklist if it exists:
+If the checklist does not exist (for example, a quick fix session), skip this
+step. Otherwise, inspect it first:
 
 ```bash
-pnpm crux sys agent-checklist complete 2>/dev/null || true
+pnpm crux sys agent-checklist status
 ```
 
 If any checklist item remains open, either complete it or mark it N/A with a
-reason before ending the session.
+reason:
+
+```bash
+pnpm crux sys agent-checklist check --na <item-id> --reason="<why this is not applicable>"
+```
+
+Then validate completion:
+
+```bash
+pnpm crux sys agent-checklist complete
+```
 
 ## 2. Update Linear
 
