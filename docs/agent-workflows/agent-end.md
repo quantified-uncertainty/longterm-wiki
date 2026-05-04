@@ -2,10 +2,8 @@
 
 Use this workflow when an agent session is done but there is no PR to ship:
 research, abandoned work, maintenance, or a quick fix that was already handled.
-For sessions that ship code through a PR, use
-[`/agent-ship`](../../.claude/commands/agent-ship.md) or the
-[`source-command-agent-push-and-verify`](../../.agents/skills/source-command-agent-push-and-verify/SKILL.md)
-skill instead.
+For sessions that ship code through a PR, use the
+[`agent-ship`](agent-ship.md) workflow instead.
 
 This is the canonical cross-agent close-out workflow. Tool-specific slash
 commands or skills should stay thin and point here.
@@ -14,7 +12,7 @@ commands or skills should stay thin and point here.
 
 | Scenario | Use |
 | --- | --- |
-| Shipping a PR | [`/agent-ship`](../../.claude/commands/agent-ship.md) or [`source-command-agent-push-and-verify`](../../.agents/skills/source-command-agent-push-and-verify/SKILL.md) |
+| Shipping a PR | [`agent-ship`](agent-ship.md) |
 | Research or investigation only | `agent-end` |
 | Work abandoned or folded into another session | `agent-end` |
 | Quick fix already pushed by hand | `agent-end` |
