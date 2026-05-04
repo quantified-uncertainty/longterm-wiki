@@ -17,6 +17,7 @@ import {
   listRecentAuditEntries,
   type AuditRecentResponse,
 } from '../lib/wiki-server/audit-log.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 interface CommandOptions extends BaseOptions {
   ci?: boolean;
@@ -41,11 +42,6 @@ function formatChangedAt(value: AuditEntry['changedAt']): string {
   if (!value) return '—';
   const d = new Date(value);
   return d.toISOString().slice(0, 19).replace('T', ' ') + 'Z';
-}
-
-function truncate(str: string, max: number): string {
-  if (str.length <= max) return str;
-  return str.slice(0, max - 1) + '…';
 }
 
 function summarizeRow(row: Record<string, unknown> | null | undefined): string {

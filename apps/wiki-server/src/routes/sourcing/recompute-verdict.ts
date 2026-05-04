@@ -15,6 +15,7 @@ import {
   type EvidenceRow,
   type AggregationResult,
 } from "./sourcing-aggregation.js";
+import { isStaleModel } from "./checker-model.js";
 import { logger } from "../../logger.js";
 
 /**
@@ -95,6 +96,9 @@ async function loadEvidenceRows(
       // evidence is most recent. Required so a fresh re-check supersedes
       // stale evidence at equal weight.
       checkedAt: recordSources.checkedAt,
+      // QUA-991: needed so the aggregator can drop stale evidence when a
+      // fresh re-check is present. NULL counts as stale.
+      checkerModel: recordSources.checkerModel,
     })
     .from(recordSources)
     .where(
@@ -109,6 +113,7 @@ async function loadEvidenceRows(
     relevanceScore: r.relevanceScore,
     confidence: r.confidence,
     checkedAt: r.checkedAt,
+    isStale: isStaleModel(r.checkerModel),
   }));
 }
 
@@ -116,6 +121,11 @@ async function loadEvidenceRows(
  * Human-readable `reasoning` string for `source_check_verdicts.reasoning`.
  * Reflects the aggregator's contributing breakdown so the disagree-warning
  * surface (QUA-792) can render the same computation without re-deriving it.
+ *
+ * QUA-991: when stale rows were excluded from the headline because a fresh
+ * row was present, append them as a separate clause so an operator inspecting
+ * the reasoning can see why a previously-`partial` record now reads as
+ * `confirmed`.
  */
 function buildReasoning(aggregate: AggregationResult): string {
   if (aggregate.verdict === "unchecked") {
@@ -129,8 +139,12 @@ function buildReasoning(aggregate: AggregationResult): string {
   const fmt = (c: { rowCount: number; verdict: string }) =>
     `${c.rowCount} → ${c.verdict}`;
   const [winner, ...dissent] = aggregate.contributing;
-  if (dissent.length === 0) return fmt(winner);
-  return `${fmt(winner)}; dissent: ${dissent.map(fmt).join(", ")}`;
+  const parts = [fmt(winner)];
+  if (dissent.length > 0) parts.push(`dissent: ${dissent.map(fmt).join(", ")}`);
+  if (aggregate.droppedStale.length > 0) {
+    parts.push(`stale (excluded): ${aggregate.droppedStale.map(fmt).join(", ")}`);
+  }
+  return parts.join("; ");
 }
 
 /**

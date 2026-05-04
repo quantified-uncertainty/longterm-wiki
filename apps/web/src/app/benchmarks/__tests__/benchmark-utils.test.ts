@@ -9,12 +9,17 @@ import type { AnyEntity } from "@/data/tablebase";
 // Mock @/data before importing benchmark-utils
 vi.mock("@/data", () => ({
   getTypedEntities: vi.fn(),
+  getTypedEntityByStableId: vi.fn(),
   getBenchmarkResults: vi.fn(),
   isBenchmark: (e: AnyEntity) => (e as { entityType: string }).entityType === "benchmark",
   isAiModel: (e: AnyEntity) => (e as { entityType: string }).entityType === "ai-model",
 }));
 
-import { getTypedEntities, getBenchmarkResults } from "@/data";
+import {
+  getTypedEntities,
+  getTypedEntityByStableId,
+  getBenchmarkResults,
+} from "@/data";
 import {
   getBenchmarkResultsFromModels,
   formatTestedBy,
@@ -22,6 +27,7 @@ import {
 } from "../benchmark-utils";
 
 const mockGetTypedEntities = vi.mocked(getTypedEntities);
+const mockGetTypedEntityByStableId = vi.mocked(getTypedEntityByStableId);
 const mockGetBenchmarkResults = vi.mocked(getBenchmarkResults);
 
 // --- Test data factories ---
@@ -30,6 +36,7 @@ function makeAiModel(
   id: string,
   title: string,
   benchmarks: Array<{ name: string; score: number; unit?: string }> = [],
+  stableId?: string,
 ): AnyEntity {
   return {
     id,
@@ -37,6 +44,7 @@ function makeAiModel(
     entityType: "ai-model" as const,
     developer: undefined,
     wikiId: null,
+    stableId,
     benchmarks,
     tags: [],
     description: undefined,
@@ -83,9 +91,14 @@ function makePGResult(
 beforeEach(() => {
   vi.clearAllMocks();
 
-  // Default: empty entities and no PG data
+  // Default: empty entities and no PG data. The stableId resolver falls
+  // back to the entity list so it stays consistent with the slug index
+  // mockGetTypedEntities provides.
   mockGetTypedEntities.mockReturnValue([]);
   mockGetBenchmarkResults.mockReturnValue({});
+  mockGetTypedEntityByStableId.mockImplementation((sid: string) =>
+    mockGetTypedEntities().find((e) => e.stableId === sid),
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -260,6 +273,167 @@ describe("getBenchmarkResultsFromModels — PG data takes priority", () => {
     // claude-3 uses inline score
     expect(claudeResult).toBeDefined();
     expect(claudeResult!.score).toBe(82.0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// QUA-1061: PG keys are stableIds (sid_*), not slugs — must still resolve
+// ---------------------------------------------------------------------------
+describe("getBenchmarkResultsFromModels — PG keyed by stableId (QUA-1061)", () => {
+  it("resolves PG model keyed by stableId to the matching slug-keyed entity", () => {
+    // Production reality: PG `benchmark_results.modelId` is the entity's
+    // stableId (sid_*), but `entityById` is keyed by slug. The merge must
+    // resolve PG stableId keys back to the slug-keyed entity.
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123"),
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const mmluResults = results.get("mmlu");
+    expect(mmluResults).toBeDefined();
+    expect(mmluResults).toHaveLength(1);
+    expect(mmluResults![0].modelId).toBe("gpt-4");
+    expect(mmluResults![0].score).toBe(87.5);
+  });
+
+  it("PG (stableId-keyed) wins over inline for same (model, benchmark) pair", () => {
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel(
+        "gpt-4",
+        "GPT-4",
+        [{ name: "MMLU", score: 86.4, unit: "%" }],
+        "sid_GPT4abc123",
+      ),
+    ]);
+
+    // PG keyed by stableId (real prod shape) with a different score
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const mmluResults = results.get("mmlu");
+    expect(mmluResults).toHaveLength(1);
+    expect(mmluResults![0].score).toBe(87.5);
+  });
+
+  it("resolves developer entity via stableId when developer field is a stableId", () => {
+    const openaiOrg = {
+      id: "openai",
+      title: "OpenAI",
+      entityType: "organization" as const,
+      tags: [],
+      wikiId: null,
+      stableId: "sid_OpenAIxyz",
+      relatedEntries: [],
+    } as unknown as AnyEntity;
+
+    const gpt4 = makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123");
+    // The model's developer field references the org by stableId (PG-style)
+    (gpt4 as unknown as { developer: string }).developer = "sid_OpenAIxyz";
+
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      gpt4,
+      openaiOrg,
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    // developerName must resolve from the stableId-referenced org
+    expect(row.developerName).toBe("OpenAI");
+  });
+
+  it("resolves testedByOrgId via stableId when PG references org by stableId", () => {
+    const apolloOrg = {
+      id: "apollo",
+      title: "Apollo Research",
+      entityType: "organization" as const,
+      tags: [],
+      wikiId: null,
+      stableId: "sid_ApolloOrg",
+      relatedEntries: [],
+    } as unknown as AnyEntity;
+
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123"),
+      apolloOrg,
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [
+        makePGResult("mmlu", 87.5, "%", {
+          testedBy: "apollo",
+          testedByOrgId: "sid_ApolloOrg",
+        }),
+      ],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.testedByOrgName).toBe("Apollo Research");
+    // testedByOrgId must be normalized to the canonical slug — the leaderboard
+    // renderer uses it as a URL segment (`/organizations/${testedByOrgId}`),
+    // so a raw `sid_*` would render an ugly link bypassing static generation.
+    expect(row.testedByOrgId).toBe("apollo");
+  });
+
+  it("normalizes developer field to slug when developer is referenced by stableId", () => {
+    const openaiOrg = {
+      id: "openai",
+      title: "OpenAI",
+      entityType: "organization" as const,
+      tags: [],
+      wikiId: null,
+      stableId: "sid_OpenAIxyz",
+      relatedEntries: [],
+    } as unknown as AnyEntity;
+
+    const gpt4 = makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123");
+    (gpt4 as unknown as { developer: string }).developer = "sid_OpenAIxyz";
+
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      gpt4,
+      openaiOrg,
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const row = results.get("mmlu")![0];
+    expect(row.developer).toBe("openai");
+    expect(row.developerName).toBe("OpenAI");
+  });
+
+  it("skips PG rows whose stableId does not match any entity", () => {
+    mockGetTypedEntities.mockReturnValue([
+      makeBenchmark("mmlu", "MMLU"),
+      makeAiModel("gpt-4", "GPT-4", [], "sid_GPT4abc123"),
+    ]);
+
+    mockGetBenchmarkResults.mockReturnValue({
+      sid_GPT4abc123: [makePGResult("mmlu", 87.5, "%")],
+      sid_unknownXX: [makePGResult("mmlu", 99.9, "%")],
+    });
+
+    const results = getBenchmarkResultsFromModels();
+    const mmluResults = results.get("mmlu");
+    expect(mmluResults).toHaveLength(1);
+    expect(mmluResults![0].modelId).toBe("gpt-4");
   });
 });
 

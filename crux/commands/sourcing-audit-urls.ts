@@ -27,6 +27,7 @@ import {
   extractHost,
   FLAG_THRESHOLD,
 } from '../lib/sourcing/url-quality.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // Re-export for callers that still import from this file (Phase 1 compat).
 export { classifyByUrl, normalizeUrlForJoin, extractHost };
@@ -288,9 +289,9 @@ function formatHumanOutput(
     lines.push(bold('Sample flagged evidence:'));
     lines.push('-'.repeat(100));
     for (const r of flagged) {
-      const id = r.recordId.length > 24 ? r.recordId.slice(0, 22) + '..' : r.recordId;
+      const id = truncate(r.recordId, 24, { ellipsis: '..' });
       const field = r.fieldName ? `.${r.fieldName}` : '';
-      const url = r.sourceUrl.length > 60 ? r.sourceUrl.slice(0, 57) + '...' : r.sourceUrl;
+      const url = truncate(r.sourceUrl, 60, { ellipsis: '...' });
       lines.push(`  ${r.verdict.padEnd(14)} ${r.recordType.padEnd(18)} ${(id + field).padEnd(28)} ${url}`);
     }
   }

@@ -47,6 +47,7 @@ import {
 } from '../lib/sourcing/index.ts';
 import { SOURCE_CHECK_RESPONSE_FORMAT } from '../lib/sourcing/prompt-guidelines.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -504,9 +505,7 @@ async function applyCommand(
   for (let i = 0; i < toApply.length; i++) {
     const candidate = toApply[i];
     const label = `${candidate.recordType}/${candidate.recordId}`.slice(0, 60);
-    const urlShort = candidate.suggestedUrl.length > 80
-      ? candidate.suggestedUrl.slice(0, 77) + '...'
-      : candidate.suggestedUrl;
+    const urlShort = truncate(candidate.suggestedUrl, 80, { ellipsis: '...' });
     console.log(`  [${i + 1}/${toApply.length}] ${label} → ${urlShort}`);
 
     summary.processed++;
@@ -630,8 +629,8 @@ function formatDryRunOutput(
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(120));
   for (const item of items.slice(0, 30)) {
-    const rid = item.recordId.length > 28 ? item.recordId.slice(0, 27) + '...' : item.recordId;
-    const url = item.suggestedUrl.length > 50 ? item.suggestedUrl.slice(0, 47) + '...' : item.suggestedUrl;
+    const rid = truncate(item.recordId, 30, { ellipsis: '...' });
+    const url = truncate(item.suggestedUrl, 50, { ellipsis: '...' });
     lines.push(
       `${String(item.id).padEnd(8)} ${item.recordType.padEnd(16)} ${rid.padEnd(30)} ${item.status.padEnd(14)} ${url}`,
     );

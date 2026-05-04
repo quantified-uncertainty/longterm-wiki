@@ -54,6 +54,14 @@ export interface EvidenceRow {
    * priority tie-breaker below. Tests can omit it for back-compat.
    */
   checkedAt?: Date | null;
+  /**
+   * QUA-991: when true, the row was written by an older checker model
+   * (or has no recorded model) and is excluded from the headline
+   * aggregation if at least one fresh row is available. NULL/undefined
+   * is treated as "not stale" so legacy callers and tests that don't
+   * supply the field keep their old behavior.
+   */
+  isStale?: boolean | null;
 }
 
 export interface ContributingVerdict {
@@ -95,6 +103,21 @@ export interface AggregationResult {
    * low-relevance row may both have `verdict = 'contradicted'`).
    */
   droppedLowRelevance: ContributingVerdict[];
+  /**
+   * QUA-991: per-verdict counts of rows that were excluded from the
+   * headline because they were stale (`isStale=true`) AND at least one
+   * fresh row was available. When all rows are stale, this is empty and
+   * the stale rows feed the headline as before — i.e. stale evidence is
+   * better than nothing.
+   *
+   * Currently consumed by `buildReasoning` (renders the `stale (excluded):
+   * N → verdict` clause that ships in `source_check_verdicts.reasoning`).
+   * The frontend `buildDisagreementExplainer` does NOT yet read this
+   * field — extending the explainer to surface stale dissent alongside
+   * low-relevance dissent is a deliberate follow-up; the persisted
+   * reasoning text is the operator-facing surface for now.
+   */
+  droppedStale: ContributingVerdict[];
   /** Count of `not_applicable` rows that were filtered out before aggregation. */
   droppedNotApplicable: number;
 }

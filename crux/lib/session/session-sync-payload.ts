@@ -1,0 +1,153 @@
+/**
+ * Session sync payload — gather closing-time fields from local state.
+ *
+ * QUA-1073: `crux sys agents close` and `crux sys agent-checklist complete`
+ * historically PATCHed only `{ status: 'completed' }`, leaving `prUrl`,
+ * `checksYaml`, and `reviewed` permanently NULL on `agent_sessions` rows
+ * even though the schema, the `PATCH /api/agent-sessions/:id` endpoint,
+ * and the `/agent-ship` skill all expect those columns to be populated.
+ *
+ * Returned fields are all optional: callers spread the result into the
+ * PATCH body so missing fields are omitted (the endpoint preserves
+ * existing values when a key is `undefined`).
+ */
+
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { buildChecklistSnapshot } from './session-checklist.ts';
+import { checkReviewMarker } from '../review-marker.ts';
+import { getOpenPrUrlByBranch } from '../github.ts';
+
+export interface SessionSyncPayload {
+  /** JSON-stringified ChecklistSnapshot, or undefined if no checklist exists. */
+  checksYaml?: string;
+  /**
+   * - `true`  — marker exists, SHA + diff hash both match HEAD.
+   * - `false` — marker is missing OR malformed OR stale.
+   * - `undefined` — couldn't determine (no merge-base with main, e.g.
+   *   fresh worktree). The dashboard distinguishes "ran without
+   *   review" (false) from "we have no idea" (undefined).
+   */
+  reviewed?: boolean;
+  /** PR URL discovered via the GitHub API; undefined when no PR exists. */
+  prUrl?: string;
+}
+
+export interface BuildPayloadOptions {
+  /** Project root. Defaults to `process.cwd()`. */
+  cwd?: string;
+  /** Branch to look up a PR for. Required for the prUrl lookup. */
+  branch?: string;
+  /**
+   * Override the PR URL lookup — e.g. callers that already know the URL
+   * (just-pushed-PR flow) can pass it directly to skip the API call.
+   */
+  prUrl?: string;
+  /**
+   * Skip the PR lookup. Used by `agent-checklist complete`, which runs
+   * BEFORE the PR exists in the `/agent-ship` flow (Step 7 → Step 8 push
+   * → Step 9 close).
+   */
+  skipPrLookup?: boolean;
+}
+
+const CHECKLIST_REL_PATH = '.claude/wip-checklist.md';
+
+/** Best-effort PR URL lookup; never throws. */
+async function lookupPrUrl(branch: string | undefined): Promise<string | undefined> {
+  if (!branch) return undefined;
+  try {
+    return (await getOpenPrUrlByBranch(branch)) ?? undefined;
+  } catch {
+    // A 404 / 401 / network error during close should not block the
+    // status update. The next `close` invocation can fill it in.
+    return undefined;
+  }
+}
+
+/**
+ * Build the close-time PATCH payload from local state.
+ *
+ * The checksYaml column is named for historical reasons but stored as
+ * JSON — consumers (`/internal/agent-sessions`, `crux sys maintain
+ * review-prs`) `JSON.parse(row.checksYaml)`.
+ */
+export async function buildSessionSyncPayload(
+  options: BuildPayloadOptions = {},
+): Promise<SessionSyncPayload> {
+  const cwd = options.cwd ?? process.cwd();
+  const payload: SessionSyncPayload = {};
+
+  try {
+    const markdown = readFileSync(join(cwd, CHECKLIST_REL_PATH), 'utf-8');
+    payload.checksYaml = JSON.stringify(buildChecklistSnapshot(markdown));
+  } catch {
+    // Missing or unreadable checklist — best-effort, omit field.
+  }
+
+  try {
+    const result = checkReviewMarker(cwd);
+    if (result.code !== 'no-base') payload.reviewed = result.ok;
+  } catch {
+    // Defensive: `checkReviewMarker` normalizes git failures to
+    // `code: 'no-base'`, so this catch is unreachable in practice.
+  }
+
+  if (options.prUrl) {
+    payload.prUrl = options.prUrl;
+  } else if (!options.skipPrLookup) {
+    const url = await lookupPrUrl(options.branch);
+    if (url) payload.prUrl = url;
+  }
+
+  return payload;
+}
+
+/**
+ * Sync the close-time fields to a session row, then attempt the status
+ * promotion separately. The endpoint hard-fails the entire UPDATE when
+ * `status='completed'` is sent without `title+summary` already present
+ * — which is the steady state for `agent-checklist complete` and
+ * `agents close`, since those run BEFORE the SessionEnd hook fires
+ * `session-finalize` to populate title/summary from the transcript.
+ *
+ * Splitting the PATCH lets the close-time fields (`checksYaml`,
+ * `reviewed`, `prUrl`) land regardless of whether the status promotion
+ * succeeds. The status PATCH is best-effort and silently 400s when
+ * title/summary are missing — which is fine, the row stays in
+ * `active`/`stale` until the next session-finalize fills them in.
+ *
+ * Returns whether the status promotion succeeded so callers can log
+ * appropriately.
+ */
+export async function syncAndCloseSession(
+  sessionId: number,
+  updateAgentSession: (
+    id: number,
+    updates: Record<string, unknown>,
+  ) => Promise<{ ok: boolean; error?: string; message?: string }>,
+  options: BuildPayloadOptions = {},
+): Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }> {
+  const sync = await buildSessionSyncPayload(options);
+
+  let fieldsSync: 'ok' | 'failed' | 'noop' = 'noop';
+  let firstFailedTransport = false;
+  if (Object.keys(sync).length > 0) {
+    const r = await updateAgentSession(sessionId, sync as Record<string, unknown>);
+    fieldsSync = r.ok ? 'ok' : 'failed';
+    // If the first PATCH failed at the transport layer (network /
+    // auth / server unavailable), the second one will fail the same
+    // way — skip it to avoid doubling the timeout penalty + log noise.
+    // A 4xx (e.g. validation_error on the close-time fields themselves)
+    // does NOT short-circuit since the status PATCH might still
+    // succeed independently.
+    firstFailedTransport = !r.ok && (r.error === 'unavailable' || r.error === 'timeout');
+  }
+
+  if (firstFailedTransport) {
+    return { fieldsSync, statusSet: false };
+  }
+
+  const r2 = await updateAgentSession(sessionId, { status: 'completed' });
+  return { fieldsSync, statusSet: r2.ok };
+}

@@ -1,0 +1,74 @@
+name: Sub-app Dockerfile smoke test
+
+# Builds one representative sub-app Dockerfile (discord-bot — fewest workspace
+# deps before the install layer) on any PR that could regress the root
+# `postinstall` script's behavior inside a sub-app docker install layer.
+# The three sub-app images (apps/wiki-server, apps/discord-bot,
+# apps/groundskeeper) all COPY the root package.json before crux/ is on disk
+# and then run `pnpm install --filter X`, which fires the root postinstall.
+# If that script references files not yet copied, the build crashes — exactly
+# what broke the 2026-05-03 release (QUA-1053 / postmortem QUA-1081).
+#
+# Discord-bot is chosen because it has the fewest workspace dependencies
+# (no `packages/*` deps in its install filter) so the install layer is the
+# fastest to build of the three. Its produced image is actually larger than
+# groundskeeper's (it bakes content/docs and data/ for the /ask command), but
+# what we care about here is what runs *during install*, not image size.
+#
+# See docs/agent-rules/dockerfile-postinstall-trap.md for the full pattern.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      # Root manifest / lockfile changes are the QUA-1053 failure shape — they
+      # affect every sub-app's install layer.
+      - "package.json"
+      - "pnpm-lock.yaml"
+      # Any sub-app Dockerfile change — including a *new* sub-app — should run
+      # the smoke test, because new Dockerfiles introduced after this workflow
+      # may re-encounter the same install-layer trap.
+      - "apps/*/Dockerfile"
+      # Discord-bot's workspace package.json — we're building this image, so a
+      # change to its scripts could break the install layer.
+      - "apps/discord-bot/package.json"
+      - ".github/workflows/sub-app-docker-smoke.yml"
+
+concurrency:
+  group: sub-app-docker-smoke-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build discord-bot Dockerfile (no push)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build discord-bot image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/discord-bot/Dockerfile
+          push: false
+          # READ from the production discord-bot scope so PR builds can reuse
+          # warm layers from the most recent prod build (e.g. when only the
+          # postinstall script changed but pnpm-lock.yaml didn't, the install
+          # layer's content hash matches and pnpm-store + node_modules are
+          # cached). PR builds cannot poison this scope: GHA cache enforces
+          # branch isolation, so writes from PR contexts only land in the
+          # PR-scoped namespace.
+          cache-from: type=gha,scope=discord-bot
+          # WRITE to a separate scope so PR-specific layers don't compete with
+          # production cache entries. mode=min only persists the final layer
+          # (not every intermediate), which keeps the GHA cache pool (10 GB
+          # per repo, LRU eviction) from thrashing the production discord-bot
+          # entries when a PR-burst lands.
+          cache-to: type=gha,scope=discord-bot-smoke,mode=min

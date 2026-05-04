@@ -9,8 +9,8 @@
 
 set -uo pipefail
 
-# CLAUDE_PROJECT_DIR is symlink-safe; fall back for manual testing.
-REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+# CODEX_PROJECT_DIR is preferred; CLAUDE_PROJECT_DIR keeps the hook usable in legacy sessions.
+REPO_ROOT="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}}"
 CHECKLIST="$REPO_ROOT/.claude/wip-checklist.md"
 
 if [ ! -f "$CHECKLIST" ]; then

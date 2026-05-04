@@ -2,7 +2,7 @@
 #
 # PreToolUse hook: blocks branch-switching git commands.
 # Switching branches mid-session causes cross-session confusion in multi-agent slots.
-# Agents should use worktree isolation (Agent tool with isolation: "worktree") instead.
+# Agents should use a slot or an explicit /tmp worktree instead.
 #
 # Allowed:
 #   git checkout -b <new-branch>     (creating a new branch is safe)
@@ -21,7 +21,7 @@
 #
 # Exit codes:
 #   0 = allow the tool call
-#   2 = block the tool call (stderr is shown to Claude as error)
+#   2 = block the tool call (stderr is shown to the agent as error)
 
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
@@ -53,13 +53,13 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\b'; then
   fi
   # Allow (with warning): git checkout main — needed for /agent-reset end-of-session
   if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\s+main\b'; then
-    echo "WARNING: Switching to main. This is only appropriate during /agent-reset (end-of-session cleanup). If you are mid-session, use worktree isolation instead." >&2
+    echo "WARNING: Switching to main. This is only appropriate during /agent-reset (end-of-session cleanup). If you are mid-session, use a slot or explicit /tmp worktree instead." >&2
     exit 0
   fi
   # Block everything else (branch switching)
   echo "BLOCKED: \`git checkout <branch>\` is prohibited in agent sessions — it destroys the current branch context and causes cross-session confusion. Instead:" >&2
-  echo "  - To work on another branch: use the Agent tool with \`isolation: \"worktree\"\`" >&2
-  echo "  - To create a new branch: \`git checkout -b claude/<description>\`" >&2
+  echo "  - To work on another branch: use a slot or explicit /tmp worktree" >&2
+  echo "  - To create a new branch: \`git checkout -b claude/<description>\` or \`git checkout -b codex/<description>\`" >&2
   echo "  - To discard file changes: \`git checkout -- <file>\`" >&2
   echo "  - To check CI on main: \`gh run list --branch main -L 3\`" >&2
   exit 2
@@ -72,7 +72,7 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+switch\b'; then
     exit 0
   fi
   # Block everything else
-  echo "BLOCKED: \`git switch <branch>\` is prohibited in agent sessions. Use worktree isolation instead." >&2
+  echo "BLOCKED: \`git switch <branch>\` is prohibited in agent sessions. Use a slot or explicit /tmp worktree instead." >&2
   exit 2
 fi
 

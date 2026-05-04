@@ -8,6 +8,7 @@
  */
 
 import { normalizeUrl, normalizeUrlForDedup } from "@longterm-wiki/url-utils";
+import { truncate } from "./text-utils.ts";
 
 // Re-export the canonical dedup helper for back-compat with existing
 // `import { normalizeUrlForDedup } from '../footnote-parser.ts'` callers.
@@ -169,7 +170,7 @@ function extractTitleFromText(text: string): string | null {
   if (/^https?:\/\//.test(cleaned)) return cleaned;
   // First sentence — find period followed by space or end (not mid-URL periods)
   const sentence = cleaned.match(/^.+?(?:\.\s|[!?]|$)/)?.[0]?.trim() || cleaned;
-  return sentence.length > 120 ? sentence.slice(0, 117) + "..." : sentence;
+  return truncate(sentence, 120, { ellipsis: "..." });
 }
 
 /**

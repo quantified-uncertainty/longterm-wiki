@@ -12,6 +12,7 @@
  */
 
 import { loadResourceIdsPGFirst, loadResources } from '../../resource-io.ts';
+import { truncate } from '../text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -335,7 +336,7 @@ export function validateResourceTitles(
       issues.push({ title: trimmed, reason: `title too short (${trimmed.length} chars)` });
     } else if (trimmed.length > 300) {
       issues.push({
-        title: trimmed.slice(0, 60) + '...',
+        title: truncate(trimmed, 63, { ellipsis: '...' }),
         reason: `title too long (${trimmed.length} chars)`,
       });
     }

@@ -19,6 +19,7 @@
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
+import { truncate } from '../text-utils.ts';
 
 // Pattern: line starting with a number > 1 followed by period and space
 const NUMBERED_LIST_PATTERN = /^(\d+)\.\s+/;
@@ -58,7 +59,7 @@ export const markdownListsRule = createRule({
                 rule: this.id,
                 file: content.path,
                 line: lineNum,
-                message: `Numbered list starting with "${listNumber}." needs a blank line before it (otherwise won't render as a list). Previous line: "${prevLine.slice(0, 50)}${prevLine.length > 50 ? '...' : ''}"`,
+                message: `Numbered list starting with "${listNumber}." needs a blank line before it (otherwise won't render as a list). Previous line: "${truncate(prevLine, 53, { ellipsis: '...' })}"`,
                 severity: Severity.ERROR,
                 fix: {
                   type: FixType.INSERT_LINE_BEFORE,

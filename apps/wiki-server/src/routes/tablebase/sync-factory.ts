@@ -41,22 +41,14 @@ import {
   validationError,
   invalidJsonError,
   zodErrorToValidationBody,
-  type ValidationErrorBody,
 } from "../shared/utils.js";
 import {
   validateEntityRefs,
-  findMissingEntityRefs,
-  shouldSkipEntityValidation,
   type EntityRefField,
 } from "../shared/validate-entity-refs.js";
-import {
-  enforceSourcing,
-  resolveSourcingRequirement,
-  logSourcingSkipped,
-} from "../shared/sourcing-enforcement.js";
+import { enforceSourcing } from "../shared/sourcing-enforcement.js";
 import {
   validateClaimRefs,
-  classifyClaims,
   linkClaimsToRecords,
 } from "../shared/validate-claims.js";
 import {
@@ -206,10 +198,7 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
    * FK field. Each field's IDs are batch-checked against the entities table.
    *
    * **Contract**: callbacks MUST be pure (no side effects, no DB calls, no
-   * logging). In best-effort mode (QUA-955) the callback is invoked once
-   * over the full batch and then once per item to attribute missing FKs back
-   * to their owning item — at most N+1 invocations per request. A callback
-   * with side effects will surface them N+1 times in best-effort mode.
+   * logging). The factory may invoke them more than once per request.
    */
   entityRefFields?: (items: TItem[]) => EntityRefField[];
 
@@ -315,37 +304,6 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
    * external side effects forbidden, throwing rolls back the entire sync.
    */
   postUpsert?: (tx: Tx, items: TItem[], rows: Row[]) => Promise<void>;
-
-  // ---- Best-effort partial-success mode (QUA-955) ----
-
-  /**
-   * Allow callers to request best-effort partial-success semantics by passing
-   * `?mode=best_effort` on the request.
-   *
-   * **Default `false`** — most routes should remain atomic (any per-item
-   * validation failure rejects the whole batch with 400).
-   *
-   * When `true` AND the request includes `?mode=best_effort`, the factory:
-   *   - Runs per-item validation, partitioning into committed / rejected lists
-   *   - Upserts only the items that survived validation
-   *   - Returns HTTP 200 with `{ committed: [...ids], rejected: [{idx, code, message, ...}] }`
-   *     instead of the standard atomic 400-on-first-failure
-   *
-   * **Server-side guard:** `?mode=best_effort` is silently ignored on routes
-   * that don't opt in via this flag — they always run in atomic mode. This
-   * prevents a future contributor from flipping a default and silently
-   * re-introducing the QUA-941 silent-stakeholder-drop regression on a route
-   * that wasn't designed for partial-success.
-   *
-   * **Per-item partitioning is supported for these phases**: Zod schema
-   * (requires `syncSchema`), `enforceSourcing`, `naturalKey`, `entityRefs` /
-   * `entityRefFields`, and `claimSupport`. The `preValidate` hook is treated
-   * as atomic — if it returns a Response, that Response is returned as-is.
-   *
-   * No production caller wires this in QUA-955. Phase 2 opts in
-   * `policy-stakeholders` for the canary.
-   */
-  bestEffortAllowed?: boolean;
 }
 
 /**
@@ -357,42 +315,6 @@ export interface SyncResponse {
   upserted: number;
   verdictsWritten: number;
   claimsLinked: number;
-  claimLinkingError?: string;
-}
-
-/**
- * One rejected item in a best-effort response (QUA-955). `idx` is the
- * position in the original `items` array — callers can use it to map
- * rejections back to their input.
- *
- * `code` and the optional context fields mirror `ValidationErrorBody` so a
- * caller can distinguish causes structurally without string-matching the
- * `message`.
- */
-export interface BestEffortRejected extends ValidationErrorBody {
-  idx: number;
-}
-
-/**
- * Response shape returned when `bestEffortAllowed: true` AND the request
- * includes `?mode=best_effort`. Distinct from `SyncResponse` — callers should
- * branch on the request flag, not on response shape.
- */
-export interface BestEffortSyncResponse {
-  /**
-   * IDs of items that passed all validation and were upserted. One entry per
-   * surviving item; the factory throws a SyncPhaseError if any surviving
-   * item lacks a string `id` field (composite-PK routes are not yet
-   * supported by best-effort mode).
-   */
-  committed: string[];
-  /** Items that failed pre-upsert validation. Order matches reject-time order. */
-  rejected: BestEffortRejected[];
-  /** Verdicts written for committed items (mirrors atomic response). */
-  verdictsWritten: number;
-  /** Claim links created for committed items (mirrors atomic response). */
-  claimsLinked: number;
-  /** Present only if claim linking failed post-tx (records still committed). */
   claimLinkingError?: string;
 }
 
@@ -542,88 +464,22 @@ export function createSyncHandler<
     const body = await runPhase(name, "parse", async () => parseJsonBody(c));
     if (!body) return invalidJsonError(c);
 
-    // ---- QUA-955: best-effort gate ----
-    // Best-effort partial-success mode is opt-in per route via `bestEffortAllowed`
-    // AND opt-in per request via `?mode=best_effort`. The query param is silently
-    // ignored on routes that don't opt in (server-side guard).
-    const bestEffort =
-      config.bestEffortAllowed === true && c.req.query("mode") === "best_effort";
-    const rejected: BestEffortRejected[] = [];
-
     // ---- Phase 2: validate (schema) ----
-    // In best-effort mode with `syncSchema`, we per-item validate so a single
-    // malformed item doesn't reject the whole batch. Otherwise, fall through
-    // to atomic batch-level validation (existing behavior).
-    let items: TItem[];
-    let originalIndices: number[]; // maps items[i] back to its position in the request
-    if (bestEffort && config.syncSchema) {
-      // Permissive envelope so the per-item Zod errors are the partition signal.
-      const envelope = z.object({ items: z.array(z.unknown()).min(1).max(500) });
-      const envParsed = await runPhase(name, "validate", async () =>
-        envelope.safeParse(body),
-      );
-      if (!envParsed.success) {
-        return validationError(c, envParsed.error.message);
-      }
-      const rawItems = envParsed.data.items;
-      const accepted: TItem[] = [];
-      const indices: number[] = [];
-      for (let idx = 0; idx < rawItems.length; idx++) {
-        const r = config.syncSchema.safeParse(rawItems[idx]);
-        if (!r.success) {
-          // QUA-952 (Phase 0a-ii): emit structured `code` (e.g. enum_violation)
-          // so canary callers can dispatch retry-with-feedback on the same
-          // discriminator the atomic path now uses.
-          rejected.push({ idx, ...zodErrorToValidationBody(r.error) });
-        } else {
-          accepted.push(r.data as TItem);
-          indices.push(idx);
-        }
-      }
-      items = accepted;
-      originalIndices = indices;
-    } else {
-      const batchSchema = config.batchSchema ?? (config.syncSchema
-        ? z.object({ items: z.array(config.syncSchema).min(1).max(500) }) as z.ZodType<{ items: TItem[] }>
-        : null);
-      if (!batchSchema) {
-        throw new SyncPhaseError(name, "validate", new Error("SyncConfig must provide either batchSchema or syncSchema"));
-      }
-      const parsed = await runPhase(name, "validate", async () =>
-        batchSchema.safeParse(body),
-      );
-      if (!parsed.success) {
-        // QUA-952 (Phase 0a-ii): emit structured `code` so canary callers
-        // can dispatch retry-with-feedback on `enum_violation` vs generic `zod`.
-        return validationError(c, zodErrorToValidationBody(parsed.error));
-      }
-      items = parsed.data.items as TItem[];
-      originalIndices = items.map((_, i) => i);
+    const batchSchema = config.batchSchema ?? (config.syncSchema
+      ? z.object({ items: z.array(config.syncSchema).min(1).max(500) }) as z.ZodType<{ items: TItem[] }>
+      : null);
+    if (!batchSchema) {
+      throw new SyncPhaseError(name, "validate", new Error("SyncConfig must provide either batchSchema or syncSchema"));
     }
-
-    /**
-     * Drop items at the given local positions (within the current `items` array)
-     * and emit one rejection per dropped item with the supplied code/message.
-     * `originalIndices` is updated in lockstep so subsequent rejections still
-     * refer to the original request position.
-     */
-    const dropAndReject = (
-      drop: Set<number>,
-      build: (localIdx: number) => Omit<BestEffortRejected, "idx">,
-    ): void => {
-      const keptItems: TItem[] = [];
-      const keptIndices: number[] = [];
-      for (let i = 0; i < items.length; i++) {
-        if (drop.has(i)) {
-          rejected.push({ idx: originalIndices[i], ...build(i) });
-        } else {
-          keptItems.push(items[i]);
-          keptIndices.push(originalIndices[i]);
-        }
-      }
-      items = keptItems;
-      originalIndices = keptIndices;
-    };
+    const parsed = await runPhase(name, "validate", async () =>
+      batchSchema.safeParse(body),
+    );
+    if (!parsed.success) {
+      // QUA-952 (Phase 0a-ii): emit structured `code` so callers can
+      // dispatch retry-with-feedback on `enum_violation` vs generic `zod`.
+      return validationError(c, zodErrorToValidationBody(parsed.error));
+    }
+    const items: TItem[] = parsed.data.items as TItem[];
 
     // ---- Phase 2: enforceSourcing ----
     if (config.enforceSourcing) {
@@ -631,78 +487,24 @@ export function createSyncHandler<
         typeof config.enforceSourcing === "string"
           ? config.enforceSourcing
           : name;
-      if (bestEffort) {
-        // Partition: items missing sourcing get rejected, the rest survive.
-        // The `?forceSkipSourcing=true` escape hatch must still emit its audit
-        // warning here — otherwise best-effort callers can bypass enforcement
-        // silently, defeating the compliance contract.
-        await runPhase(name, "enforceSourcing", async () => {
-          const req = resolveSourcingRequirement(c, tableName);
-          if (req.kind === "skipped") {
-            logSourcingSkipped(tableName, items.length, req);
-            return;
-          }
-          if (req.kind === "required") {
-            const drop = new Set<number>();
-            for (let i = 0; i < items.length; i++) {
-              if (!(items[i] as { sourcing?: unknown }).sourcing) drop.add(i);
-            }
-            if (drop.size > 0) {
-              dropAndReject(drop, () => ({
-                code: "sourcing_required",
-                message:
-                  `Source-check required (${req.source}) but record lacks sourcing data. ` +
-                  `Run \`pnpm crux tb verify-orchestrate ${tableName}\` to populate ` +
-                  `source_check_verdicts before submitting.`,
-                field: "sourcing",
-              }));
-            }
-          }
-        });
-      } else {
-        const err = await runPhase(name, "enforceSourcing", async () =>
-          enforceSourcing(c, tableName, items as Array<{ sourcing?: unknown }>),
-        );
-        if (err) return err;
-      }
+      const err = await runPhase(name, "enforceSourcing", async () =>
+        enforceSourcing(c, tableName, items as Array<{ sourcing?: unknown }>),
+      );
+      if (err) return err;
     }
 
     // ---- Phase 2: natural key collision ----
     if (config.naturalKey) {
-      if (bestEffort) {
-        // Partition: keep first occurrence, reject duplicates.
-        const seen = new Set<string>();
-        const drop = new Set<number>();
-        const dropKeys = new Map<number, string>();
-        for (let i = 0; i < items.length; i++) {
-          const key = config.naturalKey(items[i]);
-          if (seen.has(key)) {
-            drop.add(i);
-            dropKeys.set(i, key);
-          } else {
-            seen.add(key);
-          }
+      const seen = new Set<string>();
+      for (const item of items) {
+        const key = config.naturalKey(item);
+        if (seen.has(key)) {
+          return validationError(
+            c,
+            `${config.naturalKeyError ?? "Duplicate natural key in batch"}: ${key}`,
+          );
         }
-        if (drop.size > 0) {
-          dropAndReject(drop, (i) => ({
-            code: "natural_key",
-            message:
-              `${config.naturalKeyError ?? "Duplicate natural key in batch"}: ${dropKeys.get(i)}`,
-            value: dropKeys.get(i),
-          }));
-        }
-      } else {
-        const seen = new Set<string>();
-        for (const item of items) {
-          const key = config.naturalKey(item);
-          if (seen.has(key)) {
-            return validationError(
-              c,
-              `${config.naturalKeyError ?? "Duplicate natural key in batch"}: ${key}`,
-            );
-          }
-          seen.add(key);
-        }
+        seen.add(key);
       }
     }
 
@@ -719,61 +521,11 @@ export function createSyncHandler<
         }))
       : null);
     if (entityRefFieldsFn) {
-      if (bestEffort) {
-        // Partition: items with missing FKs get rejected, the rest survive.
-        // The `?skipEntityValidation=true` bypass still applies (handled inside
-        // shouldSkipEntityValidation, called below).
-        if (!shouldSkipEntityValidation(c)) {
-          await runPhase(name, "validateEntityRefs", async () => {
-            const fields = entityRefFieldsFn(items);
-            const missing = await findMissingEntityRefs(db, fields);
-            if (missing.length === 0) return;
-            // Build a per-field set of missing IDs for fast per-item lookup.
-            const missingByField = new Map<string, Set<string>>();
-            for (const m of missing) {
-              missingByField.set(m.fieldName, new Set(m.missingIds));
-            }
-            // We need to know which item owns each missing ID. The full
-            // callback form lets users compute IDs (e.g. prefix transforms),
-            // not just read fields, so we can't shortcut via
-            // `item[fieldName]` — that would silently misclassify ID-mapping
-            // callbacks. Instead, invoke the callback with each `[item]`
-            // singleton; this is the only contract-safe partition strategy.
-            const drop = new Set<number>();
-            const dropDetails = new Map<number, { fieldName: string; id: string }>();
-            for (let i = 0; i < items.length; i++) {
-              const itemFields = entityRefFieldsFn([items[i]]);
-              for (const f of itemFields) {
-                const missingSet = missingByField.get(f.fieldName);
-                if (!missingSet) continue;
-                const badId = f.ids.find((id) => missingSet.has(id));
-                if (badId) {
-                  drop.add(i);
-                  dropDetails.set(i, { fieldName: f.fieldName, id: badId });
-                  break;
-                }
-              }
-            }
-            if (drop.size > 0) {
-              dropAndReject(drop, (i) => {
-                const detail = dropDetails.get(i)!;
-                return {
-                  code: "fk_missing",
-                  message: `Entity reference not found: ${detail.fieldName}=${detail.id}`,
-                  field: detail.fieldName,
-                  value: detail.id,
-                };
-              });
-            }
-          });
-        }
-      } else {
-        const fields = entityRefFieldsFn(items);
-        const refError = await runPhase(name, "validateEntityRefs", async () =>
-          validateEntityRefs(c, db, fields),
-        );
-        if (refError) return refError;
-      }
+      const fields = entityRefFieldsFn(items);
+      const refError = await runPhase(name, "validateEntityRefs", async () =>
+        validateEntityRefs(c, db, fields),
+      );
+      if (refError) return refError;
     }
 
     // ---- Phase 2: validateClaimRefs ----
@@ -783,91 +535,19 @@ export function createSyncHandler<
       allClaimIds = items.flatMap((i) => getClaimIds(i) ?? []);
       if (allClaimIds.length > 0) {
         const rawDb = getDb();
-        if (bestEffort) {
-          // Partition: items citing missing/non-verified claims get rejected.
-          await runPhase(name, "validateClaimRefs", async () => {
-            const status = await classifyClaims(rawDb, allClaimIds);
-            if (status.missing.length === 0 && status.nonVerified.length === 0) {
-              return;
-            }
-            const missingSet = new Set(status.missing);
-            const nonVerifiedMap = new Map(
-              status.nonVerified.map((r) => [r.id, r.status]),
-            );
-            const drop = new Set<number>();
-            const dropDetails = new Map<
-              number,
-              { claimId: number; reason: string }
-            >();
-            for (let i = 0; i < items.length; i++) {
-              const ids = getClaimIds(items[i]) ?? [];
-              for (const cid of ids) {
-                if (missingSet.has(cid)) {
-                  drop.add(i);
-                  dropDetails.set(i, { claimId: cid, reason: "missing" });
-                  break;
-                }
-                const nonVerifiedStatus = nonVerifiedMap.get(cid);
-                if (nonVerifiedStatus) {
-                  drop.add(i);
-                  dropDetails.set(i, {
-                    claimId: cid,
-                    reason: `not verified (status: ${nonVerifiedStatus})`,
-                  });
-                  break;
-                }
-              }
-            }
-            if (drop.size > 0) {
-              dropAndReject(drop, (i) => {
-                const d = dropDetails.get(i)!;
-                return {
-                  code: "claim_invalid",
-                  message: `Claim ${d.claimId} ${d.reason}`,
-                  field: "claimIds",
-                  value: d.claimId,
-                };
-              });
-            }
-          });
-          // Recompute allClaimIds against the surviving set so post-tx linking
-          // doesn't try to link claims for rejected records.
-          allClaimIds = items.flatMap((i) => getClaimIds(i) ?? []);
-        } else {
-          const claimError = await runPhase(name, "validateClaimRefs", async () =>
-            validateClaimRefs(rawDb, allClaimIds),
-          );
-          if (claimError) return validationError(c, claimError);
-        }
+        const claimError = await runPhase(name, "validateClaimRefs", async () =>
+          validateClaimRefs(rawDb, allClaimIds),
+        );
+        if (claimError) return validationError(c, claimError);
       }
     }
 
     // ---- Phase 2: preValidate hook ----
-    // Treated as atomic in both modes — the hook is opaque to the factory.
-    // If a route needs per-item preValidate behavior in best-effort mode, the
-    // hook itself can short-circuit only on items it wants to reject and
-    // return null otherwise. We don't try to partition arbitrary user code.
     if (config.preValidate) {
       const preErr = await runPhase(name, "preValidate", async () =>
         config.preValidate!(c, db, items),
       );
       if (preErr) return preErr;
-    }
-
-    // If best-effort partitioning ate everything, skip the transaction
-    // entirely. Going through the chunk loop with `allVals = []` produces a
-    // 0-column-count → degenerate chunkSize, and some Drizzle versions throw
-    // on `tx.insert(table).values([])` / `inArray(idCol, [])`. Returning early
-    // avoids that whole class of edge-case behavior on the empty input we
-    // already know we have nothing to do with.
-    if (bestEffort && items.length === 0) {
-      const emptyResponse: BestEffortSyncResponse = {
-        committed: [],
-        rejected,
-        verdictsWritten: 0,
-        claimsLinked: 0,
-      };
-      return c.json(emptyResponse);
     }
 
     // ---- Phase 3-6: transaction ----
@@ -1035,39 +715,6 @@ export function createSyncHandler<
           "claim linking failed (records already committed)",
         );
       }
-    }
-
-    if (bestEffort) {
-      // Build the committed-IDs list. The contract is `committed: string[]` —
-      // one entry per surviving item. If an item has no string `id`, we throw
-      // rather than silently truncate (that would produce a response shape
-      // that disagrees with itself: claimsLinked covers all items, committed
-      // is shorter). Fail loudly so a future composite-PK route opting in
-      // hits this in dev, not in prod.
-      const committed: string[] = [];
-      for (let i = 0; i < items.length; i++) {
-        const id = (items[i] as { id?: unknown }).id;
-        if (typeof id !== "string") {
-          throw new SyncPhaseError(
-            name,
-            "upsert",
-            new Error(
-              `bestEffortAllowed routes must produce items with a string 'id' field; ` +
-                `surviving item at index ${i} (original idx ${originalIndices[i]}) has id=${typeof id}. ` +
-                `Composite-PK routes are not yet supported in best-effort mode.`,
-            ),
-          );
-        }
-        committed.push(id);
-      }
-      const beResponse: BestEffortSyncResponse = {
-        committed,
-        rejected,
-        verdictsWritten: verdictsResult.written,
-        claimsLinked,
-        ...(claimLinkingError ? { claimLinkingError } : {}),
-      };
-      return c.json(beResponse);
     }
 
     const response: SyncResponse = {

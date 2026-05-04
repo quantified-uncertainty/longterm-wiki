@@ -16,6 +16,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 const STUB_THRESHOLD = 100;
 const EXCLUSION_FILE = join(PROJECT_ROOT, '.matrix-improved.txt');
@@ -240,7 +241,7 @@ async function pagesCommand(_args: string[], options: CommandOptions): Promise<C
     `${'─'.repeat(3)} ${'─'.repeat(8)} ${'─'.repeat(8)} ${'─'.repeat(36)} ${'─'.repeat(16)} ${'─'.repeat(3)} ${'─'.repeat(4)} ${'─'.repeat(6)} ${'─'.repeat(30)}`,
   ].filter(Boolean);
   limited.forEach((p, i) => {
-    const title = p.title.length > 35 ? p.title.slice(0, 32) + '...' : p.title;
+    const title = truncate(p.title, 35, { ellipsis: '...' });
     const ac = p.action === 'create' ? '\x1b[33m' : '\x1b[32m';
     lines.push(`${String(i + 1).padStart(3)} ${p.wikiId.padEnd(8)} ${ac}${p.action.padEnd(8)}\x1b[0m ${title.padEnd(36)} ${p.entityType.padEnd(16)} ${String(p.quality).padStart(3)} ${(p.coveragePct + '%').padStart(4)} ${String(p.impactScore).padStart(6)} ${p.reasons.join(', ')}`);
   });

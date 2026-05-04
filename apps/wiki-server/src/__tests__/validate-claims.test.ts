@@ -136,7 +136,7 @@ describe("validateClaimRefs", () => {
   });
 });
 
-describe("classifyClaims (QUA-955)", () => {
+describe("classifyClaims", () => {
   beforeEach(() => {
     resetStores();
   });

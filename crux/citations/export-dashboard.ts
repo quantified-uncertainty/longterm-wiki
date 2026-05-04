@@ -22,6 +22,7 @@ import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { getAccuracyDashboard, getAllQuotes } from '../lib/wiki-server/citations.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types (shared with the dashboard — keep in sync)
@@ -297,13 +298,8 @@ export const ACCURACY_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
 export const ACCURACY_PAGES_DIR = join(ACCURACY_DIR, 'pages');
 const SUMMARY_PATH = join(ACCURACY_DIR, 'summary.yaml');
 
-/** Max characters for claimText in exported YAML (dashboard uses line-clamp-2 anyway). */
+/** Max characters for claimText content in exported YAML (dashboard uses line-clamp-2 anyway). */
 const MAX_CLAIM_LENGTH = 150;
-
-function truncateClaim(text: string): string {
-  if (text.length <= MAX_CLAIM_LENGTH) return text;
-  return text.slice(0, MAX_CLAIM_LENGTH) + '...';
-}
 
 /**
  * Export dashboard data to YAML files.
@@ -319,7 +315,7 @@ export async function exportDashboardData(fromDbData?: DashboardExport | null): 
   const flaggedByPage = new Map<string, FlaggedCitation[]>();
   for (const fc of data.flaggedCitations) {
     const list = flaggedByPage.get(fc.pageId) || [];
-    list.push({ ...fc, claimText: truncateClaim(fc.claimText) });
+    list.push({ ...fc, claimText: truncate(fc.claimText, MAX_CLAIM_LENGTH + 3, { ellipsis: '...' }) });
     flaggedByPage.set(fc.pageId, list);
   }
 

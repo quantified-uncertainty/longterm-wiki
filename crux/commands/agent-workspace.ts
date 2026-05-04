@@ -30,6 +30,7 @@ import os from 'os';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import { truncate } from '../lib/text-utils.ts';
 import {
   type Role,
   type SentinelEnv,
@@ -1102,7 +1103,7 @@ async function dispatchStatusCmd(args: string[], options: DispatchCliOptions): P
   lines.push(`  session: ${current.sessionId}`);
   lines.push(`  pid:     ${current.pid}  alive=${alive}`);
   lines.push(`  started: ${current.startedAt}  (${elapsedSec}s ago)`);
-  lines.push(`  prompt:  ${meta.prompt.length > 120 ? meta.prompt.slice(0, 119) + '…' : meta.prompt}`);
+  lines.push(`  prompt:  ${truncate(meta.prompt, 120)}`);
   if (meta.totalCostUsd !== undefined) {
     lines.push(`  cost:    $${meta.totalCostUsd.toFixed(4)}  turns: ${meta.numTurns}  duration: ${((meta.durationMs ?? 0) / 1000).toFixed(1)}s`);
   }

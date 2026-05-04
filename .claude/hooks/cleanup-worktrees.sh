@@ -153,7 +153,7 @@ for i in "${!PATHS[@]}"; do
 
   if [ "$SHOULD_REMOVE" = true ]; then
     # Safety: check if any process has its CWD inside this worktree.
-    # This prevents removing a worktree that a concurrent Claude session
+    # This prevents removing a worktree that a concurrent agent session
     # is still using (addresses CWD corruption bug — see .claude/rules/worktree-isolation-bug.md).
     if command -v lsof >/dev/null 2>&1; then
       # lsof -d cwd lists only CWD file descriptors — fast and targeted

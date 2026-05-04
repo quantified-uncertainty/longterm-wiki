@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { extractClaimSentence } from '../lib/citation/citation-archive.ts';
 import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
@@ -129,7 +130,7 @@ export async function extractQuotesForPage(
 
     if (verbose) {
       process.stdout.write(
-        `  [^${cit.footnote}] ${cit.url ? cit.url.slice(0, 60) + '...' : cit.linkText.slice(0, 40) + '...'}`,
+        `  [^${cit.footnote}] ${cit.url ? truncate(cit.url, 63, { ellipsis: '...' }) : truncate(cit.linkText, 43, { ellipsis: '...' })}`,
       );
     }
 
@@ -507,7 +508,7 @@ async function main() {
       );
       console.log(`  ${c.dim}Claim:${c.reset} ${q.claimText.slice(0, 120)}`);
       console.log(
-        `  ${c.dim}Quote:${c.reset} "${q.sourceQuote!.slice(0, 200)}${q.sourceQuote!.length > 200 ? '...' : ''}"`,
+        `  ${c.dim}Quote:${c.reset} "${truncate(q.sourceQuote!, 203, { ellipsis: '...' })}"`,
       );
       if (q.sourceLocation) {
         console.log(`  ${c.dim}Location:${c.reset} ${q.sourceLocation}`);

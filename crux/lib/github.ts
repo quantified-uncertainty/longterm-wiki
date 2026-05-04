@@ -426,6 +426,21 @@ export async function listRecentOpenIssues(limit = 30): Promise<GitHubIssue[]> {
   );
 }
 
+/**
+ * Look up the open PR URL for a branch. Returns null when no open PR
+ * exists. Throws on auth / network error — callers decide whether to
+ * swallow. (Existing `pulls?head=...` callsites in `crux/commands/pr.ts`
+ * still hand-roll the URL and want the full `GitHubPR` shape; this
+ * helper is the URL-only fast path used by session close.)
+ */
+export async function getOpenPrUrlByBranch(branch: string): Promise<string | null> {
+  if (!branch) return null;
+  const prs = await githubApi<Array<{ html_url: string }>>(
+    `/repos/${REPO}/pulls?head=quantified-uncertainty:${encodeURIComponent(branch)}&state=open`,
+  );
+  return prs[0]?.html_url ?? null;
+}
+
 /** Create a comment on an issue. */
 export async function createIssueComment(issueNumber: number, body: string): Promise<void> {
   await githubApi(`/repos/${REPO}/issues/${issueNumber}/comments`, {

@@ -69,10 +69,7 @@ export async function validateClaimRefs(
 
 /**
  * Classify a batch of claim IDs into missing / non-verified / verified sets.
- *
- * Used by both the atomic {@link validateClaimRefs} path and the best-effort
- * sync mode (QUA-955), where the caller wants to know *which* IDs failed so
- * it can partition items per-claim instead of rejecting the whole batch.
+ * Used internally by {@link validateClaimRefs}.
  */
 export async function classifyClaims(
   db: RawDb,

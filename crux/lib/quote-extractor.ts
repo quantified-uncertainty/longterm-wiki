@@ -9,6 +9,7 @@
 
 import { getApiKey } from './api-keys.ts';
 import { withRetry } from './resilience.ts';
+import { truncate } from './text-utils.ts';
 
 const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -57,11 +58,13 @@ function normalizeDifficulty(raw: unknown): string {
   return 'medium'; // default if unrecognizable
 }
 
+const TRUNCATION_MARKER = '\n\n[... truncated ...]';
+
 /** Truncate source text to MAX_SOURCE_CHARS, adding a truncation marker. */
 export function truncateSource(text: string): string {
-  return text.length > MAX_SOURCE_CHARS
-    ? text.slice(0, MAX_SOURCE_CHARS) + '\n\n[... truncated ...]'
-    : text;
+  return truncate(text, MAX_SOURCE_CHARS + TRUNCATION_MARKER.length, {
+    ellipsis: TRUNCATION_MARKER,
+  });
 }
 
 /** Strip markdown code fences from LLM JSON responses. */

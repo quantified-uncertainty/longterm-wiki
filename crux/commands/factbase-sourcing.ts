@@ -30,6 +30,7 @@ import { parseJsonResponse } from '../lib/anthropic.ts';
 import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/verdict-handler.ts';
 import { fetchVerdictRecordIds } from '../lib/wiki-server/sourcing-client.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { fetchSourceContent } from '../lib/sourcing/source-fetcher.ts';
 import {
   SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
@@ -413,8 +414,8 @@ export async function sourcingCommand(
       const asOf = fact.asOf ?? '';
       const source = fact.source ?? '';
       // Truncate long values and URLs for display
-      const valStr = val.length > 18 ? val.slice(0, 17) + '…' : val;
-      const srcStr = source.length > 50 ? source.slice(0, 49) + '…' : source;
+      const valStr = truncate(val, 18);
+      const srcStr = truncate(source, 50);
       lines.push(
         `${entity.name.slice(0, 23).padEnd(24)} ${(property?.name ?? fact.propertyId).slice(0, 23).padEnd(24)} ${valStr.padEnd(20)} ${asOf.padEnd(12)} ${srcStr}`,
       );

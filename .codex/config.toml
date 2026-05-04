@@ -1,0 +1,7 @@
+[mcp_servers.github]
+args = [
+    "-y",
+    "@anthropic-ai/github-mcp-server",
+]
+command = "npx"
+env_vars = ["GITHUB_TOKEN"]

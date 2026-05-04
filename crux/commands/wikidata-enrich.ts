@@ -27,6 +27,7 @@ import {
   findEntityFilePath,
 } from '../lib/factbase-writer.ts';
 import type { Entity, Fact } from '../../packages/factbase/src/types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -469,9 +470,7 @@ async function wikidataEnrichCommand(
     for (const nf of newFacts) {
       const displayValue =
         typeof nf.value === 'string'
-          ? nf.value.length > 60
-            ? nf.value.slice(0, 57) + '...'
-            : nf.value
+          ? truncate(nf.value, 60, { ellipsis: '...' })
           : String(nf.value);
       log(`    + ${nf.property}: ${displayValue}`);
     }

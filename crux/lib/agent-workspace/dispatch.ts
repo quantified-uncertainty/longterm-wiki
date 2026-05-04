@@ -29,6 +29,7 @@ import {
 } from 'fs';
 import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_process';
 import { prepareClaudeSpawnEnv } from '../claude-cli.ts';
+import { truncate } from '../text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -395,8 +396,7 @@ export function writeMeta(env: DispatchEnv, rp: RunPaths, meta: RunMeta): void {
 // ---------------------------------------------------------------------------
 
 function clip(s: string, n = 160): string {
-  const oneLine = s.replace(/\s+/g, ' ').trim();
-  return oneLine.length > n ? oneLine.slice(0, n - 1) + '…' : oneLine;
+  return truncate(s.replace(/\s+/g, ' ').trim(), n);
 }
 
 /** Parse a single stream-json line into a summary, or `null` if unparseable. */

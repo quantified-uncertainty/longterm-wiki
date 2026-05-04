@@ -14,6 +14,7 @@ import type { CommandResult } from '../lib/command-types.ts';
 import { getFailures, type VerdictEntry } from '../lib/wiki-server/sourcing.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { deleteBatch } from '../lib/wiki-server/delete-batch.ts';
+import { truncate } from '../lib/text-utils.ts';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -208,7 +209,7 @@ export async function cleanContradictedCommand(
       const status = record ? '\x1b[31m✗\x1b[0m' : '\x1b[2m⊘\x1b[0m';
       lines.push(`  ${status} ${name}`);
       if (v.reasoning) {
-        lines.push(`    \x1b[2m${v.reasoning.slice(0, 150)}${v.reasoning.length > 150 ? '...' : ''}\x1b[0m`);
+        lines.push(`    \x1b[2m${truncate(v.reasoning, 153, { ellipsis: '...' })}\x1b[0m`);
       }
     }
     lines.push('');

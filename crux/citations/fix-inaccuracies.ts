@@ -51,6 +51,7 @@ import { extractQuotesForPage } from './extract-quotes.ts';
 import { exportDashboardData, ACCURACY_DIR, ACCURACY_PAGES_DIR } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1892,8 +1893,8 @@ async function main() {
         if (verbose) {
           for (const p of proposals) {
             console.log(`  ${c.yellow}[^${p.footnote}]${c.reset} ${p.fixType}: ${p.explanation}`);
-            console.log(`    ${c.red}- ${truncate(p.original, 100)}${c.reset}`);
-            console.log(`    ${c.green}+ ${truncate(p.replacement, 100)}${c.reset}`);
+            console.log(`    ${c.red}- ${truncate(p.original, 103, { oneLine: true, ellipsis: '...' })}${c.reset}`);
+            console.log(`    ${c.green}+ ${truncate(p.replacement, 103, { oneLine: true, ellipsis: '...' })}${c.reset}`);
           }
         }
 
@@ -2090,10 +2091,6 @@ async function main() {
   process.exit(0);
 }
 
-function truncate(s: string, maxLen: number): string {
-  const oneLine = s.replace(/\n/g, ' ');
-  return oneLine.length > maxLen ? oneLine.slice(0, maxLen) + '...' : oneLine;
-}
 
 // Only run when executed directly
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

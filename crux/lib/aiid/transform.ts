@@ -15,6 +15,7 @@
  */
 
 import { generateId } from "../grant-import/id.ts";
+import { truncate } from "../text-utils.ts";
 
 /** AIID "incidents" collection row (subset we consume). */
 export interface AiidIncidentRaw {
@@ -265,11 +266,7 @@ function buildTags(
 
 /** Tighten a free-form summary into the column budget without hard-breaking words. */
 export function truncateSummary(text: string, max = SUMMARY_MAX_CHARS): string {
-  if (text.length <= max) return text;
-  const trimmed = text.slice(0, max - 3);
-  const lastSpace = trimmed.lastIndexOf(" ");
-  const base = lastSpace > max / 2 ? trimmed.slice(0, lastSpace) : trimmed;
-  return base + "...";
+  return truncate(text, max, { wordBoundary: true, ellipsis: "..." });
 }
 
 export interface TransformOptions {
