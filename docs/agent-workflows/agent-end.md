@@ -2,8 +2,10 @@
 
 Use this workflow when an agent session is done but there is no PR to ship:
 research, abandoned work, maintenance, or a quick fix that was already handled.
-For sessions that ship code through a PR, use `/agent-ship` / the
-`source-command-agent-push-and-verify` skill instead.
+For sessions that ship code through a PR, use
+[`/agent-ship`](../../.claude/commands/agent-ship.md) or the
+[`source-command-agent-push-and-verify`](../../.agents/skills/source-command-agent-push-and-verify/SKILL.md)
+skill instead.
 
 This is the canonical cross-agent close-out workflow. Tool-specific slash
 commands or skills should stay thin and point here.
@@ -12,7 +14,7 @@ commands or skills should stay thin and point here.
 
 | Scenario | Use |
 | --- | --- |
-| Shipping a PR | `/agent-ship` / `source-command-agent-push-and-verify` |
+| Shipping a PR | [`/agent-ship`](../../.claude/commands/agent-ship.md) or [`source-command-agent-push-and-verify`](../../.agents/skills/source-command-agent-push-and-verify/SKILL.md) |
 | Research or investigation only | `agent-end` |
 | Work abandoned or folded into another session | `agent-end` |
 | Quick fix already pushed by hand | `agent-end` |
@@ -25,10 +27,14 @@ session and give each a disposition: `fixed`, `filed:QUA-NNN`, or
 ## 1. Complete the Checklist
 
 If the checklist does not exist (for example, a quick fix session), skip this
-step. Otherwise, inspect it first:
+step. Check for it explicitly before running checklist commands:
 
 ```bash
-pnpm crux sys agent-checklist status
+if [ ! -f .claude/wip-checklist.md ]; then
+  echo "No .claude/wip-checklist.md found; skipping checklist completion."
+else
+  pnpm crux sys agent-checklist status
+fi
 ```
 
 If any checklist item remains open, either complete it or mark it N/A with a
@@ -41,7 +47,9 @@ pnpm crux sys agent-checklist check --na <item-id> --reason="<why this is not ap
 Then validate completion:
 
 ```bash
-pnpm crux sys agent-checklist complete
+if [ -f .claude/wip-checklist.md ]; then
+  pnpm crux sys agent-checklist complete
+fi
 ```
 
 ## 2. Update Linear
@@ -60,7 +68,11 @@ PR_URL="${PR_URL:-}"
 LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
 if [ -z "$LINEAR_ID" ]; then
   BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-  LINEAR_ID=$(echo "$BRANCH" | grep -oE '\bclaude/qua-[0-9]+' | sed 's|claude/||' | tr 'a-z' 'A-Z')
+  LINEAR_ID=$(printf '%s\n' "$BRANCH" \
+    | grep -oE '\b(claude|codex)/qua-[0-9]+' \
+    | sed -E 's#^(claude|codex)/##' \
+    | tr 'a-z' 'A-Z' \
+    | head -n1)
 fi
 
 if [ -n "$LINEAR_ID" ]; then
@@ -100,7 +112,7 @@ pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 If no PR was created, remove the working label:
 
 ```bash
-gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
+gh api repos/quantified-uncertainty/longterm-wiki/issues/<ISSUE_NUM>/labels/agent:working -X DELETE 2>/dev/null || true
 ```
 
 ## 5. Stop Local Session Processes
@@ -162,14 +174,22 @@ If there are uncommitted changes or unpushed commits on a non-main branch,
 ask the user before proceeding. They may want to commit, push, or preserve
 work first.
 
-If the branch has merged or the user confirms the reset, continue:
+If the branch has merged or the user explicitly confirms the reset, set
+`AGENT_RESET=1` in the same shell and continue. Otherwise, stop here and ask
+whether to commit, push, preserve, or discard the remaining work.
 
 ```bash
+if [ "${AGENT_RESET:-}" != "1" ]; then
+  echo "AGENT_RESET=1 is required before destructive slot reset commands."
+  echo "Commit, push, preserve, or explicitly confirm discard before continuing."
+  exit 1
+fi
+
 git checkout -- .
 git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env
 
 if [ "$BRANCH" != "main" ]; then
-  AGENT_RESET=1 git checkout main
+  git checkout main
   git pull --ff-only origin main || git reset --hard origin/main
   git branch -D "$BRANCH" 2>/dev/null || true
 fi
