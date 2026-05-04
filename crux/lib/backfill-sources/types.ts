@@ -103,6 +103,30 @@ export interface CandidateRecord {
   } | null;
 }
 
+/**
+ * YAML write outcome for one record's dual-write mirror.
+ *
+ *   wrote            — source: <url> appended to the right entity in YAML
+ *   skipped-existing — entity/stakeholder already had a non-empty source
+ *   not-found        — entity/stakeholder couldn't be located in YAML
+ *   no-yaml-target   — entity sid wasn't in the index (legacy thing: file)
+ *   not-applicable   — record's table isn't YAML-mirrored (no write needed)
+ *   error            — read or write IO failure (see error string)
+ */
+export type YamlWriteStatusReport =
+  | 'wrote'
+  | 'skipped-existing'
+  | 'not-found'
+  | 'no-yaml-target'
+  | 'not-applicable'
+  | 'error';
+
+export interface YamlWriteRecordReport {
+  status: YamlWriteStatusReport;
+  filepath: string | null;
+  error?: string;
+}
+
 /** Per-record outcome captured for the summary + JSON report. */
 export type Outcome =
   | {
@@ -111,6 +135,7 @@ export type Outcome =
       provider?: string;
       quotes?: string[];
       updated?: boolean;
+      yaml_write?: YamlWriteRecordReport;
       cost: CostBreakdown;
       candidates: CandidateRecord[];
     }

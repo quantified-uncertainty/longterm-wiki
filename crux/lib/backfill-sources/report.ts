@@ -186,6 +186,7 @@ function serializeOutcome({ record, outcome }: RecordOutcome) {
       // Verbatim quotes Sonnet judged as supporting the claim — included so a
       // human can spot-check for false positives without re-running.
       quotes: outcome.quotes ?? [],
+      yaml_write: outcome.yaml_write ?? null,
       cost_usd: totalOf(outcome.cost),
       candidates: outcome.candidates,
     };
