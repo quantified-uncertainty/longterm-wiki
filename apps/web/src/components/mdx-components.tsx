@@ -285,9 +285,10 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Tabs: MdxTabs,
   TabItem: MdxTabItem,
 
-  // Wrap markdown tables with overflow-x-auto to prevent horizontal page overflow
+  // Wrap markdown tables so wide tables scroll horizontally without changing
+  // the page width. Keep vertical overflow visible for source hover cards.
   table: (props: React.ComponentProps<"table">) => (
-    <div className="overflow-x-auto">
+    <div className="wiki-table-scroll">
       <table {...props} />
     </div>
   ),
