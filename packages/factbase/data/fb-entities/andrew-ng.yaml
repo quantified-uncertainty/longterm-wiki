@@ -3,6 +3,8 @@ facts:
   - id: f_eOS7s8epzw
     property: born-year
     value: 1976
+    source: https://id.loc.gov/authorities/names/no2010058999.html
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_Rg89IN7s7w
     property: notable-for
