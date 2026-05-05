@@ -249,6 +249,20 @@
   overflow: visible;
 }
 
+.prose .wiki-table-scroll {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  overscroll-behavior-x: contain;
+}
+
+.prose .wiki-table-scroll table {
+  width: 100%;
+  min-width: 44rem;
+  margin: 0;
+}
+
 .prose th {
   text-align: left;
   padding: 0.5rem 0.75rem;
