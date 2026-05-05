@@ -5,7 +5,7 @@ description: Probability-weighted synthesis answer to "How likely is AI-enabled 
 sidebar:
   order: 70
 subcategory: analysis-models
-lastEdited: "2026-05-04"
+lastEdited: "2026-05-05"
 clusters:
   - cyber
   - ai-safety
@@ -28,7 +28,9 @@ This page synthesizes four inputs:
 
 ## Bottom line
 
-**P(AI-enabled cyber damage exceeds 10% of global GDP in any single year through 2035) ≈ 5-20%, low-to-medium confidence, under a "substantial AI contribution" and economically meaningful damage reading.**
+**P(aggregate AI-enabled cyber damage in some single year through 2035 exceeds 10% of global GDP) ≈ 5-20%, low-to-medium confidence, under a "substantial AI contribution" and economically meaningful damage reading.**
+
+This is *aggregate* damage in a single year — the sum of all AI-attributable cyber events that year — not a single discrete event. The single-event variant is much lower: see line 4 of the calibration table below. For comparison, P(non-AI cyber damage in a single year > 10% of global GDP through 2035) is plausibly **2-7%** under the same accounting method — i.e., AI uplift roughly doubles the tail, with most of the difference coming from mid-tier-actor scaling and faster offense-defense iteration rather than from new singular catastrophes.
 
 The lower end corresponds to a world where AI mostly increases the volume and sophistication of existing attacks, while defense at hyperscalers, identity providers, endpoint vendors, and major software platforms scales in parallel. The upper end corresponds to a world where AI materially lowers the floor for mid-tier state and criminal actors, attribution erodes deterrence, and at least one systemic chokepoint (payments, cloud, industrial control, OS/browser monoculture) suffers a multi-week disruption or data-integrity failure.
 
@@ -44,6 +46,8 @@ Two nearer-term estimates are useful for calibration:
 | Single-year AI-cyber damage >10% of global GDP by 2035 | ≈5-20% | Main "catastrophic economic disruption" threshold used by this page |
 
 These are judgmental synthesis estimates, not outputs of an actuarial model. They are meant to keep the page honest about scale: a \$100B-\$1T cyber event is much more plausible than a \$10T+ cyber event, and arguments that address one threshold often do not address the other.
+
+The four rows are not independent and their probabilities should not be summed. Most paths to row 4 (10% GDP in a single year) run through row 1 (a \$500B warning shot) plus continued AI-driven scaling — i.e., the headline interval mostly compounds row 1 with a sustained acceleration in baseline cybercrime. The single-event analogue of row 4 is row 4 in the [definitional table below](#definitional-crux): P(single discrete cyber event >\$10T in one year before 2030) ≈ 1-5%. The gap between that single-event number and the 5-20% aggregate headline is meant to capture the cumulative-from-many-events path — many \$10B-\$100B incidents in one year summing to >10% of GDP — which dominates the upper half of the headline interval.
 
 ### How the numbers are calibrated
 
@@ -123,7 +127,7 @@ The right probability estimate depends heavily on the scenario. Arguments that a
 
 The first question is whether ordinary cyber damage can simply grow into catastrophe. The answer is probably no, unless one accepts the broadest cybercrime-cost estimates as direct GDP losses.
 
-**P(annual baseline >10% GDP without a catastrophic single event) ≈ 1-3% by 2030, rising to 5-15% by 2040.**
+**P(annual baseline >10% GDP without a catastrophic single event) ≈ 1-3% by 2030, rising to 3-8% by 2035.**
 
 Reasoning:
 
@@ -177,18 +181,19 @@ The strongest case for concern is also concrete. It does not require assuming lo
 | Argument | Why it raises the estimate | Main caveat |
 |---|---|---|
 | NotPetya proves destructive state cyber is real | A state operation caused global spillover and roughly \$10B damage[^notpetya] | Still 50-1000x below the thresholds that dominate this page |
-| Pre-positioning changes crisis risk | Volt Typhoon-style access in critical infrastructure looks designed for future disruption, not immediate theft[^volt-typhoon] | Pre-positioning is often detected before use, and use risks escalation |
+| Pre-positioning changes crisis risk | Volt Typhoon-style access in critical infrastructure looks designed for future disruption, not immediate theft[^volt-typhoon] | Some pre-positioning is detected before use, and use carries escalation risk; detection rates against well-resourced state campaigns remain unclear |
 | AI lowers the floor for mid-tier actors | North Korea-style, Iran-style, and proxy teams can automate work that used to require more elite staff | Frontier models and scaffolding may be restricted or monitored |
 | Offense scales naturally in some stages | Recon, phishing, vulnerability triage, exploit adaptation, and credential attacks can be automated; Google observed state and criminal misuse across the attack lifecycle in 2025[^gtig-2025] | Post-exploitation persistence and reliable impact remain harder |
 | Attribution may erode deterrence | AI-generated tooling and less distinctive tradecraft can blur actor signatures | States still leave infrastructure, targeting, and intelligence traces |
 | Trailing-edge defenders are exposed | Legacy systems, thin security teams, and underpatched infrastructure may not benefit from defensive AI quickly | Catastrophic global damage usually requires more than weak small organizations |
 | AI systems become new attack surfaces | Model weights, data centers, tool-using agents, and AI SOC systems are valuable targets | Direct damage is often indirect unless compromise enables broader operations |
+| Capability discontinuity | Autonomous AI R&D or scaling could compress the offense-defense iteration cycle faster than defenders can adopt — OpenAI reported its CTF cyber-eval rising from 27% to 76% in three months in 2025[^openai-cyber-resilience] | Single eval results don't generalize to enterprise-realistic intrusion; defenders also benefit from frontier models |
 
 This case implies a specific threat model: capable state or state-backed teams using AI to multiply operator output during a geopolitical crisis, or professional criminal groups using AI to scale attacks against weakly defended shared service providers. It does not imply that every AI-assisted phishing campaign is a global catastrophe precursor.
 
 ## Offense-defense balance
 
-The offense-defense balance is not one number. AI helps different sides at different stages. CSET's 2025 analysis is a useful anchor: it argues that AI can help both sides and that the net balance depends on whether defenders use AI to automate hardening, monitoring, and response faster than attackers use it to automate exploitation.[^cset-ai-cyber] CNAS reaches a more offense-worried version of the same conclusion: past AI has often helped defenders, but future autonomous systems could tip the balance toward attackers if policy and defensive investment lag.[^cnas-2025]
+The offense-defense balance is not one number. AI helps different sides at different stages. CSET's 2025 analysis is a useful anchor: it argues that AI can help both sides and that the net balance depends on whether defenders use AI to automate hardening, monitoring, and response faster than attackers use it to automate exploitation.[^cset-ai-cyber] CNAS reaches a more offense-worried version of the same conclusion: it argues that past AI has on net helped defenders more than attackers — a contested claim, since 2024-2026 threat-intelligence reporting documents AI uplift across the attack lifecycle — but that future autonomous systems could tip the balance toward attackers if policy and defensive investment lag.[^cnas-2025][^gtig-2025]
 
 | Attack stage | AI effect on offense | AI effect on defense | Net concern |
 |---|---|---|---|
