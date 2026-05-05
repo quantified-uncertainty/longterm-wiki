@@ -8,6 +8,14 @@ For sessions that ship code through a PR, use the
 This is the canonical cross-agent close-out workflow. Tool-specific slash
 commands or skills should stay thin and point here.
 
+> **Fast path:** `pnpm crux sys agent-end` (added in QUA-1090) executes
+> Steps 1–9 below in one Node process — no LLM round-tripping required. Use
+> that as the default; fall back to running the steps by hand only when
+> pnpm is unavailable, when debugging a single step, or when the
+> consolidated command's `--dirty=fail` gate refuses to proceed and you
+> need to triage a specific path. See `pnpm crux sys agent-end --help` for
+> the action list and `--dry-run` to preview without side effects.
+
 ## 0. Choose the Right Workflow
 
 | Scenario | Use |
