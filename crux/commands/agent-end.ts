@@ -8,7 +8,6 @@
  *   crux sys agent-end                            Close & reset (defaults)
  *   crux sys agent-end --pr=URL                   Pass PR URL to Linear `done`
  *   crux sys agent-end --dirty=force              Discard unexpected dirty state
- *   crux sys agent-end --dirty=ask                Bail with dirty details (LLM triages)
  *   crux sys agent-end --dry-run                  Print actions only
  */
 
@@ -25,16 +24,20 @@ import * as prPatrolCommands from './pr-patrol.ts';
 
 interface CommandOptions extends BaseOptions {
   pr?: string;
-  dirty?: string; // 'ask' | 'fail' | 'force'
+  dirty?: string; // 'fail' | 'force'
   dryRun?: boolean;
   ci?: boolean;
 }
 
-type DirtyMode = 'ask' | 'fail' | 'force';
+type DirtyMode = 'fail' | 'force';
 
-// Files/directories that may legitimately be modified or untracked at session
-// end — they are session-scoped scaffolding we are about to clean. Anything
-// else dirty triggers the --dirty bail (unless --dirty=force).
+// Files / directory prefixes that may legitimately be modified or untracked at
+// session end — they are session-scoped scaffolding we are about to clean.
+// Anything else dirty triggers the --dirty bail (unless --dirty=force).
+//
+// Trailing-slash entries are directory prefixes; the matcher checks
+// `path.startsWith(prefix)` for those. Non-slash entries match exactly OR with
+// `path === entry + '/' + ...`. See `isExpectedPath` below.
 const EXPECTED_DIRTY_PATHS = [
   '.claude/wip-checklist.md',
   '.claude/wip-context.md',
@@ -47,6 +50,13 @@ const EXPECTED_DIRTY_PATHS = [
   '.claude/sessions/',
   '.agent-task',
 ];
+
+function isExpectedPath(path: string): boolean {
+  return EXPECTED_DIRTY_PATHS.some((p) => {
+    if (p.endsWith('/')) return path.startsWith(p);
+    return path === p || path.startsWith(p + '/');
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -158,11 +168,13 @@ export function inspectDirtyState(): DirtyStatus {
   const unexpectedFiles: string[] = [];
 
   for (const line of status.split('\n').filter(Boolean)) {
-    // Format: "XY <path>"  (X = staged, Y = unstaged; both single chars)
-    const path = line.slice(3);
-    const isExpected = EXPECTED_DIRTY_PATHS.some(
-      (p) => path === p || path.startsWith(p + '/') || (p.endsWith('/') && path.startsWith(p)),
-    );
+    // Format: "XY <path>" (X = staged, Y = unstaged; both single chars).
+    // Renames have the form "R<flag> old -> new" — both old and new must be
+    // checked, since a session might rename an expected scaffolding file.
+    const slice = line.slice(3);
+    const renameSplit = ' -> ';
+    const paths = slice.includes(renameSplit) ? slice.split(renameSplit) : [slice];
+    const isExpected = paths.every(isExpectedPath);
     if (isExpected) expectedFiles.push(line);
     else unexpectedFiles.push(line);
   }
@@ -179,7 +191,7 @@ export function inspectDirtyState(): DirtyStatus {
 }
 
 export function parseDirtyMode(raw: unknown): DirtyMode {
-  if (raw === 'ask' || raw === 'fail' || raw === 'force') return raw;
+  if (raw === 'force') return 'force';
   return 'fail';
 }
 
@@ -350,44 +362,42 @@ function stepCleanWipArtifacts(): StepResult {
   return { label: 'WIP artifacts', ok: true, detail: `removed ${removed.length}` };
 }
 
-function stepRestoreTrackedFiles(): StepResult {
-  // Tracked files / dirs that get touched mid-session and must be returned to
-  // their committed state. `git checkout --` for tracked, plain rm for untracked.
-  const restored: string[] = [];
-  const cleared: string[] = [];
+// Gitignored review markers — agent-end always unlinks if present (no
+// git-checkout needed since git doesn't track them).
+const GITIGNORED_MARKERS = ['.claude/review-phases-done', '.claude/simplify-done'];
 
-  const trackedTargets = [
-    '.claude/review-done',
-    '.claude/review-phases-done',
-    '.claude/simplify-done',
-    '.claude/hooks/',
-  ];
-  for (const rel of trackedTargets) {
+// Tracked paths that may be modified mid-session (review-done is committed
+// when the marker file exists in git history; .claude/hooks/ is the live
+// session-hook scaffolding) — restore to HEAD with git checkout.
+const TRACKED_RESTORE_TARGETS = ['.claude/review-done', '.claude/hooks/'];
+
+function stepCleanReviewArtifacts(): StepResult {
+  let actions = 0;
+
+  // Unlink gitignored markers
+  for (const rel of GITIGNORED_MARKERS) {
     const abs = join(PROJECT_ROOT, rel);
-    if (execSafe(`git ls-files --error-unmatch -- "${rel}"`) !== null) {
-      // Tracked: discard local modifications
-      if (execSafe(`git checkout -- "${rel}"`) !== null) restored.push(rel);
-    } else if (existsSync(abs)) {
-      // Untracked: best-effort remove
+    if (existsSync(abs)) {
       try {
-        if (rel.endsWith('/')) {
-          // Directory: leave to `git clean -fd` later, since rm -rf is risky
-          cleared.push(rel + '(via clean)');
-        } else {
-          unlinkSync(abs);
-          cleared.push(rel);
-        }
+        unlinkSync(abs);
+        actions++;
       } catch {
-        // Non-fatal
+        // Non-fatal — the branch reset below will catch any leftovers via
+        // `git clean -fd`. We don't fail the step on a single unlink miss.
       }
     }
   }
 
-  const all = [...restored, ...cleared];
-  if (all.length === 0) {
-    return { label: 'Tracked-file restore', ok: true, detail: 'nothing to restore' };
+  // Restore tracked review artifacts
+  for (const rel of TRACKED_RESTORE_TARGETS) {
+    if (execSafe(`git checkout -- "${rel}"`) !== null) actions++;
   }
-  return { label: 'Tracked-file restore', ok: true, detail: `${all.length} target(s)` };
+
+  return {
+    label: 'Review artifacts',
+    ok: true,
+    detail: actions === 0 ? 'nothing to restore' : `${actions} target(s)`,
+  };
 }
 
 async function stepCloseAgentSession(_opts: CommandOptions): Promise<StepResult> {
@@ -421,17 +431,43 @@ function stepBranchReset(plan: Plan): StepResult {
     return { label: 'Branch reset', ok: true, detail: 'already on main; cleaned' };
   }
 
+  // Guard against pathological branch states. These shouldn't happen in a
+  // healthy slot, but we'd rather no-op than `git branch -D "(unknown)"`.
+  if (!plan.branch || plan.branch === '(unknown)') {
+    return { label: 'Branch reset', ok: false, detail: `cannot reset: branch=${plan.branch}` };
+  }
+
   // The PreToolUse hook for branch switching is bypassed here because we are
   // running outside the Bash tool (TS execSync is a child process, not a tool
   // call). No `AGENT_RESET=1` needed.
   if (execSafe('git checkout main') === null) {
     return { label: 'Branch reset', ok: false, detail: `failed to checkout main from ${plan.branch}` };
   }
-  // Pull latest; on conflict force to origin/main (the slot has no work to keep)
-  if (execSafe('git pull --ff-only origin main', 30000) === null) {
-    execSafe('git reset --hard origin/main');
+
+  // Refresh origin so the divergence check below uses up-to-date refs.
+  execSafe('git fetch origin main', 30000);
+
+  // Detect local commits on main that origin/main doesn't have. If any exist,
+  // bail rather than risk discarding them via `git reset --hard origin/main`.
+  // Healthy slots never accumulate local commits on main, but if a prior
+  // session committed accidentally we want a loud error, not silent loss.
+  const localAhead = Number(execSafe('git rev-list --count origin/main..main 2>/dev/null') ?? '0');
+  if (localAhead > 0) {
+    return {
+      label: 'Branch reset',
+      ok: false,
+      detail: `${localAhead} local commit(s) on main not in origin/main — refusing to reset; investigate by hand`,
+    };
   }
-  // Delete the spent feature branch (best-effort — may already be gone)
+
+  // Local main is either even with or behind origin — safe to fast-forward.
+  if (execSafe('git pull --ff-only origin main', 30000) === null) {
+    return { label: 'Branch reset', ok: false, detail: 'pull --ff-only failed (network?); main is unchanged' };
+  }
+
+  // Delete the spent feature branch (best-effort — may already be gone). `-D`
+  // is force-delete; safe because the branch is presumed merged or abandoned
+  // by the operator running /agent-end.
   execSafe(`git branch -D "${plan.branch}"`);
 
   return { label: 'Branch reset', ok: true, detail: `switched main; deleted ${plan.branch}` };
@@ -524,7 +560,7 @@ async function agentEndCommand(
       output += `  • dev server — no DEV_PORT in .env\n`;
     }
     output += `  • rm .claude/wip-checklist.md, .claude/wip-context.md\n`;
-    output += `  • git checkout -- .claude/review-done .claude/review-phases-done .claude/simplify-done .claude/hooks/\n`;
+    output += `  • rm gitignored markers (review-phases-done, simplify-done) + git checkout -- .claude/review-done .claude/hooks/\n`;
     output += `  • agents close (DB session)\n`;
     if (plan.isMain) {
       output += `  • git checkout -- . && git clean -fd (already on main)\n`;
@@ -547,7 +583,7 @@ async function agentEndCommand(
   steps.push(await stepPatrolStop(options));
   steps.push(stepKillDevServer(plan));
   steps.push(stepCleanWipArtifacts());
-  steps.push(stepRestoreTrackedFiles());
+  steps.push(stepCleanReviewArtifacts());
   steps.push(await stepCloseAgentSession(options));
   steps.push(stepBranchReset(plan));
   steps.push(stepRenameTmux(plan));
@@ -588,19 +624,18 @@ Usage:
   crux sys agent-end                    Close & reset (defaults)
   crux sys agent-end --pr=URL           Pass PR URL to Linear \`done\`
   crux sys agent-end --dirty=force      Discard unexpected dirty state
-  crux sys agent-end --dirty=ask        Bail with details (LLM triages)
   crux sys agent-end --dry-run          Print actions, take none
 
 Options:
   --pr=URL           PR URL to attach to the Linear done comment.
                      With a PR: Linear → In Review.
                      Without:   Linear → Done.
-  --dirty=MODE       fail (default) | ask | force.
-                     fail/ask: bail (exit 2) on unexpected dirty paths or
-                              unpushed commits, listing each so the operator
-                              can commit/push/discard and re-run.
-                     force:   discard everything (current behavior of the
-                              old skill body).
+  --dirty=MODE       fail (default) | force.
+                     fail:  bail (exit 2) on unexpected dirty paths or
+                            unpushed commits, listing each so the operator
+                            can commit/push/discard and re-run.
+                     force: discard everything (matches the old skill's
+                            behaviour). Use only when you know what's dirty.
   --dry-run          Print the actions that would be taken, exit 0.
   --ci               Plain (no-color) output.
 
@@ -611,7 +646,7 @@ What runs (in order):
   4. pr-patrol stop                     Halt patrol daemon if running
   5. kill dev server on $DEV_PORT       Uses lsof -sTCP:LISTEN (port-scoped)
   6. rm .claude/wip-{checklist,context}.md
-  7. git checkout -- .claude/review-done .claude/review-phases-done .claude/simplify-done .claude/hooks/
+  7. rm gitignored markers (review-phases-done, simplify-done) + git checkout -- .claude/review-done .claude/hooks/
   8. agents close                       Close active agent + session row in DB
   9. git checkout main; pull --ff-only; git branch -D <feature>
   10. tmux rename-window A<slot>
@@ -619,7 +654,7 @@ What runs (in order):
 Exit codes:
   0  All steps passed (or dry-run).
   1  At least one step reported an error — review the output.
-  2  Bail before running any step (dirty state with --dirty=fail|ask).
+  2  Bail before running any step (dirty state with --dirty=fail).
 
 Examples:
   crux sys agent-end --dry-run

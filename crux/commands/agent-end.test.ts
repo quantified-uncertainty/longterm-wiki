@@ -121,10 +121,11 @@ describe('parseDirtyMode', () => {
     expect(parseDirtyMode('')).toBe('fail');
     expect(parseDirtyMode('garbage')).toBe('fail');
   });
-  it('accepts the three valid modes', () => {
-    expect(parseDirtyMode('ask')).toBe('ask');
-    expect(parseDirtyMode('fail')).toBe('fail');
+  it('returns "force" only for the literal "force"', () => {
     expect(parseDirtyMode('force')).toBe('force');
+    expect(parseDirtyMode('fail')).toBe('fail');
+    // "ask" was dropped from v1 because it was indistinguishable from "fail".
+    expect(parseDirtyMode('ask')).toBe('fail');
   });
 });
 
@@ -261,6 +262,31 @@ describe('inspectDirtyState', () => {
     ]);
     expect(inspectDirtyState().unpushedCommits).toBe(0);
   });
+
+  it('treats a rename row that maps an expected file to another expected path as expected', () => {
+    setExec([
+      // Rename of .claude/wip-checklist.md → .claude/wip-context.md (both expected)
+      { match: /status --porcelain/, out: 'R  .claude/wip-checklist.md -> .claude/wip-context.md\n' },
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      { match: /rev-list --count/, out: '0' },
+    ]);
+    const r = inspectDirtyState();
+    expect(r.expectedFiles).toHaveLength(1);
+    expect(r.unexpectedFiles).toHaveLength(0);
+  });
+
+  it('treats a rename row that touches an unexpected path as unexpected', () => {
+    setExec([
+      // Rename of an expected wip file → an unexpected app source path
+      { match: /status --porcelain/, out: 'R  .claude/wip-checklist.md -> apps/web/leak.md\n' },
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      { match: /rev-list --count/, out: '0' },
+    ]);
+    const r = inspectDirtyState();
+    expect(r.expectedFiles).toHaveLength(0);
+    expect(r.unexpectedFiles).toHaveLength(1);
+    expect(r.unexpectedFiles[0]).toContain('apps/web/leak.md');
+  });
 });
 
 // ---- findPortListeners ----------------------------------------------------
@@ -394,5 +420,139 @@ describe('agent-end dirty-state gate', () => {
     );
     expect(result.exitCode).toBe(0);
     expect(result.output).toMatch(/Would execute/);
+  });
+});
+
+// ---- Destructive execution path ------------------------------------------
+
+describe('agent-end execute (non-dry-run)', () => {
+  it('runs every step and reports them in the summary', async () => {
+    installFs({
+      [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n',
+      [join(PROJECT_ROOT, '.env')]: 'DEV_PORT=3017\n',
+      [join(PROJECT_ROOT, '.agent-slot')]: '7\n',
+    });
+    setExec([
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      // Clean working tree → no dirty bail.
+      { match: /status --porcelain/, out: '' },
+      { match: /rev-list --count @\{u\}\.\.HEAD/, out: '0' },
+      { match: /rev-list --count origin\/main\.\.main/, out: '0' },
+      // No dev-server listener.
+      { match: /lsof -ti:3017/, out: '' },
+      { match: /pgrep/, out: '' },
+      // git plumbing — succeed silently.
+      { match: /git checkout -- \./, out: '' },
+      { match: /git clean -fd/, out: '' },
+      { match: /git checkout main/, out: '' },
+      { match: /git fetch origin main/, out: '' },
+      { match: /git pull --ff-only/, out: '' },
+      { match: /git branch -D/, out: '' },
+      { match: /git checkout -- /, out: '' },
+    ]);
+
+    const result = await commands.default([], { ci: true });
+
+    // Mocked sub-commands all succeeded → exit 0
+    expect(result.exitCode).toBe(0);
+
+    // Each step contributed a line
+    expect(result.output).toMatch(/Checklist/);
+    expect(result.output).toMatch(/Linear leak-check/);
+    expect(result.output).toMatch(/Linear done/);
+    expect(result.output).toMatch(/Patrol daemon/);
+    expect(result.output).toMatch(/Dev server/);
+    expect(result.output).toMatch(/WIP artifacts/);
+    expect(result.output).toMatch(/Review artifacts/);
+    expect(result.output).toMatch(/Agent session/);
+    expect(result.output).toMatch(/Branch reset/);
+    expect(result.output).toMatch(/Tmux rename/);
+
+    // Side-effect mocks were called
+    expect(checklistCompleteMock).toHaveBeenCalledOnce();
+    expect(leakCheckMock).toHaveBeenCalledOnce();
+    expect(linearDoneMock).toHaveBeenCalledOnce();
+    expect(patrolStopMock).toHaveBeenCalledOnce();
+    expect(agentsCloseMock).toHaveBeenCalledOnce();
+
+    // Summary footer
+    expect(result.output).toMatch(/Done\./);
+  });
+
+  it('REFUSES to reset main when local main has commits not in origin/main', async () => {
+    // This is the QUA-1090 review-found data-loss guard. Without it, an
+    // accidental local commit on main would be silently discarded by
+    // `git reset --hard origin/main`.
+    installFs({
+      [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n',
+      [join(PROJECT_ROOT, '.env')]: '',
+      [join(PROJECT_ROOT, '.agent-slot')]: '7\n',
+    });
+    setExec([
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      { match: /status --porcelain/, out: '' },
+      { match: /rev-list --count @\{u\}\.\.HEAD/, out: '0' },
+      // 2 local-only commits on main → safety guard fires.
+      { match: /rev-list --count origin\/main\.\.main/, out: '2' },
+      { match: /git checkout -- \./, out: '' },
+      { match: /git clean -fd/, out: '' },
+      { match: /git checkout main/, out: '' },
+      { match: /git fetch origin main/, out: '' },
+      // git pull / reset --hard / branch -D should NOT fire if guard works.
+      { match: /git pull --ff-only/, out: new Error('would not be called') },
+      { match: /git reset --hard/, out: new Error('would not be called') },
+      { match: /git branch -D/, out: new Error('would not be called') },
+    ]);
+
+    const result = await commands.default([], { ci: true });
+
+    expect(result.exitCode).toBe(1); // at least one step failed
+    expect(result.output).toMatch(/2 local commit\(s\) on main not in origin\/main/);
+    expect(result.output).toMatch(/refusing to reset/);
+  });
+
+  it('reports failure when checklist has unchecked items but still runs the rest', async () => {
+    installFs({
+      [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n[ ] item-a\n[ ] item-b\n',
+      [join(PROJECT_ROOT, '.env')]: '',
+      [join(PROJECT_ROOT, '.agent-slot')]: '7\n',
+    });
+    setExec([
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      { match: /status --porcelain/, out: '' },
+      { match: /rev-list --count/, out: '0' },
+      { match: /lsof/, out: '' },
+      { match: /pgrep/, out: '' },
+    ]);
+    // checklist complete returns exit 1 with output containing two `[ ]` markers
+    checklistCompleteMock.mockResolvedValueOnce({
+      output: '✗ 2 unchecked item(s):\n  [ ] item-a\n  [ ] item-b\n',
+      exitCode: 1,
+    });
+
+    const result = await commands.default([], { ci: true });
+    // checklist failure surfaces in the per-step report, but the rest of the
+    // session-close still runs to completion — the slot would otherwise leak.
+    expect(result.output).toMatch(/Checklist/);
+    expect(result.output).toMatch(/2 item\(s\) unchecked/);
+    expect(linearDoneMock).toHaveBeenCalled();
+    expect(agentsCloseMock).toHaveBeenCalled();
+  });
+
+  it('skips dev-server kill cleanly when no DEV_PORT is configured', async () => {
+    installFs({
+      [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n',
+      [join(PROJECT_ROOT, '.env')]: 'FOO=bar\n', // no DEV_PORT
+      [join(PROJECT_ROOT, '.agent-slot')]: '7\n',
+    });
+    setExec([
+      { match: /rev-parse --abbrev-ref/, out: 'claude/qua-1090-foo' },
+      { match: /status --porcelain/, out: '' },
+      { match: /rev-list --count/, out: '0' },
+      { match: /pgrep/, out: '' },
+      { match: /git/, out: '' },
+    ]);
+    const result = await commands.default([], { ci: true });
+    expect(result.output).toMatch(/Dev server.*no DEV_PORT in \.env/);
   });
 });
