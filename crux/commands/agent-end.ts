@@ -17,6 +17,9 @@ import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { gitSafe } from '../lib/git.ts';
+import { findSlotFromAncestors } from '../lib/session/session-context.ts';
+import { resolveLinearId as resolveLinearIdFromSources } from '../lib/linear/parse-id.ts';
 import * as agentChecklistCommands from './agent-checklist.ts';
 import * as agentsCommands from './agents.ts';
 import * as linearCommands from './linear.ts';
@@ -62,24 +65,24 @@ function isExpectedPath(path: string): boolean {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function exec(cmd: string, timeoutMs = 30000): string {
-  return execSync(cmd, { encoding: 'utf-8', timeout: timeoutMs, cwd: PROJECT_ROOT }).trim();
-}
-
-function execSafe(cmd: string, timeoutMs = 30000): string | null {
+/**
+ * Run a non-git shell command. Returns null on failure. Uses execSync (with a
+ * shell) intentionally for things like `lsof | tmux | pgrep` that aren't in
+ * lib/git.ts. For git commands, prefer gitSafe (no shell, injection-safe).
+ */
+function shellSafe(cmd: string, timeoutMs = 30000): string | null {
   try {
-    return exec(cmd, timeoutMs);
+    return execSync(cmd, { encoding: 'utf-8', timeout: timeoutMs, cwd: PROJECT_ROOT }).trim();
   } catch {
     return null;
   }
 }
 
 /**
- * Like execSafe but preserves whitespace. Use for command output where leading
- * whitespace is semantic — notably `git status --porcelain` (a leading space in
- * column 0 means "no staged change", and `.trim()` would corrupt the layout).
+ * Like shellSafe but preserves leading whitespace. Used for `git status
+ * --porcelain` whose column-0 space (" M file" = unstaged modify) is semantic.
  */
-function execRawSafe(cmd: string, timeoutMs = 30000): string | null {
+function shellRawSafe(cmd: string, timeoutMs = 30000): string | null {
   try {
     return execSync(cmd, { encoding: 'utf-8', timeout: timeoutMs, cwd: PROJECT_ROOT });
   } catch {
@@ -89,21 +92,32 @@ function execRawSafe(cmd: string, timeoutMs = 30000): string | null {
 
 /**
  * Read the Linear ID from the wip checklist (`> Linear: QUA-NNN`) first,
- * then fall back to parsing the current branch (`claude/qua-NNN-...`).
+ * then fall back to parsing the current branch via the shared parse-id helper
+ * (which enforces the team-key allowlist — see crux/lib/linear/parse-id.ts).
+ *
+ * Exported for tests; pass the branch in to avoid a redundant rev-parse.
  */
-export function resolveLinearId(): string | null {
+export function resolveLinearId(branch?: string | null): string | null {
+  const sources: Array<string | null> = [];
   const checklistPath = join(PROJECT_ROOT, '.claude/wip-checklist.md');
   if (existsSync(checklistPath)) {
     const md = readFileSync(checklistPath, 'utf-8');
     const m = md.match(/^>\s*Linear:\s*([A-Z]+-\d+)/m);
-    if (m) return m[1];
+    if (m) sources.push(m[0]);
   }
-  const branch = execSafe('git rev-parse --abbrev-ref HEAD');
-  if (branch) {
-    const m = branch.match(/claude\/(qua-\d+)/i);
-    if (m) return m[1].toUpperCase();
-  }
-  return null;
+  // Caller passes branch when known to avoid a duplicate rev-parse.
+  const branchValue = branch ?? readCurrentBranch();
+  if (branchValue) sources.push(branchValue);
+  return resolveLinearIdFromSources(sources);
+}
+
+/**
+ * Current branch name, or null on failure. Wraps `gitSafe` so we don't need to
+ * decide between throwing/non-throwing variants at every call site.
+ */
+function readCurrentBranch(): string | null {
+  const r = gitSafe('rev-parse', '--abbrev-ref', 'HEAD');
+  return r.ok ? r.output : null;
 }
 
 /**
@@ -120,9 +134,15 @@ export function readDevPort(): number | null {
 }
 
 /**
- * Read .agent-slot (e.g. "7" → 7). Returns null if missing or unparsable.
+ * Slot number for the current cwd, or null. Walks ancestors for `a<N>`
+ * (canonical) and falls back to `.agent-slot` for legacy layouts. Returns the
+ * value as a string for tmux/output use; callers needing a number should
+ * import findSlotFromAncestors directly.
  */
 export function readSlotNumber(): string | null {
+  const n = findSlotFromAncestors(process.cwd());
+  if (n !== null) return String(n);
+  // Legacy fallback — pre-a<N> layouts and worktrees that override .agent-slot.
   const slotPath = join(PROJECT_ROOT, '.agent-slot');
   if (!existsSync(slotPath)) return null;
   const raw = readFileSync(slotPath, 'utf-8').trim();
@@ -135,7 +155,7 @@ export function readSlotNumber(): string | null {
  * `feedback_kill_port_safely.md`).
  */
 export function findPortListeners(port: number): number[] {
-  const out = execSafe(`lsof -ti:${port} -sTCP:LISTEN`);
+  const out = shellSafe(`lsof -ti:${port} -sTCP:LISTEN`);
   if (!out) return [];
   return out
     .split('\n')
@@ -157,12 +177,12 @@ interface DirtyStatus {
  * Unpushed commits are reported only on non-main branches (on main any unpushed
  * work is a separate issue the user owns; agent-end does not amend that).
  */
-export function inspectDirtyState(): DirtyStatus {
-  // execRawSafe (no trim): porcelain output uses two columns where column 0
+export function inspectDirtyState(branch?: string | null): DirtyStatus {
+  // shellRawSafe (no trim): porcelain output uses two columns where column 0
   // can legitimately be a space (" M file" = unstaged modify). Trim would
   // corrupt the slice(3).
-  const status = execRawSafe('git status --porcelain') ?? '';
-  const branch = execSafe('git rev-parse --abbrev-ref HEAD') ?? '(unknown)';
+  const status = shellRawSafe('git status --porcelain') ?? '';
+  const branchValue = branch ?? readCurrentBranch() ?? '(unknown)';
 
   const expectedFiles: string[] = [];
   const unexpectedFiles: string[] = [];
@@ -180,11 +200,11 @@ export function inspectDirtyState(): DirtyStatus {
   }
 
   let unpushedCommits = 0;
-  if (branch !== 'main' && branch !== '(unknown)') {
-    // 2>/dev/null swallows the "no upstream configured" error that fires for
-    // branches that were never pushed (research/abandoned sessions).
-    const counted = execSafe('git rev-list --count @{u}..HEAD 2>/dev/null');
-    if (counted) unpushedCommits = Number(counted) || 0;
+  if (branchValue !== 'main' && branchValue !== '(unknown)') {
+    // gitSafe handles the "no upstream configured" error cleanly without
+    // shell stderr redirection (returns ok:false → unpushedCommits stays 0).
+    const counted = gitSafe('rev-list', '--count', '@{u}..HEAD');
+    if (counted.ok) unpushedCommits = Number(counted.output) || 0;
   }
 
   return { unexpectedFiles, unpushedCommits, expectedFiles };
@@ -211,65 +231,92 @@ interface Plan {
   branch: string;
   slot: string | null;
   devPort: number | null;
-  devPids: number[];
-  patrolPid: number | null;
-  isMain: boolean;
 }
 
-function buildPlan(options: CommandOptions): Plan {
-  const branch = execSafe('git rev-parse --abbrev-ref HEAD') ?? '(unknown)';
-  const linearId = resolveLinearId();
-  const slot = readSlotNumber();
-  const devPort = readDevPort();
-  const devPids = devPort ? findPortListeners(devPort) : [];
-  const patrolPid = (() => {
-    try {
-      // Reuse pr-patrol's daemon registry — same source the `stop` command uses.
-      // Falling back to null if anything throws.
-      const out = execSafe('pgrep -f "crux gh pr-patrol run" 2>/dev/null') ?? '';
-      const first = out.split('\n').find(Boolean);
-      return first ? Number(first) : null;
-    } catch {
-      return null;
-    }
-  })();
-
+function buildPlan(options: CommandOptions, branch: string): Plan {
   return {
-    linearId,
+    linearId: resolveLinearId(branch),
     prUrl: typeof options.pr === 'string' ? options.pr : null,
     branch,
-    slot,
-    devPort,
-    devPids,
-    patrolPid,
-    isMain: branch === 'main',
+    slot: readSlotNumber(),
+    devPort: readDevPort(),
   };
 }
 
-async function stepCompleteChecklist(_opts: CommandOptions): Promise<StepResult> {
+/**
+ * Look up a running pr-patrol daemon's PID, for dry-run reporting only.
+ * `stepPatrolStop` calls into the daemon's own registry directly — we don't
+ * pass the PID in.
+ */
+function patrolPid(): number | null {
+  const out = shellSafe('pgrep -f "crux gh pr-patrol run"');
+  if (!out) return null;
+  const first = out.split('\n').find(Boolean);
+  const n = first ? Number(first) : null;
+  return Number.isInteger(n) && n! > 0 ? n : null;
+}
+
+/**
+ * Execute a delegated command (Linear/agents/patrol/checklist) and shape the
+ * result into a StepResult. Three orchestration steps share this exact shape;
+ * inlining was 3x copy-paste.
+ *
+ * `onSuccess` interprets a 0-exit result. `onNonZero` (optional) interprets a
+ * non-zero exit with the captured output — defaults to truncating the first
+ * line to 200 chars. Caught exceptions always become `error: <msg>`.
+ */
+async function runDelegate(
+  label: string,
+  invoke: () => Promise<CommandResult>,
+  onSuccess: (result: CommandResult) => string,
+  onNonZero?: (result: CommandResult) => StepResult,
+): Promise<StepResult> {
+  try {
+    const result = await invoke();
+    if (result.exitCode === 0) {
+      return { label, ok: true, detail: onSuccess(result) };
+    }
+    if (onNonZero) return onNonZero(result);
+    const firstLine = result.output.trim().split('\n')[0]?.slice(0, 200) ?? 'unknown error';
+    return { label, ok: false, detail: firstLine };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { label, ok: false, detail: `error: ${msg}` };
+  }
+}
+
+async function stepCompleteChecklist(): Promise<StepResult> {
   // The checklist file may not exist (quick-fix sessions) — that's a no-op.
   const checklistPath = join(PROJECT_ROOT, '.claude/wip-checklist.md');
   if (!existsSync(checklistPath)) {
     return { label: 'Checklist', ok: true, detail: 'no checklist (skipped)' };
   }
-  const result = await agentChecklistCommands.commands.complete([], { ci: true });
-  // exitCode 0 = complete, 1 = unchecked items remain. Either way we proceed
-  // (the checklist command surfaces the warning; agent-end is meant to close
-  // the slot regardless of checklist state).
-  if (result.exitCode === 0) {
-    return { label: 'Checklist', ok: true, detail: 'all items complete' };
-  }
-  const unchecked = (result.output.match(/\[ \]/g) ?? []).length;
-  return { label: 'Checklist', ok: false, detail: `${unchecked} item(s) unchecked` };
+  return runDelegate(
+    'Checklist',
+    () => agentChecklistCommands.commands.complete([], { ci: true }),
+    () => 'all items complete',
+    // Exit 1 = unchecked items remain. Surface the count, but agent-end still
+    // proceeds — closing the slot regardless of checklist state is by design.
+    (result) => {
+      const unchecked = (result.output.match(/\[ \]/g) ?? []).length;
+      return { label: 'Checklist', ok: false, detail: `${unchecked} item(s) unchecked` };
+    },
+  );
 }
 
-async function stepLeakCheck(_opts: CommandOptions): Promise<StepResult> {
-  const result = await linearCommands.commands['leak-check']([], { ci: true });
-  // leakCheck is advisory and returns exit 0 even when leaks exist — the
-  // command's printed output names any leaked refs.
-  const leaks = (result.output.match(/QUA-\d+/g) ?? []).filter((v, i, a) => a.indexOf(v) === i);
-  if (leaks.length === 0) return { label: 'Linear leak-check', ok: true, detail: 'no extra refs' };
-  return { label: 'Linear leak-check', ok: true, detail: `flagged: ${leaks.join(', ')}` };
+async function stepLeakCheck(): Promise<StepResult> {
+  return runDelegate(
+    'Linear leak-check',
+    () => linearCommands.commands['leak-check']([], { ci: true }),
+    // leakCheck is advisory: exit 0 even when leaks exist. Surface any
+    // mentioned QUA-NNN refs in the detail line.
+    (result) => {
+      const leaks = (result.output.match(/QUA-\d+/g) ?? []).filter(
+        (v, i, a) => a.indexOf(v) === i,
+      );
+      return leaks.length === 0 ? 'no extra refs' : `flagged: ${leaks.join(', ')}`;
+    },
+  );
 }
 
 async function stepLinearDone(plan: Plan): Promise<StepResult> {
@@ -278,45 +325,40 @@ async function stepLinearDone(plan: Plan): Promise<StepResult> {
   }
   const opts: CommandOptions = { ci: true };
   if (plan.prUrl) opts.pr = plan.prUrl;
-  try {
-    const result = await linearCommands.commands.done([plan.linearId], opts);
-    if (result.exitCode === 0) {
+  return runDelegate(
+    'Linear done',
+    () => linearCommands.commands.done([plan.linearId!], opts),
+    () => {
       const target = plan.prUrl ? 'In Review' : 'Done';
       const suffix = plan.prUrl ? ` (PR ${plan.prUrl})` : '';
-      return { label: 'Linear done', ok: true, detail: `${plan.linearId} → ${target}${suffix}` };
-    }
-    return { label: 'Linear done', ok: false, detail: result.output.trim().slice(0, 200) };
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return { label: 'Linear done', ok: false, detail: `error: ${msg}` };
-  }
+      return `${plan.linearId} → ${target}${suffix}`;
+    },
+  );
 }
 
-async function stepPatrolStop(_opts: CommandOptions): Promise<StepResult> {
-  try {
-    const result = await prPatrolCommands.commands.stop([], { ci: true });
-    if (result.output.toLowerCase().includes('no patrol daemon')) {
-      return { label: 'Patrol daemon', ok: true, detail: 'not running (skipped)' };
-    }
-    if (result.exitCode === 0) {
-      return { label: 'Patrol daemon', ok: true, detail: 'stopped' };
-    }
-    return { label: 'Patrol daemon', ok: false, detail: result.output.trim().slice(0, 200) };
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return { label: 'Patrol daemon', ok: false, detail: `error: ${msg}` };
-  }
+async function stepPatrolStop(): Promise<StepResult> {
+  return runDelegate(
+    'Patrol daemon',
+    () => prPatrolCommands.commands.stop([], { ci: true }),
+    (result) =>
+      result.output.toLowerCase().includes('no patrol daemon')
+        ? 'not running (skipped)'
+        : 'stopped',
+  );
 }
 
 function stepKillDevServer(plan: Plan): StepResult {
   if (!plan.devPort) {
     return { label: 'Dev server', ok: true, detail: 'no DEV_PORT in .env (skipped)' };
   }
-  if (plan.devPids.length === 0) {
+  // Look up listeners at execute time (not at buildPlan), so dry-run can
+  // print plan-time PIDs but the kill step always operates on fresh data.
+  const pids = findPortListeners(plan.devPort);
+  if (pids.length === 0) {
     return { label: 'Dev server', ok: true, detail: `port ${plan.devPort} has no listener` };
   }
   const failed: number[] = [];
-  for (const pid of plan.devPids) {
+  for (const pid of pids) {
     try {
       process.kill(pid, 'SIGTERM');
     } catch (e: unknown) {
@@ -329,7 +371,7 @@ function stepKillDevServer(plan: Plan): StepResult {
     return {
       label: 'Dev server',
       ok: true,
-      detail: `killed port ${plan.devPort} (PIDs: ${plan.devPids.join(', ')})`,
+      detail: `killed port ${plan.devPort} (PIDs: ${pids.join(', ')})`,
     };
   }
   return {
@@ -390,7 +432,7 @@ function stepCleanReviewArtifacts(): StepResult {
 
   // Restore tracked review artifacts
   for (const rel of TRACKED_RESTORE_TARGETS) {
-    if (execSafe(`git checkout -- "${rel}"`) !== null) actions++;
+    if (gitSafe('checkout', '--', rel).ok) actions++;
   }
 
   return {
@@ -400,39 +442,34 @@ function stepCleanReviewArtifacts(): StepResult {
   };
 }
 
-async function stepCloseAgentSession(_opts: CommandOptions): Promise<StepResult> {
-  try {
-    const result = await agentsCommands.commands.close([], { ci: true });
-    if (result.exitCode === 0) {
-      return { label: 'Agent session', ok: true, detail: 'closed in DB' };
-    }
-    return {
-      label: 'Agent session',
-      ok: false,
-      detail: result.output.trim().split('\n')[0]?.slice(0, 200) ?? 'unknown error',
-    };
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return { label: 'Agent session', ok: false, detail: `error: ${msg}` };
-  }
+async function stepCloseAgentSession(): Promise<StepResult> {
+  return runDelegate(
+    'Agent session',
+    () => agentsCommands.commands.close([], { ci: true }),
+    () => 'closed in DB',
+  );
 }
 
 function stepBranchReset(plan: Plan): StepResult {
+  const isMain = plan.branch === 'main';
+
   // Always run the discard pair — even on main this just reverts any session
   // hook tweaks.
-  const discardOk = execSafe('git checkout -- .') !== null;
-  const cleanOk =
-    execSafe('git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env') !== null;
+  const discardOk = gitSafe('checkout', '--', '.').ok;
+  const cleanOk = gitSafe(
+    'clean', '-fd',
+    '--exclude=.agent-slot', '--exclude=.envrc', '--exclude=.env',
+  ).ok;
 
-  if (plan.isMain) {
+  if (isMain) {
     if (!discardOk || !cleanOk) {
       return { label: 'Branch reset', ok: false, detail: 'on main; discard/clean failed' };
     }
     return { label: 'Branch reset', ok: true, detail: 'already on main; cleaned' };
   }
 
-  // Guard against pathological branch states. These shouldn't happen in a
-  // healthy slot, but we'd rather no-op than `git branch -D "(unknown)"`.
+  // Guard against pathological branch states. Shouldn't happen in a healthy
+  // slot, but we'd rather no-op than `git branch -D "(unknown)"`.
   if (!plan.branch || plan.branch === '(unknown)') {
     return { label: 'Branch reset', ok: false, detail: `cannot reset: branch=${plan.branch}` };
   }
@@ -440,18 +477,19 @@ function stepBranchReset(plan: Plan): StepResult {
   // The PreToolUse hook for branch switching is bypassed here because we are
   // running outside the Bash tool (TS execSync is a child process, not a tool
   // call). No `AGENT_RESET=1` needed.
-  if (execSafe('git checkout main') === null) {
+  if (!gitSafe('checkout', 'main').ok) {
     return { label: 'Branch reset', ok: false, detail: `failed to checkout main from ${plan.branch}` };
   }
 
   // Refresh origin so the divergence check below uses up-to-date refs.
-  execSafe('git fetch origin main', 30000);
+  gitSafe('fetch', 'origin', 'main');
 
   // Detect local commits on main that origin/main doesn't have. If any exist,
   // bail rather than risk discarding them via `git reset --hard origin/main`.
   // Healthy slots never accumulate local commits on main, but if a prior
   // session committed accidentally we want a loud error, not silent loss.
-  const localAhead = Number(execSafe('git rev-list --count origin/main..main 2>/dev/null') ?? '0');
+  const localAheadResult = gitSafe('rev-list', '--count', 'origin/main..main');
+  const localAhead = localAheadResult.ok ? Number(localAheadResult.output) || 0 : 0;
   if (localAhead > 0) {
     return {
       label: 'Branch reset',
@@ -461,14 +499,14 @@ function stepBranchReset(plan: Plan): StepResult {
   }
 
   // Local main is either even with or behind origin — safe to fast-forward.
-  if (execSafe('git pull --ff-only origin main', 30000) === null) {
+  if (!gitSafe('pull', '--ff-only', 'origin', 'main').ok) {
     return { label: 'Branch reset', ok: false, detail: 'pull --ff-only failed (network?); main is unchanged' };
   }
 
   // Delete the spent feature branch (best-effort — may already be gone). `-D`
   // is force-delete; safe because the branch is presumed merged or abandoned
   // by the operator running /agent-end.
-  execSafe(`git branch -D "${plan.branch}"`);
+  gitSafe('branch', '-D', plan.branch);
 
   return { label: 'Branch reset', ok: true, detail: `switched main; deleted ${plan.branch}` };
 }
@@ -477,7 +515,7 @@ function stepRenameTmux(plan: Plan): StepResult {
   if (!plan.slot) return { label: 'Tmux rename', ok: true, detail: 'no .agent-slot (skipped)' };
   if (!process.env.TMUX) return { label: 'Tmux rename', ok: true, detail: 'not in tmux (skipped)' };
   const target = `A${plan.slot}`;
-  if (execSafe(`tmux rename-window "${target}"`) === null) {
+  if (shellSafe(`tmux rename-window "${target}"`) === null) {
     return { label: 'Tmux rename', ok: false, detail: `failed to rename to ${target}` };
   }
   return { label: 'Tmux rename', ok: true, detail: `renamed to ${target}` };
@@ -488,15 +526,15 @@ function stepRenameTmux(plan: Plan): StepResult {
 // ---------------------------------------------------------------------------
 
 function planLines(plan: Plan, dirtyMode: DirtyMode): string[] {
-  const out: string[] = [];
-  out.push(`branch:    ${plan.branch}${plan.isMain ? ' (already main — no delete)' : ''}`);
-  out.push(`slot:      ${plan.slot ?? '(none)'}`);
-  out.push(`linear:    ${plan.linearId ?? '(none — skip linear done)'}`);
-  out.push(`pr:        ${plan.prUrl ?? '(none — Linear → Done)'}`);
-  out.push(`dev port:  ${plan.devPort ?? '(none)'}${plan.devPids.length ? ` PIDs ${plan.devPids.join(', ')}` : ''}`);
-  out.push(`patrol:    ${plan.patrolPid ?? '(not running)'}`);
-  out.push(`dirty:     ${dirtyMode}`);
-  return out;
+  const isMain = plan.branch === 'main';
+  return [
+    `branch:    ${plan.branch}${isMain ? ' (already main — no delete)' : ''}`,
+    `slot:      ${plan.slot ?? '(none)'}`,
+    `linear:    ${plan.linearId ?? '(none — skip linear done)'}`,
+    `pr:        ${plan.prUrl ?? '(none — Linear → Done)'}`,
+    `dev port:  ${plan.devPort ?? '(none)'}`,
+    `dirty:     ${dirtyMode}`,
+  ];
 }
 
 async function agentEndCommand(
@@ -508,14 +546,15 @@ async function agentEndCommand(
   const dirtyMode = parseDirtyMode(options.dirty);
   const isDryRun = Boolean(options.dryRun);
 
-  const plan = buildPlan(options);
+  const branch = readCurrentBranch() ?? '(unknown)';
+  const plan = buildPlan(options, branch);
 
   let output = '';
   output += `${c.bold}Agent End${c.reset} — ${plan.slot ? `slot ${plan.slot}` : 'no slot marker'}${isDryRun ? ` ${c.dim}(dry-run)${c.reset}` : ''}\n`;
   output += `${c.dim}${'─'.repeat(50)}${c.reset}\n`;
 
   // ── 1. Dirty-state gate ────────────────────────────────────────────────
-  const dirty = inspectDirtyState();
+  const dirty = inspectDirtyState(branch);
   const hasUnexpectedDirty = dirty.unexpectedFiles.length > 0 || dirty.unpushedCommits > 0;
   if (hasUnexpectedDirty && dirtyMode !== 'force') {
     output += `${c.red}✗${c.reset} Dirty state requires attention (--dirty=${dirtyMode}):\n`;
@@ -544,6 +583,12 @@ async function agentEndCommand(
 
   // ── 3. Dry-run: print and exit ─────────────────────────────────────────
   if (isDryRun) {
+    // patrolPid + dev-port listeners are looked up only for dry-run reporting.
+    // The real steps re-resolve at execute time, so a stale snapshot is fine.
+    const patrol = patrolPid();
+    const devPids = plan.devPort ? findPortListeners(plan.devPort) : [];
+    const isMain = plan.branch === 'main';
+
     output += `${c.bold}Would execute:${c.reset}\n`;
     output += `  • agent-checklist complete\n`;
     output += `  • linear leak-check\n`;
@@ -553,16 +598,16 @@ async function agentEndCommand(
     } else {
       output += `  • linear done — skipped (no Linear ID)\n`;
     }
-    output += `  • pr-patrol stop ${plan.patrolPid ? `(PID ${plan.patrolPid})` : '(not running)'}\n`;
+    output += `  • pr-patrol stop ${patrol ? `(PID ${patrol})` : '(not running)'}\n`;
     if (plan.devPort) {
-      output += `  • kill dev server on port ${plan.devPort} ${plan.devPids.length ? `(PIDs: ${plan.devPids.join(', ')})` : '(no listener)'}\n`;
+      output += `  • kill dev server on port ${plan.devPort} ${devPids.length ? `(PIDs: ${devPids.join(', ')})` : '(no listener)'}\n`;
     } else {
       output += `  • dev server — no DEV_PORT in .env\n`;
     }
     output += `  • rm .claude/wip-checklist.md, .claude/wip-context.md\n`;
     output += `  • rm gitignored markers (review-phases-done, simplify-done) + git checkout -- .claude/review-done .claude/hooks/\n`;
     output += `  • agents close (DB session)\n`;
-    if (plan.isMain) {
+    if (isMain) {
       output += `  • git checkout -- . && git clean -fd (already on main)\n`;
     } else {
       output += `  • git checkout -- . && git clean -fd && git checkout main && git pull && git branch -D ${plan.branch}\n`;
@@ -574,19 +619,27 @@ async function agentEndCommand(
     return { output, exitCode: 0 };
   }
 
-  // ── 4. Execute steps in order ──────────────────────────────────────────
-  const steps: StepResult[] = [];
+  // ── 4. Independent steps run in parallel ───────────────────────────────
+  // Linear and agents-close hit the wiki-server (200–800ms each); patrol,
+  // dev-server, wip-cleanup, review-artifacts are local. Running them
+  // concurrently saves 1–2s per session-end. Promise.all preserves input
+  // order, so the printed summary still reads sequentially.
+  const parallel = await Promise.all([
+    stepCompleteChecklist(),
+    stepLeakCheck(),
+    stepLinearDone(plan),
+    stepPatrolStop(),
+    Promise.resolve(stepKillDevServer(plan)),
+    Promise.resolve(stepCleanWipArtifacts()),
+    Promise.resolve(stepCleanReviewArtifacts()),
+    stepCloseAgentSession(),
+  ]);
 
-  steps.push(await stepCompleteChecklist(options));
-  steps.push(await stepLeakCheck(options));
-  steps.push(await stepLinearDone(plan));
-  steps.push(await stepPatrolStop(options));
-  steps.push(stepKillDevServer(plan));
-  steps.push(stepCleanWipArtifacts());
-  steps.push(stepCleanReviewArtifacts());
-  steps.push(await stepCloseAgentSession(options));
-  steps.push(stepBranchReset(plan));
-  steps.push(stepRenameTmux(plan));
+  // ── 5. Sequential steps that mutate branch / window state ──────────────
+  // Branch-reset must run after the cleanups (the discard pair expects the
+  // working tree to be in its post-cleanup state). Tmux-rename is last
+  // because it changes the visible window title.
+  const steps = [...parallel, stepBranchReset(plan), stepRenameTmux(plan)];
 
   for (const s of steps) {
     const icon = s.ok ? `${c.green}✓${c.reset}` : `${c.red}✗${c.reset}`;

@@ -18,11 +18,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ---- Hoisted mocks --------------------------------------------------------
 
-const { existsSyncMock, readFileSyncMock, unlinkSyncMock, execSyncMock } = vi.hoisted(() => ({
+const {
+  existsSyncMock,
+  readFileSyncMock,
+  unlinkSyncMock,
+  execSyncMock,
+  execFileSyncMock,
+  findSlotFromAncestorsMock,
+} = vi.hoisted(() => ({
   existsSyncMock: vi.fn<(p: string) => boolean>(() => false),
   readFileSyncMock: vi.fn<(p: string, enc: string) => string>(() => ''),
   unlinkSyncMock: vi.fn<(p: string) => void>(() => undefined),
   execSyncMock: vi.fn<(cmd: string, opts?: unknown) => string | Buffer>(() => ''),
+  execFileSyncMock: vi.fn<(file: string, args?: string[], opts?: unknown) => string | Buffer>(
+    () => '',
+  ),
+  findSlotFromAncestorsMock: vi.fn<(cwd: string) => number | null>(() => null),
 }));
 
 vi.mock('fs', () => ({
@@ -33,6 +44,13 @@ vi.mock('fs', () => ({
 
 vi.mock('child_process', () => ({
   execSync: execSyncMock,
+  execFileSync: execFileSyncMock,
+}));
+
+// Mock the slot-ancestor walker so tests run from any cwd without surprises.
+// Tests that need the walker to find a slot can override per-test.
+vi.mock('../lib/session/session-context.ts', () => ({
+  findSlotFromAncestors: findSlotFromAncestorsMock,
 }));
 
 // Stub the orchestrated command modules so dry-run never invokes them and
@@ -88,16 +106,26 @@ function installFs(files: Record<string, string>) {
   });
 }
 
+/**
+ * Route both shell-style (execSync) and arg-style (execFileSync) calls
+ * through one regex-mapping table. `git status --porcelain` and
+ * `execFileSync('git', ['status', '--porcelain'])` both match `/status --porcelain/`,
+ * so existing tests written against the old shell pipeline keep working.
+ */
 function setExec(mapping: Array<{ match: RegExp; out: string | Error }>) {
-  execSyncMock.mockImplementation((cmd: string) => {
+  const dispatch = (rendered: string) => {
     for (const { match, out } of mapping) {
-      if (match.test(cmd)) {
+      if (match.test(rendered)) {
         if (out instanceof Error) throw out;
         return out;
       }
     }
     return '';
-  });
+  };
+  execSyncMock.mockImplementation((cmd: string) => dispatch(cmd));
+  execFileSyncMock.mockImplementation((file: string, args: string[] = []) =>
+    dispatch(`${file} ${args.join(' ')}`),
+  );
 }
 
 beforeEach(() => {
@@ -105,6 +133,8 @@ beforeEach(() => {
   readFileSyncMock.mockReset();
   unlinkSyncMock.mockReset();
   execSyncMock.mockReset();
+  execFileSyncMock.mockReset();
+  findSlotFromAncestorsMock.mockReset();
   checklistCompleteMock.mockClear();
   leakCheckMock.mockClear();
   linearDoneMock.mockClear();
@@ -327,7 +357,7 @@ describe('agent-end --dry-run', () => {
     expect(result.output).toMatch(/linear:\s+QUA-1090/);
     expect(result.output).toMatch(/branch:\s+claude\/qua-1090-foo/);
     expect(result.output).toMatch(/dev port:\s+3017/);
-    expect(result.output).toMatch(/PIDs 4567/);
+    expect(result.output).toMatch(/PIDs: 4567/);
     expect(result.output).toMatch(/Re-run without --dry-run to execute/);
 
     // Must NOT have called any side-effect command.
