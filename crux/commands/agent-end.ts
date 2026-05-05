@@ -546,7 +546,18 @@ async function agentEndCommand(
   const dirtyMode = parseDirtyMode(options.dirty);
   const isDryRun = Boolean(options.dryRun);
 
+  // Bail on unresolvable git state BEFORE running any side effects. A detached
+  // HEAD returns 'HEAD' from `git rev-parse --abbrev-ref HEAD` (not the
+  // commit), and an unreadable repo returns null → '(unknown)'. Either case
+  // means stepBranchReset can't safely reset, so the parallel block (Linear
+  // close, agents close, file unlinks) must not run.
   const branch = readCurrentBranch() ?? '(unknown)';
+  if (branch === '(unknown)' || branch === 'HEAD') {
+    let earlyOut = '';
+    earlyOut += `${c.red}✗${c.reset} Cannot run agent-end from a detached or unknown git HEAD (got: ${branch}).\n`;
+    earlyOut += `  Resolve the git state manually (e.g. \`git checkout main\`), then re-run.\n`;
+    return { output: earlyOut, exitCode: 2 };
+  }
   const plan = buildPlan(options, branch);
 
   let output = '';

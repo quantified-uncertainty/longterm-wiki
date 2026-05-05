@@ -569,6 +569,34 @@ describe('agent-end execute (non-dry-run)', () => {
     expect(agentsCloseMock).toHaveBeenCalled();
   });
 
+  it('bails (exit 2) on a detached HEAD without invoking any step', async () => {
+    // Per CodeRabbit finding on PR #4878: `git rev-parse --abbrev-ref HEAD`
+    // returns the literal string 'HEAD' for a detached worktree (not the
+    // commit hash). Without an upfront guard, the parallel side-effects
+    // (Linear close, agents close, file unlinks) would run before
+    // stepBranchReset's downstream guard caught the bad state.
+    installFs({
+      [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n',
+      [join(PROJECT_ROOT, '.env')]: '',
+      [join(PROJECT_ROOT, '.agent-slot')]: '7\n',
+    });
+    setExec([
+      { match: /rev-parse --abbrev-ref/, out: 'HEAD' }, // ← detached
+      { match: /status --porcelain/, out: '' },
+      { match: /rev-list --count/, out: '0' },
+    ]);
+
+    const result = await commands.default([], { ci: true });
+
+    expect(result.exitCode).toBe(2);
+    expect(result.output).toMatch(/detached or unknown git HEAD/);
+    // Crucially: no step was invoked.
+    expect(checklistCompleteMock).not.toHaveBeenCalled();
+    expect(linearDoneMock).not.toHaveBeenCalled();
+    expect(agentsCloseMock).not.toHaveBeenCalled();
+    expect(unlinkSyncMock).not.toHaveBeenCalled();
+  });
+
   it('skips dev-server kill cleanly when no DEV_PORT is configured', async () => {
     installFs({
       [join(PROJECT_ROOT, '.claude/wip-checklist.md')]: '> Linear: QUA-1090\n',

@@ -9,12 +9,16 @@ This is the canonical cross-agent close-out workflow. Tool-specific slash
 commands or skills should stay thin and point here.
 
 > **Fast path:** `pnpm crux sys agent-end` (added in QUA-1090) executes
-> Steps 1–9 below in one Node process — no LLM round-tripping required. Use
-> that as the default; fall back to running the steps by hand only when
-> pnpm is unavailable, when debugging a single step, or when the
-> consolidated command's `--dirty=fail` gate refuses to proceed and you
-> need to triage a specific path. See `pnpm crux sys agent-end --help` for
-> the action list and `--dry-run` to preview without side effects.
+> the automated close-out steps below — checklist complete, Linear close,
+> patrol stop, dev-server kill, wip cleanup, agents close, branch reset,
+> tmux rename — in one Node process, with no LLM round-tripping. Step 4
+> (legacy GitHub issue cleanup) is **not** automated and remains manual
+> for the rare sessions tied to a legacy GitHub issue. Use the fast path
+> as the default; fall back to running steps by hand only when pnpm is
+> unavailable, when debugging a single step, or when the consolidated
+> command's `--dirty=fail` gate refuses to proceed and you need to triage
+> a specific path. See `pnpm crux sys agent-end --help` for the action
+> list and `--dry-run` to preview without side effects.
 
 ## 0. Choose the Right Workflow
 
