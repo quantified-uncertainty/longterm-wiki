@@ -217,6 +217,19 @@ SAFE_LINE=$(printf '%s' "$ERR" | grep "edit-churn cap reached" | head -1)
 NL_COUNT=$(printf '%s' "$SAFE_LINE" | wc -l | tr -d '[:space:]')
 assert_eq "BLOCKED line is single-line" "0" "$NL_COUNT"
 
+
+# Shell metacharacters in path are stripped (backtick/dollar/backslash -- QUA-1070 CodeRabbit fix)
+PDIR=$(new_pdir t13c)
+SHELL_INJECT='/tmp/foo`id`bar.ts'
+PAYLOAD=$(jq -n --arg p "$SHELL_INJECT" '{tool_name:"Edit",tool_input:{file_path:$p}}')
+for i in 1 2 3 4 5 6; do
+  ERR=$(printf '%s' "$PAYLOAD" | CLAUDE_PROJECT_DIR="$PDIR" bash "$HOOK" 2>&1 >/dev/null)
+done
+BLOCKED_LINE=$(printf '%s' "$ERR" | grep 'BLOCKED:' | head -1)
+assert_no_grep "backtick in path stripped from BLOCKED line" '`' "$BLOCKED_LINE"
+assert_no_grep "dollar in path stripped from BLOCKED line" '\$' "$BLOCKED_LINE"
+assert_grep "shell metachar path still emits cap message" "edit-churn cap reached" "$ERR"
+
 # ─── 14: tmp file does not leak ────────────────────────────────────────────────
 PDIR=$(new_pdir t14)
 run_hook "$PDIR" '{"tool_name":"Edit","tool_input":{"file_path":"/tmp/a.ts"}}' >/dev/null 2>&1

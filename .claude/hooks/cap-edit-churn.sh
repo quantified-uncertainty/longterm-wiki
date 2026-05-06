@@ -80,7 +80,7 @@ fi
 # blocking on the Nth edit itself.
 [ "$COUNT" -le "$CAP" ] && exit 0
 
-SAFE_PATH=$(printf '%s' "$FILE_PATH" | tr -d '\000-\037<>')
+SAFE_PATH=$(printf '%s' "$FILE_PATH" | tr -d '\000-\037<>`$\\')
 
 cat >&2 <<EOF
 BLOCKED: edit-churn cap reached for "$SAFE_PATH" (edit #$COUNT, cap is $CAP).
