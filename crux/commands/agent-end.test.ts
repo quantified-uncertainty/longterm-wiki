@@ -271,15 +271,19 @@ describe('inspectDirtyState', () => {
 
   it('does not query unpushed commits on main', () => {
     let revListCalls = 0;
-    execSyncMock.mockImplementation((cmd: string) => {
-      if (/status --porcelain/.test(cmd)) return '';
-      if (/rev-parse --abbrev-ref/.test(cmd)) return 'main';
-      if (/rev-list --count/.test(cmd)) {
+    const impl = (rendered: string) => {
+      if (/status --porcelain/.test(rendered)) return '';
+      if (/rev-parse --abbrev-ref/.test(rendered)) return 'main';
+      if (/rev-list --count/.test(rendered)) {
         revListCalls++;
         return '5';
       }
       return '';
-    });
+    };
+    execSyncMock.mockImplementation((cmd: string) => impl(cmd));
+    execFileSyncMock.mockImplementation((file: string, args: string[] = []) =>
+      impl(`${file} ${args.join(' ')}`),
+    );
     expect(inspectDirtyState().unpushedCommits).toBe(0);
     expect(revListCalls).toBe(0);
   });

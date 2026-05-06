@@ -200,7 +200,15 @@ git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env
 
 if [ "$BRANCH" != "main" ]; then
   git checkout main
-  git pull --ff-only origin main || git reset --hard origin/main
+  git fetch origin
+  AHEAD=$(git rev-list --count origin/main..main 2>/dev/null || echo 0)
+  if [ "$AHEAD" -ne 0 ]; then
+    echo "REFUSED: local main has $AHEAD commit(s) not in origin/main."
+    echo "Resolve (push, rebase, or explicitly discard) before re-running."
+    echo "Prefer 'pnpm crux sys agent-end' — it applies this same guard automatically."
+    exit 1
+  fi
+  git pull --ff-only origin main
   git branch -D "$BRANCH" 2>/dev/null || true
 fi
 ```

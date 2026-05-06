@@ -718,7 +718,7 @@ What runs (in order):
 Exit codes:
   0  All steps passed (or dry-run).
   1  At least one step reported an error — review the output.
-  2  Bail before running any step (dirty state with --dirty=fail).
+  2  Bail before running any step (dirty state with --dirty=fail, or detached/unreadable HEAD).
 
 Examples:
   crux sys agent-end --dry-run
