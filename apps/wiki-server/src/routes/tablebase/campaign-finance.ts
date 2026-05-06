@@ -12,6 +12,7 @@ import {
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
 
@@ -162,28 +163,27 @@ const campaignFinanceApp = new Hono()
           ? conditions[0]
           : and(...conditions);
 
-    const rows = await db
-      .select({
-        finance: campaignFinance,
-        politicianTitle: politicianEntity.title,
-        politicianSlug: politicianEntity.id,
-      })
-      .from(campaignFinance)
-      .leftJoin(
-        politicianEntity,
-        eq(campaignFinance.politicianEntityId, politicianEntity.stableId),
-      )
-      .where(where)
-      .orderBy(desc(campaignFinance.totalRaised))
-      .limit(limit)
-      .offset(offset);
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select({
+          finance: campaignFinance,
+          politicianTitle: politicianEntity.title,
+          politicianSlug: politicianEntity.id,
+        })
+        .from(campaignFinance)
+        .leftJoin(
+          politicianEntity,
+          eq(campaignFinance.politicianEntityId, politicianEntity.stableId),
+        )
+        .where(where)
+        .orderBy(desc(campaignFinance.totalRaised))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(campaignFinance).where(where),
+      formatRow,
+    });
 
-    const [{ total }] = await db
-      .select({ total: count() })
-      .from(campaignFinance)
-      .where(where);
-
-    return c.json({ records: rows.map(formatRow), total, limit, offset });
+    return c.json({ records: rows, total, limit, offset });
   })
 
   // GET /by-entity/:entityId
