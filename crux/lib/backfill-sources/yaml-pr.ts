@@ -147,18 +147,10 @@ function finishInWorktree(
     return { kind: 'error', error: `gh pr create failed: ${errMsg(err)}` };
   }
 
-  // Enable GitHub auto-merge so the PR self-merges once CI is green —
-  // mechanical YAML mirror, nothing to review by hand. Best-effort: if
-  // the repo doesn't have auto-merge enabled in branch protection, this
-  // fails and we surface a warning, but the PR itself is still opened.
-  try {
-    sh(`gh pr merge ${shellEscape(prUrl)} --auto --merge`);
-  } catch (err) {
-    process.stderr.write(
-      `[yaml-pr] WARNING: failed to enable auto-merge on ${prUrl}: ${errMsg(err)}\n` +
-      `  PR is open but you'll need to merge it manually.\n`,
-    );
-  }
+  // Merging is handled by the `auto-merge-backfill.yml` cron workflow,
+  // which polls every 20 minutes and merges any open backfill PR whose CI
+  // is green. We don't call `gh pr merge --auto` here because the repo
+  // has `allow_auto_merge: false` and the cron is the simpler path.
 
   return { kind: 'opened', branch: branchName, prUrl };
 }
