@@ -9,14 +9,20 @@ facts:
   - id: f_Rg89IN7s7w
     property: notable-for
     value: "Founder of DeepLearning.AI and Coursera; former head of Google Brain and Baidu AI; leading AI educator"
+    source: https://cs.stanford.edu/people/ang
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_CUnXLL3M8Q
     property: education
     value: "PhD in Computer Science, UC Berkeley"
+    source: https://en.wikipedia.org/wiki/Andrew_Ng
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_r4CmuKqadQ
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Andrew_Ng"
+    source: https://en.wikipedia.org/wiki/Andrew_Ng
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_PomBL98jGQ
     property: website

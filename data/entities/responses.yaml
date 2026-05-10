@@ -1657,11 +1657,13 @@
       position: support
       role: Primary Senate sponsor
       importance: high
+      source: https://govtrack.us/congress/bills/119/s1705
     - name: Sen. Elizabeth Warren
       entityId: sid_OyPBrUIpeS
       position: support
       role: Senate cosponsor
       importance: high
+      source: https://exportcompliancedaily.com/article/2026/02/18/key-senate-democrat-backs-bill-to-require-security-features-on-exported-chips-2602170048?BC=bc_699b3afa6753b
     - name: Rep. Bill Huizenga
       entityId: sid_cYPfKeUa36
       position: support
@@ -2097,6 +2099,7 @@
       position: support
       importance: high
       reason: Host country; positioned itself as bridge between Western and Asian AI governance approaches
+      source: https://industry.gov.au/publications/seoul-declaration-countries-attending-ai-seoul-summit-21-22-may-2024
     - name: OpenAI
       entityId: sid_1LcLlMGLbw
       position: support
@@ -5726,6 +5729,7 @@
       position: oppose
       importance: medium
       reason: Called executive order unconstitutional
+      source: https://aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
   description: "Executive order signed December 11, 2025 directing federal agencies to challenge state AI laws deemed
     inconsistent with federal policy. Does NOT itself overturn state law — only Congress or courts can do that.
     Established DOJ AI Litigation Task Force (Jan 9, 2026). Triggered bipartisan opposition: 36 state AGs formed

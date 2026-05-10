@@ -2,10 +2,9 @@ entity: sid_3KjUCZCV8w
 facts:
   - id: f_oLpabpFPtg
     property: description
-    value: Swedish-American physicist at MIT, co-founder of the Future of Life
-      Institute, and prominent AI safety advocate known for his work on the
-      Mathematical Universe Hypothesis and efforts to promote safe artificial
-      intelligence development.
+    value: Swedish-American physicist at MIT, co-founder of the Future of Life Institute, and prominent AI safety advocate
+      known for his work on the Mathematical Universe Hypothesis and efforts to promote safe artificial intelligence
+      development.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_9YtgMVLJ37
@@ -15,17 +14,16 @@ facts:
     notes: From Wikidata Q2076321
   - id: f_cneepuZr0c
     property: education
-    value: Royal Institute of Technology; Stockholm School of Economics; University
-      of California, Berkeley
+    value: Royal Institute of Technology; Stockholm School of Economics; University of California, Berkeley
     source: https://www.wikidata.org/wiki/Q2076321
     notes: From Wikidata Q2076321
   - id: f_mT6tN2pQ3v
     property: notable-for
-    value: "Co-founded Future of Life Institute; developed 23 Asilomar AI
-      Principles; organized 2023 AI pause letter with 30,000+ signatories;
-      author of Life 3.0 (NYT bestseller); TIME 100 Most Influential in AI 2023"
+    value: "Co-founded Future of Life Institute; developed 23 Asilomar AI Principles; organized 2023 AI pause letter with
+      30,000+ signatories; author of Life 3.0 (NYT bestseller); TIME 100 Most Influential in AI 2023"
     asOf: 2026-03
     notes: Enriched from wiki page
+    source: https://futureoflife.org/person/max-tegmark
   - id: f_mTcY8fL9kA
     property: born-year
     value: 1967
@@ -34,9 +32,8 @@ facts:
 
   - id: f_mTfB4gN5mD
     property: education
-    value: "B.A. Economics, Stockholm School of Economics; B.Sc. Physics, Royal
-      Institute of Technology; M.A. Physics, UC Berkeley (1992); Ph.D. Physics,
-      UC Berkeley (1994)"
+    value: "B.A. Economics, Stockholm School of Economics; B.Sc. Physics, Royal Institute of Technology; M.A. Physics, UC
+      Berkeley (1992); Ph.D. Physics, UC Berkeley (1994)"
     source: https://en.wikipedia.org/wiki/Max_Tegmark
     notes: Enriched from wiki page
   - id: f_AGyF3JFynu

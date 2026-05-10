@@ -9,9 +9,10 @@ facts:
     notes: Migrated from old entity system
   - id: f_LtdOUHqrg1
     property: compute-threshold
-    value: 1e26
+    value: 1e+26
     asOf: 2024-02
     notes: Training compute threshold for covered models as defined in the bill text
+    source: https://leginfo.legislature.ca.gov/faces/billCompareClient.xhtml?bill_id=202320240SB1047&showamends=false
   - id: f_zcML9r8ngl
     property: cost-threshold
     value: 100000000

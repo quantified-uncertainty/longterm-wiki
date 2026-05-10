@@ -7,6 +7,8 @@ facts:
   - id: f_f3XKVPdewA
     property: notable-for
     value: "Former CTO of OpenAI; led development of ChatGPT, DALL-E, and GPT-4; now building a new AI company"
+    source: https://businessinsider.com/mira-murati-openai-startup-2025-4
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ekVZn67U9A
     property: education
@@ -15,4 +17,3 @@ facts:
   - id: f_vatTbYjtnQ
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mira_Murati"
-
