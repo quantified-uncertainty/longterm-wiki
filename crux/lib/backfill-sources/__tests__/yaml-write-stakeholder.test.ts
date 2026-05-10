@@ -156,4 +156,55 @@ describe('writeStakeholderSourceToYaml', () => {
     });
     expect(out.status).toBe('not-found');
   });
+
+  // Regression: PR #4871 showed responses.yaml getting reformatted end-to-end
+  // because doc.toString() defaults to lineWidth: 80 and re-wraps every long
+  // string literal in the document. The dual-write must touch ONLY the
+  // targeted stakeholder's `source:` line — every other byte of the file
+  // must be preserved.
+  it('preserves long unrelated lines verbatim — does not re-wrap them', () => {
+    const LONG_DESCRIPTION =
+      'Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties, pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others.';
+    const LONG_REASON =
+      'Pursues its own parallel AI safety evaluation approach through domestic institutions rather than joining the international AISI network coordinated under the UK Bletchley process';
+
+    const longLineYaml = `- id: aisi
+  stableId: sid_PolicyLong
+  type: policy
+  title: AISI
+  description: ${LONG_DESCRIPTION}
+  stakeholders:
+    - name: UK Government
+      position: support
+      importance: high
+      reason: pioneered AISI
+    - name: China
+      position: mixed
+      importance: medium
+      reason: ${LONG_REASON}
+`;
+    writeFileSync(yamlPath, longLineYaml, 'utf-8');
+    index = {
+      sidToFilepath: new Map([['sid_PolicyLong', yamlPath]]),
+      parseFailureCount: 0,
+    };
+
+    const out = writeStakeholderSourceToYaml({
+      policyEntitySid: 'sid_PolicyLong',
+      stakeholderName: 'UK Government',
+      position: 'support',
+      url: 'https://example.com/uk-aisi',
+      index,
+    });
+    expect(out.status).toBe('wrote');
+
+    const after = readFileSync(yamlPath, 'utf-8');
+
+    expect(after).toContain(`description: ${LONG_DESCRIPTION}\n`);
+    expect(after).toContain(`reason: ${LONG_REASON}\n`);
+
+    const beforeLines = longLineYaml.split('\n');
+    const afterLines = after.split('\n');
+    expect(afterLines.length).toBe(beforeLines.length + 1);
+  });
 });

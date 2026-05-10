@@ -91,4 +91,82 @@ describe('writeFactSourceToYaml', () => {
     expect(out.status).toBe('no-yaml-target');
     expect(out.filepath).toBeNull();
   });
+
+  // Regression: PR #4871 — same root cause as the stakeholder writer. The
+  // FactBase YAML serializer rewraps every long string when saving, even when
+  // we only changed one fact's `source:` field. Long unrelated lines must
+  // survive byte-for-byte.
+  it('preserves long unrelated lines verbatim — does not re-wrap them', () => {
+    const LONG_NOTE =
+      'Anthropic raised this round at a $61.5B post-money valuation according to multiple Bloomberg and Reuters reports filed in March 2025, with Lightspeed Venture Partners leading and participation from Salesforce Ventures, Cisco Investments, and others.';
+
+    // LONG_NOTE lives on the *other* fact (the one we won't touch) so the
+    // test only checks line-wrap preservation, not the orthogonal question
+    // of how we treat existing notes on the targeted fact.
+    const longLineYaml = `entity: sid_EntLongLin
+facts:
+  - id: f_FactNoSrc1
+    property: revenue
+    value: 1.2e+9
+    asOf: 2025-09
+  - id: f_FactHasSrc
+    property: valuation
+    value: 6.15e+10
+    asOf: 2025-03
+    notes: ${LONG_NOTE}
+    source: https://existing.example.com/series-e
+`;
+    writeFileSync(yamlPath, longLineYaml, 'utf-8');
+    index = {
+      sidToFilepath: new Map([['sid_EntLongLin', yamlPath]]),
+      unindexedCount: 0,
+    };
+
+    const out = writeFactSourceToYaml({
+      entitySid: 'sid_EntLongLin',
+      factId: 'f_FactNoSrc1',
+      url: 'https://example.com/news',
+      index,
+    });
+    expect(out.status).toBe('wrote');
+
+    const after = readFileSync(yamlPath, 'utf-8');
+
+    expect(after).toContain(`notes: ${LONG_NOTE}\n`);
+    expect(after).toContain('source: https://example.com/news');
+    expect(after).toContain('source: https://existing.example.com/series-e');
+  });
+
+  // Regression: PR #4871 follow-up. The writer was unconditionally setting
+  // `notes: [auto-discovered by tb backfill-sources]` on the targeted fact,
+  // overwriting any human-written notes. Existing notes must survive.
+  it('does not clobber existing notes on the targeted fact', () => {
+    const HUMAN_NOTE = 'Verified against Anthropic shareholder filing 2025-03';
+    const yaml = `entity: sid_EntKeepNot
+facts:
+  - id: f_FactKeepNo
+    property: revenue
+    value: 1.2e+9
+    asOf: 2025-09
+    notes: ${HUMAN_NOTE}
+`;
+    writeFileSync(yamlPath, yaml, 'utf-8');
+    index = {
+      sidToFilepath: new Map([['sid_EntKeepNot', yamlPath]]),
+      unindexedCount: 0,
+    };
+
+    const out = writeFactSourceToYaml({
+      entitySid: 'sid_EntKeepNot',
+      factId: 'f_FactKeepNo',
+      url: 'https://example.com/news',
+      index,
+    });
+    expect(out.status).toBe('wrote');
+
+    const after = readFileSync(yamlPath, 'utf-8');
+    expect(after).toContain(`notes: ${HUMAN_NOTE}`);
+    expect(after).toContain('source: https://example.com/news');
+    expect(after).not.toContain('[auto-discovered by tb backfill-sources]');
+  });
 });

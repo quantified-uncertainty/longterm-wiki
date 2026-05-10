@@ -47,11 +47,27 @@ export function openYamlPr(input: OpenYamlPrInput): YamlPrResult {
     };
   }
 
+  // Fork from origin/main so the auto-PR's diff is just our YAML writes —
+  // forking from the current feature branch (which is what `git checkout -b`
+  // does without an explicit start-point) bloats the diff with whatever
+  // unrelated work is on the parent branch. PR #4871 was the case study.
+  try {
+    sh('git fetch origin main');
+  } catch (err) {
+    return { kind: 'error', error: `git fetch origin main failed: ${errMsg(err)}` };
+  }
+
   const branchName = makeBranchName(input.runStartedAt);
   try {
-    sh(`git checkout -b ${branchName}`);
+    sh(`git checkout -b ${branchName} origin/main`);
   } catch (err) {
-    return { kind: 'error', error: `git checkout -b failed: ${errMsg(err)}` };
+    return {
+      kind: 'error',
+      error:
+        `git checkout -b ${branchName} origin/main failed: ${errMsg(err)} ` +
+        `(probably because the working tree has uncommitted changes that conflict with main; ` +
+        `commit or stash them on the feature branch first)`,
+    };
   }
 
   // Stage only the touched YAMLs, explicitly. Anything else in the working

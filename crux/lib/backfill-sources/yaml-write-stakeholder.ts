@@ -115,9 +115,11 @@ export function writeStakeholderSourceToYaml(
 
   target.set('source', url);
 
-  // Atomic write: temp file + rename.
+  // Atomic write: temp file + rename. `lineWidth: 0` disables the yaml
+  // package's default 80-char line folding so we don't reformat long
+  // unrelated string literals every time we touch one source field.
   try {
-    const out = String(doc);
+    const out = doc.toString({ lineWidth: 0 });
     const tmp = filepath + '.tmp';
     writeFileSync(tmp, out, 'utf-8');
     renameSync(tmp, filepath);
