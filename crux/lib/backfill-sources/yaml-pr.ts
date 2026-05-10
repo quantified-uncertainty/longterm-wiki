@@ -1,18 +1,22 @@
 /**
- * End-of-run helper: take the set of YAML files we mutated this run, branch,
- * commit, push, and open a PR.
+ * End-of-run helper: take the set of YAML files we mutated this run and
+ * commit/push/PR them on a fresh branch off origin/main — without ever
+ * touching the operator's working tree or current branch.
+ *
+ * Approach: snapshot the touched YAMLs from the operator's tree, then do
+ * all git work inside a temporary `git worktree` checked out at origin/main.
+ * The worktree gets removed at the end (success or failure), so the
+ * operator's working state is preserved exactly as they had it.
  *
  * Refuses to run when:
- *   - the current branch is `main` (we'd commit + push directly to main)
- *   - the working tree has unrelated changes staged (we'd swallow them)
+ *   - the current branch is `main` (we'd auto-commit into the merge target)
  *   - no touched YAMLs exist (nothing to commit)
- *
- * Stages files explicitly by path — never `git add -A` / `git add .`. Pushes
- * the new branch with `--no-verify` is **not** used; if pre-push hooks
- * complain we want to know.
  */
 
 import { execSync } from 'node:child_process';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 export interface OpenYamlPrInput {
   touchedPaths: string[];
@@ -41,51 +45,77 @@ export function openYamlPr(input: OpenYamlPrInput): YamlPrResult {
     return { kind: 'error', error: 'failed to read current branch' };
   }
   if (currentBranch === 'main') {
-    return {
-      kind: 'refused',
-      reason: 'refusing to auto-commit on main',
-    };
+    return { kind: 'refused', reason: 'refusing to auto-commit on main' };
   }
 
-  try {
-    return runYamlPrFlow(input, currentBranch);
-  } finally {
-    // Always try to restore the operator's original branch — leaving them
-    // checked out on the auto-PR branch is confusing UX and silently
-    // pollutes any subsequent commands they run in this terminal.
-    restoreBranch(currentBranch);
-  }
+  return runYamlPrFlow(input);
 }
 
-function runYamlPrFlow(input: OpenYamlPrInput, currentBranch: string): YamlPrResult {
-  // Fork from origin/main so the auto-PR's diff is just our YAML writes —
-  // forking from the current feature branch (which is what `git checkout -b`
-  // does without an explicit start-point) bloats the diff with whatever
-  // unrelated work is on the parent branch. PR #4871 was the case study.
+function runYamlPrFlow(input: OpenYamlPrInput): YamlPrResult {
+  // Use an explicit refspec so this works even in shallow / single-branch
+  // clones where the default fetch refspec doesn't include `main`.
   try {
-    sh('git fetch origin main');
+    sh('git fetch origin main:refs/remotes/origin/main');
   } catch (err) {
     return { kind: 'error', error: `git fetch origin main failed: ${errMsg(err)}` };
   }
 
-  const branchName = makeBranchName(input.runStartedAt);
-  try {
-    sh(`git checkout -b ${branchName} origin/main`);
-  } catch (err) {
-    return {
-      kind: 'error',
-      error:
-        `git checkout -b ${branchName} origin/main failed: ${errMsg(err)} ` +
-        `(probably because the working tree has uncommitted changes that conflict with main; ` +
-        `commit or stash them on the feature branch first)`,
-    };
-  }
-
-  // Stage only the touched YAMLs, explicitly. Anything else in the working
-  // tree (debug prints, dev/ scratch, settings.json overrides) stays out.
+  // Snapshot each touched YAML's content from the operator's working tree.
+  // We pass the bytes through to the worktree below so the operator's tree
+  // is never modified.
+  const snapshot = new Map<string, string>();
   for (const p of input.touchedPaths) {
     try {
-      sh(`git add -- ${shellEscape(p)}`);
+      snapshot.set(p, readFileSync(p, 'utf-8'));
+    } catch (err) {
+      return { kind: 'error', error: `failed to snapshot ${p}: ${errMsg(err)}` };
+    }
+  }
+
+  const branchName = makeBranchName(input.runStartedAt);
+  const worktreePath = join(tmpdir(), `lw-yaml-pr-${process.pid}-${Date.now()}`);
+
+  try {
+    sh(`git worktree add -b ${shellEscape(branchName)} ${shellEscape(worktreePath)} origin/main`);
+  } catch (err) {
+    return { kind: 'error', error: `git worktree add failed: ${errMsg(err)}` };
+  }
+
+  try {
+    return finishInWorktree(input, snapshot, branchName, worktreePath);
+  } finally {
+    try {
+      sh(`git worktree remove --force ${shellEscape(worktreePath)}`);
+    } catch (err) {
+      try { rmSync(worktreePath, { recursive: true, force: true }); } catch { /* ignore */ }
+      process.stderr.write(
+        `[yaml-pr] WARNING: failed to clean up worktree ${worktreePath}: ${errMsg(err)}\n`,
+      );
+    }
+  }
+}
+
+function finishInWorktree(
+  input: OpenYamlPrInput,
+  snapshot: Map<string, string>,
+  branchName: string,
+  worktreePath: string,
+): YamlPrResult {
+  // Write each touched path's snapshot into the worktree, overwriting
+  // origin/main's version. Then stage explicitly.
+  for (const [p, content] of snapshot) {
+    const dest = join(worktreePath, p);
+    try {
+      mkdirSync(dirname(dest), { recursive: true });
+      writeFileSync(dest, content, 'utf-8');
+    } catch (err) {
+      return { kind: 'error', error: `failed to write ${p} in worktree: ${errMsg(err)}` };
+    }
+  }
+
+  for (const p of input.touchedPaths) {
+    try {
+      sh(`git -C ${shellEscape(worktreePath)} add -- ${shellEscape(p)}`);
     } catch (err) {
       return { kind: 'error', error: `git add ${p} failed: ${errMsg(err)}` };
     }
@@ -93,13 +123,13 @@ function runYamlPrFlow(input: OpenYamlPrInput, currentBranch: string): YamlPrRes
 
   const commitMsg = buildCommitMessage(input);
   try {
-    sh(`git commit -m ${shellEscape(commitMsg)}`);
+    sh(`git -C ${shellEscape(worktreePath)} commit -m ${shellEscape(commitMsg)}`);
   } catch (err) {
     return { kind: 'error', error: `git commit failed: ${errMsg(err)}` };
   }
 
   try {
-    sh(`git push -u origin ${branchName}`);
+    sh(`git -C ${shellEscape(worktreePath)} push -u origin ${shellEscape(branchName)}`);
   } catch (err) {
     return { kind: 'error', error: `git push failed: ${errMsg(err)}` };
   }
@@ -108,34 +138,32 @@ function runYamlPrFlow(input: OpenYamlPrInput, currentBranch: string): YamlPrRes
   let prUrl: string;
   try {
     prUrl = sh(
-      `gh pr create --title ${shellEscape(`auto: backfill source URLs (${input.summary.matched} matches)`)} --body ${shellEscape(prBody)}`,
+      `cd ${shellEscape(worktreePath)} && ` +
+      `gh pr create --head ${shellEscape(branchName)} ` +
+      `--title ${shellEscape(`auto: backfill source URLs (${input.summary.matched} matches)`)} ` +
+      `--body ${shellEscape(prBody)}`,
     ).trim();
   } catch (err) {
     return { kind: 'error', error: `gh pr create failed: ${errMsg(err)}` };
   }
 
-  void currentBranch; // currentBranch is used by the caller's finally to restore.
+  // Enable GitHub auto-merge so the PR self-merges once CI is green —
+  // mechanical YAML mirror, nothing to review by hand. Best-effort: if
+  // the repo doesn't have auto-merge enabled in branch protection, this
+  // fails and we surface a warning, but the PR itself is still opened.
+  try {
+    sh(`gh pr merge ${shellEscape(prUrl)} --auto --merge`);
+  } catch (err) {
+    process.stderr.write(
+      `[yaml-pr] WARNING: failed to enable auto-merge on ${prUrl}: ${errMsg(err)}\n` +
+      `  PR is open but you'll need to merge it manually.\n`,
+    );
+  }
+
   return { kind: 'opened', branch: branchName, prUrl };
 }
 
-/** Best-effort restore of the operator's original branch. Logs to stderr on
- * failure so the operator sees it, but never throws — the auto-PR's success
- * doesn't depend on whether we got back. */
-function restoreBranch(originalBranch: string): void {
-  const nowOn = trySh('git rev-parse --abbrev-ref HEAD');
-  if (nowOn === originalBranch) return;
-  try {
-    sh(`git checkout ${shellEscape(originalBranch)}`);
-  } catch (err) {
-    process.stderr.write(
-      `[yaml-pr] WARNING: failed to restore branch '${originalBranch}': ${errMsg(err)}\n` +
-      `  You are currently on '${nowOn ?? 'unknown'}'. Switch back manually if needed.\n`,
-    );
-  }
-}
-
 function makeBranchName(isoTs: string): string {
-  // Tighten the ISO timestamp into a branch-safe slug.
   const slug = isoTs.replace(/[:.]/g, '-').replace(/Z$/, '');
   return `claude/backfill-sources-yaml-${slug}`;
 }
@@ -181,7 +209,6 @@ function trySh(cmd: string): string | null {
 }
 
 function shellEscape(s: string): string {
-  // Single-quote escaping: replace ' with '\''.
   return `'${s.replace(/'/g, `'\\''`)}'`;
 }
 
