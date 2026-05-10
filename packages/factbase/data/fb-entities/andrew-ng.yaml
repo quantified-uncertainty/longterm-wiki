@@ -3,11 +3,12 @@ facts:
   - id: f_eOS7s8epzw
     property: born-year
     value: 1976
+    source: https://en.wikipedia.org/wiki/Andrew_Ng
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_Rg89IN7s7w
     property: notable-for
-    value: "Founder of DeepLearning.AI and Coursera; former head of Google Brain and
-      Baidu AI; leading AI educator"
+    value: "Founder of DeepLearning.AI and Coursera; former head of Google Brain and Baidu AI; leading AI educator"
 
   - id: f_CUnXLL3M8Q
     property: education
