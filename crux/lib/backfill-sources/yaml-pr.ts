@@ -47,6 +47,17 @@ export function openYamlPr(input: OpenYamlPrInput): YamlPrResult {
     };
   }
 
+  try {
+    return runYamlPrFlow(input, currentBranch);
+  } finally {
+    // Always try to restore the operator's original branch — leaving them
+    // checked out on the auto-PR branch is confusing UX and silently
+    // pollutes any subsequent commands they run in this terminal.
+    restoreBranch(currentBranch);
+  }
+}
+
+function runYamlPrFlow(input: OpenYamlPrInput, currentBranch: string): YamlPrResult {
   // Fork from origin/main so the auto-PR's diff is just our YAML writes —
   // forking from the current feature branch (which is what `git checkout -b`
   // does without an explicit start-point) bloats the diff with whatever
@@ -103,7 +114,24 @@ export function openYamlPr(input: OpenYamlPrInput): YamlPrResult {
     return { kind: 'error', error: `gh pr create failed: ${errMsg(err)}` };
   }
 
+  void currentBranch; // currentBranch is used by the caller's finally to restore.
   return { kind: 'opened', branch: branchName, prUrl };
+}
+
+/** Best-effort restore of the operator's original branch. Logs to stderr on
+ * failure so the operator sees it, but never throws — the auto-PR's success
+ * doesn't depend on whether we got back. */
+function restoreBranch(originalBranch: string): void {
+  const nowOn = trySh('git rev-parse --abbrev-ref HEAD');
+  if (nowOn === originalBranch) return;
+  try {
+    sh(`git checkout ${shellEscape(originalBranch)}`);
+  } catch (err) {
+    process.stderr.write(
+      `[yaml-pr] WARNING: failed to restore branch '${originalBranch}': ${errMsg(err)}\n` +
+      `  You are currently on '${nowOn ?? 'unknown'}'. Switch back manually if needed.\n`,
+    );
+  }
 }
 
 function makeBranchName(isoTs: string): string {
