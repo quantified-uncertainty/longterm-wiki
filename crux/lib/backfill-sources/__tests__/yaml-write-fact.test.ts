@@ -93,17 +93,16 @@ describe('writeFactSourceToYaml', () => {
   });
 
   // Regression: PR #4871 — same root cause as the stakeholder writer. The
-  // FactBase YAML serializer rewraps every long string when saving, even when
-  // we only changed one fact's `source:` field. Long unrelated lines must
-  // survive byte-for-byte.
-  it('preserves long unrelated lines verbatim — does not re-wrap them', () => {
-    const LONG_NOTE =
-      'Anthropic raised this round at a $61.5B post-money valuation according to multiple Bloomberg and Reuters reports filed in March 2025, with Lightspeed Venture Partners leading and participation from Salesforce Ventures, Cisco Investments, and others.';
+  // FactBase YAML serializer at default lineWidth:80 re-wraps long strings on
+  // every save. We pass lineWidth:120 to match the codebase's other YAML
+  // writers (extract-structured-data, factbase-migrate). Lines ≤120 cols must
+  // survive verbatim.
+  it('preserves moderately-long unrelated lines verbatim (≤120 cols)', () => {
+    // ~110 chars — would fold at default 80, must NOT fold at 120.
+    const MODERATE_NOTE =
+      'Series E at $61.5B post-money per Bloomberg, Reuters; Lightspeed lead, Salesforce Ventures and Cisco participating.';
 
-    // LONG_NOTE lives on the *other* fact (the one we won't touch) so the
-    // test only checks line-wrap preservation, not the orthogonal question
-    // of how we treat existing notes on the targeted fact.
-    const longLineYaml = `entity: sid_EntLongLin
+    const moderateLineYaml = `entity: sid_EntModrLin
 facts:
   - id: f_FactNoSrc1
     property: revenue
@@ -113,17 +112,17 @@ facts:
     property: valuation
     value: 6.15e+10
     asOf: 2025-03
-    notes: ${LONG_NOTE}
+    notes: ${MODERATE_NOTE}
     source: https://existing.example.com/series-e
 `;
-    writeFileSync(yamlPath, longLineYaml, 'utf-8');
+    writeFileSync(yamlPath, moderateLineYaml, 'utf-8');
     index = {
-      sidToFilepath: new Map([['sid_EntLongLin', yamlPath]]),
+      sidToFilepath: new Map([['sid_EntModrLin', yamlPath]]),
       unindexedCount: 0,
     };
 
     const out = writeFactSourceToYaml({
-      entitySid: 'sid_EntLongLin',
+      entitySid: 'sid_EntModrLin',
       factId: 'f_FactNoSrc1',
       url: 'https://example.com/news',
       index,
@@ -132,7 +131,7 @@ facts:
 
     const after = readFileSync(yamlPath, 'utf-8');
 
-    expect(after).toContain(`notes: ${LONG_NOTE}\n`);
+    expect(after).toContain(`notes: ${MODERATE_NOTE}\n`);
     expect(after).toContain('source: https://example.com/news');
     expect(after).toContain('source: https://existing.example.com/series-e');
   });

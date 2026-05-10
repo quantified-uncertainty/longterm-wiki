@@ -115,11 +115,13 @@ export function writeStakeholderSourceToYaml(
 
   target.set('source', url);
 
-  // Atomic write: temp file + rename. `lineWidth: 0` disables the yaml
-  // package's default 80-char line folding so we don't reformat long
-  // unrelated string literals every time we touch one source field.
+  // Atomic write: temp file + rename. `lineWidth: 120` matches the
+  // convention used elsewhere in the codebase (extract-structured-data,
+  // political-data, factbase-migrate) — the yaml package's default 80
+  // would re-fold lines that those writers left unwrapped, producing
+  // noisy diffs every time we touch one source field.
   try {
-    const out = doc.toString({ lineWidth: 0 });
+    const out = doc.toString({ lineWidth: 120 });
     const tmp = filepath + '.tmp';
     writeFileSync(tmp, out, 'utf-8');
     renameSync(tmp, filepath);

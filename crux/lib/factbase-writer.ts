@@ -193,12 +193,13 @@ export function updateFactMetaById(
 /**
  * Write a YAML document back to file atomically (write to temp, rename).
  *
- * `lineWidth: 0` disables the yaml package's default 80-char line folding —
- * without it, every save reformats long unrelated string literals (descriptions,
- * notes, reasons) and produces noisy diffs even for single-field edits.
+ * `lineWidth: 120` matches the convention used elsewhere in the codebase
+ * (extract-structured-data, political-data, factbase-migrate). Without it,
+ * the yaml package's default 80-char folding would reformat long unrelated
+ * string literals and produce noisy diffs even for single-field edits.
  */
 export function writeEntityDocument(filepath: string, doc: Document): void {
-  const content = doc.toString({ lineWidth: 0 });
+  const content = doc.toString({ lineWidth: 120 });
   const tmpPath = filepath + '.tmp';
   writeFileSync(tmpPath, content, 'utf-8');
   renameSync(tmpPath, filepath);
