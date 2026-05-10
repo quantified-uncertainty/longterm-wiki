@@ -3,10 +3,9 @@ facts:
   - id: f_OG1descr01
     property: description
     value: >-
-      Founder and Executive Director of QURI (Quantified Uncertainty Research
-      Institute). Created Guesstimate (2016) and leads development of Squiggle,
-      a probabilistic programming language for estimation. Previously worked at
-      the Future of Humanity Institute at Oxford.
+      Founder and Executive Director of QURI (Quantified Uncertainty Research Institute). Created Guesstimate (2016) and
+      leads development of Squiggle, a probabilistic programming language for estimation. Previously worked at the
+      Future of Humanity Institute at Oxford.
     asOf: !date 2026-03
   - id: f_OG4educa01
     property: education
@@ -16,7 +15,11 @@ facts:
     property: notable-for
     value: "Founded QURI; created Guesstimate (2016); leads Squiggle development; FHI background"
     asOf: !date 2026-03
+    source: https://mutualunderstanding.substack.com/p/ozzie-gooen
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_OG6githb01
     property: github-profile
     value: "https://github.com/OAGr"
+    source: https://github.com/OAGr
+    notes: "[auto-discovered by tb backfill-sources]"
