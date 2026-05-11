@@ -875,7 +875,7 @@ export function EntitySourcingViewer() {
               </div>
               <div className="rounded-lg border border-border/60 p-4">
                 <p className="text-xs text-muted-foreground mb-1">Unverifiable</p>
-                <p className="text-2xl font-bold tabular-nums text-orange-600">{unverifiableCount}</p>
+                <p className="text-2xl font-bold tabular-nums text-red-600">{unverifiableCount}</p>
                 <p className="text-xs text-muted-foreground mt-1">{pctOf(unverifiableCount)}</p>
               </div>
               <div className="rounded-lg border border-border/60 p-4">

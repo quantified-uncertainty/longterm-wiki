@@ -76,10 +76,10 @@ export const SOURCE_CHECK_VERDICT_STYLES: Record<SourcingVerdictType, SourcingVe
   },
   unverifiable: {
     label: "Unverifiable",
-    className: "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400",
-    bg: "bg-orange-400/15",
-    text: "text-orange-600",
-    dot: "bg-orange-400",
+    className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+    bg: "bg-red-400/15",
+    text: "text-red-600",
+    dot: "bg-red-400",
   },
   unchecked: {
     label: "Unchecked",

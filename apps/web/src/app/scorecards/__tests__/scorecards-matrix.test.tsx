@@ -117,7 +117,7 @@ describe("ScorecardsMatrix — source-check dots", () => {
   const VERDICT_CASES: Array<{ verdict: string; label: RegExp }> = [
     { verdict: "outdated", label: /Needs attention/i },
     { verdict: "partial", label: /Needs attention/i },
-    { verdict: "unverifiable", label: /Needs attention/i },
+    { verdict: "unverifiable", label: /Failed source check/i },
     { verdict: "not_applicable", label: /Not checked/i },
   ];
 
