@@ -196,6 +196,18 @@ export const columnGroupColors: Record<string, { inactive: string; active: strin
     inactive: "border-violet-400 text-violet-700 dark:border-violet-600 dark:text-violet-400",
     active: "bg-violet-500 text-white border-violet-500 dark:bg-violet-600 dark:border-violet-600",
   },
+  state: {
+    inactive: "border-orange-400 text-orange-700 dark:border-orange-600 dark:text-orange-400",
+    active: "bg-orange-500 text-white border-orange-500 dark:bg-orange-600 dark:border-orange-600",
+  },
+  supply: {
+    inactive: "border-teal-400 text-teal-700 dark:border-teal-600 dark:text-teal-400",
+    active: "bg-teal-500 text-white border-teal-500 dark:bg-teal-600 dark:border-teal-600",
+  },
+  control: {
+    inactive: "border-blue-400 text-blue-700 dark:border-blue-600 dark:text-blue-400",
+    active: "bg-blue-500 text-white border-blue-500 dark:bg-blue-600 dark:border-blue-600",
+  },
 };
 
 // --- Safety-specific color maps (merged from safety-table-styles.ts) ---
@@ -279,6 +291,48 @@ export const archRelevanceColors: Record<string, string> = {
   medium: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
   low: "bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-orange-100",
   not_applicable: "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400",
+};
+
+// AGI bottlenecks — tightness levels (BINDING is the hardest constraint)
+export const tightnessColors: Record<string, string> = {
+  binding: "bg-red-800 text-white dark:bg-red-700",
+  tight: "bg-orange-400 text-orange-900 dark:bg-orange-600 dark:text-orange-100",
+  moderate: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
+  slack: "bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100",
+};
+
+// AGI bottlenecks — trajectory direction
+export const trajectoryColors: Record<string, string> = {
+  tightening: "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200",
+  stable: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+  loosening: "bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100",
+  mixed: "bg-amber-200 text-amber-800 dark:bg-amber-700 dark:text-amber-100",
+};
+
+// AGI bottlenecks — time-to-relieve (longer = worse)
+export const timeToRelieveColors: Record<string, string> = {
+  short: "bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100",
+  medium: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
+  long: "bg-orange-400 text-orange-900 dark:bg-orange-600 dark:text-orange-100",
+  "very-long": "bg-red-600 text-white dark:bg-red-600",
+};
+
+// AGI bottlenecks — cost-to-expand (higher = worse)
+export const costColors: Record<string, string> = {
+  low: "bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100",
+  medium: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
+  high: "bg-orange-400 text-orange-900 dark:bg-orange-600 dark:text-orange-100",
+  "very-high": "bg-red-600 text-white dark:bg-red-600",
+  "n/a": "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
+};
+
+// AGI bottlenecks — geographic concentration (higher = more concentrated = more fragile)
+export const geographicConcentrationColors: Record<string, string> = {
+  global: "bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100",
+  distributed: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
+  regional: "bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100",
+  concentrated: "bg-orange-400 text-orange-900 dark:bg-orange-600 dark:text-orange-100",
+  "single-point": "bg-red-600 text-white dark:bg-red-600",
 };
 
 // Generalization level colors (safety-generalizability)
@@ -366,6 +420,21 @@ export function getBadgeClass(level: string, category?: string): string {
         break;
       case "generalization":
         if (generalizationColors[l]) return generalizationColors[l];
+        break;
+      case "tightness":
+        if (tightnessColors[l]) return tightnessColors[l];
+        break;
+      case "trajectory":
+        if (trajectoryColors[l]) return trajectoryColors[l];
+        break;
+      case "timeToRelieve":
+        if (timeToRelieveColors[l]) return timeToRelieveColors[l];
+        break;
+      case "cost":
+        if (costColors[l]) return costColors[l];
+        break;
+      case "geographicConcentration":
+        if (geographicConcentrationColors[l]) return geographicConcentrationColors[l];
         break;
     }
   }
@@ -503,6 +572,28 @@ export const levelSortOrder: Record<string, number> = {
   defund: 1,
   // Generalization
   highest: 5,
+  // AGI bottlenecks — tightness (higher = more constrained)
+  slack: 1,
+  // moderate: 2 — already mapped above
+  // tight: covered below
+  binding: 5,
+  tight: 4,
+  // AGI bottlenecks — trajectory (higher = worsening)
+  loosening: 1,
+  stable: 2,
+  tightening: 4,
+  // AGI bottlenecks — time-to-relieve (higher = longer)
+  short: 1,
+  long: 4,
+  "very-long": 5,
+  // AGI bottlenecks — cost-to-expand (higher = costlier)
+  "very-high": 5,
+  // AGI bottlenecks — geographic concentration (higher = more concentrated)
+  global: 1,
+  distributed: 2,
+  regional: 3,
+  concentrated: 4,
+  "single-point": 5,
 };
 
 export function getLevelSortValue(level: string): number {

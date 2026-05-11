@@ -1,0 +1,62 @@
+---
+wikiId: E2565
+title: AGI Bottlenecks
+description: Interactive comparison table of frontier AI capability bottlenecks — compute, fabs, energy, data, talent, capital, and regulation — across tightness, trajectory, and control structure.
+sidebar:
+  order: 60
+contentFormat: table
+lastEdited: 2026-05-11
+createdAt: 2026-05-11
+update_frequency: 90
+summary: A structured comparison table of the supply-chain inputs that gate frontier AI capability — compute, fabs, HBM, energy, data, algorithmic insights, talent, capital, deployment infrastructure, and regulatory friction — scored on current tightness, trajectory, time-to-relieve, cost-to-expand, controllers, and geographic concentration. Useful as a strategic map of where governance interventions have leverage; entries are deliberately concise to support quarterly refresh, and the snapshot will age within months rather than years.
+clusters:
+  - ai-safety
+---
+import AGIBottlenecksTableView from '@components/tables/views/AGIBottlenecksTableView';
+import { EntityLink } from '@components/wiki';
+
+The **AGI Bottlenecks** table maps the supply chain of frontier capability progress: what the next generation of capability gains requires more of, how constrained each input is today, and who controls it. Rows are inputs (compute, fabs, energy, data, talent, capital, regulation); columns are the dimensions along which an input can bind: present tightness, direction of change, time-to-relieve, cost-to-expand, controllers, and geographic concentration.
+
+The table is intended as a strategic map. Bottlenecks define where governance interventions have leverage — a binding constraint controlled by a single firm in a single country (HBM, EUV lithography) is a different policy target from a moderately tight constraint distributed across many actors (deployment infrastructure, capital). The companion <EntityLink id="E2236">Actor Power Scorecard</EntityLink> scores who exerts power over the AI development trajectory; this table scores the inputs they have power *over*.
+
+<AGIBottlenecksTableView />
+
+## How to read the table
+
+The columns sort independently. Useful views:
+
+- **Default (tightness descending)**: which inputs are most binding right now.
+- **Sort by trajectory**: which are getting worse fastest.
+- **Sort by time-to-relieve**: which are slowest to fix even with unlimited capital.
+- **Sort by geographic concentration**: which are most fragile to a single-region shock.
+
+The grouping toggle in the controls switches between unified (one ranked list) and grouped (by category) views. Categories are deliberately coarse — five categories for thirteen rows — to keep the table readable.
+
+## What the table is not
+
+This is a snapshot, not a forecast. The cells reflect mid-2026 conditions. Several of the rows have plausible scenarios in which their tightness flips within twelve months — HBM packaging capacity, training-compute interconnect availability, and US export-control scope are all moving fast. The footer in the table notes the snapshot date and update cadence.
+
+The table also flattens several distinctions worth noting:
+
+- **Compute** is treated as a single bottleneck, but the H100/H200/B200 generations are simultaneously binding (current-gen supply) and not (next-gen reflects scaling needs not yet at frontier). Cells reflect the present-generation gating constraint.
+- **Algorithmic insights** are scored as relatively unconstrained because public-research diffusion is fast, but specific frontier-lab insights (reasoning-model training recipes, post-training procedures) stay private for 6–18 months and confer real capability advantage during that window.
+- **Regulatory friction** is the only row where "cost to expand" does not apply — regulation is a constraint to bind, not a resource to expand. The cell is marked N/A.
+- **Geographic concentration** is scored by where supply is produced, not where it is deployed. Compute deployment is global; compute production is concentrated.
+
+## Methodology
+
+Tightness, trajectory, time-to-relieve, cost-to-expand, and geographic-concentration cells are subjective expert judgments synthesized from public reporting through mid-2026. They are not derived from a single quantitative model. For each cell, the inline note captures the specific facts driving the rating; readers should weight the note more heavily than the badge.
+
+The notes column is intended for strategic framing — the single most important thing to know about each bottleneck that the structured columns do not capture.
+
+## Related
+
+- <EntityLink id="E2236">Actor Power Scorecard</EntityLink> — scores the actors exerting power over AI development; this table scores the inputs they have power over.
+- <EntityLink id="E68">AI-Driven Concentration of Power</EntityLink> — analysis of how control over bottleneck inputs concentrates strategic leverage.
+- <EntityLink id="E69">Concentration of Power Systems Model</EntityLink> — the causal model behind why bottleneck control matters.
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-05-11 | Initial table created; 13 bottlenecks scored across 5 categories |
