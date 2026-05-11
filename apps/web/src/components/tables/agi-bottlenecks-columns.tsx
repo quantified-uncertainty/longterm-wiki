@@ -160,7 +160,6 @@ export const createAGIBottlenecksColumns = (): ColumnDef<AGIBottleneck>[] => [
   },
   {
     id: "controllers",
-    accessorFn: (row) => row.controllers.join(", "),
     header: () => <span className="text-xs">Who controls</span>,
     cell: ({ row }) => <ControllersCell controllers={row.original.controllers} />,
     enableSorting: false,
