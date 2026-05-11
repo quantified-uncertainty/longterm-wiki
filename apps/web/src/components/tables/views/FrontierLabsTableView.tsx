@@ -45,100 +45,15 @@ export default function FrontierLabsTableView() {
         categoryColumnId: "category",
       }}
       description={
-        <div className="max-w-4xl space-y-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Hand-curated editorial comparison of major frontier AI developers on
-            safety-relevant dimensions. Each rating cell shows a level
-            (HIGH / MEDIUM / LOW / UNCLEAR) plus a short note anchoring the
-            rating in observable signals — published policies, system cards,
-            leadership statements, and public departures. The full evidence
-            list per lab is in the "Notable signals" column.
-          </p>
-          <Card className="border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30">
-            <CardContent className="py-3 space-y-2">
-              <p className="text-sm">
-                <strong className="text-amber-700 dark:text-amber-400">
-                  Epistemic status:
-                </strong>{" "}
-                Opinionated synthesis, not a peer-reviewed scorecard. Ratings
-                reflect public observable signals through early 2026; internal
-                practices not in the public record are not assessed. "UNCLEAR"
-                means we don't have enough public signal — not that the
-                underlying practice is bad.
-              </p>
-              <p className="text-sm">
-                <strong className="text-amber-700 dark:text-amber-400">
-                  Direction of ratings:
-                </strong>{" "}
-                For every safety dimension, HIGH means more safety-positive
-                (more investment, more restraint, more transparency, stronger
-                alignment, more detail). The capability "Tier" column is
-                descriptive, not evaluative.
-              </p>
-              <p className="text-sm">
-                <strong className="text-amber-700 dark:text-amber-400">
-                  Limits:
-                </strong>{" "}
-                Ratings age fast — frontier labs reorganize, ship new policies,
-                and lose senior staff on quarterly timescales. Update cadence
-                here is ~14 days; check linked references for current state.
-                We weigh observable artifacts (published RSPs, system cards,
-                attrition patterns) more heavily than press statements. Other
-                scorecards weight differently — see the cross-references below.
-              </p>
-            </CardContent>
-          </Card>
-          <details>
-            <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground select-none">
-              Other lab-comparison scorecards ↗
-            </summary>
-            <div className="mt-2 pl-4 border-l-2 border-border text-sm space-y-1">
-              <div>
-                <a
-                  href="https://futureoflife.org/ai-safety-index-winter-2025/"
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  FLI AI Safety Index
-                </a>{" "}
-                — Periodic lab scorecards graded by independent reviewers.
-              </div>
-              <div>
-                <a
-                  href="https://metr.org/common-elements"
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  METR: Common Elements
-                </a>{" "}
-                — Frontier safety policy comparison across companies.
-              </div>
-              <div>
-                <a
-                  href="https://ailabwatch.org/"
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  AI Lab Watch
-                </a>{" "}
-                — Independent third-party scorecard with detailed rubric.
-              </div>
-              <div>
-                <a
-                  href="/organizations"
-                  className="text-primary hover:underline"
-                >
-                  /organizations
-                </a>{" "}
-                — Full organization directory on this wiki, including FactBase
-                facts (funding, headcount, valuations).
-              </div>
-            </div>
-          </details>
-        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+          Hand-curated editorial comparison of major frontier AI developers on
+          safety-relevant dimensions. Each rating cell shows a level
+          (HIGH / MEDIUM / LOW / UNCLEAR) plus a short note anchoring the
+          rating in observable signals. Full epistemic caveats and methodology
+          are in the page body above. The capability "Tier" column is
+          descriptive, not evaluative; all other columns use HIGH = safety-
+          positive.
+        </p>
       }
       legend={
         <Card className="max-w-fit">

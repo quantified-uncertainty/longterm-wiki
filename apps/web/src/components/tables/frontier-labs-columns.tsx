@@ -2,8 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import { CellNote, LevelBadge } from "./shared/cell-components";
-import { getLevelSortValue } from "./shared/table-view-styles";
+import { CellNote } from "./shared/cell-components";
 import type { FrontierLab, LabLink } from "@data/tables/frontier-labs";
 import { levelNoteColumn } from "./shared/column-helpers";
 
@@ -60,18 +59,38 @@ function LinksCell({ links }: { links: LabLink[] }) {
   );
 }
 
+// Tier values aren't in the shared HIGH/MEDIUM/LOW level vocabulary, so they
+// would render as the gray fallback through getBadgeClass. Use a dedicated
+// badge with explicit colors so the column scans visually.
+const TIER_BADGE_COLORS: Record<string, string> = {
+  FRONTIER: "bg-purple-200 text-purple-800 dark:bg-purple-700 dark:text-purple-100",
+  "NEAR-FRONTIER": "bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-100",
+  SPECIALIZED: "bg-amber-200 text-amber-800 dark:bg-amber-700 dark:text-amber-100",
+  DEFUNCT: "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
+};
+
+function TierBadge({ level }: { level: string }) {
+  const colorClass = TIER_BADGE_COLORS[level] ?? TIER_BADGE_COLORS.DEFUNCT;
+  return (
+    <span
+      className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${colorClass}`}
+    >
+      {level}
+    </span>
+  );
+}
+
 function CapabilityTierCell({ row }: { row: { original: FrontierLab } }) {
   const lab = row.original;
   return (
     <div>
-      <LevelBadge level={lab.capabilityTier.level} />
+      <TierBadge level={lab.capabilityTier.level} />
       <CellNote note={lab.capabilityTier.note} />
     </div>
   );
 }
 
-// Map non-standard tier strings into colors via getLevelSortValue's existing levels.
-// FRONTIER → high; NEAR-FRONTIER → medium; SPECIALIZED → low-medium; DEFUNCT → none.
+// Sort tiers descending by frontier-ness: FRONTIER > NEAR-FRONTIER > SPECIALIZED > DEFUNCT.
 function capabilityTierSortValue(tier: string): number {
   const t = tier.toLowerCase();
   if (t === "frontier") return 4;
@@ -130,7 +149,6 @@ export const createFrontierLabsColumns = (): ColumnDef<FrontierLab>[] => [
     accessor: (r) => r.leadershipSafetyAlignment,
     label: "Leadership safety alignment",
     tooltip: "CEO / co-founder public stance and revealed prioritization of safety",
-    sortValue: (r) => getLevelSortValue(r.leadershipSafetyAlignment.level),
   }),
   levelNoteColumn<FrontierLab>({
     id: "employeeSafetyCulture",

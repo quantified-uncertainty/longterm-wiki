@@ -11,7 +11,7 @@
     },
     "safetyInvestment": {
       "level": "HIGH",
-      "note": "Largest dedicated alignment/interpretability staffing share among frontier labs; public RSP, RAIN governance, ASL framework."
+      "note": "Largest dedicated alignment/interpretability staffing share among frontier labs; public RSP and ASL framework; governed by the Long-Term Benefit Trust."
     },
     "racePostureRestraint": {
       "level": "MEDIUM",
@@ -26,7 +26,7 @@
       "note": "US AISI MOU, UK AISI pre-deployment access, congressional testimony, supports compute-based regulation."
     },
     "leadershipSafetyAlignment": {
-      "level": "STRONG",
+      "level": "HIGH",
       "note": "All seven co-founders left OpenAI over safety disagreements. Dario and Daniela Amodei publicly EA-aligned; 80% Giving Pledge."
     },
     "employeeSafetyCulture": {
@@ -70,8 +70,8 @@
       "note": "Publishes system cards, model spec, Preparedness Framework. Withholds training data, compute, and full safety-eval results."
     },
     "govEngagement": {
-      "level": "HIGH",
-      "note": "Altman 2023 Senate testimony; AISI partnership; participated in summit commitments. Also lobbied against parts of EU AI Act and SB 1047."
+      "level": "MEDIUM",
+      "note": "Altman 2023 Senate testimony; AISI partnership; participated in summit commitments. Downgraded from HIGH because OpenAI also lobbied against parts of EU AI Act and SB 1047 — engagement is selective, not consistently constructive."
     },
     "leadershipSafetyAlignment": {
       "level": "LOW",
@@ -79,7 +79,7 @@
     },
     "employeeSafetyCulture": {
       "level": "LOW",
-      "note": "Pattern of high-profile safety departures 2023-2025 (Sutskever, Leike, Saunders, Krueger, Bourgon, Lehman, Kokotajlo). June 2024 open letter from former employees on whistleblower protections."
+      "note": "Pattern of high-profile safety departures 2023-2025 (Sutskever, Leike, Saunders, Krueger, Lehman, Kokotajlo, Brundage). June 2024 'Right to Warn' open letter from former employees on whistleblower protections."
     },
     "rspQuality": {
       "level": "MEDIUM",
@@ -162,8 +162,8 @@
       "note": "Open-weights release strategy maximizes diffusion. LeCun has publicly minimized frontier-risk concerns; Zuckerberg framing emphasizes openness and competition with China."
     },
     "transparency": {
-      "level": "HIGH",
-      "note": "Model weights released for Llama family; detailed technical reports. Safety-eval disclosure is thinner."
+      "level": "MEDIUM",
+      "note": "Open weights and detailed technical reports are unusually transparent on capability artifacts. But this rubric weights transparency toward operational safety detail — RSPs, system cards, capability thresholds — none of which Meta publishes. HIGH on openness, LOW on safety-operational transparency; netted to MEDIUM."
     },
     "govEngagement": {
       "level": "MEDIUM",
@@ -305,8 +305,8 @@
       "note": "Strategy pushes capability frontier with permissive open-weights release. R1 reasoning model released with weights and method."
     },
     "transparency": {
-      "level": "HIGH",
-      "note": "Weights, technical methodology, and some training detail unusually open. Safety-eval disclosure is limited."
+      "level": "MEDIUM",
+      "note": "Weights, technical methodology, and some training detail unusually open. No RSP / capability-threshold framework and limited safety-eval disclosure — netted to MEDIUM on this rubric's safety-weighted definition of transparency."
     },
     "govEngagement": {
       "level": "UNCLEAR",
@@ -338,6 +338,7 @@
     "name": "Alibaba (Qwen)",
     "description": "Alibaba Cloud / DAMO Academy. Qwen family — strong open-weights releases.",
     "category": "frontier-china",
+    "entityId": "sid_eBJi3sqy7w",
     "capabilityTier": {
       "level": "NEAR-FRONTIER",
       "note": "Qwen 2.5 / 3 competitive in their tiers; multimodal and code variants strong; below absolute frontier on hardest reasoning."
@@ -351,8 +352,8 @@
       "note": "Aggressive open-weights cadence across sizes; rapid release tempo."
     },
     "transparency": {
-      "level": "HIGH",
-      "note": "Weights released; detailed technical reports. Safety-eval depth limited."
+      "level": "MEDIUM",
+      "note": "Weights released and detailed technical reports. No RSP / capability framework and limited safety-eval depth — HIGH on capability openness, LOW on safety-operational transparency; netted to MEDIUM."
     },
     "govEngagement": {
       "level": "UNCLEAR",
@@ -384,6 +385,7 @@
     "name": "Mistral AI",
     "description": "Paris-based, founded 2023. Open and commercial models; European AI champion positioning.",
     "category": "frontier-europe",
+    "entityId": "E1097",
     "capabilityTier": {
       "level": "NEAR-FRONTIER",
       "note": "Mid-sized models competitive in efficiency tier; below absolute frontier on largest closed models."
@@ -430,6 +432,7 @@
     "name": "Cohere",
     "description": "Toronto-based, founded 2019 by ex-Google Brain (Aidan Gomez). Enterprise / RAG focus.",
     "category": "specialized",
+    "entityId": "sid_JDg4Sr7Cr1",
     "capabilityTier": {
       "level": "NEAR-FRONTIER",
       "note": "Command R / R+ competitive in enterprise / RAG tier; below frontier on hardest reasoning. Strategy is enterprise-focused, not frontier-chasing."
@@ -523,6 +526,7 @@
     "name": "Inflection (defunct / absorbed)",
     "description": "Founded 2022 by Mustafa Suleyman, Karén Simonyan, Reid Hoffman. Most of team absorbed into Microsoft AI March 2024.",
     "category": "historical",
+    "entityId": "sid_r1i7cwBiD7",
     "capabilityTier": {
       "level": "DEFUNCT",
       "note": "Frontier ambitions abandoned March 2024; remaining entity pivoted to enterprise. Original Pi-model team is now Microsoft AI under Suleyman."
