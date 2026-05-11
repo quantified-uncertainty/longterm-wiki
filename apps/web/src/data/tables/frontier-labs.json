@@ -1,0 +1,567 @@
+[
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "description": "Founded 2021 by ex-OpenAI safety leads; explicitly safety-mission lab. Claude family.",
+    "category": "us-frontier",
+    "entityId": "E22",
+    "capabilityTier": {
+      "level": "FRONTIER",
+      "note": "Claude Opus / Sonnet competitive at the top tier through 2025-2026."
+    },
+    "safetyInvestment": {
+      "level": "HIGH",
+      "note": "Largest dedicated alignment/interpretability staffing share among frontier labs; public RSP, RAIN governance, ASL framework."
+    },
+    "racePostureRestraint": {
+      "level": "MEDIUM",
+      "note": "Dario Amodei has openly argued the 'race to safety' framing — explicit goal to stay at frontier rather than slow down. Commercial trajectory has accelerated."
+    },
+    "transparency": {
+      "level": "HIGH",
+      "note": "Detailed RSP v2, comprehensive system cards, public interpretability research, some training/compute disclosure."
+    },
+    "govEngagement": {
+      "level": "HIGH",
+      "note": "US AISI MOU, UK AISI pre-deployment access, congressional testimony, supports compute-based regulation."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "STRONG",
+      "note": "All seven co-founders left OpenAI over safety disagreements. Dario and Daniela Amodei publicly EA-aligned; 80% Giving Pledge."
+    },
+    "employeeSafetyCulture": {
+      "level": "HIGH",
+      "note": "Heavy alignment-research output; employee donation matching program; few high-profile safety-driven departures relative to peers."
+    },
+    "rspQuality": {
+      "level": "HIGH",
+      "note": "RSP v2 (Oct 2024) — explicit capability thresholds, deployment/training pause conditions, board governance, internal red-team requirements."
+    },
+    "notableSignals": [
+      "RSP v2 published Oct 2024 with detailed ASL-3/ASL-4 tripwires.",
+      "Pre-deployment access agreements with US and UK AISIs.",
+      "Public interpretability program with regular technical releases."
+    ],
+    "links": [
+      { "label": "RSP v2", "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy" },
+      { "label": "Acceptable Use", "url": "https://www.anthropic.com/legal/aup" }
+    ]
+  },
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "description": "Founded 2015 as nonprofit; now capped-profit. GPT family, o-series reasoning, Sora.",
+    "category": "us-frontier",
+    "entityId": "E218",
+    "capabilityTier": {
+      "level": "FRONTIER",
+      "note": "GPT-4o / o-series at the top tier; routinely trades leadership with Anthropic and Google."
+    },
+    "safetyInvestment": {
+      "level": "MEDIUM",
+      "note": "Preparedness team and Safety Advisory Group exist; Superalignment team disbanded May 2024. Safety-to-capabilities ratio has fallen since 2023 reorg."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Sam Altman has publicly framed fast deployment as inevitable. Preparedness Framework includes deployment-gating language but execution has been criticized as lagging."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Publishes system cards, model spec, Preparedness Framework. Withholds training data, compute, and full safety-eval results."
+    },
+    "govEngagement": {
+      "level": "HIGH",
+      "note": "Altman 2023 Senate testimony; AISI partnership; participated in summit commitments. Also lobbied against parts of EU AI Act and SB 1047."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "LOW",
+      "note": "Founding safety mission walked back; chief scientist Sutskever departed; Jan Leike departed citing 'safety culture taking a back seat'; November 2023 board episode."
+    },
+    "employeeSafetyCulture": {
+      "level": "LOW",
+      "note": "Pattern of high-profile safety departures 2023-2025 (Sutskever, Leike, Saunders, Krueger, Bourgon, Lehman, Kokotajlo). June 2024 open letter from former employees on whistleblower protections."
+    },
+    "rspQuality": {
+      "level": "MEDIUM",
+      "note": "Preparedness Framework v1 (Dec 2023, updated 2025) — thresholds for cyber, persuasion, CBRN, autonomy. Less prescriptive on operational tripwires than Anthropic's RSP."
+    },
+    "notableSignals": [
+      "Superalignment team disbanded May 2024.",
+      "June 2024 'Right to Warn' open letter signed by 13 former and current employees.",
+      "Preparedness Framework updated 2025 but Safety Advisory Group decisions opaque."
+    ],
+    "links": [
+      { "label": "Preparedness Framework", "url": "https://openai.com/safety/preparedness/" },
+      { "label": "Right to Warn", "url": "https://righttowarn.ai/" }
+    ]
+  },
+  {
+    "id": "google-deepmind",
+    "name": "Google DeepMind",
+    "description": "Merger of DeepMind and Google Brain (2023). Gemini family; AlphaFold / AlphaGo lineage.",
+    "category": "us-frontier",
+    "entityId": "E98",
+    "capabilityTier": {
+      "level": "FRONTIER",
+      "note": "Gemini 2.x and reasoning models competitive at top tier."
+    },
+    "safetyInvestment": {
+      "level": "MEDIUM",
+      "note": "Frontier Safety + AGI Safety teams; substantial absolute headcount but smaller fraction of total org than Anthropic. Long alignment research history."
+    },
+    "racePostureRestraint": {
+      "level": "MEDIUM",
+      "note": "Demis Hassabis publicly safety-conscious. 2023 DeepMind/Brain merger driven in part by competitive pressure; Gemini cadence has accelerated."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Frontier Safety Framework, model cards, AGI safety paper. Less prescriptive than Anthropic's RSP; commercial constraints from Google reduce disclosure."
+    },
+    "govEngagement": {
+      "level": "HIGH",
+      "note": "UK + US AISI partnerships; Hassabis advises UK Government; participated in Bletchley / Seoul / Paris summit commitments."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "MEDIUM",
+      "note": "Hassabis publicly safety-focused since DeepMind founding; original ethics board legacy. Operating constraints from Google parent."
+    },
+    "employeeSafetyCulture": {
+      "level": "MEDIUM",
+      "note": "Strong public alignment-research output. Some internal-protest history (Project Maven, Gemini launch). Less visible attrition pattern than OpenAI."
+    },
+    "rspQuality": {
+      "level": "MEDIUM",
+      "note": "Frontier Safety Framework v2 (Feb 2025) — capability thresholds and deployment mitigations, less operationally specific than RSP v2."
+    },
+    "notableSignals": [
+      "Frontier Safety Framework v2 (Feb 2025).",
+      "AGI safety position paper (2025) outlining technical research agenda.",
+      "Pre-deployment AISI access for Gemini frontier releases."
+    ],
+    "links": [
+      { "label": "Frontier Safety Framework", "url": "https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/" },
+      { "label": "Responsibility & Safety", "url": "https://deepmind.google/about/responsibility-safety/" }
+    ]
+  },
+  {
+    "id": "meta-ai",
+    "name": "Meta AI / FAIR",
+    "description": "Includes FAIR (Yann LeCun) and Meta GenAI. Llama family; open-weights strategy.",
+    "category": "us-frontier",
+    "entityId": "E549",
+    "capabilityTier": {
+      "level": "NEAR-FRONTIER",
+      "note": "Llama 3.x / 4 competitive in their tiers but consistently behind closed-weights frontier."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "Small explicit safety team relative to size; LeCun publicly skeptical of catastrophic AI x-risk framings."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Open-weights release strategy maximizes diffusion. LeCun has publicly minimized frontier-risk concerns; Zuckerberg framing emphasizes openness and competition with China."
+    },
+    "transparency": {
+      "level": "HIGH",
+      "note": "Model weights released for Llama family; detailed technical reports. Safety-eval disclosure is thinner."
+    },
+    "govEngagement": {
+      "level": "MEDIUM",
+      "note": "Participated at summits. Opposed parts of EU AI Act addressing open-source models. Less proactive on safety-specific policy."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "LOW",
+      "note": "LeCun's public position downplays catastrophic risk. Strategy is openness-first."
+    },
+    "employeeSafetyCulture": {
+      "level": "LOW",
+      "note": "Few public safety-driven departures or open letters from FAIR / GenAI. Less visible internal safety advocacy."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No published RSP or capability-threshold framework as of early 2026."
+    },
+    "notableSignals": [
+      "Llama 4 release continued open-weights strategy.",
+      "LeCun has repeatedly publicly minimized AGI / x-risk framings.",
+      "Acceptable Use Policy exists for Llama; no upstream capability thresholds."
+    ],
+    "links": [
+      { "label": "Llama AUP", "url": "https://www.llama.com/llama3/use-policy/" },
+      { "label": "Responsible Use Guide", "url": "https://ai.meta.com/llama/responsible-use-guide/" }
+    ]
+  },
+  {
+    "id": "xai",
+    "name": "xAI",
+    "description": "Founded 2023 by Elon Musk. Grok family; Colossus GPU build-out in Memphis.",
+    "category": "us-frontier",
+    "entityId": "E378",
+    "capabilityTier": {
+      "level": "FRONTIER",
+      "note": "Grok 3 (Feb 2025) competitive on public benchmarks; massive compute build-out."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "Small explicit safety team; thin public safety-research output; Risk Management Framework published Feb 2025 is brief."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Founded explicitly to race; Musk publicly framed xAI as 'anti-woke' alternative to OpenAI. Grok released with deliberately minimal output guardrails."
+    },
+    "transparency": {
+      "level": "LOW",
+      "note": "Sparse model documentation, no detailed safety evaluations published, brief system cards."
+    },
+    "govEngagement": {
+      "level": "MEDIUM",
+      "note": "Musk publicly supported SB 1047. xAI participated in Seoul Summit. Less ongoing engagement than the frontier-3."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "LOW",
+      "note": "Musk's positioning has shifted over time; pattern at xAI is to ship capability before safety scaffolding."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Too early to characterize; little public information on internal safety dissent."
+    },
+    "rspQuality": {
+      "level": "LOW",
+      "note": "Risk Management Framework (Feb 2025) — published but thin on operational thresholds, tripwires, and governance specifics."
+    },
+    "notableSignals": [
+      "Risk Management Framework published Feb 2025; criticized for brevity and lack of tripwires.",
+      "Grok image-generation launches with notably few content filters.",
+      "Memphis Colossus cluster built rapidly; environmental and grid-impact concerns raised by local press."
+    ],
+    "links": [
+      { "label": "xAI Risk Management Framework", "url": "https://x.ai/blog/risk-management-framework" }
+    ]
+  },
+  {
+    "id": "microsoft-ai",
+    "name": "Microsoft AI",
+    "description": "Mustafa Suleyman-led division (Mar 2024). Phi series + Copilot products + OpenAI partnership.",
+    "category": "us-frontier",
+    "entityId": "E550",
+    "capabilityTier": {
+      "level": "NEAR-FRONTIER",
+      "note": "Phi small-model line is strong; frontier-capability access primarily via OpenAI partnership rather than in-house pretraining."
+    },
+    "safetyInvestment": {
+      "level": "MEDIUM",
+      "note": "Microsoft Responsible AI Office and large governance apparatus; less in-house alignment-research output than frontier-3."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Commercial deployment-first strategy via Copilot ubiquity. Bing chat / Sydney incidents (2023) reflect prioritizing speed."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Responsible AI Standard published; Phi model cards exist; less RSP-style capability disclosure."
+    },
+    "govEngagement": {
+      "level": "HIGH",
+      "note": "Brad Smith leads global policy advocacy; AISI partner; UN AI advisory body participation."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "MEDIUM",
+      "note": "Suleyman publicly safety-aware; Microsoft RAI track record mixed (Tay 2016, Sydney 2023). Brad Smith is policy-active."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Large enterprise; few visible safety-driven departures, also less visibility into internal advocacy."
+    },
+    "rspQuality": {
+      "level": "LOW",
+      "note": "Responsible AI Standard is an enterprise-policy framework; no RSP-style capability-threshold tripwire system."
+    },
+    "notableSignals": [
+      "Inflection AI team (incl. Suleyman) absorbed Mar 2024 to lead Microsoft AI.",
+      "Responsible AI Transparency Report published annually.",
+      "Significant deployment via Copilot, Office, Azure — sets the de facto safety floor for enterprise AI."
+    ],
+    "links": [
+      { "label": "Responsible AI Standard", "url": "https://www.microsoft.com/en-us/ai/responsible-ai" },
+      { "label": "RAI Transparency Report", "url": "https://www.microsoft.com/en-us/corporate-responsibility/responsible-ai-transparency-report" }
+    ]
+  },
+  {
+    "id": "deepseek",
+    "name": "DeepSeek",
+    "description": "Hangzhou-based, spun out of High-Flyer Capital. DeepSeek V3 / R1 reasoning models, open-weights.",
+    "category": "frontier-china",
+    "entityId": "E1098",
+    "capabilityTier": {
+      "level": "FRONTIER",
+      "note": "DeepSeek V3 / R1 (early 2025) reached frontier reasoning performance at notably lower training cost."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "Minimal public safety apparatus. Some alignment-related discussion in technical reports; no dedicated safety org disclosure."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Strategy pushes capability frontier with permissive open-weights release. R1 reasoning model released with weights and method."
+    },
+    "transparency": {
+      "level": "HIGH",
+      "note": "Weights, technical methodology, and some training detail unusually open. Safety-eval disclosure is limited."
+    },
+    "govEngagement": {
+      "level": "UNCLEAR",
+      "note": "Operates under PRC regulatory framework (algorithm registration, content moderation). Limited Western governance interaction."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "UNCLEAR",
+      "note": "Few public safety statements from leadership in English-language venues."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Limited public information on internal safety culture or dissent."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No public RSP, framework, or capability-threshold commitment."
+    },
+    "notableSignals": [
+      "DeepSeek R1 release (Jan 2025) shifted assumptions about training-cost frontiers.",
+      "Operates under Chinese generative AI regulations including algorithm filings.",
+      "No counterpart to the Western RSP / FSF framework family."
+    ],
+    "links": [
+      { "label": "DeepSeek", "url": "https://www.deepseek.com/" }
+    ]
+  },
+  {
+    "id": "alibaba-qwen",
+    "name": "Alibaba (Qwen)",
+    "description": "Alibaba Cloud / DAMO Academy. Qwen family — strong open-weights releases.",
+    "category": "frontier-china",
+    "capabilityTier": {
+      "level": "NEAR-FRONTIER",
+      "note": "Qwen 2.5 / 3 competitive in their tiers; multimodal and code variants strong; below absolute frontier on hardest reasoning."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "DAMO Academy has safety research streams; explicit frontier-safety framing limited in English-language public output."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Aggressive open-weights cadence across sizes; rapid release tempo."
+    },
+    "transparency": {
+      "level": "HIGH",
+      "note": "Weights released; detailed technical reports. Safety-eval depth limited."
+    },
+    "govEngagement": {
+      "level": "UNCLEAR",
+      "note": "Operates under PRC regulatory framework. Limited Western policy interaction by Alibaba AI specifically."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "UNCLEAR",
+      "note": "Few public safety-framed statements from leadership."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Limited public information."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No public RSP-equivalent framework."
+    },
+    "notableSignals": [
+      "Qwen 2.5 / 3 open-weights releases competitive with peer-tier closed models.",
+      "Operating under PRC content / algorithmic regulation.",
+      "Strong code and multilingual variants; less emphasis on safety scaffolding in English-language docs."
+    ],
+    "links": [
+      { "label": "QwenLM", "url": "https://qwenlm.github.io/" }
+    ]
+  },
+  {
+    "id": "mistral",
+    "name": "Mistral AI",
+    "description": "Paris-based, founded 2023. Open and commercial models; European AI champion positioning.",
+    "category": "frontier-europe",
+    "capabilityTier": {
+      "level": "NEAR-FRONTIER",
+      "note": "Mid-sized models competitive in efficiency tier; below absolute frontier on largest closed models."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "Minimal public safety research output; no dedicated safety org publicly disclosed."
+    },
+    "racePostureRestraint": {
+      "level": "LOW",
+      "note": "Open-weights strategy; European-champion competitive framing."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Model cards exist; safety detail thinner."
+    },
+    "govEngagement": {
+      "level": "MEDIUM",
+      "note": "Active in EU AI Act lobbying — primarily to reduce obligations on open-source frontier models."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "UNCLEAR",
+      "note": "Limited public statements on existential safety; not a central messaging focus."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Too small / too recent for clear pattern."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No published RSP."
+    },
+    "notableSignals": [
+      "Active lobbying against parts of EU AI Act applying to GPAI models.",
+      "Open-weights releases (Mixtral, Pixtral, Codestral).",
+      "Microsoft partnership 2024 for Azure distribution."
+    ],
+    "links": [
+      { "label": "Mistral", "url": "https://mistral.ai/" }
+    ]
+  },
+  {
+    "id": "cohere",
+    "name": "Cohere",
+    "description": "Toronto-based, founded 2019 by ex-Google Brain (Aidan Gomez). Enterprise / RAG focus.",
+    "category": "specialized",
+    "capabilityTier": {
+      "level": "NEAR-FRONTIER",
+      "note": "Command R / R+ competitive in enterprise / RAG tier; below frontier on hardest reasoning. Strategy is enterprise-focused, not frontier-chasing."
+    },
+    "safetyInvestment": {
+      "level": "MEDIUM",
+      "note": "Cohere For AI research lab; published responsible-AI / multilingual safety work. Smaller commercial scale than frontier-3."
+    },
+    "racePostureRestraint": {
+      "level": "MEDIUM",
+      "note": "Enterprise positioning de-emphasizes the frontier race; deliberate focus on smaller, deployable models."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Model and use-policy docs available; some safety research published; not full weight releases."
+    },
+    "govEngagement": {
+      "level": "HIGH",
+      "note": "Active in Canadian and international AI governance discussion; Aidan Gomez public commentary on policy."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "MEDIUM",
+      "note": "Some public safety framing alongside commercial focus."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Limited public signal."
+    },
+    "rspQuality": {
+      "level": "LOW",
+      "note": "Acceptable Use and responsible-use docs; no published RSP-style capability-threshold framework."
+    },
+    "notableSignals": [
+      "Cohere For AI publishes open multilingual safety research.",
+      "Enterprise / RAG positioning rather than chat-product frontier race.",
+      "Aidan Gomez active in policy commentary; co-founded the lab as a frontier alternative focused on deployability."
+    ],
+    "links": [
+      { "label": "Cohere", "url": "https://cohere.com/" },
+      { "label": "Cohere For AI", "url": "https://cohere.com/research" }
+    ]
+  },
+  {
+    "id": "ai21",
+    "name": "AI21 Labs",
+    "description": "Tel Aviv-based, founded 2017. Jurassic, Jamba (SSM hybrid); enterprise focus.",
+    "category": "specialized",
+    "capabilityTier": {
+      "level": "SPECIALIZED",
+      "note": "Jamba (SSM-Transformer hybrid) is technically distinctive but not at general-purpose frontier; enterprise-specialized."
+    },
+    "safetyInvestment": {
+      "level": "LOW",
+      "note": "Minimal public safety apparatus."
+    },
+    "racePostureRestraint": {
+      "level": "MEDIUM",
+      "note": "Enterprise-focused; less frontier-race framing than the closed-weights frontier-3."
+    },
+    "transparency": {
+      "level": "MEDIUM",
+      "note": "Jamba weights released; technical reports detailed. Safety-eval disclosure limited."
+    },
+    "govEngagement": {
+      "level": "UNCLEAR",
+      "note": "Limited Western-frontier policy visibility."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "UNCLEAR",
+      "note": "Limited public statements on existential safety."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Limited public information."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No published RSP-equivalent framework."
+    },
+    "notableSignals": [
+      "Jamba 1.5 released 2024 — first production-quality SSM hybrid.",
+      "Enterprise focus rather than frontier chat product.",
+      "Limited public engagement with frontier-safety governance frameworks."
+    ],
+    "links": [
+      { "label": "AI21 Labs", "url": "https://www.ai21.com/" }
+    ]
+  },
+  {
+    "id": "inflection",
+    "name": "Inflection (defunct / absorbed)",
+    "description": "Founded 2022 by Mustafa Suleyman, Karén Simonyan, Reid Hoffman. Most of team absorbed into Microsoft AI March 2024.",
+    "category": "historical",
+    "capabilityTier": {
+      "level": "DEFUNCT",
+      "note": "Frontier ambitions abandoned March 2024; remaining entity pivoted to enterprise. Original Pi-model team is now Microsoft AI under Suleyman."
+    },
+    "safetyInvestment": {
+      "level": "UNCLEAR",
+      "note": "Not applicable to current entity; pre-absorption safety apparatus was modest."
+    },
+    "racePostureRestraint": {
+      "level": "UNCLEAR",
+      "note": "Pre-absorption was a fast scaler; current entity is no longer frontier."
+    },
+    "transparency": {
+      "level": "LOW",
+      "note": "Minimal public technical detail in either form."
+    },
+    "govEngagement": {
+      "level": "UNCLEAR",
+      "note": "Suleyman has carried his policy engagement into Microsoft AI."
+    },
+    "leadershipSafetyAlignment": {
+      "level": "UNCLEAR",
+      "note": "Not applicable to current entity."
+    },
+    "employeeSafetyCulture": {
+      "level": "UNCLEAR",
+      "note": "Not applicable post-absorption."
+    },
+    "rspQuality": {
+      "level": "NONE",
+      "note": "No public RSP-equivalent framework, before or after absorption."
+    },
+    "notableSignals": [
+      "March 2024: Suleyman + most technical team move to Microsoft AI.",
+      "Inflection entity remains, pivoted to B2B enterprise inference.",
+      "Frequently cited as the canonical 'frontier lab gets absorbed by hyperscaler' case."
+    ],
+    "links": [
+      { "label": "Inflection AI", "url": "https://inflection.ai/" }
+    ]
+  }
+]
