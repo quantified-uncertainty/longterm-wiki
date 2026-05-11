@@ -976,7 +976,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     accessorKey: "scUnverifiable",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records that could not be verified">Unver</SortableHeader>,
-    cell: ({ row }) => <VerdictCount value={row.original.scUnverifiable} color="text-orange-400" icon="?" />,
+    cell: ({ row }) => <VerdictCount value={row.original.scUnverifiable} color="text-red-400" icon="?" />,
   },
   {
     accessorKey: "scUnchecked",

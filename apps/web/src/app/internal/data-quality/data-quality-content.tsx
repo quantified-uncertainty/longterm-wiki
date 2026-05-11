@@ -135,7 +135,7 @@ export async function DataQualityContent() {
           <VerdictBadge label="Partial" count={latest.verdictsPartial} color="text-yellow-600" />
           <VerdictBadge label="Contradicted" count={latest.verdictsContradicted} color="text-red-600" />
           <VerdictBadge label="Outdated" count={latest.verdictsOutdated} color="text-orange-600" />
-          <VerdictBadge label="Unverifiable" count={latest.verdictsUnverifiable} color="text-gray-500" />
+          <VerdictBadge label="Unverifiable" count={latest.verdictsUnverifiable} color="text-red-600" />
           <VerdictBadge label="Needs Recheck" count={latest.verdictsNeedsRecheck} color="text-blue-600" />
         </div>
       </section>

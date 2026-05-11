@@ -7,8 +7,9 @@
  * States:
  *   not_run  — Check hasn't been executed yet (white dot)
  *   error    — System error, check couldn't complete (black dot)
- *   failed   — Checked but couldn't verify the claim (red dot)
- *   trouble  — Partially verified or concerns found (orange dot)
+ *   failed   — Source actively contradicted the claim, or checker tried and could not
+ *              confirm it (red dot)
+ *   trouble  — Partially verified, outdated, or other actionable concerns (amber dot)
  *   verified — Successfully verified (green dot)
  */
 
