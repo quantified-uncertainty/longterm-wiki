@@ -2,8 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import { getLevelSortValue } from "./shared/table-view-styles";
-import { LevelBadge, CellNote } from "./shared/cell-components";
+import { levelNoteColumn } from "./shared/column-helpers";
 
 export type { AGIBottleneck, AGIBottleneckCategory } from "@data/tables/agi-bottlenecks";
 import type { AGIBottleneck } from "@data/tables/agi-bottlenecks";
@@ -62,133 +61,55 @@ export const createAGIBottlenecksColumns = (): ColumnDef<AGIBottleneck>[] => [
       </span>
     ),
   },
-  {
+  levelNoteColumn<AGIBottleneck>({
     id: "tightness",
-    accessorFn: (row) => row.tightness.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How constrained is this input right now?">
-        Tightness
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.tightness.level} category="tightness" formatLevel={formatLevel} />
-        <CellNote note={row.original.tightness.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      return (
-        getLevelSortValue(rowA.original.tightness.level) -
-        getLevelSortValue(rowB.original.tightness.level)
-      );
-    },
-  },
-  {
+    accessor: (r) => ({ level: r.tightness.level, note: r.tightness.note }),
+    label: "Tightness",
+    tooltip: "How constrained is this input right now?",
+    badgeCategory: "tightness",
+    formatLevel,
+  }),
+  levelNoteColumn<AGIBottleneck>({
     id: "trajectory",
-    accessorFn: (row) => row.trajectory.direction,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Is the constraint tightening or loosening?">
-        Trajectory
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge
-          level={row.original.trajectory.direction}
-          category="trajectory"
-          formatLevel={formatLevel}
-        />
-        <CellNote note={row.original.trajectory.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      return (
-        getLevelSortValue(rowA.original.trajectory.direction) -
-        getLevelSortValue(rowB.original.trajectory.direction)
-      );
-    },
-  },
-  {
+    accessor: (r) => ({ level: r.trajectory.direction, note: r.trajectory.note }),
+    label: "Trajectory",
+    tooltip: "Is the constraint tightening or loosening?",
+    badgeCategory: "trajectory",
+    formatLevel,
+  }),
+  levelNoteColumn<AGIBottleneck>({
     id: "timeToRelieve",
-    accessorFn: (row) => row.timeToRelieve.horizon,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How fast can supply be expanded?">
-        Time to relieve
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge
-          level={row.original.timeToRelieve.horizon}
-          category="timeToRelieve"
-          formatLevel={formatLevel}
-        />
-        <CellNote note={row.original.timeToRelieve.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      return (
-        getLevelSortValue(rowA.original.timeToRelieve.horizon) -
-        getLevelSortValue(rowB.original.timeToRelieve.horizon)
-      );
-    },
-  },
-  {
+    accessor: (r) => ({ level: r.timeToRelieve.horizon, note: r.timeToRelieve.note }),
+    label: "Time to relieve",
+    tooltip: "How fast can supply be expanded?",
+    badgeCategory: "timeToRelieve",
+    formatLevel,
+  }),
+  levelNoteColumn<AGIBottleneck>({
     id: "costToExpand",
-    accessorFn: (row) => row.costToExpand.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Capex required to relieve the constraint">
-        Cost to expand
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge
-          level={row.original.costToExpand.level}
-          category="cost"
-          formatLevel={formatLevel}
-        />
-        <CellNote note={row.original.costToExpand.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      return (
-        getLevelSortValue(rowA.original.costToExpand.level) -
-        getLevelSortValue(rowB.original.costToExpand.level)
-      );
-    },
-  },
+    accessor: (r) => ({ level: r.costToExpand.level, note: r.costToExpand.note }),
+    label: "Cost to expand",
+    tooltip: "Capex required to relieve the constraint",
+    badgeCategory: "cost",
+    formatLevel,
+  }),
   {
     id: "controllers",
     header: () => <span className="text-xs">Who controls</span>,
     cell: ({ row }) => <ControllersCell controllers={row.original.controllers} />,
     enableSorting: false,
   },
-  {
+  levelNoteColumn<AGIBottleneck>({
     id: "geographicConcentration",
-    accessorFn: (row) => row.geographicConcentration.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How geographically concentrated is supply?">
-        Geographic conc.
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge
-          level={row.original.geographicConcentration.level}
-          category="geographicConcentration"
-          formatLevel={formatLevel}
-        />
-        <CellNote note={row.original.geographicConcentration.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      return (
-        getLevelSortValue(rowA.original.geographicConcentration.level) -
-        getLevelSortValue(rowB.original.geographicConcentration.level)
-      );
-    },
-  },
+    accessor: (r) => ({
+      level: r.geographicConcentration.level,
+      note: r.geographicConcentration.note,
+    }),
+    label: "Geographic conc.",
+    tooltip: "How geographically concentrated is supply?",
+    badgeCategory: "geographicConcentration",
+    formatLevel,
+  }),
   {
     id: "notes",
     accessorKey: "notes",

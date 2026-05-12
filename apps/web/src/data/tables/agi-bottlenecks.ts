@@ -1,6 +1,3 @@
-// AGI Bottlenecks Table Data
-// QUA-1124
-
 import agiBottlenecksData from "./agi-bottlenecks.json";
 
 export type AGIBottleneck = {

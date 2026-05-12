@@ -574,15 +574,13 @@ export const levelSortOrder: Record<string, number> = {
   highest: 5,
   // AGI bottlenecks — tightness (higher = more constrained)
   slack: 1,
-  // moderate: 2 — already mapped above
-  // tight: covered below
   binding: 5,
   tight: 4,
   // AGI bottlenecks — trajectory (higher = worsening)
   loosening: 1,
   stable: 2,
   tightening: 4,
-  // AGI bottlenecks — time-to-relieve (higher = longer)
+  // AGI bottlenecks — time-to-relieve (higher = longer to fix)
   short: 1,
   long: 4,
   "very-long": 5,

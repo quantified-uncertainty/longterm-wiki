@@ -1,6 +1,5 @@
 "use client";
 
-// AGI Bottlenecks — supply-chain map of frontier capability inputs (QUA-1124)
 import { useCallback } from "react";
 import {
   createAGIBottlenecksColumns,
@@ -49,12 +48,8 @@ export default function AGIBottlenecksTableView() {
             A supply-chain map of the inputs that gate frontier AI capability. Each row
             is something the next capability generation needs more of; the columns
             assess how constrained that input is today, how fast it can be relieved,
-            who controls it, and where it is concentrated.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Useful as a strategic map: the bottlenecks define where governance
-            interventions have leverage. Columns are sorted by tightness — binding
-            constraints at the top.
+            who controls it, and where it is concentrated. Sorted by tightness —
+            binding constraints at the top.
           </p>
           <div className="bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 rounded-lg p-3 text-[12px] text-amber-900 dark:text-amber-200">
             <strong>Tightness</strong> answers &ldquo;is this a binding constraint right
