@@ -169,10 +169,18 @@ export function updateFactMetaById(
       wrote = true;
     }
     // If we're skipping the source-write, drop the backfill-provenance note
-    // too — a note without a fresh source URL would be misleading.
+    // too — a note without a fresh source URL would be misleading. Also
+    // never overwrite a non-empty existing notes field unless the caller
+    // explicitly opted into overwriting (same flag that gates source replacement).
+    // Human notes are higher-trust than auto-generated provenance.
     if (updates.notes !== undefined && !skippedForSource) {
-      item.set('notes', updates.notes);
-      wrote = true;
+      const existingNotes = item.get('notes');
+      const hasExistingNotes =
+        typeof existingNotes === 'string' && existingNotes.trim() !== '';
+      if (!hasExistingNotes || options.overwriteExisting) {
+        item.set('notes', updates.notes);
+        wrote = true;
+      }
     }
 
     if (wrote) return 'updated';
@@ -184,9 +192,14 @@ export function updateFactMetaById(
 
 /**
  * Write a YAML document back to file atomically (write to temp, rename).
+ *
+ * `lineWidth: 120` matches the convention used elsewhere in the codebase
+ * (extract-structured-data, political-data, factbase-migrate). Without it,
+ * the yaml package's default 80-char folding would reformat long unrelated
+ * string literals and produce noisy diffs even for single-field edits.
  */
 export function writeEntityDocument(filepath: string, doc: Document): void {
-  const content = doc.toString();
+  const content = doc.toString({ lineWidth: 120 });
   const tmpPath = filepath + '.tmp';
   writeFileSync(tmpPath, content, 'utf-8');
   renameSync(tmpPath, filepath);

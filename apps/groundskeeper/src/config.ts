@@ -19,6 +19,13 @@ export interface AutoUpdateEnqueueConfig extends TaskConfig {
   maxPages: number;
 }
 
+export interface BackfillSourcesEnqueueConfig extends TaskConfig {
+  /** Max records per table per run (default: 100). */
+  limit: number;
+  /** Max dollars per backfill run (default: 5). */
+  maxCost: number;
+}
+
 export interface Config {
   githubAppId: string;
   githubInstallationId: string;
@@ -39,6 +46,7 @@ export interface Config {
     dataQualitySnapshot: TaskConfig;
     jobWorkerHealth: TaskConfig;
     autoUpdateEnqueue: AutoUpdateEnqueueConfig;
+    backfillSourcesEnqueue: BackfillSourcesEnqueueConfig;
     jobFailureTriage: TaskConfig;
     tablebaseScan: TaskConfig;
     e2ePostDeployWatcher: TaskConfig;
@@ -143,6 +151,13 @@ export function loadConfig(): Config {
           process.env["TASK_AUTO_UPDATE_ENQUEUE_SCHEDULE"] ?? "0 6 * * *", // daily at 6am UTC
         budget: envInt("TASK_AUTO_UPDATE_ENQUEUE_BUDGET", 30),
         maxPages: envInt("TASK_AUTO_UPDATE_ENQUEUE_MAX_PAGES", 5),
+      },
+      backfillSourcesEnqueue: {
+        enabled: envBool("TASK_BACKFILL_SOURCES_ENQUEUE_ENABLED", true),
+        schedule:
+          process.env["TASK_BACKFILL_SOURCES_ENQUEUE_SCHEDULE"] ?? "0 2 * * *", // daily at 2am UTC
+        limit: envInt("TASK_BACKFILL_SOURCES_ENQUEUE_LIMIT", 100),
+        maxCost: envInt("TASK_BACKFILL_SOURCES_ENQUEUE_MAX_COST", 5),
       },
       jobFailureTriage: {
         enabled: envBool("TASK_JOB_FAILURE_TRIAGE_ENABLED", true),

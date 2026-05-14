@@ -19,7 +19,12 @@ import { rankMatchingSources } from './llm-calls.ts';
 import { extractMatchTerms } from './match-terms.ts';
 import { verifySource } from './verify-source.ts';
 import type { RejectionReason, VerifyResult } from './verify-source.ts';
-import type { CostBreakdown, MissingSourceRecord, RankCandidate } from './types.ts';
+import type {
+  CandidateRecord,
+  CostBreakdown,
+  MissingSourceRecord,
+  RankCandidate,
+} from './types.ts';
 
 export interface ProcessOptions {
   dryRun: boolean;
@@ -28,8 +33,15 @@ export interface ProcessOptions {
 }
 
 export type ProcessResult =
-  | { matched: true; url: string; provider?: string; quotes?: string[]; cost: CostBreakdown }
-  | { matched: false; reason: string; cost: CostBreakdown };
+  | {
+      matched: true;
+      url: string;
+      provider?: string;
+      quotes?: string[];
+      cost: CostBreakdown;
+      candidates: CandidateRecord[];
+    }
+  | { matched: false; reason: string; cost: CostBreakdown; candidates: CandidateRecord[] };
 
 /**
  * Run the full pipeline for one record. Caller is responsible for the actual
@@ -49,7 +61,13 @@ export async function processRecord(
   const selfSource = selfSourcingUrl(record);
   if (selfSource) {
     console.log(`  ✓ Self-sourced (value is a URL): ${selfSource}`);
-    return { matched: true, url: selfSource, provider: 'self-sourced', cost };
+    return {
+      matched: true,
+      url: selfSource,
+      provider: 'self-sourced',
+      cost,
+      candidates: [],
+    };
   }
 
   const entityName = (record.entity_name ?? '').trim();
@@ -59,13 +77,18 @@ export async function processRecord(
 
   const sources = await fetchCandidateSources(record, cost);
   if (sources === null) {
-    return { matched: false, reason: 'search failed', cost };
+    return { matched: false, reason: 'search failed', cost, candidates: [] };
   }
 
   const matches = await verifyAllSources(sources, claim, entityName, mentionTargets, cost, options);
 
   if (matches.accepted.length === 0) {
-    return { matched: false, reason: matches.rejectionSummary, cost };
+    return {
+      matched: false,
+      reason: matches.rejectionSummary,
+      cost,
+      candidates: matches.candidates,
+    };
   }
 
   const chosen = await pickBestMatch(matches.accepted, record, matchTerms, cost);
@@ -79,6 +102,7 @@ export async function processRecord(
     provider: chosen.provider,
     quotes: chosen.quotes,
     cost,
+    candidates: matches.candidates,
   };
 }
 
@@ -127,6 +151,7 @@ async function fetchCandidateSources(
 interface VerifyAllResult {
   accepted: RankCandidate[];
   rejectionSummary: string;
+  candidates: CandidateRecord[];
 }
 
 async function verifyAllSources(
@@ -138,12 +163,14 @@ async function verifyAllSources(
   options: ProcessOptions,
 ): Promise<VerifyAllResult> {
   const accepted: RankCandidate[] = [];
+  const candidates: CandidateRecord[] = [];
   const rejectionCounts: Partial<Record<RejectionReason, number>> = {};
 
   for (const source of sources) {
     const result = await verifySource(source, claim, entityName, mentionTargets);
     cost.quoteExtractCost += result.cost.quoteExtractCost;
     cost.entailmentCost += result.cost.entailmentCost;
+    candidates.push(result.record);
 
     if (options.debug) logVerifyResult(source.url, result);
 
@@ -154,10 +181,15 @@ async function verifyAllSources(
     }
   }
 
-  return { accepted, rejectionSummary: summarizeRejections(rejectionCounts) };
+  return {
+    accepted,
+    rejectionSummary: summarizeRejections(rejectionCounts),
+    candidates,
+  };
 }
 
 const REJECTION_LABELS: Record<RejectionReason, string> = {
+  'invalid-url': 'invalid URL',
   'self-domain': 'self domain',
   'placeholder-url': 'placeholder URL',
   'too-short': 'content too short',

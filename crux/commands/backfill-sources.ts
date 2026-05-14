@@ -20,7 +20,18 @@ import { fetchMissingSources, updateRecordSource } from '../lib/backfill-sources
 import { extractMatchTerms } from '../lib/backfill-sources/match-terms.ts';
 import { processRecord } from '../lib/backfill-sources/process-record.ts';
 import { buildSummaryLines, writeOutcomesJson } from '../lib/backfill-sources/report.ts';
-import type { CostBreakdown, MissingSourceRecord, RecordOutcome } from '../lib/backfill-sources/types.ts';
+import type {
+  CostBreakdown,
+  MissingSourceRecord,
+  RecordOutcome,
+  YamlWriteRecordReport,
+} from '../lib/backfill-sources/types.ts';
+import { openYamlPr } from '../lib/backfill-sources/yaml-pr.ts';
+import {
+  buildFactbaseEntityIndex,
+  buildPolicyEntityIndex,
+} from '../lib/backfill-sources/yaml-target-resolvers.ts';
+import { writeRecordToYaml, type YamlIndexes } from '../lib/backfill-sources/yaml-write.ts';
 
 type CommandResult = { exitCode?: number; output?: string };
 type CommandOptions = Record<string, unknown>;
@@ -35,6 +46,10 @@ interface ParsedOptions {
   verbose: boolean;
   debug: boolean;
   unmatchedOut: string;
+  /** When true, skip the end-of-run YAML branch + commit + push + PR.
+   *  Defaults to false; set via --no-yaml-pr for local dry-application
+   *  testing where you want the YAML mutations on disk but no git activity. */
+  skipYamlPr: boolean;
 }
 
 async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions): Promise<CommandResult> {
@@ -62,6 +77,7 @@ async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions
   console.log(`Found ${fetchResult.totalMissing} records without sources.`);
   console.log(`Budget cap: $${parsed.maxCost.toFixed(2)} (per-record cap $${PER_RECORD_BUDGET.toFixed(2)})\n`);
 
+  const runStartedAt = new Date().toISOString();
   const run = await processAllRecords(records, parsed);
 
   const lines = buildSummaryLines({
@@ -90,6 +106,32 @@ async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions
     matched: run.matched,
   });
   if (outcomeStatus) lines.push(outcomeStatus);
+
+  if (parsed.apply) {
+    lines.push(
+      `  YAML writes: ${run.factsYamlWritten} facts, ${run.stakeholdersYamlWritten} policy stakeholders` +
+      ` (${run.touchedYamlPaths.size} files touched)`,
+    );
+  }
+
+  if (parsed.apply && !parsed.skipYamlPr && run.touchedYamlPaths.size > 0) {
+    const prResult = openYamlPr({
+      touchedPaths: [...run.touchedYamlPaths].sort(),
+      runStartedAt,
+      summary: {
+        matched: run.matched,
+        factsWritten: run.factsYamlWritten,
+        stakeholdersWritten: run.stakeholdersYamlWritten,
+      },
+    });
+    if (prResult.kind === 'opened') {
+      lines.push(`  YAML PR opened: ${prResult.prUrl} (branch: ${prResult.branch})`);
+    } else if (prResult.kind === 'refused') {
+      lines.push(`  YAML PR skipped: ${prResult.reason}`);
+    } else {
+      lines.push(`  YAML PR FAILED: ${prResult.error}`);
+    }
+  }
 
   return { exitCode: 0, output: lines.join('\n') };
 }
@@ -125,6 +167,7 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     debug: !!o.debug,
     unmatchedOut: (o.unmatchedOut as string | undefined)
       ?? `dev/reports/backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+    skipYamlPr: !!o.noYamlPr,
   };
 }
 
@@ -179,6 +222,10 @@ interface RunTotals {
   budgetStopped: boolean;
   totalBreakdown: CostBreakdown;
   winningProviderCounts: Record<string, number>;
+  /** YAML files mutated during this run — staged explicitly at PR time. */
+  touchedYamlPaths: Set<string>;
+  factsYamlWritten: number;
+  stakeholdersYamlWritten: number;
 }
 
 async function processAllRecords(
@@ -196,7 +243,26 @@ async function processAllRecords(
     budgetStopped: false,
     totalBreakdown: emptyCost(),
     winningProviderCounts: {},
+    touchedYamlPaths: new Set<string>(),
+    factsYamlWritten: 0,
+    stakeholdersYamlWritten: 0,
   };
+
+  // Build YAML target indexes once per apply-run. In dry-run we skip this
+  // entirely — no writes happen so the index is unused.
+  const indexes: YamlIndexes | null = parsed.apply
+    ? {
+        facts: buildFactbaseEntityIndex(),
+        policies: buildPolicyEntityIndex(),
+      }
+    : null;
+  if (indexes) {
+    console.log(
+      `YAML target index: ${indexes.facts.sidToFilepath.size} factbase entities` +
+      ` (skipped ${indexes.facts.unindexedCount}), ${indexes.policies.sidToFilepath.size} policy entities` +
+      ` (parse failures: ${indexes.policies.parseFailureCount}).\n`,
+    );
+  }
 
   for (let i = 0; i < records.length; i++) {
     const record = records[i];
@@ -227,7 +293,15 @@ async function processAllRecords(
     addCost(run.totalBreakdown, result.cost);
 
     if (!result.matched) {
-      run.outcomes.push({ record, outcome: { kind: 'no-match', reason: result.reason, cost: result.cost } });
+      run.outcomes.push({
+        record,
+        outcome: {
+          kind: 'no-match',
+          reason: result.reason,
+          cost: result.cost,
+          candidates: result.candidates,
+        },
+      });
       continue;
     }
 
@@ -236,10 +310,34 @@ async function processAllRecords(
       (run.winningProviderCounts[result.provider ?? 'unknown'] ?? 0) + 1;
 
     let updated: boolean | undefined;
+    let yamlReport: YamlWriteRecordReport | undefined;
     if (parsed.apply) {
       updated = await updateRecordSource(record, result.url);
       if (updated) run.updatedCount++;
       else { run.updateFailed++; console.warn(`  ✗ Update failed — source not written`); }
+
+      // Dual-write to YAML for facts + policy_stakeholders. The PG write
+      // above is wiped by the YAML→PG sync workflow on the next push to
+      // data/entities or packages/factbase/data/fb-entities, so we mirror
+      // the write into YAML and let the sync re-populate PG durably.
+      if (updated && indexes) {
+        const yamlOutcome = writeRecordToYaml(record, result.url, indexes);
+        yamlReport = {
+          status: yamlOutcome.status,
+          filepath: yamlOutcome.filepath,
+          ...(yamlOutcome.applicable && yamlOutcome.status === 'error' && yamlOutcome.error
+            ? { error: yamlOutcome.error }
+            : {}),
+        };
+        if (yamlOutcome.applicable && yamlOutcome.status === 'wrote' && yamlOutcome.filepath) {
+          run.touchedYamlPaths.add(yamlOutcome.filepath);
+          if (record.record_table === 'facts') run.factsYamlWritten++;
+          if (record.record_table === 'policy_stakeholders') run.stakeholdersYamlWritten++;
+          console.log(`    → YAML write: ${yamlOutcome.filepath}`);
+        } else if (yamlOutcome.applicable) {
+          console.warn(`    → YAML write ${yamlOutcome.status}` + (yamlReport.error ? `: ${yamlReport.error}` : ''));
+        }
+      }
     }
 
     run.outcomes.push({
@@ -250,7 +348,9 @@ async function processAllRecords(
         provider: result.provider,
         quotes: result.quotes,
         updated,
+        yaml_write: yamlReport,
         cost: result.cost,
+        candidates: result.candidates,
       },
     });
   }
