@@ -43,11 +43,17 @@ jobs:
           set -euo pipefail
 
           # List open PRs from auto-backfill branches with their CI status.
+          # base:main filter prevents accidentally merging into release branches.
           PRS=$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
             --state open \
+            --base main \
             --search "head:claude/backfill-sources-yaml-" \
-            --json number,headRefName,mergeable,statusCheckRollup,title)
+            --json number,headRefName,baseRefName,mergeable,statusCheckRollup,title)
+
+          # Defense-in-depth: re-filter by baseRefName == "main" in case the
+          # --base flag is ever loosened or the search syntax changes.
+          PRS=$(echo "$PRS" | jq -c '[.[] | select(.baseRefName == "main")]')
 
           COUNT=$(echo "$PRS" | jq 'length')
           echo "Found $COUNT open auto-backfill PR(s)"

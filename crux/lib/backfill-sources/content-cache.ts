@@ -16,11 +16,24 @@ import { join } from 'node:path';
 const DEFAULT_DIR = 'dev/backfill-content-cache';
 
 let _cacheDir: string | null = null;
+let _cacheDirReady = false;
 function cacheDir(): string {
   if (_cacheDir !== null) return _cacheDir;
   _cacheDir = process.env.BACKFILL_CONTENT_CACHE_DIR ?? DEFAULT_DIR;
-  mkdirSync(_cacheDir, { recursive: true });
   return _cacheDir;
+}
+
+function ensureCacheDir(dir: string): boolean {
+  if (_cacheDirReady) return true;
+  try {
+    mkdirSync(dir, { recursive: true });
+    _cacheDirReady = true;
+    return true;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[content-cache] mkdir failed for ${dir}: ${msg}`);
+    return false;
+  }
 }
 
 /**
@@ -31,7 +44,9 @@ function cacheDir(): string {
  */
 export function rememberContent(text: string): string {
   const sha = createHash('sha256').update(text).digest('hex');
-  const path = join(cacheDir(), `${sha}.txt`);
+  const dir = cacheDir();
+  if (!ensureCacheDir(dir)) return sha;
+  const path = join(dir, `${sha}.txt`);
   if (!existsSync(path)) {
     try {
       writeFileSync(path, text);
