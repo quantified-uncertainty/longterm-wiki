@@ -3,7 +3,7 @@ facts:
   - id: f_2HGntp6Jt1
     property: born-year
     value: 1998
-    notes: "Born approximately 1998; grew up in Germany"
+    notes: "Born approximately 1998; grew up in Germany; [auto-discovered by tb backfill-sources]"
     source: https://radaris.com/p/Connor/Leahy
 
   - id: f_cL1aB2cD3e
