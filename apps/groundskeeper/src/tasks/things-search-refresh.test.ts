@@ -35,6 +35,7 @@ function makeConfig(): Config {
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
       jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
       autoUpdateEnqueue: { enabled: false, schedule: "0 6 * * *", budget: 30, maxPages: 5 },
+      backfillSourcesEnqueue: { enabled: false, schedule: "0 2 * * *", limit: 100, maxCost: 5 },
       jobFailureTriage: { enabled: false, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: false, schedule: "0 5 * * *" },
       e2ePostDeployWatcher: { enabled: false, schedule: "15 * * * *" },
