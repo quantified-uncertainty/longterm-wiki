@@ -39,6 +39,7 @@ import { parseAndValidate } from '../json-parsing.ts';
 import { CostTracker } from '../cost-tracker.ts';
 import { sanitizeBatchCustomId, type BatchRequest } from '../anthropic-batch.ts';
 import { withPipelineRun } from '../pipeline-runs/lifecycle.ts';
+import { truncate } from '../text-utils.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -174,14 +175,15 @@ type RawResponse = z.infer<typeof ResponseSchema>;
  * prompt size (cost) or pushing the real instructions out of context. */
 const MAX_USER_FIELD_LENGTH = 2000;
 
+const TRUNCATE_MARKER = '… (truncated)';
+
 /**
  * Truncate a possibly-untrusted string field to bound prompt size.
  * Returns null/undefined as-is so JSON encoding emits `null` not `"null"`.
  */
 function truncateField(s: string | null | undefined, max = MAX_USER_FIELD_LENGTH): string | null {
   if (s == null) return null;
-  if (s.length <= max) return s;
-  return s.slice(0, max) + '… (truncated)';
+  return truncate(s, max + TRUNCATE_MARKER.length, { ellipsis: TRUNCATE_MARKER });
 }
 
 /**

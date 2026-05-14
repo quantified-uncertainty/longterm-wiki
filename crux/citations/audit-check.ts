@@ -31,6 +31,7 @@ import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { auditCitations, type CitationAudit } from '../lib/citation/citation-service.ts';
 
 const DEFAULT_THRESHOLD = 0.8;
@@ -120,11 +121,11 @@ async function main() {
     console.log(`  ${icon} [^${cit.footnoteRef}] ${c.bold}${label}${c.reset}`);
 
     if (cit.claim) {
-      const shortClaim = cit.claim.length > 100 ? cit.claim.slice(0, 100) + '…' : cit.claim;
+      const shortClaim = truncate(cit.claim, 101);
       console.log(`    ${c.dim}Claim:${c.reset} ${shortClaim}`);
     }
 
-    const shortUrl = cit.sourceUrl.length > 80 ? cit.sourceUrl.slice(0, 80) + '…' : cit.sourceUrl;
+    const shortUrl = truncate(cit.sourceUrl, 81);
     console.log(`    ${c.dim}URL:${c.reset} ${shortUrl}`);
 
     if (cit.explanation) {
@@ -132,9 +133,7 @@ async function main() {
     }
 
     if (cit.relevantQuote) {
-      const shortQuote = cit.relevantQuote.length > 120
-        ? cit.relevantQuote.slice(0, 120) + '…'
-        : cit.relevantQuote;
+      const shortQuote = truncate(cit.relevantQuote, 121);
       console.log(`    ${c.dim}Quote:${c.reset} "${shortQuote}"`);
     }
 

@@ -37,6 +37,7 @@ import EvalTypesTableView from "@/components/tables/views/EvalTypesTableView";
 import ArchitectureScenariosTableView from "@/components/tables/views/ArchitectureScenariosTableView";
 import DeploymentArchitecturesTableView from "@/components/tables/views/DeploymentArchitecturesTableView";
 import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGeneralizabilityTableView";
+import AGIBottlenecksTableView from "@/components/tables/views/AGIBottlenecksTableView";
 
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
@@ -268,6 +269,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ArchitectureScenariosTableView,
   DeploymentArchitecturesTableView,
   SafetyGeneralizabilityTableView,
+  AGIBottlenecksTableView,
 
   // Starlight card components
   Card: StarlightCard,
@@ -287,9 +289,10 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Tabs: MdxTabs,
   TabItem: MdxTabItem,
 
-  // Wrap markdown tables with overflow-x-auto to prevent horizontal page overflow
+  // Wrap markdown tables so wide tables scroll horizontally without changing
+  // the page width. Keep vertical overflow visible for source hover cards.
   table: (props: React.ComponentProps<"table">) => (
-    <div className="overflow-x-auto">
+    <div className="wiki-table-scroll">
       <table {...props} />
     </div>
   ),

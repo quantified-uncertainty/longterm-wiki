@@ -72,6 +72,18 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
   getAgentSessionByBranch: vi.fn(async () => ({ ok: false })),
 }));
 
+// Mock the close-time sync helper so the `complete` test can verify
+// it's called correctly without exercising the real fs / git / API
+// lookups (those are covered by the helper's own tests).
+const { syncAndCloseSessionMock } = vi.hoisted(() => ({
+  syncAndCloseSessionMock: vi.fn<
+    (...a: unknown[]) => Promise<{ fieldsSync: 'ok' | 'failed' | 'noop'; statusSet: boolean }>
+  >(async () => ({ fieldsSync: 'ok' as const, statusSet: true })),
+}));
+vi.mock('../lib/session/session-sync-payload.ts', () => ({
+  syncAndCloseSession: syncAndCloseSessionMock,
+}));
+
 // Mock the git sync helpers so we can observe which one init picks (QUA-403)
 // without actually shelling out to git. The return type is widened (boolean ok,
 // optional error/keptBranch) so tests can override with `ok: false` via
@@ -853,6 +865,82 @@ describe('agent-checklist complete', () => {
     const result = await commands.complete([], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('All 2 checklist items complete');
+  });
+
+  // QUA-1073: must call syncAndCloseSession so the helper does the
+  // split-PATCH (close-time fields, then status as best-effort).
+  it('calls syncAndCloseSession with skipPrLookup=true (QUA-1073)', async () => {
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [x] \`gate-passes\` Gate passes (auto-verify)
+`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 42, status: 'active' },
+    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
+
+    const result = await commands.complete([], {});
+    expect(result.exitCode).toBe(0);
+
+    // skipPrLookup: true because `complete` runs before the PR is pushed.
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      42,
+      agentSessions.updateAgentSession,
+      expect.objectContaining({ branch: 'claude/test-branch-ABC', skipPrLookup: true }),
+    );
+  });
+
+  // QUA-1073 follow-up: a long session (>2h) gets swept to 'stale'
+  // by the periodic sweep before complete runs. We must still
+  // populate the close-time fields on explicit close.
+  it('calls syncAndCloseSession when session is stale (not just active)', async () => {
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 477, status: 'stale' },
+    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
+
+    await commands.complete([], {});
+
+    expect(syncAndCloseSessionMock).toHaveBeenCalledWith(
+      477,
+      expect.any(Function),
+      expect.objectContaining({ branch: 'claude/test-branch-ABC', skipPrLookup: true }),
+    );
+  });
+
+  it('skips sync when session is already completed (terminal state)', async () => {
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)\n`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const agentSessions = await import('../lib/wiki-server/agent-sessions.ts');
+    const getByBranchMock = vi.mocked(agentSessions.getAgentSessionByBranch);
+    syncAndCloseSessionMock.mockClear();
+
+    getByBranchMock.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 999, status: 'completed' },
+    } as Awaited<ReturnType<typeof agentSessions.getAgentSessionByBranch>>);
+
+    await commands.complete([], {});
+
+    // Re-syncing a completed row would be wasteful (and the status
+    // PATCH would be a no-op).
+    expect(syncAndCloseSessionMock).not.toHaveBeenCalled();
   });
 });
 

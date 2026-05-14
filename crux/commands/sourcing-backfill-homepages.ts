@@ -28,6 +28,7 @@ import { loadResourcesPGFirst } from '../resource-io.ts';
 import { upsertResourceBatch, type UpsertResourceItem } from '../lib/wiki-server/resources.ts';
 import { classifyByUrl } from './sourcing-audit-urls.ts';
 import type { Resource } from '../resource-types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ── Module constants ────────────────────────────────────────────────
 
@@ -261,7 +262,7 @@ async function backfillCommand(
   console.log(bold(`Sample URLs (first ${SAMPLE_URLS_SHOWN})`));
   console.log('-'.repeat(72));
   for (const c of limited.slice(0, SAMPLE_URLS_SHOWN)) {
-    const url = c.url.length > 65 ? c.url.slice(0, 62) + '...' : c.url;
+    const url = truncate(c.url, 65, { ellipsis: '...' });
     console.log(`  [conf=${c.confidence.toFixed(2)}] ${url}`);
   }
   console.log('');

@@ -9,6 +9,7 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { bulkQuery } from "../shared/bulk-query.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Query schemas ----
@@ -67,20 +68,19 @@ const divisionPersonnelApp = new Hono()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select()
-      .from(divisionPersonnel)
-      .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(divisionPersonnel);
-    const total = countResult[0].count;
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(divisionPersonnel)
+        .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(divisionPersonnel),
+      formatRow,
+    });
 
     return c.json({
-      divisionPersonnel: rows.map(formatRow),
+      divisionPersonnel: rows,
       total,
       limit,
       offset,
@@ -111,23 +111,23 @@ const divisionPersonnelApp = new Hono()
       const { limit, offset } = c.req.valid("query");
       const db = getDrizzleDb();
 
-      const rows = await db
-        .select()
-        .from(divisionPersonnel)
-        .where(eq(divisionPersonnel.divisionId, divisionId))
-        .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
-        .limit(limit)
-        .offset(offset);
+      const where = eq(divisionPersonnel.divisionId, divisionId);
 
-      const countResult = await db
-        .select({ count: count() })
-        .from(divisionPersonnel)
-        .where(eq(divisionPersonnel.divisionId, divisionId));
-      const total = countResult[0].count;
+      const { rows, total } = await paginatedQuery({
+        query: db
+          .select()
+          .from(divisionPersonnel)
+          .where(where)
+          .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
+          .limit(limit)
+          .offset(offset),
+        countQuery: db.select({ count: count() }).from(divisionPersonnel).where(where),
+        formatRow,
+      });
 
       return c.json({
         divisionId,
-        divisionPersonnel: rows.map(formatRow),
+        divisionPersonnel: rows,
         total,
         limit,
         offset,
@@ -141,23 +141,23 @@ const divisionPersonnelApp = new Hono()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select()
-      .from(divisionPersonnel)
-      .where(eq(divisionPersonnel.personId, personId))
-      .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
-      .limit(limit)
-      .offset(offset);
+    const where = eq(divisionPersonnel.personId, personId);
 
-    const countResult = await db
-      .select({ count: count() })
-      .from(divisionPersonnel)
-      .where(eq(divisionPersonnel.personId, personId));
-    const total = countResult[0].count;
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(divisionPersonnel)
+        .where(where)
+        .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(divisionPersonnel).where(where),
+      formatRow,
+    });
 
     return c.json({
       personId,
-      divisionPersonnel: rows.map(formatRow),
+      divisionPersonnel: rows,
       total,
       limit,
       offset,

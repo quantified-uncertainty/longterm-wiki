@@ -19,6 +19,7 @@ import {
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 const VALID_PLATFORMS = [
   "lesswrong",
@@ -104,19 +105,16 @@ const platformAccountsApp = new Hono()
     const where =
       conditions.length > 0 ? and(...conditions) : undefined;
 
-    const rows = await db
-      .select()
-      .from(platformAccounts)
-      .where(where)
-      .orderBy(platformAccounts.platform, platformAccounts.platformUsername)
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(platformAccounts)
-      .where(where);
-    const total = countResult[0].count;
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(platformAccounts)
+        .where(where)
+        .orderBy(platformAccounts.platform, platformAccounts.platformUsername)
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(platformAccounts).where(where),
+    });
 
     return c.json({ accounts: rows, total, limit, offset }, 200);
   })

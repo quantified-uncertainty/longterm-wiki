@@ -6,7 +6,7 @@
 #
 # Exit codes:
 #   0 = allow the tool call
-#   2 = block the tool call (stderr is shown to Claude as error)
+#   2 = block the tool call (stderr is shown to the agent as error)
 
 # Only applies to Bash tool calls
 INPUT=$(cat)
@@ -31,7 +31,7 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+stash\b'; then
   echo "BLOCKED: \`git stash\` is prohibited in agent sessions — it causes branch confusion when a later session pops state from a different branch/task. Instead:" >&2
   echo "  - Commit work-in-progress: \`git commit -m 'wip: description'\`" >&2
   echo "  - Discard changes: \`git checkout -- <file>\`" >&2
-  echo "  - Create a new branch: \`git checkout -b claude/wip-<description>\`" >&2
+  echo "  - Create a new branch: \`git checkout -b claude/wip-<description>\` or \`git checkout -b codex/wip-<description>\`" >&2
   exit 2
 fi
 

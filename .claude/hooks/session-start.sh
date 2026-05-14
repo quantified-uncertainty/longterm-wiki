@@ -2,8 +2,8 @@
 #
 # SessionStart hook — surfaces context that saves the agent early orientation turns.
 #
-# Runs every time a Claude Code session starts (including resume).
-# stdout is injected as context for the Claude session.
+# Runs every time an agent session starts (including resume).
+# stdout is injected as context for the agent session.
 # stderr is shown as progress during setup.
 #
 # Heavy env prep (deps, data layer, git config) lives in .claude/setup.sh,
@@ -19,19 +19,19 @@ CONTEXT_LINES=()
 WARNINGS=()
 
 # ─── 0pre. Concurrent session detection ──────────────────────────────────────────
-# Check if another Claude session is already running in this slot.
+# Check if another agent session is already running in this slot.
 # Uses a PID lock file — if the PID is still alive, warn about concurrent access.
 
 LOCK_FILE="$REPO_ROOT/.claude/session.pid"
 if [ -f "$LOCK_FILE" ]; then
   OLD_PID=$(cat "$LOCK_FILE" 2>/dev/null | tr -d '[:space:]')
   if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
-    WARNINGS+=("CONCURRENT SESSION DETECTED: Another Claude session (PID ${OLD_PID}) is already running in this slot!")
+    WARNINGS+=("CONCURRENT SESSION DETECTED: Another agent session (PID ${OLD_PID}) is already running in this slot!")
     WARNINGS+=("Running two sessions in the same directory causes git conflicts and file corruption.")
     WARNINGS+=("Either stop the other session or use a different slot.")
   fi
 fi
-# Write current parent PID (the Claude process that invoked this hook)
+# Write current parent PID (the agent process that invoked this hook)
 echo "$$" > "$LOCK_FILE"
 
 # ─── 0. Clear stale checklist from previous session ─────────────────────────────

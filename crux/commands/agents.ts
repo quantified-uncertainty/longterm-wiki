@@ -29,6 +29,7 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
+import { syncAndCloseSession } from '../lib/session/session-sync-payload.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { getIssueStates } from '../lib/linear/issue-states-cache.ts';
 
@@ -392,6 +393,12 @@ async function closeCommand(
 
   let output = '';
   let agentId: number | null = null;
+  // Tracks whether the wiki-server side of the close (lookup +
+  // close-time PATCH) actually completed. When false, we skip the
+  // local-file cleanup so the operator can retry — otherwise a
+  // transient wiki-server outage destroys the .claude/wip-checklist.md
+  // that the next close attempt needs to regenerate `checksYaml`.
+  let sessionCloseFailed = false;
 
   // 1. Read agent ID from local file
   if (existsSync(agentIdPath)) {
@@ -419,11 +426,21 @@ async function closeCommand(
         ])
       : null;
 
-    const sessionClosePromise = (branch && branch !== 'main' && branch !== 'detached')
-      ? getAgentSessionByBranch(branch).catch(() => null)
+    const closeable = branch && branch !== 'main' && branch !== 'detached';
+    // Wrap thrown errors as a discriminated value so the consumer can
+    // tell "no session for this branch" (`{ok:false, error:'not_found'}`,
+    // a normal outcome) apart from a programmer-error throw or transport
+    // exception (`{ok:false, error:'thrown', ...}`, which we must NOT
+    // treat as "no session" — losing close-time metadata + skipping
+    // cleanup-skip leaves the operator no retry signal).
+    const sessionClosePromise = closeable
+      ? getAgentSessionByBranch(branch).catch((e: unknown) => ({
+          ok: false as const,
+          error: 'thrown' as const,
+          message: e instanceof Error ? e.message : String(e),
+        }))
       : null;
 
-    // Await all parallel calls
     const [agentResults, sessionResult] = await Promise.all([
       agentClosePromise,
       sessionClosePromise,
@@ -447,22 +464,73 @@ async function closeCommand(
       output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
     }
 
-    // Process session close result — may need a follow-up call
-    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
+    // QUA-1073: split-PATCH so the close-time fields land regardless
+    // of whether status promotion to 'completed' succeeds. The combined
+    // PATCH used to roll back the entire UPDATE when title/summary were
+    // missing (validated server-side after status='completed'), but
+    // those fields are only populated by the SessionEnd hook AFTER
+    // this command runs. The split lets `checksYaml`/`reviewed`/`prUrl`
+    // land while letting status promotion fail silently — the next
+    // session-finalize call will populate title/summary and the next
+    // close attempt will succeed in promoting status.
+    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status !== 'completed') {
       try {
-        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
-        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
+        const result = await syncAndCloseSession(
+          sessionResult.data.id,
+          updateAgentSession,
+          { cwd: PROJECT_ROOT, branch: branch ?? undefined },
+        );
+        const fieldsNote =
+          result.fieldsSync === 'failed'
+            ? ` ${c.yellow}(close-time field sync failed)${c.reset}`
+            : '';
+        const statusNote = result.statusSet
+          ? ' marked completed'
+          : ` ${c.dim}(status stays ${sessionResult.data.status} — title/summary not yet set; will promote on next close after session-finalize)${c.reset}`;
+        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset}${statusNote}${fieldsNote}\n`;
+        if (result.fieldsSync === 'failed') sessionCloseFailed = true;
       } catch (e: unknown) {
         output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
+        sessionCloseFailed = true;
       }
+    } else if (sessionResult && 'error' in sessionResult && sessionResult.error === 'thrown') {
+      // Lookup itself threw (transport / programmer error) — the
+      // close path never had a chance to run. Surface the error and
+      // mark for cleanup-skip so the operator can retry without
+      // losing local state (esp. .claude/wip-checklist.md, which the
+      // next close attempt needs to regenerate `checksYaml`).
+      const msg = (sessionResult as { message?: string }).message ?? 'unknown error';
+      output += `${c.yellow}⚠ Failed to look up agent session for ${branch}: ${msg}${c.reset}\n`;
+      output += `${c.dim}  Skipping cleanup so you can retry. Re-run \`crux sys agents close\` once the wiki-server is reachable.${c.reset}\n`;
+      sessionCloseFailed = true;
+    } else if (sessionResult && 'ok' in sessionResult && !sessionResult.ok && sessionResult.error !== 'not_found') {
+      // Wiki-server returned a non-2xx that isn't 404 — same blast
+      // radius as a thrown error.
+      const msg = (sessionResult as { message?: string }).message ?? 'unknown error';
+      output += `${c.yellow}⚠ Wiki-server lookup error for ${branch}: ${msg}${c.reset}\n`;
+      output += `${c.dim}  Skipping cleanup so you can retry.${c.reset}\n`;
+      sessionCloseFailed = true;
     }
   } else {
     output += agentId
       ? `${c.yellow}⚠ Wiki server unreachable — skipping DB close${c.reset}\n`
       : `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
+    // Wiki-server unreachable + we have an agentId → close path
+    // never ran, preserve cleanup state for retry. (No agentId
+    // means there was nothing to close anyway, so cleanup is fine.)
+    if (agentId) sessionCloseFailed = true;
   }
 
-  // 4. Clean up local files
+  // 4. Clean up local files (skipped if the session close didn't
+  // run — preserves .claude/wip-checklist.md so retry can regenerate
+  // checksYaml from it). Note: .claude/agent-id is always cleaned
+  // regardless, since it's a slot-orchestration concern not a close-
+  // time-payload concern.
+  if (sessionCloseFailed) {
+    output += `${c.dim}Cleanup skipped — session close did not complete. Re-run after wiki-server recovers to retry.${c.reset}\n`;
+    return { exitCode: 1, output };
+  }
+
   const cleaned: string[] = [];
   for (const [path, label] of [
     [agentIdPath, '.claude/agent-id'],

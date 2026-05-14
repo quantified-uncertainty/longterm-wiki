@@ -10,6 +10,7 @@ import {
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 import { VALID_TESTED_BY, resolveBenchmarkRefs } from "./benchmark-shared.js";
 
 // ---- Constants ----
@@ -97,14 +98,18 @@ const benchmarkResultsApp = new Hono()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select()
-      .from(benchmarkResults)
-      .orderBy(desc(benchmarkResults.syncedAt))
-      .limit(limit)
-      .offset(offset);
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(benchmarkResults)
+        .orderBy(desc(benchmarkResults.syncedAt))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(benchmarkResults),
+      formatRow,
+    });
 
-    return c.json({ benchmarkResults: rows.map(formatRow) });
+    return c.json({ benchmarkResults: rows, total, limit, offset });
   })
 
   // ---- GET /by-benchmark/:benchmarkId ----
@@ -124,15 +129,21 @@ const benchmarkResultsApp = new Hono()
       ? benchmarkResults.score          // ascending for lower-is-better
       : desc(benchmarkResults.score);   // descending for higher-is-better
 
-    const rows = await db
-      .select()
-      .from(benchmarkResults)
-      .where(eq(benchmarkResults.benchmarkId, benchmarkId))
-      .orderBy(scoreOrder)
-      .limit(limit)
-      .offset(offset);
+    const where = eq(benchmarkResults.benchmarkId, benchmarkId);
 
-    return c.json({ benchmarkResults: rows.map(formatRow) });
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(benchmarkResults)
+        .where(where)
+        .orderBy(scoreOrder)
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(benchmarkResults).where(where),
+      formatRow,
+    });
+
+    return c.json({ benchmarkResults: rows, total, limit, offset });
   })
 
   // ---- GET /by-model/:modelId ----
@@ -141,15 +152,21 @@ const benchmarkResultsApp = new Hono()
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select()
-      .from(benchmarkResults)
-      .where(eq(benchmarkResults.modelId, modelId))
-      .orderBy(desc(benchmarkResults.score))
-      .limit(limit)
-      .offset(offset);
+    const where = eq(benchmarkResults.modelId, modelId);
 
-    return c.json({ benchmarkResults: rows.map(formatRow) });
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(benchmarkResults)
+        .where(where)
+        .orderBy(desc(benchmarkResults.score))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(benchmarkResults).where(where),
+      formatRow,
+    });
+
+    return c.json({ benchmarkResults: rows, total, limit, offset });
   })
 
   // ---- POST /sync ----

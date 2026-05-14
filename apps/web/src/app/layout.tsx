@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import { MobileNav } from "@/components/MobileNav";
@@ -40,6 +41,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -51,6 +53,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground overflow-x-clip">
+        {plausibleDomain ? (
+          <Script
+            data-domain={plausibleDomain}
+            src="https://plausible.io/js/script.js"
+          />
+        ) : null}
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-card focus:border focus:border-border focus:rounded-md focus:text-sm focus:font-medium focus:text-foreground focus:shadow-lg">
           Skip to content
         </a>

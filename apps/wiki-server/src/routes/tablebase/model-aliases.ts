@@ -18,6 +18,7 @@ import { zv, clampedLimit } from "../shared/utils.js";
 import { buildSearchCondition } from "../shared/query-helpers.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
 
@@ -121,19 +122,20 @@ const modelAliasesApp = new Hono()
 
     const where = conditions.length ? and(...conditions) : undefined;
 
-    const [rows, [{ total }]] = await Promise.all([
-      db
+    const { rows, total } = await paginatedQuery({
+      query: db
         .select()
         .from(modelAliases)
         .where(where)
         .orderBy(desc(modelAliases.createdAt), modelAliases.alias)
         .limit(limit)
         .offset(offset),
-      db.select({ total: count() }).from(modelAliases).where(where),
-    ]);
+      countQuery: db.select({ count: count() }).from(modelAliases).where(where),
+      formatRow,
+    });
 
     return c.json({
-      items: rows.map(formatRow),
+      items: rows,
       total,
       limit,
       offset,

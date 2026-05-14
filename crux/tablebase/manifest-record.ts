@@ -7,12 +7,13 @@
  * level. See QUA-672 for context.
  */
 
+import { truncate as truncateText } from '../lib/text-utils.ts';
+
 const TRUNCATE_FIELDS = new Set(['notes', 'background', 'description']);
 const TRUNCATE_AT = 300;
 
 function truncate(s: string): string {
-  if (s.length <= TRUNCATE_AT) return s;
-  return `${s.slice(0, TRUNCATE_AT)}… [truncated, ${s.length - TRUNCATE_AT} more chars]`;
+  return truncateText(s, TRUNCATE_AT, { showCount: true });
 }
 
 function truncateIfString(value: unknown): unknown {

@@ -18,6 +18,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { loadPages, findPage, getFilePath } from './page-improver/utils.ts';
 import { adversarialReviewPhase } from './page-improver/phases/adversarial-review.ts';
 import type { PageData, AdversarialReviewResult, PipelineOptions } from './page-improver/types.ts';
+import { truncate } from '../lib/text-utils.ts';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,7 +77,7 @@ function printBatchSummary(results: Array<{ page: PageData; review: AdversarialR
   console.log('  ' + '─'.repeat(56));
 
   for (const { page, review } of sorted) {
-    const name = page.title.length > 35 ? page.title.slice(0, 32) + '...' : page.title;
+    const name = truncate(page.title, 35, { ellipsis: '...' });
     const gaps = String(review.gaps.length).padEnd(8);
     const reresearch = review.needsReResearch ? 'yes' : 'no';
     console.log(`  ${name.padEnd(38)}${gaps}${reresearch}`);

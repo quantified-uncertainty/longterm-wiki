@@ -1,0 +1,425 @@
+[
+  {
+    "id": "compute-training",
+    "name": "Compute (training)",
+    "description": "Frontier training compute — H100/B200-class clusters at 100K+ accelerator scale used for foundation-model training runs.",
+    "category": "Compute & Chips",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Frontier training runs use 100K+ H100-equivalents; allocations contested across hyperscalers"
+    },
+    "trajectory": {
+      "direction": "tightening",
+      "note": "Frontier training compute growing ~4-10x/yr; supply ramp lags demand"
+    },
+    "timeToRelieve": {
+      "horizon": "long",
+      "note": "New fab capacity 2-4 yr; new GPU generations on 1-2 yr cycle"
+    },
+    "costToExpand": {
+      "level": "VERY_HIGH",
+      "note": "Single frontier cluster $5-50B in capex"
+    },
+    "controllers": [
+      "NVIDIA",
+      "TSMC",
+      "Hyperscalers (MSFT/AMZN/GOOG)",
+      "Frontier labs"
+    ],
+    "geographicConcentration": {
+      "level": "CONCENTRATED",
+      "note": "Most frontier training compute in US data centers; UAE/Singapore growing"
+    },
+    "notes": "The headline bottleneck. NVIDIA-led GPU supply, hyperscaler cluster build-out, and TSMC fab capacity are the three sub-constraints."
+  },
+  {
+    "id": "compute-inference",
+    "name": "Compute (inference)",
+    "description": "Serving capacity for deployed models — accelerator-hours per token across cloud and edge deployment.",
+    "category": "Compute & Chips",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Major releases regularly hit capacity limits; reasoning models multiply inference cost 10-100x"
+    },
+    "trajectory": {
+      "direction": "tightening",
+      "note": "Demand growth (reasoning chains, agents) outpacing efficiency gains and capacity adds"
+    },
+    "timeToRelieve": {
+      "horizon": "medium",
+      "note": "Inference is more parallelizable; custom silicon (Trainium, TPU, Groq) helping"
+    },
+    "costToExpand": {
+      "level": "HIGH",
+      "note": "Substantial but lower per-FLOP than training; commoditizing"
+    },
+    "controllers": [
+      "Hyperscalers (AWS/Azure/GCP)",
+      "NVIDIA",
+      "Custom silicon (Trainium, TPU, Groq, Cerebras)"
+    ],
+    "geographicConcentration": {
+      "level": "DISTRIBUTED",
+      "note": "Many regions, but US/EU dominant; latency forces geographic distribution"
+    },
+    "notes": "Less single-point-of-failure than training. Inference is where most users feel capacity constraints (rate limits, queues)."
+  },
+  {
+    "id": "fab-capacity",
+    "name": "Fab capacity",
+    "description": "Leading-edge semiconductor fabrication (3nm and below) — the upstream constraint behind nearly all frontier AI accelerators.",
+    "category": "Compute & Chips",
+    "tightness": {
+      "level": "BINDING",
+      "note": "TSMC sub-3nm sold out 12+ months ahead; one credible supplier for frontier nodes"
+    },
+    "trajectory": {
+      "direction": "stable",
+      "note": "TSMC Arizona, Samsung Texas, Intel Foundry expanding; multi-year ramps"
+    },
+    "timeToRelieve": {
+      "horizon": "very-long",
+      "note": "Fab buildout 3-5 yr; equipment lead times 1-2 yr"
+    },
+    "costToExpand": {
+      "level": "VERY_HIGH",
+      "note": "$20-40B per leading-edge fab; only 3 firms can plausibly attempt"
+    },
+    "controllers": [
+      "TSMC",
+      "Samsung Foundry",
+      "Intel Foundry",
+      "ASML (EUV supply)"
+    ],
+    "geographicConcentration": {
+      "level": "SINGLE_POINT",
+      "note": "TSMC Taiwan dominant; ASML EUV monopoly. Geopolitical concentration risk."
+    },
+    "notes": "The upstream chokepoint. US CHIPS Act and Taiwan tensions make this the bottleneck with the highest strategic salience."
+  },
+  {
+    "id": "hbm-memory",
+    "name": "HBM / memory supply",
+    "description": "High-bandwidth memory (HBM3/HBM3E/HBM4) — paired with logic dies in every frontier accelerator. Memory bandwidth, not FLOPS, often gates throughput.",
+    "category": "Compute & Chips",
+    "tightness": {
+      "level": "BINDING",
+      "note": "SK Hynix HBM3E sold out into 2026; memory bandwidth gates accelerator throughput"
+    },
+    "trajectory": {
+      "direction": "tightening",
+      "note": "Each chip generation increases HBM stack count; demand outpaces DRAM fab additions"
+    },
+    "timeToRelieve": {
+      "horizon": "medium",
+      "note": "DRAM fab lead times shorter than logic; HBM packaging (CoWoS) is the bottleneck within the bottleneck"
+    },
+    "costToExpand": {
+      "level": "HIGH",
+      "note": "Multi-billion DRAM and packaging capex; CoWoS capacity at TSMC is gating"
+    },
+    "controllers": [
+      "SK Hynix",
+      "Samsung",
+      "Micron",
+      "TSMC (CoWoS packaging)"
+    ],
+    "geographicConcentration": {
+      "level": "CONCENTRATED",
+      "note": "South Korea dominant for HBM; Taiwan for advanced packaging"
+    },
+    "notes": "Often overlooked. The reason H100 and B200 supply is constrained is as much HBM and CoWoS as logic-die wafers."
+  },
+  {
+    "id": "energy-power",
+    "name": "Energy / power",
+    "description": "Grid interconnect capacity, generation, and transmission — increasingly the rate-limiter for new datacenter siting.",
+    "category": "Physical Infrastructure",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Multi-GW interconnects waitlisted 5-10 yr in major US grids; UK, Ireland, Netherlands at moratorium"
+    },
+    "trajectory": {
+      "direction": "tightening",
+      "note": "Gigawatt-scale clusters proposed; grid build-out 5-10x slower than datacenter demand"
+    },
+    "timeToRelieve": {
+      "horizon": "very-long",
+      "note": "Transmission line permitting 5-10 yr; new generation (nuclear, gas) similar"
+    },
+    "costToExpand": {
+      "level": "HIGH",
+      "note": "Interconnect upgrades $100M-$1B per site; new generation in $B"
+    },
+    "controllers": [
+      "Utilities",
+      "FERC / state PUCs",
+      "Independent power producers",
+      "Local zoning authorities"
+    ],
+    "geographicConcentration": {
+      "level": "DISTRIBUTED",
+      "note": "Many viable regions globally, but per-site permitting is the constraint"
+    },
+    "notes": "Replacing compute as the headline bottleneck for next-generation clusters. Stargate, Microsoft-Constellation, and Meta nuclear deals all reflect this."
+  },
+  {
+    "id": "cooling-siting",
+    "name": "Cooling / siting",
+    "description": "Water rights, land, climate suitability, and zoning for hyperscale datacenters.",
+    "category": "Physical Infrastructure",
+    "tightness": {
+      "level": "MODERATE",
+      "note": "Water-cooled designs constrained in arid regions; direct-liquid cooling reduces water demand"
+    },
+    "trajectory": {
+      "direction": "stable",
+      "note": "Air and direct-liquid cooling retrofits expanding; sites still available outside drought regions"
+    },
+    "timeToRelieve": {
+      "horizon": "medium",
+      "note": "Datacenter construction 1-2 yr once site and power are secured"
+    },
+    "costToExpand": {
+      "level": "MEDIUM",
+      "note": "Site acquisition and construction in $100M-$1B range"
+    },
+    "controllers": [
+      "Hyperscalers",
+      "Local zoning boards",
+      "Water authorities"
+    ],
+    "geographicConcentration": {
+      "level": "DISTRIBUTED",
+      "note": "Many viable global sites; concentration follows power and fiber availability"
+    },
+    "notes": "Less acute than power but interacts with it — water-cooled efficiency is what makes some 100MW+ sites viable."
+  },
+  {
+    "id": "training-data",
+    "name": "High-quality training data",
+    "description": "Pretraining corpora — text, code, multimodal data of sufficient quality to drive frontier model improvements.",
+    "category": "Data & Algorithms",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Public web text approaching exhaustion at frontier scale; quality filtering aggressive"
+    },
+    "trajectory": {
+      "direction": "mixed",
+      "note": "Tightening for novel human-generated data; loosening via synthetic data and licensing deals"
+    },
+    "timeToRelieve": {
+      "horizon": "medium",
+      "note": "Synthetic generation pipelines, real-world telemetry, and licensed corpora maturing"
+    },
+    "costToExpand": {
+      "level": "MEDIUM",
+      "note": "Licensing deals (NYT, Reddit, Shutterstock) in $10s-$100s of millions; labeling at scale"
+    },
+    "controllers": [
+      "Frontier labs (proprietary pipelines)",
+      "Major publishers (NYT, Reddit, Stack Exchange)",
+      "Data brokers and labeling firms",
+      "Synthetic-data toolchains"
+    ],
+    "geographicConcentration": {
+      "level": "GLOBAL",
+      "note": "Data sources are global; legal regimes (GDPR, copyright) regional"
+    },
+    "notes": "Synthetic-data viability is the open question. If synthetic scales, this bottleneck loosens; if not, real-data licensing becomes a moat."
+  },
+  {
+    "id": "evaluation-data",
+    "name": "Evaluation data",
+    "description": "Benchmarks, held-out test sets, and dangerous-capability evals used to measure frontier-model progress and safety.",
+    "category": "Data & Algorithms",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Public benchmarks saturating; contamination widespread; few credible held-out evals"
+    },
+    "trajectory": {
+      "direction": "mixed",
+      "note": "Public benchmarks tightening (saturation); private holdout sets from AISIs and labs emerging"
+    },
+    "timeToRelieve": {
+      "horizon": "medium",
+      "note": "Eval suite development 6-18 months; held-out test creation iterative"
+    },
+    "costToExpand": {
+      "level": "LOW",
+      "note": "Eval data cheap relative to training data; expert annotation is the cost driver"
+    },
+    "controllers": [
+      "METR",
+      "US/UK AISI",
+      "Labs (private holdouts)",
+      "Academic groups (BIG-Bench, HELM)"
+    ],
+    "geographicConcentration": {
+      "level": "GLOBAL",
+      "note": "Eval development globally distributed; AISIs concentrated in US/UK/EU"
+    },
+    "notes": "A governance-critical bottleneck. Bad evals → labs can't credibly self-report risk → safety commitments lose teeth."
+  },
+  {
+    "id": "algorithmic-insights",
+    "name": "Algorithmic insights",
+    "description": "Research breakthroughs in architectures, training procedures, post-training methods, and reasoning techniques.",
+    "category": "Data & Algorithms",
+    "tightness": {
+      "level": "MODERATE",
+      "note": "Key insights diffuse fast via papers, code, and lab transitions; some methods stay private 6-18 months"
+    },
+    "trajectory": {
+      "direction": "loosening",
+      "note": "Open-weight releases (DeepSeek, Llama, Mistral) and academic publications keep diffusion fast"
+    },
+    "timeToRelieve": {
+      "horizon": "short",
+      "note": "Papers and code propagate in weeks once published"
+    },
+    "costToExpand": {
+      "level": "LOW",
+      "note": "Research is talent-intensive, not capex-intensive"
+    },
+    "controllers": [
+      "Frontier labs (closed research)",
+      "Academic community",
+      "Open-weight releasers (Meta, DeepSeek, Mistral, AI2)"
+    ],
+    "geographicConcentration": {
+      "level": "GLOBAL",
+      "note": "Research community is global; lab concentration in US/UK/China"
+    },
+    "notes": "The least supply-constrained bottleneck. The question is whether closed labs can sustain a multi-month research lead."
+  },
+  {
+    "id": "talent-supply",
+    "name": "Talent supply",
+    "description": "Frontier ML researchers, alignment researchers, and senior engineering staff capable of operating at the capability frontier.",
+    "category": "Capital & Talent",
+    "tightness": {
+      "level": "TIGHT",
+      "note": "Top frontier-ML researchers ~1000s globally; alignment researchers ~100s; compensation reflects scarcity"
+    },
+    "trajectory": {
+      "direction": "loosening",
+      "note": "PhD pipelines growing, but slowly; lab hiring frenzy bids up the senior tier"
+    },
+    "timeToRelieve": {
+      "horizon": "very-long",
+      "note": "PhD pipelines 5-10 yr; senior engineering experience harder to manufacture"
+    },
+    "costToExpand": {
+      "level": "HIGH",
+      "note": "Senior researcher comp packages reach $1M-$10M; aggressive cross-lab poaching"
+    },
+    "controllers": [
+      "Top frontier labs (compete for talent)",
+      "Universities and PhD programs",
+      "Government immigration policy"
+    ],
+    "geographicConcentration": {
+      "level": "CONCENTRATED",
+      "note": "US Bay Area, UK, China dominate; visa policy is a material lever"
+    },
+    "notes": "A slow-moving bottleneck. Less acute than compute today, but the long pipeline makes shocks (e.g. visa restrictions) hard to recover from."
+  },
+  {
+    "id": "capital",
+    "name": "Capital",
+    "description": "Investment capital for frontier training runs, infrastructure buildout, and operating losses during scaling.",
+    "category": "Capital & Talent",
+    "tightness": {
+      "level": "MODERATE",
+      "note": "Frontier labs have access to $10s-$100s of billions; trailing labs more constrained"
+    },
+    "trajectory": {
+      "direction": "loosening",
+      "note": "Sovereign wealth (UAE, Saudi), hyperscaler commitments, Stargate-scale infrastructure deals"
+    },
+    "timeToRelieve": {
+      "horizon": "short",
+      "note": "Capital can be deployed in months when investor appetite exists"
+    },
+    "costToExpand": {
+      "level": "LOW",
+      "note": "Capital is fungible; the question is access, not creation"
+    },
+    "controllers": [
+      "Hyperscalers (MSFT, AMZN, GOOG)",
+      "Sovereign wealth (UAE, Saudi, Singapore)",
+      "Mega-cap VC and strategic investors"
+    ],
+    "geographicConcentration": {
+      "level": "CONCENTRATED",
+      "note": "US capital markets dominant; sovereign-wealth tier is the swing player"
+    },
+    "notes": "Capital is the least constrained input for top-3 labs. For everyone else it is the binding constraint."
+  },
+  {
+    "id": "deployment-infrastructure",
+    "name": "Deployment infrastructure",
+    "description": "APIs, enterprise integrations, agent frameworks, and tooling needed to put model capabilities in front of users.",
+    "category": "Capital & Talent",
+    "tightness": {
+      "level": "MODERATE",
+      "note": "Major API providers mature; enterprise integration and agent tooling still nascent"
+    },
+    "trajectory": {
+      "direction": "loosening",
+      "note": "API ecosystems, agent frameworks (MCP, agent SDKs), and enterprise pipelines maturing"
+    },
+    "timeToRelieve": {
+      "horizon": "short",
+      "note": "Engineering effort scales with capital; not capacity-bound"
+    },
+    "costToExpand": {
+      "level": "LOW",
+      "note": "Engineering cost, not capex; standard SaaS economics"
+    },
+    "controllers": [
+      "Major API providers (OpenAI, Anthropic, Google)",
+      "Cloud platforms (AWS Bedrock, Azure OpenAI, Vertex)",
+      "Enterprise integrators"
+    ],
+    "geographicConcentration": {
+      "level": "DISTRIBUTED",
+      "note": "API access global where not legally restricted"
+    },
+    "notes": "Less a supply bottleneck than a maturity bottleneck. Affects deployment timelines more than capability frontier."
+  },
+  {
+    "id": "regulatory-friction",
+    "name": "Regulatory friction",
+    "description": "Legal, regulatory, and compliance constraints — EU AI Act, US export controls, sectoral rules, liability frameworks.",
+    "category": "Governance",
+    "tightness": {
+      "level": "MODERATE",
+      "note": "EU AI Act and US export controls binding for some uses; not capability-gating for frontier training in the US"
+    },
+    "trajectory": {
+      "direction": "tightening",
+      "note": "EU enforcement ramping; US export controls expanding; California SB-53 and sectoral rules emerging"
+    },
+    "timeToRelieve": {
+      "horizon": "long",
+      "note": "Legislative cycles slow; rule-making takes years"
+    },
+    "costToExpand": {
+      "level": "N/A",
+      "note": "This is a constraint, not a resource to expand"
+    },
+    "controllers": [
+      "EU Commission",
+      "US BIS / White House",
+      "China State Council / CAC",
+      "California, NY, and state legislatures"
+    ],
+    "geographicConcentration": {
+      "level": "REGIONAL",
+      "note": "Brussels Effect plus US-China bifurcation creating regional regulatory regimes"
+    },
+    "notes": "The bottleneck most amenable to deliberate governance intervention. Tightening it (more rules) reduces risk but slows deployment; loosening it does the opposite."
+  }
+]

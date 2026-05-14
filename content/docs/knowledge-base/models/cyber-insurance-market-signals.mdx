@@ -5,8 +5,8 @@ description: Cyber insurance pricing, capacity limits, war exclusions, and reins
 sidebar:
   order: 50
 subcategory: analysis-models
-lastEdited: 2026-04-25
-summary: "Analyzes cyber insurance market signals (2017–2024) as revealed-preference evidence on catastrophic cyber risk, using premium data, loss ratios, war exclusions, reinsurance structures, and cat bond issuance to argue that the market treats correlated systemic cyber events as largely uninsurable; Munich Re's 200-year return period estimates range from \\$20–46B in industry losses against \\$16.6B in annual premiums, with \\$575M in cyber cat bonds representing ~1.3% of total cat bond market."
+lastEdited: 2026-05-04
+summary: "Analyzes cyber insurance market signals (2017–2025) as revealed-preference evidence on catastrophic cyber risk, using premium data, loss ratios, war exclusions, reinsurance structures, and cat bond issuance to argue that the market treats correlated systemic events as hard to underwrite but not abandoned; Munich Re's 200-year return period estimates range from \\$20–46B in industry losses against \\$16.6B in annual premiums, while cyber catastrophe bonds remain small but growing relative to the \\$61.3B total cat bond market."
 clusters:
   - cyber
   - ai-safety
@@ -102,15 +102,18 @@ Global cyber reinsurance premiums are expected to grow at 8–11% CAGR, with gro
 
 The first fully public (144A registered) cyber catastrophe bond was AXIS Capital's "Long Walk Re 2024-1," a \$75 million indemnity-per-occurrence transaction pricing at 9.75%, protecting against systemic cyber events arising from a single point of failure, issued November 2023.[^rc-3777] In addition, Stone Ridge Asset Management provided \$100 million to Hannover Re in early 2023 in the first proportional reinsurance transaction involving a capital-markets investor for cyber risk, though this was not a cat bond structure.[^rc-d4f2]
 
+The market continued to grow after the first 2023-2024 transactions. Beazley closed a \$300 million PoleStar Re cyber catastrophe bond in December 2025, bringing Beazley's own outstanding cyber cat-bond protection to \$670 million and providing three-year cover for catastrophic and systemic cyber events through the end of 2028.[^rc-beazley-2025] That is meaningful growth from a zero base, but still small relative to the overall catastrophe bond market, which Artemis reported at \$61.3 billion outstanding at year-end 2025.[^rc-artemis-2025]
+
 | Transaction | Sponsor | Size | Date | Type | Key Terms |
 |-------------|---------|------|------|------|-----------|
 | Cairney | Beazley | \$45M | Jan 2023 | Private (Sec. 4(2)) | Indemnity; \$300M attachment; Fermat Capital investor |
 | Long Walk Re 2024-1 | AXIS Capital | \$75M | Nov 2023 | 144A public | Indemnity; systemic events; 9.75% spread |
 | Market total (through mid-2024) | Various | \$575M | 2023–2024 | Mix | 5 bonds, 4 sponsors |
+| PoleStar Re 2026-1 | Beazley | \$300M | Dec 2025 | 144A public | Three tranches; systemic cyber cover through end-2028 |
 
-Sources: [Artemis/AM Best 2024](https://www.artemis.bm/news/cyber-parametric-ils-gain-momentum-as-cat-bond-market-evolves-am-best/), [Aon ILS Annual Report 2024](https://www.aon.com/getmedia/154b74d4-b861-45a5-a14c-bc258c88d19f/20240830-ils-annual-report-2024.pdf), [Fitch/Royal Gazette 2023](https://www.royalgazette.com/re-insurance/business/article/20230131/fitch-ils-cyber-bond-issue-encouraging-for-re-insurers/)
+Sources: [Artemis/AM Best 2024](https://www.artemis.bm/news/cyber-parametric-ils-gain-momentum-as-cat-bond-market-evolves-am-best/), [Aon ILS Annual Report 2024](https://www.aon.com/getmedia/154b74d4-b861-45a5-a14c-bc258c88d19f/20240830-ils-annual-report-2024.pdf), [Fitch/Royal Gazette 2023](https://www.royalgazette.com/re-insurance/business/article/20230131/fitch-ils-cyber-bond-issue-encouraging-for-re-insurers/), [Royal Gazette 2025](https://www.royalgazette.com/reinsurance/business/article/20251217/beazley-secures-300m-cyber-cat-bond-in-bermuda-vehicle/), and [Artemis 2026](https://www.artemis.bm/news/catastrophe-bond-market-records-that-were-broken-in-2025/).
 
-The \$575 million in total cyber cat bond issuance through mid-2024 represents approximately 1.3% of the total catastrophe bond market (\$45.6 billion outstanding).[^rc-3777][^rc-5914] The narrow investor base, limited secondary market liquidity, and high initial spreads (9.75% for Long Walk Re) reflect investor caution about the correlation properties of cyber risk, as noted in the Geneva Association's December 2024 report on cyber ILS.[^rc-61b8]
+The \$575 million in total cyber cat bond issuance through mid-2024 represented approximately 1.3% of the total catastrophe bond market at that time (\$45.6 billion outstanding).[^rc-3777][^rc-5914] Subsequent 2025 issuance shows growing investor appetite, not market withdrawal, but cyber remains a small fraction of the broader catastrophe bond market. The narrow investor base, limited secondary market liquidity, and high initial spreads (9.75% for Long Walk Re) reflect investor caution about the correlation properties of cyber risk, as noted in the Geneva Association's December 2024 report on cyber ILS.[^rc-61b8]
 
 ### Catastrophe Modeling and Return Periods
 
@@ -148,7 +151,7 @@ Several factors constrain how directly market behavior can be interpreted as evi
 
 **US market dominance**: North America accounts for approximately 63% of global cyber premiums.[^rc-2042] Market structure, regulatory environment, claims culture, and loss history outside North America differ substantially. Conclusions drawn primarily from US NAIC data may not generalize to the global market or to the global damage distribution.
 
-**Cat bond market immaturity**: With approximately \$575 million in issuance through mid-2024, the cyber catastrophe bond market is too small for reliable price discovery at catastrophic loss levels.[^rc-3777] The high spreads observed on early transactions (9.75% for Long Walk Re) may reflect information asymmetry, illiquidity premia, and investor unfamiliarity rather than calibrated risk pricing. The total cyber ILS market remains less than 1.7% of the total catastrophe bond market.[^rc-61b8]
+**Cat bond market immaturity**: Cyber catastrophe bonds are growing from a very small base, but the market is still too small for reliable price discovery at catastrophic loss levels.[^rc-3777][^rc-beazley-2025] The high spreads observed on early transactions (9.75% for Long Walk Re) may reflect information asymmetry, illiquidity premia, and investor unfamiliarity rather than calibrated risk pricing. Even after 2025 growth, cyber remains small relative to a total cat-bond market that Artemis reported at \$61.3 billion outstanding at year-end 2025.[^rc-artemis-2025]
 
 **Protection gap interpretation**: The gap between economic and insured cyber losses can reflect either that losses are uninsurable (too correlated or uncertain) or that buyers have not yet purchased available coverage. Munich Re identifies SMEs as the largest underserved market segment,[^rc-0fbd] and there is evidence that SME underinsurance reflects cost and awareness barriers rather than supply-side judgments about insurability. Distinguishing demand-side underpurchase from supply-side non-insurability is analytically difficult at the aggregate level.
 
@@ -179,3 +182,5 @@ Several factors constrain how directly market behavior can be interpreted as evi
 [^rc-61b8]: Geneva Association, "Catalysing Cyber Risk Transfer to Capital Markets," December 2024, https://www.genevaassociation.org/sites/default/files/2024-12/cyber_ils_report_1213.pdf
 [^rc-ef1d]: Munich Re, "Dealing with Cyber Accumulation Risk," 2023–2024, https://www.munichre.com/en/insights/cyber/dealing-with-cyber-accumulation-risk.html
 [^rc-0fbd]: Munich Re, "From Gap to Gains: Protection Gap in Cyber Insurance," 2024, https://www.munichre.com/en/insights/cyber/cyber-protection-gap.html; Industrial Cyber / Munich Re, "Munich Re Sees Untapped Potential in \$15.3B Cyber Insurance Market," 2024, https://industrialcyber.co/reports/munich-re-sees-untapped-potential-in-15-3b-cyber-insurance-market-amid-rising-threats-and-evolving-risks/
+[^rc-beazley-2025]: Royal Gazette, "Beazley secures \$300m cyber cat bond in Bermuda vehicle," December 17, 2025, https://www.royalgazette.com/reinsurance/business/article/20251217/beazley-secures-300m-cyber-cat-bond-in-bermuda-vehicle/
+[^rc-artemis-2025]: Artemis, "Catastrophe bond market records that were broken in 2025," January 2026, https://www.artemis.bm/news/catastrophe-bond-market-records-that-were-broken-in-2025/

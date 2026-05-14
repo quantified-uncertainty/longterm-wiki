@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { batchedRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
+import { truncate } from '../lib/text-utils.ts';
 import { normalizeUrlForDedup } from '../lib/footnote-parser.ts';
 import { buildKBFactSourceMap, type KBFactMatch } from '../lib/factbase-fact-lookup.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -373,9 +374,7 @@ async function migrateCrCommand(
         ? '\x1b[32mKB\x1b[0m'
         : '\x1b[33mrc\x1b[0m';
       // Truncate description to fit on one line
-      const desc = action.description.length > 50
-        ? action.description.slice(0, 50) + '...'
-        : action.description;
+      const desc = truncate(action.description, 53, { ellipsis: '...' });
       lines.push(`  ${arrow}  (${tag}: ${desc})`);
     }
     lines.push('');

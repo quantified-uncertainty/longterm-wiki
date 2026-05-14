@@ -338,6 +338,9 @@ describe('truncate', () => {
     expect(truncate(null, 5)).toBe('—');
     expect(truncate(undefined, 5)).toBe('—');
   });
+  it('returns — for empty string (regression — empty string is falsy)', () => {
+    expect(truncate('', 5)).toBe('—');
+  });
 });
 
 describe('toDisplayRow', () => {

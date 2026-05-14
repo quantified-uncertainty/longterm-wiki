@@ -2,7 +2,7 @@
 #
 # SessionEnd hook — auto-finalize agent session metadata from JSONL transcript.
 #
-# Runs when a Claude Code session ends. Parses the JSONL transcript to extract
+# Runs when an agent session ends. Parses the JSONL transcript to extract
 # title, summary, cost, model, and duration, then PATCHes the agent_sessions record.
 #
 # This is a fail-safe hook: all errors are caught and logged to stderr.

@@ -1,6 +1,15 @@
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@wiki-server/checker-model': path.resolve(
+        __dirname,
+        '../apps/wiki-server/src/routes/sourcing/checker-model.ts',
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: 'node',
