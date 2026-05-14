@@ -324,7 +324,7 @@ async function processAllRecords(
         const yamlOutcome = writeRecordToYaml(record, result.url, indexes);
         yamlReport = {
           status: yamlOutcome.status,
-          filepath: yamlOutcome.filepath,
+          ...(yamlOutcome.filepath ? { filepath: yamlOutcome.filepath } : {}),
           ...(yamlOutcome.applicable && yamlOutcome.status === 'error' && yamlOutcome.error
             ? { error: yamlOutcome.error }
             : {}),

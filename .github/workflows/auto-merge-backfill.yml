@@ -48,6 +48,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --state open \
             --base main \
+            --limit 200 \
             --search "head:claude/backfill-sources-yaml-" \
             --json number,headRefName,baseRefName,mergeable,statusCheckRollup,title)
 

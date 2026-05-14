@@ -184,8 +184,7 @@ export function updateFactMetaById(
     }
 
     if (wrote) return 'updated';
-    if (skippedForSource) return 'skipped-existing';
-    return 'updated';  // caller asked for nothing — treat as no-op success
+    return 'skipped-existing';
   }
   return 'not-found';
 }
