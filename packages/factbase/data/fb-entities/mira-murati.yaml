@@ -7,12 +7,17 @@ facts:
   - id: f_f3XKVPdewA
     property: notable-for
     value: "Former CTO of OpenAI; led development of ChatGPT, DALL-E, and GPT-4; now building a new AI company"
+    source: https://businessinsider.com/mira-murati-openai-startup-2025-4
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ekVZn67U9A
     property: education
     value: "BS in Mechanical Engineering, Dartmouth College"
+    source: https://albaniandailynews.com/news/meet-mira-murati-the-36-year-old-tech-prodigy-who-shot-to-fame-at-openai-and-now-runs-a-startup-that-s-a-poaching-target-for-zuckerberg
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_vatTbYjtnQ
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mira_Murati"
-
+    source: https://en.wikipedia.org/wiki/Mira_Murati
+    notes: "[auto-discovered by tb backfill-sources]"
