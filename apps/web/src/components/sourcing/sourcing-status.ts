@@ -7,8 +7,9 @@
  * States:
  *   not_run  — Check hasn't been executed yet (white dot)
  *   error    — System error, check couldn't complete (black dot)
- *   failed   — Checked but couldn't verify the claim (red dot)
- *   trouble  — Partially verified or concerns found (orange dot)
+ *   failed   — Source actively contradicted the claim, or checker tried and could not
+ *              confirm it (red dot)
+ *   trouble  — Partially verified, outdated, or other actionable concerns (amber dot)
  *   verified — Successfully verified (green dot)
  */
 
@@ -67,7 +68,10 @@ const RECORD_VERDICT_MAP: Record<string, SourcingStatus> = {
   contradicted: "failed",
   outdated: "trouble",
   partial: "trouble",
-  unverifiable: "trouble",
+  // "Unverifiable" = the checker actively tried to verify and could not.
+  // That's a stronger negative signal than "partial" (some support found) —
+  // surface it as failed (red), not trouble (amber).
+  unverifiable: "failed",
   // QUA-426: pre-LLM relevance-gate short-circuit — the source didn't even
   // mention the record's subject, so neither confirmation nor contradiction
   // is possible. Render as neutral "not checked", not as "trouble".
@@ -94,7 +98,9 @@ const FACTBASE_VERDICT_MAP: Record<string, SourcingStatus> = {
   minor_issues: "trouble",
   inaccurate: "failed",
   unsupported: "failed",
-  not_verifiable: "trouble",
+  // Parallel to the TableBase `unverifiable` mapping: when the citation checker
+  // tried and couldn't verify, surface as failed (red), not trouble (amber).
+  not_verifiable: "failed",
 };
 
 /**

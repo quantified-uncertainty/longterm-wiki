@@ -10,7 +10,8 @@ describe("recordVerdictToStatus", () => {
     expect(recordVerdictToStatus("contradicted")).toBe("failed");
     expect(recordVerdictToStatus("outdated")).toBe("trouble");
     expect(recordVerdictToStatus("partial")).toBe("trouble");
-    expect(recordVerdictToStatus("unverifiable")).toBe("trouble");
+    // Unverifiable = checker tried and couldn't confirm → surface as failed, not trouble.
+    expect(recordVerdictToStatus("unverifiable")).toBe("failed");
   });
 
   // QUA-426: pre-LLM relevance-gate short-circuits write `not_applicable`
@@ -36,7 +37,8 @@ describe("factbaseVerdictToStatus", () => {
     expect(factbaseVerdictToStatus("minor_issues")).toBe("trouble");
     expect(factbaseVerdictToStatus("inaccurate")).toBe("failed");
     expect(factbaseVerdictToStatus("unsupported")).toBe("failed");
-    expect(factbaseVerdictToStatus("not_verifiable")).toBe("trouble");
+    // Citation analog of TableBase `unverifiable` — surface as failed, not trouble.
+    expect(factbaseVerdictToStatus("not_verifiable")).toBe("failed");
   });
 
   it("maps null/unknown values to not_run", () => {

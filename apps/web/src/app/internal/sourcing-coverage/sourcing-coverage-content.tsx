@@ -91,7 +91,7 @@ const VERDICT_COLORS: Record<string, string> = {
   contradicted: "text-red-600",
   outdated: "text-amber-600",
   partial: "text-amber-500",
-  unverifiable: "text-orange-600",
+  unverifiable: "text-red-600",
   unchecked: "text-muted-foreground",
 };
 
@@ -100,7 +100,7 @@ const BAR_COLORS: Record<string, string> = {
   contradicted: "bg-red-500",
   outdated: "bg-amber-500",
   partial: "bg-amber-400",
-  unverifiable: "bg-orange-400",
+  unverifiable: "bg-red-400",
   unchecked: "bg-gray-300",
 };
 
@@ -682,7 +682,7 @@ export async function SourcingCoverageContent() {
         const VERDICT_RGB: Record<string, string> = {
           confirmed: "16, 185, 129",    // emerald-500
           partial: "251, 191, 36",      // amber-400
-          unverifiable: "251, 146, 60", // orange-400
+          unverifiable: "248, 113, 113", // red-400
           contradicted: "239, 68, 68",  // red-500
           outdated: "245, 158, 11",     // amber-500
           unchecked: "209, 213, 219",   // gray-300
