@@ -9,7 +9,6 @@
  * operator's working state is preserved exactly as they had it.
  *
  * Refuses to run when:
- *   - the current branch is `main` (we'd auto-commit into the merge target)
  *   - no touched YAMLs exist (nothing to commit)
  */
 
@@ -38,14 +37,6 @@ export type YamlPrResult =
 export function openYamlPr(input: OpenYamlPrInput): YamlPrResult {
   if (input.touchedPaths.length === 0) {
     return { kind: 'refused', reason: 'no YAML files touched this run' };
-  }
-
-  const currentBranch = trySh('git rev-parse --abbrev-ref HEAD');
-  if (!currentBranch) {
-    return { kind: 'error', error: 'failed to read current branch' };
-  }
-  if (currentBranch === 'main') {
-    return { kind: 'refused', reason: 'refusing to auto-commit on main' };
   }
 
   return runYamlPrFlow(input);
