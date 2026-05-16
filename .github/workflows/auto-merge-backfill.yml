@@ -64,15 +64,21 @@ jobs:
           fi
 
           # Filter to PRs that are MERGEABLE and have all checks passing.
-          # statusCheckRollup is an array of {conclusion, status, name}; we
-          # require every entry to be conclusion=SUCCESS (or status=COMPLETED
-          # with no failures). Empty rollup => no checks ran => skip (don't
-          # merge a PR that hasn't been validated).
+          # statusCheckRollup mixes two shapes:
+          #   - CheckRun entries (GitHub Actions jobs) use `.conclusion`
+          #     with values like SUCCESS / FAILURE / NEUTRAL / SKIPPED.
+          #   - StatusContext entries (external services e.g. Vercel,
+          #     CodeRabbit) use `.state` (SUCCESS / FAILURE / PENDING)
+          #     and leave `.conclusion` null.
+          # We accept either shape's "passed" signal, and reject the PR if
+          # ANY entry is in a non-passing state. Empty rollup => no checks
+          # ran => skip (don't merge a PR that hasn't been validated).
           ELIGIBLE=$(echo "$PRS" | jq -c '[.[] |
             select(.mergeable == "MERGEABLE") |
             select((.statusCheckRollup | length) > 0) |
             select([.statusCheckRollup[] |
               (.conclusion == "SUCCESS" or .conclusion == "NEUTRAL" or .conclusion == "SKIPPED")
+              or .state == "SUCCESS"
             ] | all)
           ]')
 
