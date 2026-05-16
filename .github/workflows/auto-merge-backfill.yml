@@ -1,0 +1,93 @@
+name: Auto-Merge Backfill PRs
+run-name: "Auto-Merge Backfill PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Auto-merges open PRs from the source-backfill auto-PR flow
+# (`crux tb backfill-sources` opens these on `claude/backfill-sources-yaml-*`
+# branches; they are mechanical YAML mirrors with nothing to review by hand).
+#
+# Merge criteria:
+#   - PR is open and on a `claude/backfill-sources-yaml-*` head branch
+#   - All status checks succeeded (statusCheckRollup is all SUCCESS)
+#   - mergeable == MERGEABLE (no conflicts)
+#
+# CodeRabbit review state is intentionally NOT checked — its reviews are
+# advisory on this repo (no branch protection requires them) and the YAML
+# diffs are mechanical.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'   # every 20 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-backfill
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  merge:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Find and merge eligible PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # List open PRs from auto-backfill branches with their CI status.
+          # base:main filter prevents accidentally merging into release branches.
+          PRS=$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --base main \
+            --limit 200 \
+            --search "head:claude/backfill-sources-yaml-" \
+            --json number,headRefName,baseRefName,mergeable,statusCheckRollup,title)
+
+          # Defense-in-depth: re-filter by baseRefName == "main" in case the
+          # --base flag is ever loosened or the search syntax changes.
+          PRS=$(echo "$PRS" | jq -c '[.[] | select(.baseRefName == "main")]')
+
+          COUNT=$(echo "$PRS" | jq 'length')
+          echo "Found $COUNT open auto-backfill PR(s)"
+
+          if [ "$COUNT" -eq 0 ]; then
+            exit 0
+          fi
+
+          # Filter to PRs that are MERGEABLE and have all checks passing.
+          # statusCheckRollup is an array of {conclusion, status, name}; we
+          # require every entry to be conclusion=SUCCESS (or status=COMPLETED
+          # with no failures). Empty rollup => no checks ran => skip (don't
+          # merge a PR that hasn't been validated).
+          ELIGIBLE=$(echo "$PRS" | jq -c '[.[] |
+            select(.mergeable == "MERGEABLE") |
+            select((.statusCheckRollup | length) > 0) |
+            select([.statusCheckRollup[] |
+              (.conclusion == "SUCCESS" or .conclusion == "NEUTRAL" or .conclusion == "SKIPPED")
+            ] | all)
+          ]')
+
+          ELIGIBLE_COUNT=$(echo "$ELIGIBLE" | jq 'length')
+          echo "$ELIGIBLE_COUNT PR(s) eligible to merge"
+
+          echo "$ELIGIBLE" | jq -c '.[]' | while read -r pr; do
+            NUM=$(echo "$pr" | jq -r '.number')
+            BRANCH=$(echo "$pr" | jq -r '.headRefName')
+            TITLE=$(echo "$pr" | jq -r '.title')
+            echo "::group::Merging PR #$NUM ($BRANCH): $TITLE"
+            if gh pr merge "$NUM" --repo "$GITHUB_REPOSITORY" --merge --delete-branch; then
+              echo "✓ Merged PR #$NUM"
+            else
+              echo "::warning::Failed to merge PR #$NUM — will retry next run"
+            fi
+            echo "::endgroup::"
+          done

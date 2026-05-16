@@ -12,6 +12,7 @@ import { activeAgentsSweep } from "./tasks/active-agents-sweep.js";
 import { dataQualitySnapshot } from "./tasks/data-quality-snapshot.js";
 import { jobWorkerHealth } from "./tasks/job-worker-health.js";
 import { autoUpdateEnqueue } from "./tasks/auto-update-enqueue.js";
+import { backfillSourcesEnqueue } from "./tasks/backfill-sources-enqueue.js";
 import { jobFailureTriage } from "./tasks/job-failure-triage.js";
 import { tablebaseScan } from "./tasks/tablebase-scan.js";
 import { e2ePostDeployWatcher } from "./tasks/e2e-post-deploy-watcher.js";
@@ -63,6 +64,12 @@ logger.info({
       schedule: config.tasks.autoUpdateEnqueue.schedule,
       budget: config.tasks.autoUpdateEnqueue.budget,
       maxPages: config.tasks.autoUpdateEnqueue.maxPages,
+    },
+    backfillSourcesEnqueue: {
+      enabled: config.tasks.backfillSourcesEnqueue.enabled,
+      schedule: config.tasks.backfillSourcesEnqueue.schedule,
+      limit: config.tasks.backfillSourcesEnqueue.limit,
+      maxCost: config.tasks.backfillSourcesEnqueue.maxCost,
     },
     jobFailureTriage: {
       enabled: config.tasks.jobFailureTriage.enabled,
@@ -157,6 +164,14 @@ registerTask(
   config.tasks.autoUpdateEnqueue.schedule,
   config.tasks.autoUpdateEnqueue.enabled,
   () => autoUpdateEnqueue(config)
+);
+
+registerTask(
+  config,
+  "backfill-sources-enqueue",
+  config.tasks.backfillSourcesEnqueue.schedule,
+  config.tasks.backfillSourcesEnqueue.enabled,
+  () => backfillSourcesEnqueue(config)
 );
 
 registerTask(
