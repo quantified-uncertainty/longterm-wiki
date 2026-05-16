@@ -90,7 +90,12 @@ jobs:
             BRANCH=$(echo "$pr" | jq -r '.headRefName')
             TITLE=$(echo "$pr" | jq -r '.title')
             echo "::group::Merging PR #$NUM ($BRANCH): $TITLE"
-            if gh pr merge "$NUM" --repo "$GITHUB_REPOSITORY" --merge --delete-branch; then
+            # `--delete-branch` is intentionally omitted: it's rejected by
+            # `gh pr merge` when the repo has a merge queue ("Cannot use
+            # `-d` or `--delete-branch` when merge queue enabled"). The
+            # repo's "Automatically delete head branches" setting handles
+            # cleanup after the queue finishes the merge.
+            if gh pr merge "$NUM" --repo "$GITHUB_REPOSITORY" --merge; then
               echo "✓ Merged PR #$NUM"
             else
               echo "::warning::Failed to merge PR #$NUM — will retry next run"
