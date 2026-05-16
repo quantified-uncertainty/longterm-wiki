@@ -3,6 +3,8 @@ facts:
   - id: f_QNd3zfa3yw
     property: born-year
     value: 1963
+    source: https://en.wikipedia.org/wiki/Jensen_Huang
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_uWhqL9PqsQ
     property: notable-for
@@ -14,7 +16,6 @@ facts:
 
   - id: f_jELY7QhUGw
     property: education
-    value: Oregon State University; Stanford University; Aloha High School; Oneida
-      Baptist Institute
+    value: Oregon State University; Stanford University; Aloha High School; Oneida Baptist Institute
     source: https://www.wikidata.org/wiki/Q305177
     notes: From Wikidata Q305177

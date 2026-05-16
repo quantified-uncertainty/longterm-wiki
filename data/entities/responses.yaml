@@ -6552,6 +6552,7 @@
       position: support
       importance: high
       reason: Lead sponsor; champions the bill as essential protection for victims of nonconsensual intimate imagery
+      source: https://durbin.senate.gov/newsroom/press-releases/durbin-graham-klobuchar-hawley-introduce-defiance-act-to-hold-accountable-those-responsible-for-the-proliferation-of-nonconsensual-sexually-explicit-deepfake-images-and-videos
     - name: Senator Lindsey Graham (R-SC)
       entityId: sid_iSc4TztRuB
       position: support
@@ -6561,6 +6562,7 @@
       position: support
       importance: high
       reason: Passed unanimously January 13, 2026, reflecting rare complete bipartisan agreement on deepfake civil remedies
+      source: https://judiciary.senate.gov/press/dem/releases/durbin-successfully-passes-bill-to-combat-nonconsensual-sexually-explicit-deepfake-images
     - name: Technology platforms
       position: mixed
       importance: medium
@@ -6610,6 +6612,7 @@
       importance: high
       reason: Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining
         multiple policy areas
+      source: https://blackburn.senate.gov/2025/12/technology/blackburn-unveils-national-policy-framework-for-artificial-intelligence
     - name: Content creators and artists
       position: support
       importance: high
