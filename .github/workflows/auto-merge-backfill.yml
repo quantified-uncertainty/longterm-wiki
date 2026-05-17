@@ -50,7 +50,7 @@ jobs:
             --base main \
             --limit 200 \
             --search "head:claude/backfill-sources-yaml-" \
-            --json number,headRefName,baseRefName,mergeable,statusCheckRollup,title)
+            --json number,headRefName,headRefOid,baseRefName,mergeable,statusCheckRollup,title,id)
 
           # Defense-in-depth: re-filter by baseRefName == "main" in case the
           # --base flag is ever loosened or the search syntax changes.
@@ -85,20 +85,45 @@ jobs:
           ELIGIBLE_COUNT=$(echo "$ELIGIBLE" | jq 'length')
           echo "$ELIGIBLE_COUNT PR(s) eligible to merge"
 
+          # The repo has a merge queue enabled and "Allow auto-merge" is
+          # intentionally OFF, so `gh pr merge --merge` cannot be used
+          # (it falls back to enabling auto-merge, which the repo
+          # rejects). Instead we add the PR directly to the merge queue
+          # via the GraphQL `enqueuePullRequest` mutation, which only
+          # needs the `pull-requests: write` permission this workflow
+          # already grants. `expectedHeadOid` gives optimistic
+          # concurrency: if a new commit landed on the PR branch since
+          # we listed it, GitHub rejects rather than enqueuing a stale
+          # SHA. Branch cleanup is handled by the repo's "Automatically
+          # delete head branches" setting after the queue finishes.
           echo "$ELIGIBLE" | jq -c '.[]' | while read -r pr; do
             NUM=$(echo "$pr" | jq -r '.number')
             BRANCH=$(echo "$pr" | jq -r '.headRefName')
             TITLE=$(echo "$pr" | jq -r '.title')
-            echo "::group::Merging PR #$NUM ($BRANCH): $TITLE"
-            # `--delete-branch` is intentionally omitted: it's rejected by
-            # `gh pr merge` when the repo has a merge queue ("Cannot use
-            # `-d` or `--delete-branch` when merge queue enabled"). The
-            # repo's "Automatically delete head branches" setting handles
-            # cleanup after the queue finishes the merge.
-            if gh pr merge "$NUM" --repo "$GITHUB_REPOSITORY" --merge; then
-              echo "✓ Merged PR #$NUM"
+            PR_ID=$(echo "$pr" | jq -r '.id')
+            HEAD_OID=$(echo "$pr" | jq -r '.headRefOid')
+            echo "::group::Enqueuing PR #$NUM ($BRANCH): $TITLE"
+            ENQUEUE_OUT=$(gh api graphql \
+              -f query='mutation($prId: ID!, $headOid: GitObjectID!) {
+                enqueuePullRequest(input: {
+                  pullRequestId: $prId,
+                  expectedHeadOid: $headOid
+                }) {
+                  mergeQueueEntry { position }
+                }
+              }' \
+              -f prId="$PR_ID" \
+              -f headOid="$HEAD_OID" 2>&1) && RC=0 || RC=$?
+            if [ "$RC" -eq 0 ]; then
+              echo "✓ PR #$NUM added to merge queue"
+            elif echo "$ENQUEUE_OUT" | grep -qiE "already in|merge queue is not enabled|MERGE_QUEUE"; then
+              # PR is already in the queue (we re-list open PRs every run, so
+              # any PR queued on a previous run will re-appear here until the
+              # queue finishes merging it). Not an error.
+              echo "PR #$NUM already in merge queue — skipping"
             else
-              echo "::warning::Failed to merge PR #$NUM — will retry next run"
+              echo "::warning::Failed to enqueue PR #$NUM — will retry next run"
+              echo "$ENQUEUE_OUT"
             fi
             echo "::endgroup::"
           done
