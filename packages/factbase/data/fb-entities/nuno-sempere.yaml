@@ -18,7 +18,7 @@ facts:
   - id: f_nPcY8fL6kA
     property: born-year
     value: 1998
-    notes: Born October 10, 1998; enriched from wiki page
+    notes: "Born October 10, 1998; enriched from wiki page; source is Estonian business registry (indirect — lists birth year for board member regulatory compliance)"
     source: https://inforegister.ee/en/2329278-ID
 
   - id: f_nPfB4gN9mD

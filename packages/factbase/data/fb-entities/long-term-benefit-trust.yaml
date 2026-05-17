@@ -32,7 +32,7 @@ facts:
   - id: f_niWDPXutXO
     property: country
     value: United States
-    source: https://anthropic.com/news/the-long-term-benefit-trust
+    source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_3G9ZjjArMX

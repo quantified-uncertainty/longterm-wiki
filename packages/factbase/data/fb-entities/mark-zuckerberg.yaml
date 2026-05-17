@@ -3,7 +3,7 @@ facts:
   - id: f_1TD2ftGDkg
     property: born-year
     value: 1984
-    source: https://en.wikipedia.org/wiki/Mark_Zuckerberg?wprov=sfla1
+    source: https://en.wikipedia.org/wiki/Mark_Zuckerberg
     notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_YbXRRr8Bcw

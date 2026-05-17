@@ -29,7 +29,7 @@ facts:
     property: born-year
     value: 1992
     notes: Enriched from wiki page; born in Melbourne, Australia
-    source: https://wikipedia.org/wiki/Helen_Toner
+    source: https://en.wikipedia.org/wiki/Helen_Toner
 
   - id: f_hTfB4gN2mD
     property: education

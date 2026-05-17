@@ -4,7 +4,7 @@ facts:
     property: description
     value: Vipul Naik is a mathematician and EA community member who has funded ~$255K in contract research (primarily to
       Sebastian Sanchez and Issa Rice) and created the Donations List Website tracking $72.8B in philanthropic
-      donations. His main contribution is transparency infrastructure for EA funding patte
+      donations. His main contribution is transparency infrastructure for EA funding patterns
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_2g5ca53q4S
@@ -14,7 +14,7 @@ facts:
     notes: From Wikidata Q102535772
   - id: f_Po9MZwki99
     property: education
-    value: University of Chicago; University of Chicago; Chennai Mathematical Institute
+    value: University of Chicago; Chennai Mathematical Institute
     source: https://www.wikidata.org/wiki/Q102535772
     notes: From Wikidata Q102535772
   - id: f_vN6tN2pQ6v
