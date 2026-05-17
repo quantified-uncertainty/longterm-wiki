@@ -4,6 +4,7 @@ facts:
     property: born-year
     value: 1985
     notes: "Born April 22, 1985 in Chicago, Illinois"
+    source: https://en.wikipedia.org/wiki/Sam_Altman
   - id: f_aR3kT8mW5q
     property: education
     value: "Studied computer science at Stanford University for two years; dropped out in 2005"
@@ -12,8 +13,8 @@ facts:
 
   - id: f_bN7vQ2xJ4p
     property: notable-for
-    value: "CEO of OpenAI; previously president of Y Combinator; central figure in
-      the commercialization of large language models"
+    value: "CEO of OpenAI; previously president of Y Combinator; central figure in the commercialization of large language
+      models"
     source: https://en.wikipedia.org/wiki/Sam_Altman
 
   - id: f_cM6wP9rK3s
@@ -24,6 +25,8 @@ facts:
   - id: f_4wv2f7drz7
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Sam_Altman"
+    source: https://en.wikipedia.org/wiki/Sam_Altman
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_68fi4nulwx
     property: website
@@ -32,12 +35,16 @@ facts:
   - id: f_a0agpci09z
     property: github-profile
     value: "https://github.com/sama"
+    source: https://github.com/sama
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_U5suM3Dqcg
     property: net-worth
     value: 3.3e+9
     asOf: "2026-03"
     source: https://en.wikipedia.org/wiki/Sam_Altman
-    notes: "Forbes March 2026: $3.3B. Derived from venture investments including Reddit (~$1.6B in shares), Stripe, Helion Energy, and other holdings. Altman holds zero OpenAI equity per the Oct 2025 PBC restructuring, despite earlier reports of a proposed 7% stake."
+    notes: "Forbes March 2026: $3.3B. Derived from venture investments including Reddit (~$1.6B in shares), Stripe, Helion
+      Energy, and other holdings. Altman holds zero OpenAI equity per the Oct 2025 PBC restructuring, despite earlier
+      reports of a proposed 7% stake."
 
   - id: f_kFUCZeA9vg
     property: description
@@ -59,8 +66,7 @@ facts:
 
   - id: f_kmBIoQdLEQ
     property: description
-    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter
-      threatening to quit"
+    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter threatening to quit"
 
   - id: f_7lQ4XtaMBQ
     property: description

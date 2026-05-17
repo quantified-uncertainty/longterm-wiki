@@ -3,14 +3,15 @@ facts:
   - id: f_SH1descr01
     property: description
     value: >-
-      Web platform for creating, sharing, and discovering Squiggle models.
-      Features model groups, version history, AI-assisted editing via
-      SquiggleAI, and a growing library of community-contributed models.
+      Web platform for creating, sharing, and discovering Squiggle models. Features model groups, version history,
+      AI-assisted editing via SquiggleAI, and a growing library of community-contributed models.
     asOf: !date 2026-03
 
   - id: f_SH2found01
     property: founded-date
     value: !date 2023
+    source: https://forum.effectivealtruism.org/posts/rK3NgqLg3HHDzyLah/announcing-squiggle-hub
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_SH3webst01
     property: website

@@ -3,6 +3,8 @@ facts:
   - id: f_8Iej2b7LDw
     property: born-year
     value: 1988
+    source: https://en.wikipedia.org/wiki/Mira_Murati
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_f3XKVPdewA
     property: notable-for

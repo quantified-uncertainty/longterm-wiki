@@ -6,13 +6,17 @@ facts:
 
   - id: f_r8MSWiNrLQ
     property: notable-for
-    value: "UC Berkeley professor working on AI safety and robustness; leads the Steinhardt Group; runs AI forecasting contests"
+    value: "UC Berkeley professor working on AI safety and robustness; leads the Steinhardt Group; runs AI forecasting
+      contests"
+    source: https://jsteinhardt.stat.berkeley.edu
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_TtoXYolaog
     property: education
     value: "PhD in Computer Science, Stanford University"
+    source: https://live-simons-institute.pantheon.berkeley.edu/people/jacob-steinhardt
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_VzmoBlD3AA
     property: website
     value: "https://jsteinhardt.stat.berkeley.edu"
-

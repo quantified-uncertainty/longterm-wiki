@@ -2,23 +2,22 @@ entity: sid_wjtZjN8acQ
 facts:
   - id: f_MGt6wCbGFA
     property: description
-    value: "AI researcher, forecaster, and entrepreneur specializing in AGI
-      timelines forecasting, scenario planning, and AI governance. Ranks #1 on
-      the RAND Forecasting Initiative all-time leaderboard and co-authored the
-      influential AI 2027 scenario forecast."
+    value: "AI researcher, forecaster, and entrepreneur specializing in AGI timelines forecasting, scenario planning, and AI
+      governance. Ranks #1 on the RAND Forecasting Initiative all-time leaderboard and co-authored the influential AI
+      2027 scenario forecast."
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_eL6tN2pQ1v
     property: notable-for
-    value: "Ranked #1 on RAND Forecasting Initiative all-time leaderboard;
-      co-authored AI 2027 scenario forecast; co-leads Samotsvety forecasting
-      team; co-founded AI Futures Project"
+    value: "Ranked #1 on RAND Forecasting Initiative all-time leaderboard; co-authored AI 2027 scenario forecast; co-leads
+      Samotsvety forecasting team; co-founded AI Futures Project"
     asOf: 2026-03
     notes: Enriched from wiki page
   - id: f_eLcY8fL6kA
     property: education
     value: "Computer science and economics degrees, University of Virginia"
     notes: Enriched from wiki page
+    source: https://elilifland.com
   - id: f_FhVj6PJZfg
     property: website
     value: https://www.elilifland.com/

@@ -55,8 +55,7 @@ facts:
     value: 1.4e+10
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Run-rate revenue at Series G announcement; 500+ customers spending $1M+
-      annually"
+    notes: "Run-rate revenue at Series G announcement; 500+ customers spending $1M+ annually"
 
   - id: f_dW5cR9mJ8q
     property: revenue
@@ -113,19 +112,16 @@ facts:
     value: 3.8e+11
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Series G post-money valuation; second-largest venture deal ever behind
-      OpenAI's $40B"
+    notes: "Series G post-money valuation; second-largest venture deal ever behind OpenAI's $40B"
 
   - id: f_kR8wT3vN6m
     property: secondary-valuation
     value: 5.95e+11
     asOf: 2026-03
     source: https://app.ventuals.com/trade/anthropic
-    notes: "Secondary/derivatives market implied valuation (Ventuals platform, March
-      2026). Not a primary funding round. Mark price ~$596/share, up from
-      $259-306 in Feb 2026 secondary markets. Represents ~57% premium over $380B
-      Series G. Oracle price ~$520, suggesting actual OTC trades at lower levels
-      (~$580B implied)."
+    notes: "Secondary/derivatives market implied valuation (Ventuals platform, March 2026). Not a primary funding round.
+      Mark price ~$596/share, up from $259-306 in Feb 2026 secondary markets. Represents ~57% premium over $380B Series
+      G. Oracle price ~$520, suggesting actual OTC trades at lower levels (~$580B implied)."
 
   # ── Employee Tender Offer ───────────────────────────────────────
   - id: f_nQ4xW7mK9p
@@ -133,9 +129,8 @@ facts:
     value: 5.5e+9
     asOf: 2026-02
     source: https://www.bloomberg.com/news/articles/2026-02-23/anthropic-kicks-off-share-sale-for-staffers-of-up-to-6-billion
-    notes: "Employee share sale program, $5-6B at $350B pre-money valuation (below
-      the $380B post-money Series G). Provides employee liquidity while company
-      remains private. Launched Feb 2026 per Bloomberg."
+    notes: "Employee share sale program, $5-6B at $350B pre-money valuation (below the $380B post-money Series G). Provides
+      employee liquidity while company remains private. Launched Feb 2026 per Bloomberg."
 
   # ── Total Funding ───────────────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -143,8 +138,7 @@ facts:
     property: total-funding
     value: 4.4e+9
     asOf: 2023-10
-    notes: "Estimate; no published source. After Google $2B investment and Amazon
-      first tranche"
+    notes: "Estimate; no published source. After Google $2B investment and Amazon first tranche"
 
   # UNVERIFIED ESTIMATE
   - id: f_oBMR5hGA6A
@@ -158,11 +152,10 @@ facts:
     value: 6.7e+10
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Total funding raised as of Series G (Feb 2026), per Reuters. Includes
-      Series A-G equity rounds plus Amazon's $10.75B and Google's $3.3B
-      strategic investments. Excludes Microsoft/Nvidia 'up to $15B' commitment
-      (not fully deployed). The FTX ~$500M investment (2022) was sold to
-      creditors after FTX's collapse and is not counted in the live total."
+    notes: "Total funding raised as of Series G (Feb 2026), per Reuters. Includes Series A-G equity rounds plus Amazon's
+      $10.75B and Google's $3.3B strategic investments. Excludes Microsoft/Nvidia 'up to $15B' commitment (not fully
+      deployed). The FTX ~$500M investment (2022) was sold to creditors after FTX's collapse and is not counted in the
+      live total."
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_zBoko30S4g
@@ -193,7 +186,8 @@ facts:
     property: headcount
     value: 600
     asOf: 2024-03
-    notes: "Rough mid-point estimate for early 2024. No published source; interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as range [500,700]; simplified to point estimate for consistency."
+    notes: "Rough mid-point estimate for early 2024. No published source; interpolated between 240 (2023) and 1,035 (Sep
+      2024). Previously stored as range [500,700]; simplified to point estimate for consistency."
 
   - id: f_J3yAxRJ05k
     property: headcount
@@ -218,8 +212,8 @@ facts:
     property: headcount
     value: 4074
     asOf: 2026-01
-    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic planned
-      to triple international headcount in late 2025. Treat as rough estimate."
+    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic planned to triple international headcount in
+      late 2025. Treat as rough estimate."
 
   # ── Organizational ──────────────────────────────────────────────
   - id: f_8kX2pQ7mNr
@@ -250,8 +244,7 @@ facts:
     property: legal-structure
     value: "Public benefit corporation"
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
-    notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class
-      T stock"
+    notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class T stock"
 
   # ── Financial Detail ────────────────────────────────────────────
   - id: f_gM7xR4nW2b
@@ -259,8 +252,8 @@ facts:
     value: 40
     asOf: 2025-12
     source: https://www.theinformation.com/articles/anthropics-finances
-    notes: "Actual 2025 gross margin; 10 percentage points below previous estimate;
-      inference costs surged 23% more than expected"
+    notes: "Actual 2025 gross margin; 10 percentage points below previous estimate; inference costs surged 23% more than
+      expected"
 
   - id: f_VeJPtr2gAQ
     property: gross-margin
@@ -303,7 +296,8 @@ facts:
     value: 32
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey (corrected from coding-market-share — source describes overall enterprise usage, not coding-specific)"
+    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey (corrected from coding-market-share — source
+      describes overall enterprise usage, not coding-specific)"
 
   # ── Product & Usage ─────────────────────────────────────────────
   - id: f_JoN2Jr8liA
@@ -318,8 +312,7 @@ facts:
     value: 300000
     asOf: 2025-10
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Grew from fewer than 1,000 businesses to 300,000+ in two years; 80% of
-      revenue from business"
+    notes: "Grew from fewer than 1,000 businesses to 300,000+ in two years; 80% of revenue from business"
 
   - id: f_Nje8oobrCw
     property: api-calls-monthly
@@ -333,8 +326,7 @@ facts:
     value: 2.5e+9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Claude Code run-rate revenue; hit $1B milestone in Nov 2025, doubled by
-      Feb 2026"
+    notes: "Claude Code run-rate revenue; hit $1B milestone in Nov 2025, doubled by Feb 2026"
 
   # ── Safety ──────────────────────────────────────────────────────
   - id: f_BnkEWenniQ
@@ -350,23 +342,20 @@ facts:
     value: "ASL-3 (Opus 4, Opus 4.5, Opus 4.6), ASL-2 (Sonnet, Haiku)"
     asOf: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
-    notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3,
-      Sonnet/Haiku remain ASL-2"
+    notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3, Sonnet/Haiku remain ASL-2"
 
   - id: f_ddR2zmZ1ZQ
     property: safety-researcher-count
     value: 265
     asOf: 2025-12
-    notes: "Estimate; no published source. Estimated 200-330 across
-      interpretability, alignment science, policy, trust & safety; ~20-30% of
-      technical staff"
+    notes: "Estimate; no published source. Estimated 200-330 across interpretability, alignment science, policy, trust &
+      safety; ~20-30% of technical staff"
 
   - id: f_vNw3jgVCvg
     property: interpretability-team-size
     value: 50
     asOf: 2025-12
-    notes: "Estimate; no published source. Estimated 40-60 researchers; among the
-      largest concentrations globally"
+    notes: "Estimate; no published source. Estimated 40-60 researchers; among the largest concentrations globally"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_Pd29CR24TA
@@ -374,12 +363,14 @@ facts:
     value: 3.5e+11
     asOf: 2025-11
     notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to secondary-valuation."
+    source: https://ainvest.com/news/anthropic-350-billion-valuation-structural-liquidity-inflection-ai-industry-2602
 
   - id: f_U3LMAv6zjQ
     property: revenue-guidance
     value: 2e+10
     asOf: 2026-01
     notes: "Base case $20B, best case $26B per Reuters."
+    source: https://reuters.com/business/retail-consumer/anthropic-aims-nearly-triple-annualized-revenue-2026-sources-say-2025-10-15
 
   - id: f_VuX4YGhERw
     property: retention-rate
@@ -391,21 +382,20 @@ facts:
     property: customer-concentration
     value: 25
     asOf: "2025"
-    notes: "Estimate; no published source. Revenue share from top customers (Cursor,
-      GitHub Copilot); inferred from reporting"
+    notes: "Estimate; no published source. Revenue share from top customers (Cursor, GitHub Copilot); inferred from reporting"
 
   - id: f_w2MNMoBnsg
     property: safety-staffing-ratio
     value: 25
     asOf: "2025"
-    notes: "Estimate; no published source. 20-30% of technical staff in
-      safety-related roles"
+    notes: "Estimate; no published source. 20-30% of technical staff in safety-related roles"
 
   - id: f_CrjYKVhbow
     property: infrastructure-investment
     value: 5e+10
     asOf: "2026"
     notes: "AI infrastructure expansion plan announced November 2025."
+    source: https://anthropic.com/news/anthropic-invests-50-billion-in-american-ai-infrastructure
 
   - id: f_gwwJxIwrNA
     property: description
@@ -416,15 +406,14 @@ facts:
     property: equity-stake-percent
     value: 14
     asOf: 2026-02
-    notes: "Approximate Google post-Series G equity stake; computed from $3.3B
-      invested across 3 rounds."
+    notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds."
+    source: https://nytimes.com/2025/03/11/technology/google-investment-anthropic.html
 
   - id: f_FXudrRDOeQ
     property: equity-value
     value: 6.65e+10
     asOf: 2026-02
-    notes: "All seven co-founders combined equity value estimated $53-80B (midpoint
-      used); 2-3% each x $380B valuation."
+    notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation."
 
   - id: f_RqnR8XyGFQ
     property: description
@@ -435,28 +424,26 @@ facts:
     property: equity-value
     value: 5.7e+10
     asOf: 2026-02
-    notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of
-      $380B valuation."
+    notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation."
 
   - id: f_akJZvJpTFg
     property: equity-stake-percent
     value: 2.5
     asOf: 2026-02
-    notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3%
-      (midpoint used)."
+    notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used)."
 
   - id: f_nJ9CJQcZ4A
     property: equity-stake-percent
     value: 1.15
     asOf: 2026-02
-    notes: "Estimate; no published source. Jaan Tallinn equity stake estimated
-      0.6-1.7% (midpoint used); Series A lead position"
+    notes: "Estimate; no published source. Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead
+      position"
 
   - id: f_xKAnrZIbwg
     property: description
     value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
-    notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned
-      philanthropic capital from all Anthropic stakeholders"
+    notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic
+      stakeholders"
   - id: f_itUmsfeLOt
     property: website
     value: https://www.anthropic.com/

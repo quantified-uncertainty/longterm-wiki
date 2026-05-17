@@ -8,15 +8,16 @@ facts:
 
   - id: f_Ix3mkuMr35
     property: notable-for
-    value: "46th President of the United States (2021-2025); signed Executive Order
-      14110 on Safe, Secure, and Trustworthy AI (October 2023), the most
-      comprehensive federal AI policy action at the time"
+    value: "46th President of the United States (2021-2025); signed Executive Order 14110 on Safe, Secure, and Trustworthy
+      AI (October 2023), the most comprehensive federal AI policy action at the time"
     source: https://en.wikipedia.org/wiki/Joe_Biden
     notes: "EO 14110 was later revoked by the Trump administration in January 2025"
 
   - id: f_QLtye0VpIp
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Joe_Biden"
+    source: https://en.wikipedia.org/wiki/Joe_Biden
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_02wv3I18Rw
     property: website
     value: https://joebiden.com/es/inicio

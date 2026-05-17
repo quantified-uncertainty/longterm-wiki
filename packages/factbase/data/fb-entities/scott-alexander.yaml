@@ -2,8 +2,10 @@ entity: sid_ykTqvdkiLQ
 facts:
   - id: f_VR9yTjYlmg
     property: notable-for
-    value: "Author of Astral Codex Ten (formerly Slate Star Codex); influential
-      rationalist blogger covering AI risk and effective altruism"
+    value: "Author of Astral Codex Ten (formerly Slate Star Codex); influential rationalist blogger covering AI risk and
+      effective altruism"
+    source: https://finance.yahoo.com/news/failed-terribly-keeping-identity-secret-175458543.html
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_wIn1DbjxRQ
     property: website

@@ -4,16 +4,18 @@ facts:
     property: born-year
     value: 1960
     notes: "Born July 8, 1960 in Soisy-sous-Montmorency, France"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
 
   - id: f_yL1aB2cD3e
     property: education
-    value: "PhD in Computer Science, Universit\u00E9 Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
+    value: "PhD in Computer Science, Université Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
     notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with Geoffrey Hinton"
 
   - id: f_yL4fG5hI6j
     property: notable-for
-    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
+    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of
+      AGI existential risk"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
 
   - id: f_yL7kL8mN9o
@@ -24,10 +26,14 @@ facts:
   - id: f_38uo2p1lbe
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Yann_LeCun"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_4bmkyq2hx6
     property: google-scholar
     value: "https://scholar.google.com/citations?user=WLN3QrAAAAAJ"
+    source: https://scholar.google.com/citations?user=WLN3QrAAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_4eqnc2klts
     property: website

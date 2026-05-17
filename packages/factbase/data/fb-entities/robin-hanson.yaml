@@ -2,10 +2,8 @@ entity: sid_DmGXPl1h2g
 facts:
   - id: f_Gtl0JxK7MQ
     property: description
-    value: Economist and futurist at George Mason University, known for work on
-      prediction markets, near-term AI economics, and the Em scenario (brain
-      emulation). Author of The Age of Em and co-author of The Elephant in the
-      Brain.
+    value: Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics,
+      and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_W7mOGG6LTP
@@ -15,18 +13,17 @@ facts:
     notes: From Wikidata Q2159779
   - id: f_mrt81NPljz
     property: education
-    value: University of California, Irvine; University of Chicago; California
-      Institute of Technology
+    value: University of California, Irvine; University of Chicago; California Institute of Technology
     source: https://www.wikidata.org/wiki/Q2159779
     notes: From Wikidata Q2159779
   - id: f_rH6tN2pQ2v
     property: notable-for
-    value: "Pioneered prediction markets (since 1988); invented Logarithmic Market
-      Scoring Rule (LMSR); proposed futarchy governance; originated Great Filter
-      hypothesis; authored The Age of Em and The Elephant in the Brain; 5,200+
+    value: "Pioneered prediction markets (since 1988); invented Logarithmic Market Scoring Rule (LMSR); proposed futarchy
+      governance; originated Great Filter hypothesis; authored The Age of Em and The Elephant in the Brain; 5,200+
       citations"
     asOf: 2026-03
     notes: Enriched from wiki page
+    source: https://lifeboat.com/ex/bios.robin.d.hanson
 
   - id: f_rH9wS5jH5d
     property: born-year
@@ -36,9 +33,8 @@ facts:
 
   - id: f_rHcY8fL8kA
     property: education
-    value: "B.S. Physics, UC Irvine (1981); M.S. Physics and M.A. Conceptual
-      Foundations of Science, University of Chicago (1984); Ph.D. Social
-      Science, Caltech (1997)"
+    value: "B.S. Physics, UC Irvine (1981); M.S. Physics and M.A. Conceptual Foundations of Science, University of Chicago
+      (1984); Ph.D. Social Science, Caltech (1997)"
     notes: Enriched from wiki page
   - id: f_nkemfq398n
     property: wikipedia-url

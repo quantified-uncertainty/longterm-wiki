@@ -4,8 +4,8 @@ facts:
     property: founded-date
     value: "2015-12-11"
     source: https://openai.com/blog/introducing-openai
-    notes: "Founded December 11, 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon
-      Musk, Wojciech Zaremski, and John Schulman. Blog post dated Dec 11."
+    notes: "Founded December 11, 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon Musk, Wojciech Zaremski, and John
+      Schulman. Blog post dated Dec 11."
 
   - id: f_jyRF7MXyWw
     property: headquarters
@@ -34,17 +34,15 @@ facts:
     asOf: "2025"
     validEnd: 2025-10
     source: https://openai.com/blog/openai-lp
-    notes: "Announced conversion to PBC in early 2025; superseded by completed
-      restructuring in October 2025"
+    notes: "Announced conversion to PBC in early 2025; superseded by completed restructuring in October 2025"
 
   - id: f_fRR7Yodhrw
     property: legal-structure
     value: "Public Benefit Corporation"
     asOf: 2025-10
     source: https://www.cnbc.com/2025/10/28/open-ai-for-profit-microsoft.html
-    notes: "Completed restructuring into OpenAI Group PBC on October 28, 2025.
-      Nonprofit OpenAI Foundation holds 26% equity stake ($130B) and retains
-      legal control. $500B valuation. Microsoft holds 27% stake ($135B)."
+    notes: "Completed restructuring into OpenAI Group PBC on October 28, 2025. Nonprofit OpenAI Foundation holds 26% equity
+      stake ($130B) and retains legal control. $500B valuation. Microsoft holds 27% stake ($135B)."
 
   - id: f_A4ImW0y2sw
     property: founded-by
@@ -63,9 +61,8 @@ facts:
     asOf: 2024-10
     validEnd: 2025-03
     source: https://openai.com/index/openai-announces-a-new-funding-round/
-    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive
-      Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B
-      in prior rounds. Superseded by SoftBank $40B round in March 2025."
+    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA,
+      SoftBank, and others) on top of ~$11.3B in prior rounds. Superseded by SoftBank $40B round in March 2025."
 
   - id: f_Sb4nW9mT7a
     property: total-funding
@@ -73,29 +70,22 @@ facts:
     asOf: 2025-03
     validEnd: 2026-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
-    notes: "Cumulative primary funding through SoftBank's $40B round (March 2025)
-      at a $300B valuation. Bottom-up sum of documented primary rounds: $1B founding
-      pledge (2015) + $1B Microsoft (2019) + $1B Series (2021) + $300M
-      Series (2023) + $10B Microsoft (2023) + $6.6B Series (Oct 2024) + $40B
-      SoftBank (Mar 2025) = $59.9B. OpenAI's own March 2025 announcement
-      stated \"approximately $57.9B\" — the ~$2B gap reflects OpenAI's
-      exclusion of the 2015 founding pledge (most of which was never
-      realized) from its cumulative figure. The October 2025 PBC
-      restructuring at $500B valuation was a recapitalization /
-      secondary-tender event, not a new primary round, so the
-      total-primary figure was unchanged through that event. Superseded
-      by the $122B March 2026 primary round (see f_QNOH7UIrtg)."
+    notes: "Cumulative primary funding through SoftBank's $40B round (March 2025) at a $300B valuation. Bottom-up sum of
+      documented primary rounds: $1B founding pledge (2015) + $1B Microsoft (2019) + $1B Series (2021) + $300M Series
+      (2023) + $10B Microsoft (2023) + $6.6B Series (Oct 2024) + $40B SoftBank (Mar 2025) = $59.9B. OpenAI's own March
+      2025 announcement stated \"approximately $57.9B\" — the ~$2B gap reflects OpenAI's exclusion of the 2015 founding
+      pledge (most of which was never realized) from its cumulative figure. The October 2025 PBC restructuring at $500B
+      valuation was a recapitalization / secondary-tender event, not a new primary round, so the total-primary figure
+      was unchanged through that event. Superseded by the $122B March 2026 primary round (see f_QNOH7UIrtg)."
 
   - id: f_QNOH7UIrtg
     property: total-funding
     value: 1.819e+11
     asOf: 2026-03
     source: https://openai.com/index/accelerating-the-next-phase-ai/
-    notes: "Cumulative primary funding through OpenAI's $122B round closed
-      March 31, 2026 at an $852B post-money valuation, anchored by Amazon,
-      NVIDIA, and SoftBank with co-leads (a16z, D.E. Shaw Ventures, MGX,
-      TPG, T. Rowe Price) and Microsoft participation. Total = $59.9B
-      cumulative through Mar 2025 + $122B Mar 2026 round = $181.9B."
+    notes: "Cumulative primary funding through OpenAI's $122B round closed March 31, 2026 at an $852B post-money valuation,
+      anchored by Amazon, NVIDIA, and SoftBank with co-leads (a16z, D.E. Shaw Ventures, MGX, TPG, T. Rowe Price) and
+      Microsoft participation. Total = $59.9B cumulative through Mar 2025 + $122B Mar 2026 round = $181.9B."
 
   # ── Valuation ──────────────────────────────────────────────────
   - id: f_b56n3kcD2g
@@ -103,6 +93,7 @@ facts:
     value: 1.57e+11
     asOf: 2024-10
     notes: "October 2024 funding round valuation"
+    source: https://wsj.com/tech/ai/openai-nearly-doubles-valuation-to-157-billion-in-funding-round-ee220607
 
   - id: f_Qj7kR2pX9v
     property: valuation
@@ -130,16 +121,15 @@ facts:
     value: 1.31e+10
     asOf: 2025-12
     source: https://www.pymnts.com/artificial-intelligence-2/2026/openais-annual-recurring-revenue-tripled-to-20-billion-in-2025/
-    notes: "Full-year 2025 actual revenue of $13.1B, beating $13B forecast by $100M.
-      ARR exceeded $20B by year-end per CFO Sarah Friar."
+    notes: "Full-year 2025 actual revenue of $13.1B, beating $13B forecast by $100M. ARR exceeded $20B by year-end per CFO
+      Sarah Friar."
 
   - id: f_8XLLtHLMdg
     property: revenue
     value: 2.5e+10
     asOf: 2026-02
     source: https://sacra.com/c/openai/
-    notes: "Annualized revenue run rate as of February 2026 per Sacra; up from
-      $20B at end of 2025"
+    notes: "Annualized revenue run rate as of February 2026 per Sacra; up from $20B at end of 2025"
 
   # ── Headcount ──────────────────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -154,8 +144,8 @@ facts:
     value: 4500
     asOf: 2026-03
     source: https://www.cnbc.com/2026/03/21/openai-to-nearly-double-workforce-to-8000-by-end-2026-ft-reports.html
-    notes: "Current headcount as of March 2026; OpenAI plans to nearly double
-      workforce to 8,000 by end of 2026 per FT/CNBC reports"
+    notes: "Current headcount as of March 2026; OpenAI plans to nearly double workforce to 8,000 by end of 2026 per FT/CNBC
+      reports"
 
   # ── Market Share ───────────────────────────────────────────────
   - id: f_xW3cN7mP4q
@@ -163,17 +153,15 @@ facts:
     value: 50
     asOf: 2023-12
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
-    notes: "Enterprise LLM API market share per Menlo Ventures survey; dominant
-      position at the time"
+    notes: "Enterprise LLM API market share per Menlo Ventures survey; dominant position at the time"
 
   - id: f_rK9bF2vL6s
     property: market-share
     value: 27
     asOf: 2025-12
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
-    notes: "Enterprise LLM API market share per Menlo Ventures December 2025
-      report; lost nearly half of market since 2023 (50% to 27%) as Anthropic
-      (40%) overtook OpenAI"
+    notes: "Enterprise LLM API market share per Menlo Ventures December 2025 report; lost nearly half of market since 2023
+      (50% to 27%) as Anthropic (40%) overtook OpenAI"
 
   # ── Gross Margin ───────────────────────────────────────────────
   - id: f_hJ5dQ8nT3w
@@ -181,24 +169,24 @@ facts:
     value: 33
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Adjusted gross margin for 2025; down from 40% in 2024 and below 46%
-      target. Inference costs reached $8.4B in 2025, constraining margins."
+    notes: "Adjusted gross margin for 2025; down from 40% in 2024 and below 46% target. Inference costs reached $8.4B in
+      2025, constraining margins."
 
   # ── Monthly Active Users ──────────────────────────────────────
   - id: f_5VcbvP89LA
     property: monthly-active-users
     value: 1e+8
     asOf: 2023-02
-    notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
-      fastest-growing consumer application in history at that time"
+    notes: "ChatGPT reached 100M monthly active users within 2 months of launch; fastest-growing consumer application in
+      history at that time"
+    source: https://techloy.com/chatgpt-reaches-100-million-monthly-users
 
   - id: f_cIPm9agJVw
     property: monthly-active-users
     value: 2e+8
     asOf: 2024-08
     source: https://nerdynav.com/chatgpt-statistics/
-    notes: "Estimated MAU based on traffic data and weekly active user
-      extrapolation; OpenAI does not officially disclose MAU"
+    notes: "Estimated MAU based on traffic data and weekly active user extrapolation; OpenAI does not officially disclose MAU"
 
   # ── Weekly Active Users ──────────────────────────────────────
   - id: f_br0wYi0tog
@@ -206,16 +194,14 @@ facts:
     value: 4e+8
     asOf: 2025-02
     source: https://openai.com/index/400-million-users/
-    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO
-      Sam Altman"
+    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO Sam Altman"
 
   - id: f_OXCw5BvQtQ
     property: weekly-active-users
     value: 8e+8
     asOf: 2025-10
     source: https://www.demandsage.com/chatgpt-statistics/
-    notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman.
-      Some sources estimate 1B+ MAU by January 2026."
+    notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman. Some sources estimate 1B+ MAU by January 2026."
 
   - id: f_irWobt0L9Q
     property: weekly-active-users
@@ -230,17 +216,15 @@ facts:
     value: 1000000
     asOf: 2025-09
     source: https://openai.com/index/1-million-businesses-putting-ai-to-work/
-    notes: "Reached 1 million business customers milestone; fastest-growing
-      business platform in history per OpenAI"
+    notes: "Reached 1 million business customers milestone; fastest-growing business platform in history per OpenAI"
 
   - id: f_PpiIFr576g
     property: business-customers
     value: 9000000
     asOf: 2026-02
     source: https://sacra.com/c/openai/
-    notes: "9M+ paying business users as of February 2026; includes ChatGPT
-      Enterprise, Team, and business API customers. Enterprise seats grew
-      9x year-over-year."
+    notes: "9M+ paying business users as of February 2026; includes ChatGPT Enterprise, Team, and business API customers.
+      Enterprise seats grew 9x year-over-year."
 
   # ── Product Revenue ───────────────────────────────────────────
   - id: f_F6F2FrPKGg
@@ -248,8 +232,8 @@ facts:
     value: 2e+10
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Full-year 2025 revenue ~$20B per CFO Sarah Friar. Consumer subscriptions
-      ~75%, API revenue exceeded $1B ARR. Annualized run rate rose to $25B by Feb 2026."
+    notes: "Full-year 2025 revenue ~$20B per CFO Sarah Friar. Consumer subscriptions ~75%, API revenue exceeded $1B ARR.
+      Annualized run rate rose to $25B by Feb 2026."
 
   # ── Cash Burn ─────────────────────────────────────────────────
   - id: f_Fy9eOKxsbA
@@ -257,16 +241,15 @@ facts:
     value: 5e+9
     asOf: 2024-12
     source: https://fortune.com/2025/11/12/openai-cash-burn-rate-annual-losses-2028-profitable-2030-financial-documents/
-    notes: "Annual net loss of approximately $5B in 2024 excluding stock-based
-      compensation; total operating costs ~$9B against ~$4B revenue"
+    notes: "Annual net loss of approximately $5B in 2024 excluding stock-based compensation; total operating costs ~$9B
+      against ~$4B revenue"
 
   - id: f_SiRGFVNapg
     property: cash-burn
     value: 8.5e+9
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Cash burn of ~$8.5B on ~$20B in revenue for 2025; cash burn rate
-      approximately 43% of revenue."
+    notes: "Cash burn of ~$8.5B on ~$20B in revenue for 2025; cash burn rate approximately 43% of revenue."
 
   # ── Enterprise Market Share ───────────────────────────────────
   - id: f_wwhRjMvagg
@@ -274,24 +257,21 @@ facts:
     value: 50
     asOf: 2023-12
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
-    notes: "Enterprise LLM API market share per Menlo Ventures; dominant
-      position before Anthropic's rise"
+    notes: "Enterprise LLM API market share per Menlo Ventures; dominant position before Anthropic's rise"
 
   - id: f_4YoVOtpBdg
     property: enterprise-market-share
     value: 25
     asOf: 2025-07
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
-    notes: "Enterprise LLM market share per Menlo Ventures mid-2025 update;
-      halved from 50% in 2023 as Anthropic rose to 32%"
+    notes: "Enterprise LLM market share per Menlo Ventures mid-2025 update; halved from 50% in 2023 as Anthropic rose to 32%"
 
   - id: f_spJ9bPCr0w
     property: enterprise-market-share
     value: 27
     asOf: 2025-12
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
-    notes: "Enterprise LLM API market share per Menlo Ventures December 2025
-      report; Anthropic at 40%, Google at 21%"
+    notes: "Enterprise LLM API market share per Menlo Ventures December 2025 report; Anthropic at 40%, Google at 21%"
 
   # ── Coding Market Share ───────────────────────────────────────
   - id: f_PS27ufSjTA
@@ -299,16 +279,16 @@ facts:
     value: 21
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "Enterprise coding assistant market share per Menlo Ventures mid-2025;
-      Anthropic at 42%, more than double OpenAI's share"
+    notes: "Enterprise coding assistant market share per Menlo Ventures mid-2025; Anthropic at 42%, more than double
+      OpenAI's share"
 
   - id: f_8OwwUfsBMw
     property: coding-market-share
     value: 21
     asOf: 2025-12
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
-    notes: "Enterprise coding market share per Menlo Ventures December 2025;
-      Anthropic expanded to 54%. Coding is a $4B category."
+    notes: "Enterprise coding market share per Menlo Ventures December 2025; Anthropic expanded to 54%. Coding is a $4B
+      category."
 
   # ── Safety Level ──────────────────────────────────────────────
   - id: f_fVImwrRN8A
@@ -316,10 +296,9 @@ facts:
     value: "High/Critical capability thresholds (Preparedness Framework v2)"
     asOf: 2025-04
     source: https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf
-    notes: "OpenAI uses its own Preparedness Framework (v2, April 2025) rather
-      than Anthropic's ASL system. Two thresholds: 'High capability' (could
-      amplify existing harm pathways) and 'Critical capability' (unprecedented
-      new harm pathways). No models currently rated at Critical level."
+    notes: "OpenAI uses its own Preparedness Framework (v2, April 2025) rather than Anthropic's ASL system. Two thresholds:
+      'High capability' (could amplify existing harm pathways) and 'Critical capability' (unprecedented new harm
+      pathways). No models currently rated at Critical level."
 
   # ── Safety Researcher Count ───────────────────────────────────
   - id: f_yF0X77SvbQ
@@ -327,9 +306,8 @@ facts:
     value: 650
     asOf: 2025-12
     source: https://sqmagazine.co.uk/how-many-people-work-at-openai/
-    notes: "650+ employees across trust, safety, and alignment divisions. Includes
-      Preparedness team, Safety Systems team, and alignment researchers.
-      Daily human review audits exceed 500,000 samples."
+    notes: "650+ employees across trust, safety, and alignment divisions. Includes Preparedness team, Safety Systems team,
+      and alignment researchers. Daily human review audits exceed 500,000 samples."
 
   # ── Interpretability Team Size ────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -337,10 +315,9 @@ facts:
     property: interpretability-team-size
     value: 40
     asOf: 2025-12
-    notes: "Estimate; no published source. Approximate size of interpretability
-      research group within the broader safety organization. OpenAI's
-      interpretability efforts expanded after the Superalignment team
-      dissolution in mid-2024, with work distributed across multiple teams."
+    notes: "Estimate; no published source. Approximate size of interpretability research group within the broader safety
+      organization. OpenAI's interpretability efforts expanded after the Superalignment team dissolution in mid-2024,
+      with work distributed across multiple teams."
 
   # ── Revenue Guidance ──────────────────────────────────────────
   - id: f_3L0CrXb8fg
@@ -348,9 +325,8 @@ facts:
     value: 3e+10
     asOf: 2026-01
     source: https://epoch.ai/gradient-updates/openai-is-projecting-unprecedented-revenue-growth
-    notes: "2026 revenue projection of ~$30B (2.3x growth from 2025's $13.1B);
-      2027 projected at ~$62B (2x), 2028 at ~$100B (1.6x), 2030 target
-      $280B per CFO Sarah Friar"
+    notes: "2026 revenue projection of ~$30B (2.3x growth from 2025's $13.1B); 2027 projected at ~$62B (2x), 2028 at ~$100B
+      (1.6x), 2030 target $280B per CFO Sarah Friar"
 
   # ── Retention Rate ────────────────────────────────────────────
   - id: f_mu9366g8mA
@@ -358,9 +334,8 @@ facts:
     value: 71
     asOf: 2025-06
     source: https://www.pymnts.com/artificial-intelligence-2/2025/report-chatgpt-plus-has-top-retention-rate-among-ai-subscription-services/
-    notes: "ChatGPT Plus paid user retention rate of 71% at six months, ranking
-      first among AI subscription services. 89% after one quarter, 74%
-      after three quarters, 68% at 12 months. Paid churn under 4% monthly."
+    notes: "ChatGPT Plus paid user retention rate of 71% at six months, ranking first among AI subscription services. 89%
+      after one quarter, 74% after three quarters, 68% at 12 months. Paid churn under 4% monthly."
 
   # ── Customer Concentration ────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -368,11 +343,9 @@ facts:
     property: customer-concentration
     value: 10
     asOf: 2025-12
-    notes: "Estimate; no published source. Revenue concentration from largest
-      customer (likely Microsoft via API/Azure partnership) estimated at
-      ~10%. With 1M+ business customers and 15M+ Plus subscribers, OpenAI
-      has relatively low customer concentration compared to B2B-focused
-      competitors."
+    notes: "Estimate; no published source. Revenue concentration from largest customer (likely Microsoft via API/Azure
+      partnership) estimated at ~10%. With 1M+ business customers and 15M+ Plus subscribers, OpenAI has relatively low
+      customer concentration compared to B2B-focused competitors."
 
   # ── Infrastructure Investment ─────────────────────────────────
   - id: f_xnepFIhHIA
@@ -380,10 +353,9 @@ facts:
     value: 6e+11
     asOf: 2026-02
     source: https://www.cnbc.com/2026/02/20/openai-resets-spend-expectations-targets-around-600-billion-by-2030.html
-    notes: "Cumulative compute spending TARGET of $600B by 2030 (down from
-      earlier $1.4T commitment). This is a future projection, not current spend.
-      Includes $250B Microsoft Azure commitment and $38B AWS commitment.
-      Compute capacity reached 1.9GW by end of 2025, a 9.5x increase from 2023."
+    notes: "Cumulative compute spending TARGET of $600B by 2030 (down from earlier $1.4T commitment). This is a future
+      projection, not current spend. Includes $250B Microsoft Azure commitment and $38B AWS commitment. Compute capacity
+      reached 1.9GW by end of 2025, a 9.5x increase from 2023."
 
   # ── Equity Stake ──────────────────────────────────────────────
   - id: f_FZb1inTwrQ
@@ -391,19 +363,16 @@ facts:
     value: 27
     asOf: 2025-10
     source: https://fortune.com/2025/10/28/openai-for-profit-restructuring-microsoft-stake/
-    notes: "Microsoft equity stake in OpenAI Group PBC after restructuring;
-      valued at approximately $135B on $500B valuation. Down from previous
-      32.5% stake. Microsoft invested $13.8B total ($11.6B funded as of
-      September 2025)."
+    notes: "Microsoft equity stake in OpenAI Group PBC after restructuring; valued at approximately $135B on $500B
+      valuation. Down from previous 32.5% stake. Microsoft invested $13.8B total ($11.6B funded as of September 2025)."
 
   - id: f_12O2XaCyPA
     property: equity-stake-percent
     value: 26
     asOf: 2025-10
     source: https://www.cnbc.com/2025/10/28/open-ai-for-profit-microsoft.html
-    notes: "OpenAI Foundation equity stake in OpenAI Group PBC; valued at ~$130B.
-      Foundation retains legal control. 47% held by current/former employees
-      and investors."
+    notes: "OpenAI Foundation equity stake in OpenAI Group PBC; valued at ~$130B. Foundation retains legal control. 47% held
+      by current/former employees and investors."
 
   # ── Equity Value ──────────────────────────────────────────────
   - id: f_swFnF8WXew
@@ -411,8 +380,7 @@ facts:
     value: 1.35e+11
     asOf: 2025-10
     source: https://www.constellationr.com/blog-news/insights/microsoft-owns-27-openai-worth-135-billion
-    notes: "Microsoft's 27% equity stake valued at $135B based on $500B
-      valuation at PBC restructuring"
+    notes: "Microsoft's 27% equity stake valued at $135B based on $500B valuation at PBC restructuring"
 
   # ── Annual Expenses ───────────────────────────────────────────
   - id: f_1tj27H2wMw
@@ -420,17 +388,16 @@ facts:
     value: 9e+9
     asOf: 2024-12
     source: https://sanj.dev/post/real-cost-of-ai-openai-financials
-    notes: "Total operating costs approximately $9B in 2024; includes ~$3B
-      training compute, ~$2B inference compute, plus staff and operations"
+    notes: "Total operating costs approximately $9B in 2024; includes ~$3B training compute, ~$2B inference compute, plus
+      staff and operations"
 
   - id: f_DtyJCdGd1g
     property: annual-expenses
     value: 2.2e+10
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Total anticipated spending of ~$22B in 2025 against $13.1B revenue;
-      inference costs of $8.4B, R&D of $6.7B in H1 alone, plus $2.5B in
-      stock-based compensation in H1"
+    notes: "Total anticipated spending of ~$22B in 2025 against $13.1B revenue; inference costs of $8.4B, R&D of $6.7B in H1
+      alone, plus $2.5B in stock-based compensation in H1"
 
   # ── Safety Staffing Ratio ─────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -438,8 +405,8 @@ facts:
     property: safety-staffing-ratio
     value: 19
     asOf: 2025-12
-    notes: "Estimate; no published source. 650+ safety/trust/alignment staff out
-      of ~3,500 total employees, approximately 19% of workforce"
+    notes: "Estimate; no published source. 650+ safety/trust/alignment staff out of ~3,500 total employees, approximately
+      19% of workforce"
 
   # ── API Calls Monthly ────────────────────────────────────────
   - id: f_DJyrjvvvIg
@@ -447,10 +414,9 @@ facts:
     value: 2.6e+11
     asOf: 2025-10
     source: https://techcrunch.com/2025/10/06/sam-altman-says-chatgpt-has-hit-800m-weekly-active-users/
-    notes: "Approximate monthly API calls derived from Sam Altman's October 2025
-      disclosure of 6B tokens per minute on the API, up 20x over two years.
-      At 6B tokens/min and ~1,000 tokens per call average, this implies
-      roughly 8.6T tokens/day processed."
+    notes: "Approximate monthly API calls derived from Sam Altman's October 2025 disclosure of 6B tokens per minute on the
+      API, up 20x over two years. At 6B tokens/min and ~1,000 tokens per call average, this implies roughly 8.6T
+      tokens/day processed."
 
   # ── GPU Count ─────────────────────────────────────────────────
   - id: f_eC8eggO7bA
@@ -458,9 +424,8 @@ facts:
     value: 1000000
     asOf: 2025-12
     source: https://www.tomshardware.com/tech-industry/sam-altman-teases-100-million-gpu-scale-for-openai-that-could-cost-usd3-trillion-chatgpt-maker-to-cross-well-over-1-million-by-end-of-year
-    notes: "Sam Altman stated in July 2025 that OpenAI was on track to bring
-      'well over' 1M GPUs online by end of 2025. Compute capacity reached
-      1.9GW by end of 2025. Stargate Project aims for ~2M chips."
+    notes: "Sam Altman stated in July 2025 that OpenAI was on track to bring 'well over' 1M GPUs online by end of 2025.
+      Compute capacity reached 1.9GW by end of 2025. Stargate Project aims for ~2M chips."
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_ZencK2XFDA
@@ -481,6 +446,7 @@ facts:
     value: 71.7
     asOf: 2024-09
     notes: "o1 model on SWE-bench Verified."
+    source: https://plantemoran.com/explore-our-thinking/insight/2025/01/unveiling-openai-o3-from-benchmarks-to-real-world
 
   - id: f_Cvorun6akA
     property: description

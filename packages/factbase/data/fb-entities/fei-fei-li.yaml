@@ -3,16 +3,23 @@ facts:
   - id: f_Tz7Zi9bQUw
     property: born-year
     value: 1976
+    source: https://bayer.com/sites/default/files/curricula-vitae-of-fei-fei-li.pdf
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_QB41VrylJQ
     property: notable-for
     value: "Stanford professor; creator of ImageNet; co-director of Stanford Human-Centered AI Institute (HAI)"
+    source: https://profiles.stanford.edu/fei-fei-li
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_6jSJH4dKkg
     property: education
     value: "PhD in Electrical Engineering, Caltech"
+    source: https://profiles.stanford.edu/fei-fei-li
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_JTMGj07W7Q
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
-
+    source: https://en.wikipedia.org/wiki/Fei-Fei_Li
+    notes: "[auto-discovered by tb backfill-sources]"

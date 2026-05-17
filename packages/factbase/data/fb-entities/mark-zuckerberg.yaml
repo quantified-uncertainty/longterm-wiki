@@ -3,19 +3,24 @@ facts:
   - id: f_1TD2ftGDkg
     property: born-year
     value: 1984
+    source: https://en.wikipedia.org/wiki/Mark_Zuckerberg?wprov=sfla1
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_YbXRRr8Bcw
     property: notable-for
     value: "CEO of Meta; leads Meta AI and open-source Llama model development; advocate for open-source AI"
+    source: https://fortune.com/2024/11/19/zuckerberg-meta-ai-openai-llama
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_RRcNwwrZzQ
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
+    source: https://en.wikipedia.org/wiki/Mark_Zuckerberg
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_aBMP7Bjbc8
     property: education
-    value: Harvard University; Phillips Exeter Academy; Ardsley High School; Johns
-      Hopkins Center for Talented Youth; Mercy University; New York Medical
-      College
+    value: Harvard University; Phillips Exeter Academy; Ardsley High School; Johns Hopkins Center for Talented Youth; Mercy
+      University; New York Medical College
     source: https://www.wikidata.org/wiki/Q36215
     notes: From Wikidata Q36215
