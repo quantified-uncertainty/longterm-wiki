@@ -37,6 +37,7 @@ function makeConfig(overrides: Partial<Config> = {}): Config {
         budget: 30,
         maxPages: 5,
       },
+      backfillSourcesEnqueue: { enabled: false, schedule: "0 2 * * *", limit: 100, maxCost: 5 },
       jobFailureTriage: { enabled: true, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: true, schedule: "0 5 * * *" },
       e2ePostDeployWatcher: { enabled: false, schedule: "15 * * * *" },

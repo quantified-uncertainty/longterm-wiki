@@ -16,10 +16,11 @@
  */
 
 import { MIN_CONTENT_LENGTH } from './config.ts';
+import { rememberContent } from './content-cache.ts';
 import { contentMentionsEntity, isSelfDomain } from './entity-mention.ts';
 import { extractSupportingQuotes, verifyEntailment } from './llm-calls.ts';
 import { verifyQuoteInContent } from './prompts.ts';
-import type { RankCandidate } from './types.ts';
+import type { CandidateRecord, RankCandidate } from './types.ts';
 
 export type RejectionReason =
   | 'invalid-url'
@@ -77,11 +78,12 @@ export interface VerifyCost {
 }
 
 export type VerifyResult =
-  | { kind: 'accepted'; candidate: RankCandidate; cost: VerifyCost }
+  | { kind: 'accepted'; candidate: RankCandidate; cost: VerifyCost; record: CandidateRecord }
   | {
       kind: 'rejected';
       reason: RejectionReason;
       cost: VerifyCost;
+      record: CandidateRecord;
       /** Extra context for debug logs (e.g. missing entity slots, fabricated quotes). */
       detail?: { missingSlots?: string[][]; haikuQuotes?: string[]; verifiedQuotes?: string[] };
     };
@@ -105,60 +107,124 @@ export async function verifySource(
   mentionTargets: string[][],
 ): Promise<VerifyResult> {
   const cost: VerifyCost = { quoteExtractCost: 0, entailmentCost: 0 };
+  const record: CandidateRecord = {
+    url: source.url,
+    provider: source.provider,
+    title: source.title,
+    decision: 'rejected',
+    rejection_reason: null,
+    content_sha256: null,
+    content_chars: null,
+    quote_extraction: null,
+    entailment: null,
+  };
 
   if (!isHttpUrl(source.url)) {
-    return { kind: 'rejected', reason: 'invalid-url', cost };
+    record.rejection_reason = 'invalid-url';
+    return { kind: 'rejected', reason: 'invalid-url', cost, record };
   }
 
   if (isSelfDomain(source.url)) {
-    return { kind: 'rejected', reason: 'self-domain', cost };
+    record.rejection_reason = 'self-domain';
+    return { kind: 'rejected', reason: 'self-domain', cost, record };
   }
 
   if (isPlaceholderUrl(source.url)) {
-    return { kind: 'rejected', reason: 'placeholder-url', cost };
+    record.rejection_reason = 'placeholder-url';
+    return { kind: 'rejected', reason: 'placeholder-url', cost, record };
   }
 
   if (source.content.length < MIN_CONTENT_LENGTH) {
-    return { kind: 'rejected', reason: 'too-short', cost };
+    record.rejection_reason = 'too-short';
+    return { kind: 'rejected', reason: 'too-short', cost, record };
   }
 
   const missingSlots = mentionTargets.filter(
     variants => !variants.some(v => contentMentionsEntity(source.content, v, source.url)),
   );
   if (missingSlots.length > 0) {
-    return { kind: 'rejected', reason: 'no-entity-mention', cost, detail: { missingSlots } };
+    record.rejection_reason = 'no-entity-mention';
+    record.missing_slots = missingSlots;
+    return { kind: 'rejected', reason: 'no-entity-mention', cost, record, detail: { missingSlots } };
   }
+
+  // Persist the exact text the judges saw before any LLM call so the
+  // call can be replayed byte-for-byte after the run.
+  record.content_sha256 = rememberContent(source.content);
+  record.content_chars = source.content.length;
 
   const extracted = await extractSupportingQuotes(claim, entityName, source.content);
   cost.quoteExtractCost = extracted.cost;
+  const haikuVerified = extracted.quotes.filter(q => verifyQuoteInContent(q, source.content));
+  record.quote_extraction = {
+    haiku: {
+      raw_text: extracted.rawText,
+      quotes: extracted.quotes,
+      duration_ms: extracted.durationMs,
+    },
+    haiku_verified_quotes: haikuVerified,
+    vllm: extracted.vllm
+      ? {
+          raw_text: extracted.vllm.raw_text,
+          quotes: extracted.vllm.quotes,
+          verified_quotes: extracted.vllm.quotes.filter(q => verifyQuoteInContent(q, source.content)),
+          duration_ms: extracted.vllm.duration_ms,
+        }
+      : null,
+  };
   if (extracted.quotes.length === 0) {
-    return { kind: 'rejected', reason: 'no-quote', cost };
+    record.rejection_reason = 'no-quote';
+    return { kind: 'rejected', reason: 'no-quote', cost, record };
   }
 
-  const verifiedQuotes = extracted.quotes.filter(q => verifyQuoteInContent(q, source.content));
-  if (verifiedQuotes.length === 0) {
+  if (haikuVerified.length === 0) {
+    record.rejection_reason = 'quote-fabricated';
     return {
       kind: 'rejected',
       reason: 'quote-fabricated',
       cost,
+      record,
       detail: { haikuQuotes: extracted.quotes },
     };
   }
 
-  const entailment = await verifyEntailment(claim, verifiedQuotes, source.url, source.title);
+  const entailment = await verifyEntailment(claim, haikuVerified, source.url, source.title);
   cost.entailmentCost = entailment.cost;
+  record.entailment = {
+    sonnet: {
+      raw_text: entailment.rawText,
+      supports: entailment.supports,
+      duration_ms: entailment.durationMs,
+    },
+    vllm: entailment.vllm
+      ? {
+          raw_text: entailment.vllm.raw_text,
+          decision:
+            entailment.vllm.supports === true
+              ? 'supports'
+              : entailment.vllm.supports === false
+                ? 'no-support'
+                : 'unparseable',
+          duration_ms: entailment.vllm.duration_ms,
+        }
+      : null,
+  };
   if (!entailment.supports) {
-    return { kind: 'rejected', reason: 'entailment-failed', cost, detail: { verifiedQuotes } };
+    record.rejection_reason = 'entailment-failed';
+    return { kind: 'rejected', reason: 'entailment-failed', cost, record, detail: { verifiedQuotes: haikuVerified } };
   }
 
+  record.decision = 'accepted';
+  record.rejection_reason = null;
   return {
     kind: 'accepted',
     cost,
+    record,
     candidate: {
       url: source.url,
       snippet: source.content.slice(0, 600),
       provider: source.provider,
-      quotes: verifiedQuotes,
+      quotes: haikuVerified,
     },
   };
 }

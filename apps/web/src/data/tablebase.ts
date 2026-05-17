@@ -489,86 +489,6 @@ export type AnyEntity = TypedEntity | GenericEntity;
 let _database: TableBaseShape | null = null;
 let _typedEntities: AnyEntity[] | null = null;
 
-// ============================================================================
-// STRICT-FAIL COUNTER (QUA-953)
-//
-// Tracks how often TypedEntitySchema.safeParse falls through to
-// GenericEntityPassthroughSchema in getTypedEntities(). Phase 6 of QUA-943
-// requires this counter to read zero for 7 consecutive prod build cycles
-// before GenericEntityPassthroughSchema can be deleted.
-//
-// Scope:
-// - Per-process and per-build-cycle. Stats are populated on the first call
-//   to getTypedEntities() in a process and are stable thereafter (the
-//   function is memoized via _typedEntities). Each Next.js build → fresh
-//   process → fresh stats, which is exactly the cadence Phase 6's
-//   "7 consecutive prod build cycles" check needs.
-// - Not aggregated across workers. A multi-worker deploy will give each
-//   worker its own snapshot; readers should expect identical values across
-//   workers because the input (database.json) is identical.
-// ============================================================================
-
-// Cap per-type sample arrays so a pathological "100 entities of bad type X"
-// build doesn't bloat the JSON response. 5 is enough to spot the failure
-// pattern (failing field path + message) without flooding the endpoint.
-const SAMPLE_LIMIT = 5;
-
-// Used as the bucket key / sample id when an entity is missing entityType / id.
-export const STRICT_FAIL_UNKNOWN_LABEL = "<unknown>";
-
-interface StrictFailSample {
-  id: string;
-  fieldPath: string;
-  message: string;
-}
-
-interface StrictFailTypeBreakdown {
-  count: number;
-  samples: StrictFailSample[];
-}
-
-export interface StrictFailStats {
-  fallthroughCount: number;
-  /** Entities that failed even GenericEntityPassthroughSchema (skipped entirely). */
-  hardFailCount: number;
-  totalEntities: number;
-  byType: Record<string, StrictFailTypeBreakdown>;
-  /** ISO timestamp of when the counter was last populated. Null until
-   * getTypedEntities() runs. Use as the populated/unpopulated signal. */
-  populatedAt: string | null;
-}
-
-function makeEmptyStats(): StrictFailStats {
-  return {
-    fallthroughCount: 0,
-    hardFailCount: 0,
-    totalEntities: 0,
-    byType: {},
-    populatedAt: null,
-  };
-}
-
-let _strictFailStats: StrictFailStats = makeEmptyStats();
-
-/** Snapshot of the strict-fail counter. Returns an empty stats object if
- * getTypedEntities() has not been called yet in this process. The returned
- * object is a deep copy — mutating it does not affect internal state. */
-export function getStrictFailStats(): StrictFailStats {
-  return structuredClone(_strictFailStats);
-}
-
-/** Reset the counter — for tests only. Throws in non-test environments to
- * prevent accidental cache invalidation in production bundles. */
-export function _resetStrictFailStatsForTests(): void {
-  if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {
-    throw new Error(
-      "_resetStrictFailStatsForTests() is only callable in test environments",
-    );
-  }
-  _strictFailStats = makeEmptyStats();
-  _typedEntities = null;
-}
-
 export function getTableBase(): TableBaseShape {
   if (_database) return _database;
 
@@ -602,12 +522,6 @@ export function getTypedEntities(): AnyEntity[] {
   const entities: AnyEntity[] = [];
   const isDev = process.env.NODE_ENV === "development";
 
-  const stats: StrictFailStats = {
-    ...makeEmptyStats(),
-    totalEntities: db.typedEntities.length,
-    populatedAt: new Date().toISOString(),
-  };
-
   for (const raw of db.typedEntities) {
     const result = TypedEntitySchema.safeParse(raw);
     if (result.success) {
@@ -615,45 +529,29 @@ export function getTypedEntities(): AnyEntity[] {
       continue;
     }
 
-    // GenericEntityPassthroughSchema preserves unknown keys
-    // (causeEffectGraph, content, currentAssessment, etc.).
-    const rawRecord = raw as Record<string, unknown>;
-    const id =
-      typeof rawRecord.id === "string" ? rawRecord.id : STRICT_FAIL_UNKNOWN_LABEL;
-    const type =
-      typeof rawRecord.entityType === "string"
-        ? rawRecord.entityType
-        : STRICT_FAIL_UNKNOWN_LABEL;
-
-    stats.fallthroughCount += 1;
-    const bucket = (stats.byType[type] ??= { count: 0, samples: [] });
-    bucket.count += 1;
-    if (bucket.samples.length < SAMPLE_LIMIT) {
-      const firstIssue = result.error.issues[0];
-      bucket.samples.push({
-        id,
-        fieldPath: firstIssue?.path.join(".") ?? "",
-        message: firstIssue?.message ?? "",
-      });
-    }
-
     if (isDev) {
+      const rawRecord = raw as Record<string, unknown>;
+      const id = typeof rawRecord.id === "string" ? rawRecord.id : "<unknown>";
+      const type = typeof rawRecord.entityType === "string" ? rawRecord.entityType : "<unknown>";
       console.warn(
         `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
       );
     }
+
+    // GenericEntityPassthroughSchema preserves unknown keys
+    // (causeEffectGraph, content, currentAssessment, etc.).
     const genericResult = GenericEntityPassthroughSchema.safeParse(raw);
     if (genericResult.success) {
       entities.push(genericResult.data as GenericEntity);
-    } else {
-      stats.hardFailCount += 1;
-      if (isDev) {
-        console.warn(`[entity-validation] ${id}: failed generic parse too — skipping`);
-      }
+      continue;
+    }
+    if (isDev) {
+      const rawRecord = raw as Record<string, unknown>;
+      const id = typeof rawRecord.id === "string" ? rawRecord.id : "<unknown>";
+      console.warn(`[entity-validation] ${id}: failed generic parse too — skipping`);
     }
   }
 
-  _strictFailStats = stats;
   _typedEntities = entities;
   return _typedEntities;
 }

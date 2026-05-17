@@ -72,6 +72,48 @@ const handlers: Record<string, JobHandler> = {
     }
   },
 
+  'backfill-sources': async (params, ctx) => {
+    const limit = typeof params.limit === 'number' ? String(params.limit) : '100';
+    const maxCost =
+      typeof params.maxCost === 'number' ? String(params.maxCost) : '5';
+    const args = [
+      '--import',
+      'tsx/esm',
+      '--no-warnings',
+      'crux/crux.mjs',
+      'tb',
+      'backfill-sources',
+      '--apply',
+      `--limit=${limit}`,
+      `--max-cost=${maxCost}`,
+    ];
+    if (typeof params.table === 'string' && params.table.length > 0) {
+      args.push(`--table=${params.table}`);
+    }
+
+    try {
+      const output = execFileSync('node', args, {
+        cwd: ctx.projectRoot,
+        encoding: 'utf-8',
+        timeout: 60 * 60 * 1000, // 1h — full prod sweep is ~30-50 min
+        stdio: ['pipe', 'pipe', 'pipe'],
+        maxBuffer: 16 * 1024 * 1024,
+      });
+
+      // Tail of stdout is enough to summarise outcomes; the full report is
+      // written to dev/reports/backfill-unmatched-*.json on the worker pod.
+      const tail = output.slice(-2000);
+      return { success: true, data: { limit, maxCost, table: params.table ?? null, output: tail } };
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        success: false,
+        data: { limit, maxCost, table: params.table ?? null },
+        error: error.slice(0, 500),
+      };
+    }
+  },
+
   // Content-modifying handlers (lazy — depend on full monorepo)
   'page-improve': lazyHandler(async () =>
     (await import('./page-improve.ts')).handlePageImprove),

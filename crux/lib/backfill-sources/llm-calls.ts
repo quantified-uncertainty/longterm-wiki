@@ -5,6 +5,11 @@
  * the response, return `(parsedResult, costUsd)`. On any error we log a
  * warning and return a "no support" / fallback result with cost 0 — the
  * pipeline keeps running rather than halting on a single transient failure.
+ *
+ * Dual-judge: when enabled, the local vLLM server is queried with the same
+ * prompt in parallel with Haiku/Sonnet. The vLLM result is returned
+ * alongside the primary result for offline comparison only — it never
+ * influences accept/reject decisions or DB writes.
  */
 
 import { createLlmClient, streamingCreate, extractText, MODELS } from '../llm.ts';
@@ -18,20 +23,76 @@ import {
   parseRankingResponse,
 } from './prompts.ts';
 import type { RankCandidate } from './types.ts';
+import { callVllm, loadVllmConfig, type VllmConfig } from './vllm-client.ts';
+
+let _vllmConfig: VllmConfig | null = null;
+function vllmConfig(): VllmConfig {
+  if (!_vllmConfig) _vllmConfig = loadVllmConfig();
+  return _vllmConfig;
+}
+
+/** Parallel vLLM observation for a quote-extraction call (or null if disabled/failed). */
+export interface VllmQuoteObservation {
+  raw_text: string;
+  quotes: string[];
+  duration_ms: number;
+}
+
+/** Parallel vLLM observation for an entailment call. */
+export interface VllmEntailmentObservation {
+  raw_text: string;
+  /** null when the model's output couldn't be parsed as {"supports": bool}. */
+  supports: boolean | null;
+  duration_ms: number;
+}
 
 /** Haiku: extract up to 3 verbatim supporting passages, or [] if none. */
 export async function extractSupportingQuotes(
   claim: string,
   entityName: string,
   content: string,
-): Promise<{ quotes: string[]; cost: number }> {
+): Promise<{
+  quotes: string[];
+  cost: number;
+  rawText: string;
+  durationMs: number;
+  vllm: VllmQuoteObservation | null;
+}> {
   const prompt = buildQuoteExtractionPrompt(claim, entityName, content);
+  const [haiku, vllm] = await Promise.all([
+    callHaikuQuotes(prompt),
+    callVllm(prompt, 400, vllmConfig()),
+  ]);
+  return {
+    quotes: haiku.quotes,
+    cost: haiku.cost,
+    rawText: haiku.rawText,
+    durationMs: haiku.durationMs,
+    vllm: vllm
+      ? {
+          raw_text: vllm.text,
+          quotes: parseQuoteResponse(vllm.text) ?? [],
+          duration_ms: vllm.durationMs,
+        }
+      : null,
+  };
+}
+
+async function callHaikuQuotes(
+  prompt: string,
+): Promise<{ quotes: string[]; cost: number; rawText: string; durationMs: number }> {
+  const started = Date.now();
   try {
     const { text, cost } = await callLlm(MODELS.haiku, prompt, 400);
-    return { quotes: parseQuoteResponse(text) ?? [], cost };
+    return {
+      quotes: parseQuoteResponse(text) ?? [],
+      cost,
+      rawText: text,
+      durationMs: Date.now() - started,
+    };
   } catch (err: unknown) {
     console.warn(`  Quote extraction failed (${errMessage(err)})`);
-    return { quotes: [], cost: 0 };
+    return { quotes: [], cost: 0, rawText: '', durationMs: Date.now() - started };
   }
 }
 
@@ -41,15 +102,49 @@ export async function verifyEntailment(
   quotes: string[],
   sourceUrl?: string,
   sourceTitle?: string,
-): Promise<{ supports: boolean; cost: number }> {
+): Promise<{
+  supports: boolean;
+  cost: number;
+  rawText: string;
+  durationMs: number;
+  vllm: VllmEntailmentObservation | null;
+}> {
   const prompt = buildEntailmentPrompt(claim, quotes, sourceUrl, sourceTitle);
+  const [sonnet, vllm] = await Promise.all([
+    callSonnetEntailment(prompt),
+    callVllm(prompt, 50, vllmConfig()),
+  ]);
+  return {
+    supports: sonnet.supports,
+    cost: sonnet.cost,
+    rawText: sonnet.rawText,
+    durationMs: sonnet.durationMs,
+    vllm: vllm
+      ? {
+          raw_text: vllm.text,
+          supports: parseEntailmentResponse(vllm.text),
+          duration_ms: vllm.durationMs,
+        }
+      : null,
+  };
+}
+
+async function callSonnetEntailment(
+  prompt: string,
+): Promise<{ supports: boolean; cost: number; rawText: string; durationMs: number }> {
+  const started = Date.now();
   try {
     const { text, cost } = await callLlm(MODELS.sonnet, prompt, 50);
     const supports = parseEntailmentResponse(text);
-    return { supports: supports === true, cost };
+    return {
+      supports: supports === true,
+      cost,
+      rawText: text,
+      durationMs: Date.now() - started,
+    };
   } catch (err: unknown) {
     console.warn(`  Entailment check failed (${errMessage(err)})`);
-    return { supports: false, cost: 0 };
+    return { supports: false, cost: 0, rawText: '', durationMs: Date.now() - started };
   }
 }
 
@@ -57,6 +152,10 @@ export async function verifyEntailment(
  * Haiku: pick the single matching source that best directly supports the
  * claim. Returns the index plus the call's USD cost. On error or unparseable
  * output, falls back to index 0 so the caller still gets an answer.
+ *
+ * Dual-judge is intentionally NOT applied here — ranking only fires when
+ * multiple candidates pass verification (rare), and the comparison signal
+ * we care about is on the per-source accept/reject decision.
  */
 export async function rankMatchingSources(
   claim: string,

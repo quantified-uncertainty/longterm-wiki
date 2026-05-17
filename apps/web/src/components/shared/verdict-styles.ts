@@ -76,10 +76,10 @@ export const SOURCE_CHECK_VERDICT_STYLES: Record<SourcingVerdictType, SourcingVe
   },
   unverifiable: {
     label: "Unverifiable",
-    className: "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400",
-    bg: "bg-orange-400/15",
-    text: "text-orange-600",
-    dot: "bg-orange-400",
+    className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+    bg: "bg-red-400/15",
+    text: "text-red-600",
+    dot: "bg-red-400",
   },
   unchecked: {
     label: "Unchecked",
@@ -100,7 +100,17 @@ export const SOURCE_CHECK_VERDICT_DESCRIPTIONS: Record<SourcingVerdictType, stri
   unchecked: "This claim has not yet been checked against sources.",
 };
 
-/** Sort priority for sourcing verdicts: most actionable first. Lower = higher priority. */
+/**
+ * Sort priority for sourcing verdicts: most actionable first. Lower = higher priority.
+ *
+ * Note: visual severity (red/amber/green) and actionability priority are *intentionally*
+ * different axes. `unverifiable` renders red (same severity bucket as `contradicted`) but
+ * is ranked less actionable than `partial`/`outdated` here, because "no support found"
+ * gives an editor less to work with than "some support found, but stale" (`outdated`) or
+ * "some support found, but only partial" (`partial`). Don't "fix" this by reordering to
+ * match the visual severity — entity-sourcing aggregation depends on this ordering
+ * (see `entity-sourcing.test.ts` and the QUA-429 contract in `tablebase.ts`).
+ */
 export const SOURCE_CHECK_VERDICT_PRIORITY: Record<string, number> = {
   contradicted: 0,
   outdated: 1,

@@ -3,12 +3,13 @@ facts:
   - id: f_2HGntp6Jt1
     property: born-year
     value: 1998
-    notes: "Born approximately 1998; grew up in Germany"
+    notes: "Born approximately 1998; grew up in Germany; [auto-discovered by tb backfill-sources]"
+    source: https://radaris.com/p/Connor/Leahy
 
   - id: f_cL1aB2cD3e
     property: notable-for
-    value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety
-      advocate; testified before UK Parliament and EU on AI risks"
+    value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety advocate; testified before UK Parliament and EU
+      on AI risks"
     source: https://en.wikipedia.org/wiki/Connor_Leahy
 
   - id: f_cL4fG5hI6j

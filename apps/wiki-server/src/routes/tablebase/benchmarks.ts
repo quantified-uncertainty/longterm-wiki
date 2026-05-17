@@ -9,6 +9,7 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
 
@@ -116,15 +117,21 @@ const benchmarksApp = new Hono()
     const { category, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const rows = await db
-      .select()
-      .from(benchmarks)
-      .where(category ? eq(benchmarks.category, category) : undefined)
-      .orderBy(desc(benchmarks.syncedAt))
-      .limit(limit)
-      .offset(offset);
+    const where = category ? eq(benchmarks.category, category) : undefined;
 
-    return c.json({ benchmarks: rows.map(formatRow) });
+    const { rows, total } = await paginatedQuery({
+      query: db
+        .select()
+        .from(benchmarks)
+        .where(where)
+        .orderBy(desc(benchmarks.syncedAt))
+        .limit(limit)
+        .offset(offset),
+      countQuery: db.select({ count: count() }).from(benchmarks).where(where),
+      formatRow,
+    });
+
+    return c.json({ benchmarks: rows, total, limit, offset });
   })
 
   // ---- GET /:id ----

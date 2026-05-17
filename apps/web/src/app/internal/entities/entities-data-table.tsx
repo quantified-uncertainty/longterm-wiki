@@ -304,7 +304,7 @@ function VerdictBar({ row }: { row: UnifiedEntityRow }) {
     { key: "contradicted", count: row.scContradicted ?? 0, color: "bg-red-500", label: "Contradicted" },
     { key: "outdated", count: row.scOutdated ?? 0, color: "bg-amber-500", label: "Outdated" },
     { key: "partial", count: row.scPartial ?? 0, color: "bg-yellow-400", label: "Partial" },
-    { key: "unverifiable", count: row.scUnverifiable ?? 0, color: "bg-orange-400", label: "Unverifiable" },
+    { key: "unverifiable", count: row.scUnverifiable ?? 0, color: "bg-red-400", label: "Unverifiable" },
     { key: "unchecked", count: row.scUnchecked ?? 0, color: "bg-gray-300 dark:bg-gray-600", label: "Unchecked" },
   ];
 
@@ -976,7 +976,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     accessorKey: "scUnverifiable",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records that could not be verified">Unver</SortableHeader>,
-    cell: ({ row }) => <VerdictCount value={row.original.scUnverifiable} color="text-orange-400" icon="?" />,
+    cell: ({ row }) => <VerdictCount value={row.original.scUnverifiable} color="text-red-400" icon="?" />,
   },
   {
     accessorKey: "scUnchecked",
