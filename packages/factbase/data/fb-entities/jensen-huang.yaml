@@ -9,10 +9,14 @@ facts:
   - id: f_uWhqL9PqsQ
     property: notable-for
     value: "CEO and co-founder of NVIDIA; architect of the GPU computing revolution that enabled modern AI"
+    source: https://corporate-awards.ieee.org/recipient/jensen-huang
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_3HyDX4rAcA
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Jensen_Huang"
+    source: https://en.wikipedia.org/wiki/Jensen_Huang
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_jELY7QhUGw
     property: education

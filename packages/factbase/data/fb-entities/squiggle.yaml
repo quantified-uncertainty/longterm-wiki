@@ -16,6 +16,7 @@ facts:
     property: founded-date
     value: "2020"
     notes: First release circa 2020; major v0.10.0 rewrite released Jan 2025
+    source: https://accelerateshares.com/wp-content/uploads/2022/09/Squiggles-Accelerate-NFT-Research-Sept-2022.pdf
 
   - id: f_uRq5zW8bLc
     property: founded-by

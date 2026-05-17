@@ -18,3 +18,4 @@ facts:
     value: 100000000
     asOf: 2024-02
     notes: Training cost threshold ($100M) for covered models
+    source: https://leginfo.legislature.ca.gov/faces/billCompareClient.xhtml?bill_id=202320240SB1047&showamends=false

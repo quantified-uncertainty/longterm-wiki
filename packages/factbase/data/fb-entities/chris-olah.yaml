@@ -8,9 +8,8 @@ facts:
 
   - id: f_cO4fG5hI6j
     property: notable-for
-    value: "Pioneer of neural network interpretability and visualization; co-founder
-      of Anthropic; creator of Distill.pub and the Circuits thread at
-      Transformer Circuits"
+    value: "Pioneer of neural network interpretability and visualization; co-founder of Anthropic; creator of Distill.pub
+      and the Circuits thread at Transformer Circuits"
     source: https://colah.github.io/
 
   - id: f_cO7kL8mN9o
@@ -25,10 +24,14 @@ facts:
   - id: f_qzkd7k85wt
     property: github-profile
     value: "https://github.com/colah"
+    source: https://github.com/colah
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_s2rmoloko5
     property: google-scholar
     value: "https://scholar.google.com/citations?user=vKAKE1gAAAAJ"
+    source: https://scholar.google.com/citations?user=vKAKE1gAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_MyJoRfuhp3
     property: website
     value: https://colah.github.io.
@@ -45,13 +48,12 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_oxVU2XTpRV
     property: ea-alignment-estimate
-    value: [0.4, 0.6]
+    value: [ 0.4, 0.6 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Interpretability pioneer; participated in EA events;
-      safety-focused work closely aligned with EA priorities but less explicit
-      commitment to EA cause-area giving than Dario/Daniela. Moderate confidence."
+    notes: "Editorial estimate. Interpretability pioneer; participated in EA events; safety-focused work closely aligned
+      with EA priorities but less explicit commitment to EA cause-area giving than Dario/Daniela. Moderate confidence."

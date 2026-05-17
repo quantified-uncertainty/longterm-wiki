@@ -2,9 +2,8 @@ entity: sid_XnqqKHiNmw
 facts:
   - id: f_ENQaaYa3Gw
     property: description
-    value: AI safety researcher currently at Anthropic and formerly at MIRI, known
-      for the influential risks from learned optimization framework and the concept
-      of deceptive alignment (mesa-optimization). Author of key foundational work
+    value: AI safety researcher currently at Anthropic and formerly at MIRI, known for the influential risks from learned
+      optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work
       on inner alignment and corrigibility.
     asOf: 2026-03
     notes: Migrated from old entity system
@@ -15,10 +14,13 @@ facts:
     notes: From Wikidata Q126287406
   - id: f_eH6tN2pQ5v
     property: notable-for
-    value: "Co-authored Risks from Learned Optimization (2019) introducing mesa-optimization and deceptive alignment; led Sleeper Agents and Alignment Faking research at Anthropic; 3,400+ citations"
+    value: "Co-authored Risks from Learned Optimization (2019) introducing mesa-optimization and deceptive alignment; led
+      Sleeper Agents and Alignment Faking research at Anthropic; 3,400+ citations"
     asOf: 2026-03
     notes: Enriched from wiki page
+    source: https://arxiv.org/abs/1906.01820
   - id: f_eHfB4gN3mD
     property: education
     value: "B.S. Mathematics and Computer Science, Harvey Mudd College (2019), High Distinction, GPA 3.912"
     notes: Enriched from wiki page
+    source: https://evhub.github.io/resumes/ehubinger_resume_main.pdf

@@ -3,20 +3,26 @@ facts:
   - id: f_pKjP4VMnsg
     property: born-year
     value: 1967
+    source: https://britannica.com/biography/Satya-Nadella
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ogkKZjCfQg
     property: notable-for
-    value: "CEO of Microsoft; led Microsoft's multi-billion dollar investment in
-      OpenAI; shaped enterprise AI strategy"
+    value: "CEO of Microsoft; led Microsoft's multi-billion dollar investment in OpenAI; shaped enterprise AI strategy"
+    source: https://news.microsoft.com/source/exec/satya-nadella
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_O4q4Gx1XHQ
     property: education
-    value: "MS in Computer Science, University of Wisconsin-Milwaukee; MBA,
-      University of Chicago"
+    value: "MS in Computer Science, University of Wisconsin-Milwaukee; MBA, University of Chicago"
+    source: https://uwm.edu/news/satya-nadella-uwm-grad-microsoft-chief-named-ceo-year
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ZwHcneamiw
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Satya_Nadella"
+    source: https://en.wikipedia.org/wiki/Satya_Nadella
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_4YvE0vs0w0
     property: website
     value: https://news.microsoft.com/exec/satya-nadella/

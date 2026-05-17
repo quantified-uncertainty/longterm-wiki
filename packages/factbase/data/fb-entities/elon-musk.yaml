@@ -4,17 +4,18 @@ facts:
     property: born-year
     value: 1971
     notes: "Born June 28, 1971 in Pretoria, South Africa"
+    source: https://en.wikipedia.org/wiki/Elon_Musk
 
   - id: f_eM1aB2cD3e
     property: education
-    value: "BS in Economics and BS in Physics, University of Pennsylvania; briefly
-      attended Stanford PhD program (dropped out after 2 days)"
+    value: "BS in Economics and BS in Physics, University of Pennsylvania; briefly attended Stanford PhD program (dropped
+      out after 2 days)"
     source: https://en.wikipedia.org/wiki/Elon_Musk
 
   - id: f_eM4fG5hI6j
     property: notable-for
-    value: "CEO of Tesla and SpaceX; founder of xAI; co-founder of OpenAI; owner of
-      X/Twitter; one of the wealthiest people in history"
+    value: "CEO of Tesla and SpaceX; founder of xAI; co-founder of OpenAI; owner of X/Twitter; one of the wealthiest people
+      in history"
     source: https://en.wikipedia.org/wiki/Elon_Musk
 
   - id: f_eM7kL8mN9o
@@ -22,8 +23,7 @@ facts:
     value: 6.5e+11
     asOf: 2026-03
     source: https://www.bloomberg.com/billionaires/
-    notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires
-      Index estimate as of March 2026"
+    notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires Index estimate as of March 2026"
 
   - id: f_SxwgL1y46Q
     property: social-media
@@ -38,8 +38,7 @@ facts:
 
   - id: f_K7bEkeGkVA
     property: description
-    value: "Damages sought in Musk v. OpenAI expanded lawsuit (Aug 2024): $134.5B
-      (racketeering claims)"
+    value: "Damages sought in Musk v. OpenAI expanded lawsuit (Aug 2024): $134.5B (racketeering claims)"
   - id: f_xjFfRmaBmA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Elon_Musk

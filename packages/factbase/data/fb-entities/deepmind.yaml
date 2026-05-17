@@ -4,22 +4,20 @@ facts:
     property: founded-date
     value: 2010-09
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Founded September 2010 in London by Demis Hassabis, Shane Legg, and
-      Mustafa Suleyman"
+    notes: "Founded September 2010 in London by Demis Hassabis, Shane Legg, and Mustafa Suleyman"
 
   - id: f_pjpNfsuNKw
     property: headquarters
     value: "London, UK"
     source: https://deepmind.google/about
-    notes: "Headquarters remain in London; additional offices in Mountain View,
-      Paris, and other cities"
+    notes: "Headquarters remain in London; additional offices in Mountain View, Paris, and other cities"
 
   - id: f_nq7RXAwqsw
     property: legal-structure
     value: "Subsidiary of Alphabet Inc."
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Acquired by Google in January 2014 for approximately $500M; merged with
-      Google Brain in April 2023 to form Google DeepMind"
+    notes: "Acquired by Google in January 2014 for approximately $500M; merged with Google Brain in April 2023 to form
+      Google DeepMind"
 
   - id: f_AX7AnnLZQQ
     property: founded-by
@@ -34,16 +32,16 @@ facts:
     value: 1567
     asOf: 2022-12
     source: https://usesignhouse.com/blog/deepmind-stats/
-    notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023
-      merger with Google Brain to form Google DeepMind"
+    notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023 merger with Google Brain to form Google
+      DeepMind"
 
   - id: f_KtTrbGQynQ
     property: headcount
     value: 6000
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly
-      after Google Brain merger in April 2023"
+    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly after Google Brain merger in April
+      2023"
 
   # ── Revenue (UK entity filings — internal R&D remuneration from Alphabet) ──
   - id: f_Wq9Bxn5mKg
@@ -51,32 +49,28 @@ facts:
     value: 1.96e+9
     asOf: "2023"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2023-deepmind-fullaccounts.pdf
-    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for
-      2023. Represents R&D remuneration from other Alphabet group undertakings, not
-      external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for 2023. Represents R&D remuneration from
+      other Alphabet group undertakings, not external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
 
   - id: f_8pLqVz3nRg
     property: internal-revenue
     value: 1.7e+9
     asOf: "2024"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2024-deepmind-fullaccounts.pdf
-    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for
-      2024. Decrease from 2023 likely due to reorganization of internal billing after
-      Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for 2024. Decrease from 2023 likely due to
+      reorganization of internal billing after Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
 
   # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
     property: safety-researcher-count
     value: 120
     asOf: 2025-06
-    notes: "Estimated 100-150 researchers working on AI safety, alignment, and
-      responsible AI across multiple teams"
+    notes: "Estimated 100-150 researchers working on AI safety, alignment, and responsible AI across multiple teams"
 
   # ── Migrated from old facts system (google-deepmind.yaml) ──────
   - id: f_knwLHy8iXg
     property: description
-    value: "AlphaFold database: 200M+ protein structures predicted and freely
-      available (2023)"
+    value: "AlphaFold database: 200M+ protein structures predicted and freely available (2023)"
     notes: "Number of protein structures predicted by AlphaFold"
 
   - id: f_vH8oNUqEFQ
@@ -88,8 +82,8 @@ facts:
     property: context-window
     value: 2000000
     asOf: 2024-05
-    notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M
-      tokens, expanded to 2M in May 2024"
+    notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M tokens, expanded to 2M in May 2024"
+    source: https://developers.googleblog.com/en/new-features-for-the-gemini-api-and-google-ai-studio
   - id: f_zd5ye0LJT9
     property: website
     value: https://deepmind.google/

@@ -4,13 +4,10 @@ facts:
   - id: f_VtRVU2mPqr
     property: description
     value: >-
-      501(c)(3) nonprofit (formerly OpenAI, Inc.) that retains governance
-      control over OpenAI Group PBC through sole authority to appoint and
-      remove all PBC board directors. Holds a 26% equity stake valued at
-      approximately $130 billion. Operates the Safety and Security Committee
-      with power to halt model releases. Committed $1 billion in grants for
-      2026-2027 across health, AI resilience, economic impact, and civil
-      society programs.
+      501(c)(3) nonprofit (formerly OpenAI, Inc.) that retains governance control over OpenAI Group PBC through sole
+      authority to appoint and remove all PBC board directors. Holds a 26% equity stake valued at approximately $130
+      billion. Operates the Safety and Security Committee with power to halt model releases. Committed $1 billion in
+      grants for 2026-2027 across health, AI resilience, economic impact, and civil society programs.
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
@@ -19,9 +16,8 @@ facts:
     value: "2015-12"
     source: https://openai.com/our-structure/
     notes: >-
-      Originally founded as OpenAI, Inc. in December 2015 by Sam Altman,
-      Elon Musk, Ilya Sutskever, Greg Brockman, and others. Renamed to
-      OpenAI Foundation in October 2025 as part of corporate restructuring.
+      Originally founded as OpenAI, Inc. in December 2015 by Sam Altman, Elon Musk, Ilya Sutskever, Greg Brockman, and
+      others. Renamed to OpenAI Foundation in October 2025 as part of corporate restructuring.
 
   - id: f_9xMOABSPoG
     property: legal-structure
@@ -68,9 +64,8 @@ facts:
   - id: f_Cv1cFBuGb5
     property: notable-for
     value: >-
-      Holds a performance warrant for additional equity if OpenAI Group's
-      valuation exceeds approximately $5 trillion by 2040. Exact additional
-      equity amount not publicly specified.
+      Holds a performance warrant for additional equity if OpenAI Group's valuation exceeds approximately $5 trillion by
+      2040. Exact additional equity amount not publicly specified.
     source: https://openai.com/index/built-to-benefit-everyone/
 
   - id: f_iuerfTYQZt
@@ -100,8 +95,8 @@ facts:
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
     notes: >-
-      Under old structure, investors had a 100x profit cap with excess flowing
-      to the nonprofit. Under PBC structure, all shareholders hold regular equity.
+      Under old structure, investors had a 100x profit cap with excess flowing to the nonprofit. Under PBC structure,
+      all shareholders hold regular equity.
 
   # ── Governance Powers ─────────────────────────────────────────
   - id: f_779CnxmsqR
@@ -114,27 +109,24 @@ facts:
   - id: f_8UyibnXaKk
     property: notable-for
     value: >-
-      Safety and Security Committee (SSC) is a committee of the Foundation,
-      not the PBC. Chaired by Zico Kolter. Has authority to require mitigation
-      measures including halting the release of models or AI systems.
+      Safety and Security Committee (SSC) is a committee of the Foundation, not the PBC. Chaired by Zico Kolter. Has
+      authority to require mitigation measures including halting the release of models or AI systems.
     asOf: 2025-10
     source: https://openai.com/our-structure/
 
   - id: f_ibLaDPDe03
     property: notable-for
     value: >-
-      SSC Chair (Zico Kolter) serves as a non-voting observer at PBC
-      board meetings. Kolter sits exclusively on the Foundation board, not
-      the PBC board.
+      SSC Chair (Zico Kolter) serves as a non-voting observer at PBC board meetings. Kolter sits exclusively on the
+      Foundation board, not the PBC board.
     source: https://openai.com/our-structure/
     notes: "Source says 'non-voting observer', not 'full observation rights'"
 
   - id: f_LC9szgfCnW
     property: notable-for
     value: >-
-      Non-independent directors (including Sam Altman) barred from PBC Audit
-      & Risk, Compensation, and Nominating & Governance committees per
-      California AG conditions.
+      Non-independent directors (including Sam Altman) barred from PBC Audit & Risk, Compensation, and Nominating &
+      Governance committees per California AG conditions.
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
 
   - id: f_7RXmQ9V719
@@ -264,8 +256,7 @@ facts:
     asOf: 2025-05
     source: https://openai.com/index/evolving-our-structure/
     notes: >-
-      Under pressure from CA AG, DE AG, civic leaders. Original plan would
-      have stripped nonprofit of control.
+      Under pressure from CA AG, DE AG, civic leaders. Original plan would have stripped nonprofit of control.
 
   - id: f_u64ayzyFyU
     property: key-event
@@ -285,7 +276,8 @@ facts:
     value: "SoftBank completes $30B investment (contingent on restructuring)"
     asOf: 2025-12
     source: https://techcrunch.com/2025/10/28/openai-completes-its-for-profit-recapitalization/
-    notes: "December 30, 2025 completion. SoftBank invested $30B (corrected from $40B). Investment was key driver of restructuring timeline."
+    notes: "December 30, 2025 completion. SoftBank invested $30B (corrected from $40B). Investment was key driver of
+      restructuring timeline."
 
   - id: f_8KoNMCn9GU
     property: key-event
@@ -308,8 +300,8 @@ facts:
     asOf: 2026-01
     source: https://techcrunch.com/2026/01/08/elon-musks-lawsuit-against-openai-will-face-a-jury-in-march/
     notes: >-
-      Musk alleges betrayal of nonprofit mission. Contributed ~$38M (~60% of
-      early funding). Potential damages $78B-$135B. OpenAI countersued.
+      Musk alleges betrayal of nonprofit mission. Contributed ~$38M (~60% of early funding). Potential damages
+      $78B-$135B. OpenAI countersued.
 
   - id: f_Q9Pac25WbT
     property: litigation
@@ -321,27 +313,24 @@ facts:
   - id: f_Rt5gOPJrBk
     property: notable-for
     value: >-
-      Post-restructuring equity: Foundation 26%, Microsoft 27%, employees 26%,
-      other investors ~21%. Sam Altman received no equity in the restructuring
-      despite earlier reports of up to $10.5B.
+      Post-restructuring equity: Foundation 26%, Microsoft 27%, employees 26%, other investors ~21%. Sam Altman received
+      no equity in the restructuring despite earlier reports of up to $10.5B.
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
 
   - id: f_EF2KTNuKaT
     property: notable-for
     value: >-
-      Critics argue 26% financial stake is a dramatic reduction from 100%
-      control under the old structure. Board overlap between Foundation and
-      PBC raises questions about real independence. OpenAI dropped "safely"
-      from its mission statement during the restructuring.
+      Critics argue 26% financial stake is a dramatic reduction from 100% control under the old structure. Board overlap
+      between Foundation and PBC raises questions about real independence. OpenAI dropped "safely" from its mission
+      statement during the restructuring.
     source: https://calmatters.org/economy/technology/2025/10/openai-restructuring-deal-full-of-holes-critics-say/
 
   - id: f_WpFiWndfS0
     property: notable-for
     value: >-
-      Four focus areas announced March 2026: (1) Life Sciences & Curing
-      Diseases, (2) Jobs and Economic Impact, (3) AI Resilience, (4) Community
-      Programs including People-First AI Fund.
+      Four focus areas announced March 2026: (1) Life Sciences & Curing Diseases, (2) Jobs and Economic Impact, (3) AI
+      Resilience, (4) Community Programs including People-First AI Fund.
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
@@ -349,3 +338,4 @@ facts:
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/OpenAI
     notes: "Foundation shares Wikipedia article with OpenAI Group"
+    source: https://en.wikipedia.org/wiki/OpenAI

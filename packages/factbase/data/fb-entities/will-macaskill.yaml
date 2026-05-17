@@ -3,17 +3,13 @@ facts:
   - id: f_ai1K4HXqHA
     property: description
     value: >-
-      Will MacAskill is a Scottish moral philosopher and a central figure in the
-      effective altruism (EA) movement. In 2009, he co-founded Giving What We
-      Can with Toby Ord, encouraging members to pledge 10% of their income to
-      highly effective charities. He also co-founded the Centre for Effective
-      Altruism and 80,000 Hours in 2011. His 2015 book "Doing Good Better"
-      popularized EA principles, and his 2022 book "What We Owe the Future" made
-      the case for longtermism—the view that we should give significant weight
-      to future generations—bringing widespread attention to existential risk
-      and AI safety. He left his Associate Professor position at Oxford in 2024
-      to become Senior Research Fellow at Forethought, focusing on AGI
-      preparedness, space governance, and AI rights.
+      Will MacAskill is a Scottish moral philosopher and a central figure in the effective altruism (EA) movement. In
+      2009, he co-founded Giving What We Can with Toby Ord, encouraging members to pledge 10% of their income to highly
+      effective charities. He also co-founded the Centre for Effective Altruism and 80,000 Hours in 2011. His 2015 book
+      "Doing Good Better" popularized EA principles, and his 2022 book "What We Owe the Future" made the case for
+      longtermism—the view that we should give significant weight to future generations—bringing widespread attention to
+      existential risk and AI safety. He left his Associate Professor position at Oxford in 2024 to become Senior
+      Research Fellow at Forethought, focusing on AGI preparedness, space governance, and AI rights.
     asOf: 2026-03
     notes: Updated to reflect current role at Forethought (left Oxford 2024)
 
@@ -22,8 +18,8 @@ facts:
     value: https://www.willmacaskill.com/
   - id: f_wM2nLw9pYr
     property: notable-for
-    value: "Co-founder of effective altruism movement; longtermism; \"What We Owe
-      the Future\" (2022); Giving What We Can; 80,000 Hours"
+    value: "Co-founder of effective altruism movement; longtermism; \"What We Owe the Future\" (2022); Giving What We Can;
+      80,000 Hours"
     asOf: "2026-03"
   - id: f_wM4bY1987x
     property: born-year
@@ -33,11 +29,9 @@ facts:
 
   - id: f_wM5eD2014o
     property: education
-    value: "DPhil in Philosophy, St. Anne's College, Oxford (2014); BA, Cambridge;
-      studied at Princeton"
+    value: "DPhil in Philosophy, St. Anne's College, Oxford (2014); BA, Cambridge; studied at Princeton"
     source: https://en.wikipedia.org/wiki/William_MacAskill
-    notes: "Youngest person appointed as Associate Professor of Philosophy at time
-      of appointment"
+    notes: "Youngest person appointed as Associate Professor of Philosophy at time of appointment"
 
   - id: f_wM6sM0twit
     property: social-media
@@ -47,6 +41,8 @@ facts:
   - id: f_wM7wK1wiki
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/William_MacAskill"
+    source: https://en.wikipedia.org/wiki/William_MacAskill
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_KaShQmSjaC
     property: website
     value: http://www.williammacaskill.com/
