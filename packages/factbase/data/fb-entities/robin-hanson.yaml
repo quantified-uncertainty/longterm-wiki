@@ -36,6 +36,7 @@ facts:
     value: "B.S. Physics, UC Irvine (1981); M.S. Physics and M.A. Conceptual Foundations of Science, University of Chicago
       (1984); Ph.D. Social Science, Caltech (1997)"
     notes: Enriched from wiki page
+    source: https://brainpreservation.org/team/robin-hanson
   - id: f_nkemfq398n
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Robin_Hanson
