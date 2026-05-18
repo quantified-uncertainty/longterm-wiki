@@ -34,10 +34,13 @@ import {
   storeVerdict as storeVerdictRpc,
   getVerdictByRecord,
 } from '../lib/wiki-server/sourcing-client.ts';
+// Import the constant + type from api-types (already copied into the
+// worker container image); the routes/* file is not bundled, so importing
+// from there breaks the worker at runtime (ERR_MODULE_NOT_FOUND).
 import {
   VALID_SUGGESTION_STATUSES,
   type SuggestionStatus,
-} from '../../apps/wiki-server/src/routes/sourcing/url-suggestions.ts';
+} from '../../apps/wiki-server/src/api-types.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import {
   fetchSourceContent,

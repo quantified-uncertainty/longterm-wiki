@@ -182,16 +182,6 @@ export const TABLEBASE_MANUAL_MOUNTS = [
  * added. Update this list when adding a new non-route module next to the
  * real routes.
  */
-export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
-  "index.ts",
-  "mount-registry.ts",
-  "sync-factory.ts",
-  "sync-factory.test-d.ts",
-  "sourcing-schema.ts",
-  "audit-log.ts",
-  "write-inline-verdicts.ts",
-  "entity-profile-descriptions.ts",
-  "system-card-benchmark-linker.ts",
-  "benchmark-shared.ts",
-  "policy-stakeholders-schema.ts",
-];
+// Canonical definition lives in api-types.ts so the worker container can
+// reach it; re-exported here for code that already imports from this file.
+export { TABLEBASE_NON_ROUTE_FILES } from "../../api-types.js";

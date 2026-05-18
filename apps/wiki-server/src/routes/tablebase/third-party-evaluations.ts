@@ -41,26 +41,11 @@ const MAX_PAGE_SIZE = 200;
 
 const RECORD_TYPE = "third-party-evaluation" as const;
 
-// Mirror the CHECK constraint in migration 0206. Source-of-truth for the
-// same vocab also referenced by validate-third-party-eval-refs.ts.
-export const VALID_RISK_DOMAINS = [
-  "cbrn",
-  "biological",
-  "chemical",
-  "radiological",
-  "nuclear",
-  "cyber",
-  "autonomy",
-  "agent-security",
-  "persuasion",
-  "scheming",
-  "deception",
-  "jailbreak",
-  "safeguard-efficacy",
-  "evaluation-awareness",
-  "misuse",
-  "misc",
-] as const;
+// Canonical definition lives in api-types.ts so the worker container can
+// reach it; re-imported here both for local use and to keep the existing
+// re-export shape for old call sites.
+import { VALID_RISK_DOMAINS } from "../../api-types.js";
+export { VALID_RISK_DOMAINS };
 
 export const VALID_SOURCE_FORMATS = [
   "pdf",

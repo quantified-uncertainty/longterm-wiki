@@ -19,10 +19,11 @@ import { fetchSource } from "../lib/search/source-fetcher.ts";
 import { parseJsonResponse } from "../lib/anthropic.ts";
 import { escapeXml } from "../lib/prompt-utils.ts";
 
-import {
-  VALID_RISK_DOMAINS,
-  type ThirdPartyEvaluationSyncItem,
-} from "../../apps/wiki-server/src/routes/tablebase/third-party-evaluations.ts";
+// VALID_RISK_DOMAINS is imported from api-types (which the worker
+// container copies). ThirdPartyEvaluationSyncItem is type-only so it
+// can stay attached to the route file (tsx erases type-only imports).
+import { VALID_RISK_DOMAINS } from "../../apps/wiki-server/src/api-types.ts";
+import type { ThirdPartyEvaluationSyncItem } from "../../apps/wiki-server/src/routes/tablebase/third-party-evaluations.ts";
 import type { InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 export const EXTRACTOR_VERSION = "third-party-eval-extractor@1.0";

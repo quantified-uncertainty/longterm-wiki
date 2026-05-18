@@ -25,22 +25,18 @@ import {
   dbError,
   notFoundError,
 } from "../shared/utils.js";
+import {
+  VALID_SUGGESTION_STATUSES,
+  type SuggestionStatus,
+} from "../../api-types.js";
 
 const MAX_BATCH = 200;
 
-/**
- * Allowed lifecycle states for a URL suggestion.
- * Mirrored in the PG CHECK constraint — migrations 0176 (initial set) and
- * 0198 (added 'applied'). Keep in sync.
- */
-export const VALID_SUGGESTION_STATUSES = [
-  "pending",
-  "approved",
-  "rejected",
-  "auto_verified",
-  "applied",
-] as const;
-export type SuggestionStatus = (typeof VALID_SUGGESTION_STATUSES)[number];
+// Re-export so the small set of importers that read these from the route
+// file continue to work; the canonical definition now lives in api-types
+// where the worker container can reach it.
+export { VALID_SUGGESTION_STATUSES };
+export type { SuggestionStatus };
 
 const VALID_STATUSES = VALID_SUGGESTION_STATUSES;
 
