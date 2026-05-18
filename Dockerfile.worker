@@ -79,6 +79,11 @@ COPY apps/wiki-server/src/api-types.ts ./apps/wiki-server/src/api-types.ts
 # file is pure data so copying it is cheap.
 COPY apps/web/src/data/entity-type-names.ts ./apps/web/src/data/entity-type-names.ts
 
+# crux/lib/visual-detection.ts value-imports VISUAL_COMPONENT_NAMES from
+# data/schema.ts. visual-detection is pulled into crux.mjs's static graph
+# via commands/visual.ts. data/ also holds YAML the wiki-server reads.
+COPY data/ ./data/
+
 # NOTE: No other apps/wiki-server/ or apps/web/ files needed — all other
 # imports are type-only (erased by tsx). The crux.mjs static-import graph
 # is verified by `npm run docker:smoke` and `crux/validate/validate-worker-image.ts`.
