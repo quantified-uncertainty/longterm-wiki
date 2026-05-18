@@ -2,7 +2,10 @@ import { execFileSync } from "child_process";
 import { readFileSync } from "fs";
 import { basename } from "path";
 
-import { TABLEBASE_NON_ROUTE_FILES } from "../../../apps/wiki-server/src/routes/tablebase/mount-registry.ts";
+// Import from api-types (worker container copies this file). The route
+// file mount-registry.ts is NOT in the worker image and importing from
+// it causes ERR_MODULE_NOT_FOUND on crux.mjs load.
+import { TABLEBASE_NON_ROUTE_FILES } from "../../../apps/wiki-server/src/api-types.ts";
 
 import type {
   DeployTask,

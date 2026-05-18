@@ -30,7 +30,7 @@
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { getColors } from "../lib/output.ts";
-import { TABLEBASE_NON_ROUTE_FILES } from "../../apps/wiki-server/src/routes/tablebase/mount-registry.ts";
+import { TABLEBASE_NON_ROUTE_FILES } from "../../apps/wiki-server/src/api-types.ts";
 
 const ROUTES_DIR = "apps/wiki-server/src/routes/tablebase";
 const REGISTRY_PATH = "crux/tablebase/table-registry.ts";
