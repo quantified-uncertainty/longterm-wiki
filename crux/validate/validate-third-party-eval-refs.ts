@@ -80,18 +80,41 @@ interface DriftFinding {
 
 /**
  * Extract a `as const` string-array literal exported from the route file.
- * Hand-rolled scanner — looking for the named export and reading the
+ * Hand-rolled scanner — looks for the named export and reads the
  * comma-separated quoted strings up to the closing `]`. Defensive against
  * formatting changes (whitespace, multi-line layout).
+ *
+ * If the route file does not declare the constant directly but re-exports
+ * it from `api-types.ts` (the canonical home for constants the worker
+ * container imports — moved there to avoid pulling route files into the
+ * worker image), fall back to reading `api-types.ts`.
  */
 function extractRouteVocab(source: string, name: string): string[] | null {
   const re = new RegExp(
     `export\\s+const\\s+${name}\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*as\\s+const\\s*;`,
     "m",
   );
-  const m = source.match(re);
-  if (!m) return null;
-  const body = m[1];
+  const direct = source.match(re);
+  if (direct) {
+    const body = direct[1];
+    const stringRe = /['"]([^'"\n]+?)['"]/g;
+    const out: string[] = [];
+    let mm: RegExpExecArray | null;
+    while ((mm = stringRe.exec(body))) out.push(mm[1]);
+    return out;
+  }
+
+  // Re-export path: `import { NAME } from "../../api-types.js"; export { NAME };`
+  const reExportRe = new RegExp(
+    `import\\s*\\{[^}]*\\b${name}\\b[^}]*\\}\\s*from\\s*['"]\\.\\.\\/\\.\\.\\/api-types(?:\\.js)?['"]`,
+  );
+  if (!reExportRe.test(source)) return null;
+  const apiTypesPath = path.join(REPO_ROOT, "apps/wiki-server/src/api-types.ts");
+  if (!existsSync(apiTypesPath)) return null;
+  const apiTypesSrc = readFileSync(apiTypesPath, "utf-8");
+  const m2 = apiTypesSrc.match(re);
+  if (!m2) return null;
+  const body = m2[1];
   const stringRe = /['"]([^'"\n]+?)['"]/g;
   const out: string[] = [];
   let mm: RegExpExecArray | null;
