@@ -3,6 +3,8 @@ facts:
   - id: f_ZN4oC3AUWw
     property: notable-for
     value: "Co-founder of Anthropic; co-author of neural scaling laws research; formerly at OpenAI"
+    source: https://nextomoro.com/sam-mccandlish
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_jof2ov99Qe
     property: education
@@ -15,13 +17,12 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_ZVloKY5FkQ
     property: ea-alignment-estimate
-    value: [0.15, 0.3]
+    value: [ 0.15, 0.3 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Alignment researcher; no publicly documented EA
-      pledge or EA community ties. Low confidence of EA-aligned cause-area
-      giving."
+    notes: "Editorial estimate. Alignment researcher; no publicly documented EA pledge or EA community ties. Low confidence
+      of EA-aligned cause-area giving."
