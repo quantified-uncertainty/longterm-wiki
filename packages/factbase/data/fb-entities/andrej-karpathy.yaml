@@ -16,10 +16,14 @@ facts:
   - id: f_v81HDaRKqg
     property: education
     value: "PhD in Computer Science, Stanford University"
+    source: https://cs.stanford.edu/~karpathy
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_EgN1ilnrrA
     property: social-media
     value: "@karpathy"
+    source: https://threads.com/@karpathy
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_PPWIIFBj8w
     property: wikipedia-url

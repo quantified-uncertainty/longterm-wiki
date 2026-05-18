@@ -2,16 +2,18 @@ entity: sid_5MVd90lzCg
 facts:
   - id: f_MCKelTrhAw
     property: description
-    value: President of the Machine Intelligence Research Institute (MIRI) since June
-      2023, focused on mathematical foundations of AI alignment. Previously served
-      as Executive Director 2015-2023.
+    value: President of the Machine Intelligence Research Institute (MIRI) since June 2023, focused on mathematical
+      foundations of AI alignment. Previously served as Executive Director 2015-2023.
     asOf: 2026-03
     notes: Updated from Executive Director to President (transitioned June 2023 when Malo Bourgon became CEO)
   - id: f_nS6tN2pQ5v
     property: notable-for
-    value: "President of MIRI (since June 2023; previously Executive Director 2015-2023); focuses on mathematical foundations of AI alignment including logical uncertainty, decision theory, and corrigibility; author of MIRI technical agenda papers"
+    value: "President of MIRI (since June 2023; previously Executive Director 2015-2023); focuses on mathematical
+      foundations of AI alignment including logical uncertainty, decision theory, and corrigibility; author of MIRI
+      technical agenda papers"
     asOf: 2026-03
     notes: Updated role from Executive Director to President
+    source: https://intelligence.org/team/nate-soares
   - id: f_nScY8fL1kA
     property: education
     value: "B.S. in Computer Science, University of California, Berkeley"

@@ -2,12 +2,15 @@ entity: sid_ATFBoSnuqA
 facts:
   - id: f_hzaOwUZKsQ
     property: notable-for
-    value: "Cambridge professor researching AI alignment and safety; work on
-      deceptive alignment and goal misgeneralization"
+    value: "Cambridge professor researching AI alignment and safety; work on deceptive alignment and goal misgeneralization"
+    source: https://cser.ac.uk/team/david-krueger
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_t6THqERYOg
     property: education
     value: "PhD in Computer Science, University of Montreal"
+    source: https://davidscottkrueger.com/assets/pdfs/DSK_CV.pdf
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_eywAH1NAxg
     property: website

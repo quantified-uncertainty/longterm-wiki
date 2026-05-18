@@ -3,8 +3,11 @@ facts:
   - id: f_MYw0rJFjJQ
     property: notable-for
     value: "Research scientist at Google DeepMind working on AI alignment; creator of the Alignment Newsletter"
+    source: https://alignmentforum.org/users/rohinmshah
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_58eMyTSywg
     property: education
     value: "PhD in Computer Science, UC Berkeley"
-
+    source: https://www2.eecs.berkeley.edu/Pubs/TechRpts/2020/EECS-2020-210.html
+    notes: "[auto-discovered by tb backfill-sources]"

@@ -6,8 +6,10 @@ facts:
 
   - id: f_y6ELYGnAGQ
     property: notable-for
-    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of
-      the Import AI newsletter; AI policy advocate"
+    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy
+      advocate"
+    source: https://cset.georgetown.edu/staff/jack-clark
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_ImsORphD5g
     property: website
     value: https://jack-clark.net/
@@ -24,13 +26,12 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_1LrZ2LnRkC
     property: ea-alignment-estimate
-    value: [0.3, 0.5]
+    value: [ 0.3, 0.5 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Responsible-AI advocate with EA-adjacent framing;
-      founded Import AI newsletter; less documented EA cause-area alignment than
-      founders with explicit EA community ties."
+    notes: "Editorial estimate. Responsible-AI advocate with EA-adjacent framing; founded Import AI newsletter; less
+      documented EA cause-area alignment than founders with explicit EA community ties."

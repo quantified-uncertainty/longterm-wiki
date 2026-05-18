@@ -8,17 +8,15 @@ facts:
 
   - id: f_nB1aB2cD3e
     property: education
-    value: "PhD in Philosophy, London School of Economics; MA in Philosophy and
-      Physics, Stockholm University; MSc in Computational Neuroscience, King's
-      College London"
+    value: "PhD in Philosophy, London School of Economics; MA in Philosophy and Physics, Stockholm University; MSc in
+      Computational Neuroscience, King's College London"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
     notes: "One of the most extensively educated figures in AI safety"
 
   - id: f_nB4fG5hI6j
     property: notable-for
-    value: "Author of 'Superintelligence'; founder of FHI at Oxford; pioneer of
-      existential risk studies; influential philosopher on AI risk, simulation
-      argument, and anthropic reasoning"
+    value: "Author of 'Superintelligence'; founder of FHI at Oxford; pioneer of existential risk studies; influential
+      philosopher on AI risk, simulation argument, and anthropic reasoning"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
 
   - id: f_nB7kL8mN9o
@@ -29,6 +27,8 @@ facts:
   - id: f_efk4yuk5lq
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Nick_Bostrom"
+    source: https://en.wikipedia.org/wiki/Nick_Bostrom
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_hzwm2k1t58
     property: website
@@ -37,6 +37,8 @@ facts:
   - id: f_ikrzfocsqt
     property: google-scholar
     value: "https://scholar.google.com/citations?user=gk5PjEkAAAAJ"
+    source: https://scholar.google.com/citations?user=gk5PjEkAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_7FdAIeRiH9
     property: website
     value: https://www.nickbostrom.com

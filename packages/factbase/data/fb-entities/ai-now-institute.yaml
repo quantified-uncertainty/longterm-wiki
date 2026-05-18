@@ -10,8 +10,7 @@ facts:
     property: headquarters
     value: "New York, NY"
     source: https://ainowinstitute.org/about
-    notes: "Based at New York University; became independent research institute in
-      mid-2022"
+    notes: "Based at New York University; became independent research institute in mid-2022"
 
   - id: f_H3jscXNPlN
     property: founded-by
@@ -19,15 +18,13 @@ facts:
       - !ref sid_77SnPuPnk8
       - !ref sid_3R1I5JCrP4
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
-    notes: "Co-founded by Kate Crawford (researcher) and Meredith Whittaker (now
-      Signal president)"
+    notes: "Co-founded by Kate Crawford (researcher) and Meredith Whittaker (now Signal president)"
 
   - id: f_bYj3YUbF9D
     property: description
     value: >-
-      Independent policy research institute studying the social implications of
-      AI, focusing on corporate power concentration, algorithmic accountability,
-      and surveillance. Known for annual AI Now Reports and advocacy against
+      Independent policy research institute studying the social implications of AI, focusing on corporate power
+      concentration, algorithmic accountability, and surveillance. Known for annual AI Now Reports and advocacy against
       unregulated facial recognition.
     asOf: 2025-12
     source: https://ainowinstitute.org/about
@@ -38,8 +35,8 @@ facts:
       - 15
       - 30
     asOf: 2025-06
-    notes: "Estimate; no published source. LinkedIn lists 11-50 employees; research
-      staff plus policy team"
+    notes: "Estimate; no published source. LinkedIn lists 11-50 employees; research staff plus policy team"
+    source: https://signalhire.com/overview/ai-now-institute-at-new-york-university
 
   - id: f_ehgUgv6LHC
     property: legal-structure
@@ -91,20 +88,23 @@ facts:
 
   - id: f_tjvsWtm5t3
     property: publication
-    value: "AI Now 2017 Report — second annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
+    value: "AI Now 2017 Report — second annual report examining social implications of AI across health, criminal justice,
+      labor, and disability rights"
     asOf: 2017
     source: https://ainowinstitute.org/publication/ai-now-2017-report
     notes: "Second annual report; the first was the 2016 AI Now Report from the White House OSTP symposium"
 
   - id: f_bWrhn03JAn
     property: publication
-    value: "AI Now 2018 Report — expanded analysis of AI accountability gaps, bias in automated decision systems, and surveillance technologies"
+    value: "AI Now 2018 Report — expanded analysis of AI accountability gaps, bias in automated decision systems, and
+      surveillance technologies"
     asOf: 2018
     source: https://ainowinstitute.org/publication/ai-now-2018-report
 
   - id: f_szs4GuARON
     property: publication
-    value: "AI Now 2019 Report — focused on facial recognition regulation, algorithmic accountability legislation, and climate impacts of AI"
+    value: "AI Now 2019 Report — focused on facial recognition regulation, algorithmic accountability legislation, and
+      climate impacts of AI"
     asOf: 2019
     source: https://ainowinstitute.org/publication/ai-now-2019-report
 
@@ -125,7 +125,8 @@ facts:
     value: "Mozilla Foundation"
     asOf: 2022
     source: https://ainowinstitute.org/about
-    notes: "Historical funder of AI Now prior to mid-2022. AI Now stopped accepting corporate and tech industry funding when it became independent in 2022."
+    notes: "Historical funder of AI Now prior to mid-2022. AI Now stopped accepting corporate and tech industry funding when
+      it became independent in 2022."
 
   - id: f_vYiIVBXPH0
     property: grant-received
@@ -133,18 +134,21 @@ facts:
     currency: USD
     asOf: 2026-02
     source: https://www.macfound.org/press/press-releases/10-million-to-advance-ai-by-and-for-people
-    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security and AI"
+    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security
+      and AI"
 
   - id: f_N10dTfD8W6
     property: funder
     value: "Omidyar Network / Luminate"
     asOf: 2021
     source: https://ainowinstitute.org/about
-    notes: "Historical funder prior to mid-2022 independence. AI Now stopped accepting corporate/tech funding when it became independent in 2022."
+    notes: "Historical funder prior to mid-2022 independence. AI Now stopped accepting corporate/tech funding when it became
+      independent in 2022."
 
   - id: f_diDp4Ck5W9
     property: policy-influence
-    value: "Advocated for facial recognition moratoriums; influenced bans in multiple US cities (San Francisco 2019, Portland 2020, and others)"
+    value: "Advocated for facial recognition moratoriums; influenced bans in multiple US cities (San Francisco 2019,
+      Portland 2020, and others)"
     asOf: 2020
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "One of AI Now's most concrete policy wins"

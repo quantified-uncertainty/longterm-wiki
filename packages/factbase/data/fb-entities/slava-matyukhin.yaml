@@ -3,15 +3,17 @@ facts:
   - id: f_SM1descr01
     property: description
     value: >-
-      Software engineer and key Squiggle contributor at QURI. Lead developer
-      of the Squiggle language rewrite (v0.8-0.10) and the Squiggle Hub
-      platform. Also known as berekuk on GitHub.
+      Software engineer and key Squiggle contributor at QURI. Lead developer of the Squiggle language rewrite
+      (v0.8-0.10) and the Squiggle Hub platform. Also known as berekuk on GitHub.
     asOf: !date 2026-03
   - id: f_SM4notab01
     property: notable-for
-    value: "Squiggle language rewrite (v0.8-0.10); built Squiggle Hub platform; previously built Kocherga (EA community space in Moscow)"
+    value: "Squiggle language rewrite (v0.8-0.10); built Squiggle Hub platform; previously built Kocherga (EA community
+      space in Moscow)"
     asOf: !date 2026-03
 
   - id: f_SM5githb01
     property: github-profile
     value: "https://github.com/berekuk"
+    source: https://github.com/berekuk
+    notes: "[auto-discovered by tb backfill-sources]"

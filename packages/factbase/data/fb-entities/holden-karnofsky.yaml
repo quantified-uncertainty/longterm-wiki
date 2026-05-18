@@ -14,7 +14,8 @@ facts:
 
   - id: f_hK4fG5hI6j
     property: notable-for
-    value: "Co-founder of GiveWell and Open Philanthropy; influential figure in effective altruism; author of 'Most Important Century' blog series on transformative AI"
+    value: "Co-founder of GiveWell and Open Philanthropy; influential figure in effective altruism; author of 'Most
+      Important Century' blog series on transformative AI"
     source: https://en.wikipedia.org/wiki/Holden_Karnofsky
 
   - id: f_hK7kL8mN9o
@@ -25,6 +26,8 @@ facts:
   - id: f_ipz9p2zvf6
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Holden_Karnofsky"
+    source: https://en.wikipedia.org/wiki/Holden_Karnofsky
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_lagva40ag7
     property: website

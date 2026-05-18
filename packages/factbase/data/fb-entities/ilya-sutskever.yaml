@@ -4,6 +4,7 @@ facts:
     property: born-year
     value: 1985
     notes: "Born 1985 (approximate); originally from Russia, studied under Geoffrey Hinton at University of Toronto"
+    source: https://en.wikiquote.org/wiki/Ilya_Sutskever
 
   - id: f_iS1aB2cD3e
     property: education
@@ -13,7 +14,8 @@ facts:
 
   - id: f_iS4fG5hI6j
     property: notable-for
-    value: "Co-founder of OpenAI and SSI; co-inventor of the sequence-to-sequence model and AlexNet; key figure in the deep learning revolution"
+    value: "Co-founder of OpenAI and SSI; co-inventor of the sequence-to-sequence model and AlexNet; key figure in the deep
+      learning revolution"
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
 
   - id: f_iS7kL8mN9o
@@ -24,7 +26,11 @@ facts:
   - id: f_37luvw3faa
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Ilya_Sutskever"
+    source: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_38lts4pojf
     property: google-scholar
     value: "https://scholar.google.com/citations?user=x04W_mMAAAAJ"
+    source: https://scholar.google.com/citations?user=x04W_mMAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"

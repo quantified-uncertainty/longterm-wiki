@@ -2,17 +2,13 @@ entity: sid_licWPlOJMg
 facts:
   - id: f_NwIcIbqfqQ
     property: description
-    value: Nick Beckstead is a philosopher and philanthropist who completed his PhD
-      at Rutgers University in 2013 with a dissertation arguing for the
-      overwhelming importance of shaping the far future—one of the first
-      rigorous academic defenses of longtermism. He served as a program officer
-      at Open Philanthropy, where he managed a substantial longtermism portfolio
-      focusing on existential risk reduction and global catastrophic risk. He
-      later became a founding team member of the FTX Future Fund before its
-      collapse in November 2022 when FTX filed for bankruptcy. He subsequently
-      founded the Secure AI Project, a policy advocacy organization focused on
-      legislative requirements for AI safety protocols and whistleblower
-      protections.
+    value: Nick Beckstead is a philosopher and philanthropist who completed his PhD at Rutgers University in 2013 with a
+      dissertation arguing for the overwhelming importance of shaping the far future—one of the first rigorous academic
+      defenses of longtermism. He served as a program officer at Open Philanthropy, where he managed a substantial
+      longtermism portfolio focusing on existential risk reduction and global catastrophic risk. He later became a
+      founding team member of the FTX Future Fund before its collapse in November 2022 when FTX filed for bankruptcy. He
+      subsequently founded the Secure AI Project, a policy advocacy organization focused on legislative requirements for
+      AI safety protocols and whistleblower protections.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_9EOQ53N4Gg
@@ -20,14 +16,13 @@ facts:
     value: https://www.nickbeckstead.com/
   - id: f_nB2nLw9pYr
     property: notable-for
-    value: "Longtermism, existential risk, FTX Future Fund leadership, Secure AI
-      Project"
+    value: "Longtermism, existential risk, FTX Future Fund leadership, Secure AI Project"
     asOf: "2026-03"
     notes: "Migrated from entity customFields"
+    source: https://secureaiproject.org/team/nick-beckstead
   - id: f_t0mBxqD8qA
     property: education
-    value: PhD Philosophy, Rutgers University (2013); dissertation 'On the
-      Overwhelming Importance of Shaping the Far Future'
+    value: PhD Philosophy, Rutgers University (2013); dissertation 'On the Overwhelming Importance of Shaping the Far Future'
     asOf: "2013"
     source: https://philpapers.org/rec/BECOTO-3
   - id: f_Dlo6H5eUNQ
@@ -37,8 +32,7 @@ facts:
     source: https://secureaiproject.org/
   - id: f_ylO6QcJMfw
     property: notable-for
-    value: PhD dissertation defending longtermism; former Open Philanthropy program
-      officer (longtermism portfolio); founding team, FTX Future Fund (2022);
-      founder, Secure AI Project
+    value: PhD dissertation defending longtermism; former Open Philanthropy program officer (longtermism portfolio);
+      founding team, FTX Future Fund (2022); founder, Secure AI Project
     asOf: 2026-04
     source: https://www.nickbeckstead.com/
