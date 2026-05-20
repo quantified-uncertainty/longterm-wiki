@@ -118,7 +118,7 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-20"
     last_result: fail
     last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
@@ -174,6 +174,10 @@ audits:
       - date: "2026-05-12"
         result: fail
         checked_by: "manual"
+      - date: "2026-05-20"
+        result: fail
+        checked_by: "manual"
+        notes: "2026-05-20: ci-pr-health.yml fails daily on cleanup-labels (403 — needs pull-requests: write). Tracked in #4887, blocked on GitHub App workflows scope."
   - id: vercel-production-only
     category: infrastructure
     description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
@@ -255,7 +259,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-20"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -305,6 +309,10 @@ audits:
       - date: "2026-05-12"
         result: pass
         checked_by: "manual"
+      - date: "2026-05-20"
+        result: pass
+        checked_by: "manual"
+        notes: "2026-05-20 daily sweep: e2e tests passing"
   - id: gate-override-frequency
     category: process
     description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
@@ -323,7 +331,7 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
-    last_checked: "2026-05-01"
+    last_checked: "2026-05-20"
     last_result: pass
     last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
@@ -388,6 +396,10 @@ audits:
       - date: "2026-05-01"
         result: pass
         checked_by: "manual"
+      - date: "2026-05-20"
+        result: pass
+        checked_by: "manual"
+        notes: "2026-05-20 daily sweep: 10% override rate (5/50), below 20% threshold"
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -498,7 +510,7 @@ audits:
     frequency: daily
     added: "2026-04-13"
     added_by_pr: 4319
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-20"
     last_result: fail
     history:
       - date: "2026-04-14"
@@ -523,6 +535,10 @@ audits:
       - date: "2026-05-12"
         result: fail
         checked_by: "manual"
+      - date: "2026-05-20"
+        result: fail
+        checked_by: "manual"
+        notes: "2026-05-20: 3/5 recent runs failed but pattern is flaky alternating fail/success — retries pass. /resources page returns 200 with h1. Intermittent issue, not a hard regression. Latest run was success."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
