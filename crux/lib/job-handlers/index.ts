@@ -13,8 +13,19 @@
  * require(esm) cycle detection is strict.
  */
 
-import { execFileSync } from 'child_process';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import type { JobHandler } from './types.ts';
+
+// Async (non-blocking) child execution. We deliberately avoid execFileSync:
+// the worker is a single Node process that also serves the /healthz liveness
+// endpoint, and a synchronous spawn blocks the event loop for the whole job.
+// On a multi-minute job that starves /healthz, Kubernetes' liveness probe
+// fails and restarts the pod mid-job (the job is then re-claimed and
+// eventually exhausts its retries). promisify(execFile) keeps the event loop
+// free so /healthz keeps answering. On non-zero exit the returned promise
+// rejects with an Error carrying .stdout/.stderr.
+const execFileAsync = promisify(execFile);
 
 // ---------------------------------------------------------------------------
 // Lazy handler loaders — each returns the handler on first call, then caches
@@ -50,14 +61,14 @@ const handlers: Record<string, JobHandler> = {
     }
 
     try {
-      const output = execFileSync('node', [
+      const { stdout: output } = await execFileAsync('node', [
         '--import', 'tsx/esm', '--no-warnings',
         'crux/crux.mjs', 'citations', 'verify', pageId, '--json',
       ], {
         cwd: ctx.projectRoot,
         encoding: 'utf-8',
         timeout: 5 * 60 * 1000,
-        stdio: ['pipe', 'pipe', 'pipe'],
+        maxBuffer: 16 * 1024 * 1024,
       });
 
       try {
@@ -92,11 +103,10 @@ const handlers: Record<string, JobHandler> = {
     }
 
     try {
-      const output = execFileSync('node', args, {
+      const { stdout: output } = await execFileAsync('node', args, {
         cwd: ctx.projectRoot,
         encoding: 'utf-8',
         timeout: 60 * 60 * 1000, // 1h — full prod sweep is ~30-50 min
-        stdio: ['pipe', 'pipe', 'pipe'],
         maxBuffer: 16 * 1024 * 1024,
       });
 
