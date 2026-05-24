@@ -21,7 +21,12 @@ import { addCost, emptyCost, totalOf } from '../lib/backfill-sources/cost.ts';
 import { fetchMissingSources, updateRecordSource } from '../lib/backfill-sources/fetch.ts';
 import { extractMatchTerms } from '../lib/backfill-sources/match-terms.ts';
 import { processRecord } from '../lib/backfill-sources/process-record.ts';
-import { buildSummaryLines, writeOutcomesJson } from '../lib/backfill-sources/report.ts';
+import {
+  buildSummaryLines,
+  openOutcomeJsonl,
+  appendOutcomeJsonl,
+  closeOutcomeJsonl,
+} from '../lib/backfill-sources/report.ts';
 import type {
   CostBreakdown,
   MissingSourceRecord,
@@ -99,15 +104,7 @@ async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions
     verbose: parsed.verbose,
   });
 
-  const outcomeStatus = writeOutcomesJson({
-    path: parsed.unmatchedOut,
-    outcomes: run.outcomes,
-    mode: parsed.apply ? 'apply' : 'dry-run',
-    totalRecords: records.length,
-    searched: run.searched,
-    matched: run.matched,
-  });
-  if (outcomeStatus) lines.push(outcomeStatus);
+  if (run.outcomeStatus) lines.push(run.outcomeStatus);
 
   if (parsed.apply) {
     lines.push(
@@ -232,6 +229,8 @@ interface RunTotals {
   touchedYamlPaths: Set<string>;
   factsYamlWritten: number;
   stakeholdersYamlWritten: number;
+  /** Status line for the JSONL outcome file (path + counts, or write error). */
+  outcomeStatus: string;
 }
 
 async function processAllRecords(
@@ -252,6 +251,17 @@ async function processAllRecords(
     touchedYamlPaths: new Set<string>(),
     factsYamlWritten: 0,
     stakeholdersYamlWritten: 0,
+    outcomeStatus: '',
+  };
+
+  // Stream outcomes to a JSONL file as each record finishes. We keep only a
+  // light copy in memory (candidates stripped) for the end-of-run summary —
+  // the heavy candidate payloads live only in the file, one line at a time.
+  const mode = parsed.apply ? 'apply' : 'dry-run';
+  const jsonlOk = openOutcomeJsonl(parsed.unmatchedOut, mode);
+  const recordOutcome = (o: RecordOutcome): void => {
+    if (jsonlOk) appendOutcomeJsonl(parsed.unmatchedOut, o);
+    run.outcomes.push(stripCandidates(o));
   };
 
   // Build YAML target indexes once per apply-run. In dry-run we skip this
@@ -275,11 +285,11 @@ async function processAllRecords(
 
     if (extractMatchTerms(record).length === 0) {
       run.noTerms++;
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'no search terms' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'no search terms' } });
       continue;
     }
     if (isTestRecord(record)) {
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'test record' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'test record' } });
       continue;
     }
     if (totalOf(run.totalBreakdown) >= parsed.maxCost) {
@@ -288,7 +298,7 @@ async function processAllRecords(
         console.warn(`\n[budget] Reached $${totalOf(run.totalBreakdown).toFixed(4)} / $${parsed.maxCost.toFixed(2)} cap — stopping remaining records`);
       }
       run.budgetSkipped++;
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'budget cap' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'budget cap' } });
       continue;
     }
 
@@ -299,7 +309,7 @@ async function processAllRecords(
     addCost(run.totalBreakdown, result.cost);
 
     if (!result.matched) {
-      run.outcomes.push({
+      recordOutcome({
         record,
         outcome: {
           kind: 'no-match',
@@ -346,7 +356,7 @@ async function processAllRecords(
       }
     }
 
-    run.outcomes.push({
+    recordOutcome({
       record,
       outcome: {
         kind: 'matched',
@@ -361,7 +371,35 @@ async function processAllRecords(
     });
   }
 
+  const unmatched = run.searched - run.matched;
+  // Count skips from the recorded outcomes rather than summing per-reason
+  // counters: that way test-record skips (which don't have a dedicated
+  // counter) are included, matching every line actually written to the file.
+  const skipped = run.outcomes.filter((o) => o.outcome.kind === 'skipped').length;
+  run.outcomeStatus = jsonlOk
+    ? closeOutcomeJsonl(parsed.unmatchedOut, {
+        records: records.length,
+        searched: run.searched,
+        matched: run.matched,
+        unmatched,
+        skipped,
+      })
+    : `  Outcomes write skipped: ${parsed.unmatchedOut} not writable`;
+
   return run;
+}
+
+/**
+ * Strip the heavy `candidates` payload before keeping an outcome in memory for
+ * the end-of-run summary. The full outcome (with candidates) is already written
+ * to the JSONL file; the summary only needs the light fields, so dropping
+ * candidates keeps memory flat across large batches.
+ */
+function stripCandidates(o: RecordOutcome): RecordOutcome {
+  if (o.outcome.kind === 'matched' || o.outcome.kind === 'no-match') {
+    return { record: o.record, outcome: { ...o.outcome, candidates: [] } };
+  }
+  return o;
 }
 
 /** Drop seed/test records that pollute the dataset. */
