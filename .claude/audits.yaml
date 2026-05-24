@@ -118,7 +118,7 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-24"
     last_result: fail
     last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
@@ -172,6 +172,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-05-12"
+        result: fail
+        checked_by: "manual"
+      - date: "2026-05-24"
         result: fail
         checked_by: "manual"
   - id: vercel-production-only
@@ -255,7 +258,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-24"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -305,6 +308,9 @@ audits:
       - date: "2026-05-12"
         result: pass
         checked_by: "manual"
+      - date: "2026-05-24"
+        result: pass
+        checked_by: "manual"
   - id: gate-override-frequency
     category: process
     description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
@@ -323,7 +329,7 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
-    last_checked: "2026-05-01"
+    last_checked: "2026-05-24"
     last_result: pass
     last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
@@ -386,6 +392,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-05-01"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-05-24"
         result: pass
         checked_by: "manual"
   - id: model-freshness
@@ -498,7 +507,7 @@ audits:
     frequency: daily
     added: "2026-04-13"
     added_by_pr: 4319
-    last_checked: "2026-05-12"
+    last_checked: "2026-05-24"
     last_result: fail
     history:
       - date: "2026-04-14"
@@ -521,6 +530,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-05-12"
+        result: fail
+        checked_by: "manual"
+      - date: "2026-05-24"
         result: fail
         checked_by: "manual"
   - id: audits-system-adoption
