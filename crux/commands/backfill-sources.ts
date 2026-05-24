@@ -372,7 +372,10 @@ async function processAllRecords(
   }
 
   const unmatched = run.searched - run.matched;
-  const skipped = run.noTerms + run.budgetSkipped;
+  // Count skips from the recorded outcomes rather than summing per-reason
+  // counters: that way test-record skips (which don't have a dedicated
+  // counter) are included, matching every line actually written to the file.
+  const skipped = run.outcomes.filter((o) => o.outcome.kind === 'skipped').length;
   run.outcomeStatus = jsonlOk
     ? closeOutcomeJsonl(parsed.unmatchedOut, {
         records: records.length,
