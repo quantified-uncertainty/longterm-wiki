@@ -1,11 +1,17 @@
 /**
  * Build the human-readable run summary and persist the per-record outcome
- * JSON file. The summary lines go to stdout via the command's CommandResult;
- * the JSON gets written to disk so a human can spot-check matched URLs and
+ * file. The summary lines go to stdout via the command's CommandResult; the
+ * outcomes get written to disk so a human can spot-check matched URLs and
  * triage no-match reasons after the fact.
+ *
+ * The outcome file is JSONL (one record per line), written incrementally as
+ * each record finishes — see openOutcomeJsonl/appendOutcomeJsonl. This keeps
+ * memory flat regardless of batch size: we never hold every record's results
+ * (let alone a single giant pretty-printed JSON string of all of them) in
+ * memory at once, which previously OOM'd large backfill runs.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { humanizeClaim } from './humanize-claim.ts';
 import { totalOf } from './cost.ts';
@@ -95,55 +101,57 @@ function formatOutcomeLine({ record, outcome }: RecordOutcome): string {
 // Per-record JSON outcome file
 // ---------------------------------------------------------------------------
 
-export interface OutcomeFileInput {
-  path: string;
-  outcomes: RecordOutcome[];
-  mode: 'apply' | 'dry-run';
-  totalRecords: number;
+export interface OutcomeJsonlTotals {
+  records: number;
   searched: number;
   matched: number;
+  unmatched: number;
+  skipped: number;
 }
 
 /**
- * Write the run's per-record outcomes to a JSON file for post-hoc analysis.
+ * Open (truncate) the JSONL outcome file and write a `meta` header line.
  *
- * Matched items include the chosen URL + the verified quotes so a human can
- * spot-check for false positives without re-running the pipeline. Unmatched
- * + skipped items include the rejection reason for triage.
- *
- * Returns a status line for the summary block. The write is wrapped in a
- * try/catch so a write failure (read-only fs, missing dir perms) doesn't
- * derail the command — we surface the error in the summary instead.
+ * Returns true if the file is writable. If it isn't (read-only fs, missing
+ * perms) the caller simply skips the per-record writes — the run still
+ * completes; the file is for post-hoc triage only, never load-bearing.
  */
-export function writeOutcomesJson(input: OutcomeFileInput): string {
-  if (input.outcomes.length === 0) return '';
-
-  const items = input.outcomes.map(serializeOutcome);
-  const noMatchCount = items.filter(o => o.outcome === 'no-match').length;
-  const skippedCount = items.filter(o => o.outcome === 'skipped').length;
-
+export function openOutcomeJsonl(path: string, mode: 'apply' | 'dry-run'): boolean {
   try {
-    mkdirSync(dirname(input.path), { recursive: true });
+    mkdirSync(dirname(path), { recursive: true });
     writeFileSync(
-      input.path,
-      JSON.stringify(
-        {
-          generated_at: new Date().toISOString(),
-          mode: input.mode,
-          totals: {
-            records: input.totalRecords,
-            searched: input.searched,
-            matched: input.matched,
-            unmatched: noMatchCount,
-            skipped: skippedCount,
-          },
-          items,
-        },
-        null,
-        2,
-      ),
+      path,
+      JSON.stringify({ type: 'meta', generated_at: new Date().toISOString(), mode }) + '\n',
     );
-    return `  Outcomes written: ${input.path} (${items.length} items: ${input.matched} matched, ${noMatchCount} no-match, ${skippedCount} skipped)`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Append one record's outcome as a single JSONL line.
+ *
+ * Matched items include the chosen URL + verified quotes so a human can
+ * spot-check for false positives; unmatched/skipped items carry the reason.
+ * Best-effort: a mid-run write failure is swallowed so it can't abort the run.
+ */
+export function appendOutcomeJsonl(path: string, outcome: RecordOutcome): void {
+  try {
+    appendFileSync(path, JSON.stringify(serializeOutcome(outcome)) + '\n');
+  } catch {
+    // Triage-only file — never derail the run on a write failure.
+  }
+}
+
+/**
+ * Append the trailing `summary` line with the run totals, and return a status
+ * line for the human-readable summary block.
+ */
+export function closeOutcomeJsonl(path: string, totals: OutcomeJsonlTotals): string {
+  try {
+    appendFileSync(path, JSON.stringify({ type: 'summary', totals }) + '\n');
+    return `  Outcomes written: ${path} (${totals.searched + totals.skipped} items: ${totals.matched} matched, ${totals.unmatched} no-match, ${totals.skipped} skipped)`;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return `  Outcomes write FAILED: ${msg}`;
