@@ -101,7 +101,8 @@ const handlers: Record<string, JobHandler> = {
       });
 
       // Tail of stdout is enough to summarise outcomes; the full report is
-      // written to dev/reports/backfill-unmatched-*.json on the worker pod.
+      // written to backfill-unmatched-*.json in the OS temp dir on the worker
+      // pod (override with --unmatched-out).
       const tail = output.slice(-2000);
       return { success: true, data: { limit, maxCost, table: params.table ?? null, output: tail } };
     } catch (err: unknown) {

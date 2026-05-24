@@ -14,6 +14,8 @@
  *   pnpm crux tb backfill-sources --table=facts --apply  # Only facts
  */
 
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { DEFAULT_MAX_COST, PER_RECORD_BUDGET } from '../lib/backfill-sources/config.ts';
 import { addCost, emptyCost, totalOf } from '../lib/backfill-sources/cost.ts';
 import { fetchMissingSources, updateRecordSource } from '../lib/backfill-sources/fetch.ts';
@@ -165,8 +167,12 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     maxCost,
     verbose: !!o.verbose,
     debug: !!o.debug,
+    // Default into the OS temp dir, not dev/reports under the repo: the worker
+    // container runs as a non-root user on a read-only repo and can't create
+    // dev/reports. Pass --unmatched-out to write somewhere specific (e.g. a dev
+    // checkout where you want the report committed/inspected).
     unmatchedOut: (o.unmatchedOut as string | undefined)
-      ?? `dev/reports/backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+      ?? join(tmpdir(), `backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`),
     skipYamlPr: !!o.noYamlPr,
   };
 }
