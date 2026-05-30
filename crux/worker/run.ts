@@ -239,7 +239,22 @@ function startHeartbeat(): void {
 // Memory watchdog
 // ---------------------------------------------------------------------------
 
-const HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+// Most handlers should finish quickly; a 15-min cap catches anything wedged.
+const DEFAULT_HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+// Per-type overrides for handlers that legitimately run long. backfill-sources
+// sweeps up to 200 records/table through search + LLM verification — a full run
+// is ~30-50 min and can reach a few hours, so it needs a much higher ceiling
+// than the default (it was being killed mid-run at 15 min — every nightly run
+// failed). This is the worker-side backstop; the handler's own child-process
+// timeout fires slightly earlier and is what actually kills the spawned child.
+const HANDLER_TIMEOUT_OVERRIDES_MS: Record<string, number> = {
+  'backfill-sources': 3 * 60 * 60 * 1000 + 5 * 60 * 1000, // 3h5m backstop (handler kills child at 3h)
+};
+
+function handlerTimeoutMs(jobType: string): number {
+  return HANDLER_TIMEOUT_OVERRIDES_MS[jobType] ?? DEFAULT_HANDLER_TIMEOUT_MS;
+}
 
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
 
@@ -524,14 +539,15 @@ async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> 
     // Execute the handler with timeout
     const context: JobHandlerContext = { workerId, projectRoot, verbose };
     let handlerTimer: ReturnType<typeof setTimeout> | undefined;
+    const timeoutMs = handlerTimeoutMs(jobType);
 
     try {
       const result = await Promise.race([
         handler(jobParams, context),
         new Promise<never>((_, reject) => {
           handlerTimer = setTimeout(
-            () => reject(new Error(`Handler timed out after ${HANDLER_TIMEOUT_MS / 1000}s`)),
-            HANDLER_TIMEOUT_MS,
+            () => reject(new Error(`Handler timed out after ${timeoutMs / 1000}s`)),
+            timeoutMs,
           );
         }),
       ]);

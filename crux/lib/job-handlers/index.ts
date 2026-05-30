@@ -84,9 +84,9 @@ const handlers: Record<string, JobHandler> = {
   },
 
   'backfill-sources': async (params, ctx) => {
-    const limit = typeof params.limit === 'number' ? String(params.limit) : '100';
+    const limit = typeof params.limit === 'number' ? String(params.limit) : '200';
     const maxCost =
-      typeof params.maxCost === 'number' ? String(params.maxCost) : '5';
+      typeof params.maxCost === 'number' ? String(params.maxCost) : '100';
     const args = [
       '--import',
       'tsx/esm',
@@ -106,7 +106,13 @@ const handlers: Record<string, JobHandler> = {
       const { stdout: output } = await execFileAsync('node', args, {
         cwd: ctx.projectRoot,
         encoding: 'utf-8',
-        timeout: 60 * 60 * 1000, // 1h — full prod sweep is ~30-50 min
+        // 3h — a full sweep (up to 200 records/table through search + LLM
+        // verification) can run long. On timeout execFile sends killSignal to
+        // the child, so the spawned process is actually terminated (the worker
+        // backstop in run.ts is set slightly higher, at 3h5m, so this fires
+        // first and does the cleanup rather than being abandoned).
+        timeout: 3 * 60 * 60 * 1000,
+        killSignal: 'SIGKILL',
         maxBuffer: 16 * 1024 * 1024,
       });
 
