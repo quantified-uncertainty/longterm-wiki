@@ -100,7 +100,7 @@ function parseConfig(): WorkerConfig {
 
 let shuttingDown = false;
 const activeJobIds = new Set<number>();
-const jobStartTimes = new Map<number, number>(); // jobId -> start timestamp
+const jobStartTimes = new Map<number, { start: number; type: string }>(); // jobId -> start timestamp + type
 
 for (const sig of ['SIGTERM', 'SIGINT'] as const) {
   process.on(sig, () => {
@@ -131,12 +131,12 @@ function startHealthServer(): void {
 
   healthServer = createServer((req, res) => {
     if (req.url === '/healthz' || req.url === '/health') {
-      const stuckThresholdMs = 20 * 60 * 1000; // 20 minutes
       const now = Date.now();
-      // Check if ANY individual job has been running too long (not just time since last completion)
+      // Stuck if any in-flight job has run past its own handler timeout (+grace),
+      // so a legitimately long job like backfill-sources isn't restarted mid-run.
       let isStuck = false;
-      for (const [, startTime] of jobStartTimes) {
-        if (now - startTime > stuckThresholdMs) { isStuck = true; break; }
+      for (const [, { start, type }] of jobStartTimes) {
+        if (now - start > handlerTimeoutMs(type) + STUCK_GRACE_MS) { isStuck = true; break; }
       }
       const status = shuttingDown ? 'shutting_down' : isStuck ? 'stuck' : 'ok';
       const statusCode = (status === 'ok') ? 200 : 503;
@@ -239,7 +239,22 @@ function startHeartbeat(): void {
 // Memory watchdog
 // ---------------------------------------------------------------------------
 
-const HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+const DEFAULT_HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+// Per-type overrides for handlers that legitimately run long. The handler's own
+// child-process timeout fires slightly earlier and kills the child; this is the
+// worker-side backstop.
+const HANDLER_TIMEOUT_OVERRIDES_MS: Record<string, number> = {
+  'backfill-sources': 3 * 60 * 60 * 1000 + 5 * 60 * 1000, // 3h5m (child killed at 3h)
+};
+
+function handlerTimeoutMs(jobType: string): number {
+  return HANDLER_TIMEOUT_OVERRIDES_MS[jobType] ?? DEFAULT_HANDLER_TIMEOUT_MS;
+}
+
+// Grace above the handler timeout before the watchdog flags a job "stuck",
+// so the handler's own timeout fires first on a real hang.
+const STUCK_GRACE_MS = 5 * 60 * 1000; // 5 minutes
 
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
 
@@ -524,14 +539,15 @@ async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> 
     // Execute the handler with timeout
     const context: JobHandlerContext = { workerId, projectRoot, verbose };
     let handlerTimer: ReturnType<typeof setTimeout> | undefined;
+    const timeoutMs = handlerTimeoutMs(jobType);
 
     try {
       const result = await Promise.race([
         handler(jobParams, context),
         new Promise<never>((_, reject) => {
           handlerTimer = setTimeout(
-            () => reject(new Error(`Handler timed out after ${HANDLER_TIMEOUT_MS / 1000}s`)),
-            HANDLER_TIMEOUT_MS,
+            () => reject(new Error(`Handler timed out after ${timeoutMs / 1000}s`)),
+            timeoutMs,
           );
         }),
       ]);
@@ -617,7 +633,7 @@ async function runWorker(config: WorkerConfig): Promise<void> {
       // C1: Track job immediately before async dispatch to close SIGTERM race window.
       // If SIGTERM arrives between claim and executeJob, the handler sees the job as in-flight.
       activeJobIds.add(outcome.id);
-      jobStartTimes.set(outcome.id, Date.now());
+      jobStartTimes.set(outcome.id, { start: Date.now(), type: outcome.type });
       dispatched++;
       const slot = executeJob(outcome, config)
         .catch((err: unknown) => {
