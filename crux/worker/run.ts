@@ -256,6 +256,19 @@ function handlerTimeoutMs(jobType: string): number {
 // so the handler's own timeout fires first on a real hang.
 const STUCK_GRACE_MS = 5 * 60 * 1000; // 5 minutes
 
+// The idle poll loop runs every few seconds; logging "claiming / no jobs /
+// waiting" each time floods the logs. Throttle that heartbeat to one line per
+// interval so verbose logs still show real job activity without the noise.
+const IDLE_LOG_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+let lastIdleLogAt = 0;
+function logIdleHeartbeat(msg: string, verbose: boolean): void {
+  if (!verbose) return;
+  const now = Date.now();
+  if (now - lastIdleLogAt < IDLE_LOG_INTERVAL_MS) return;
+  lastIdleLogAt = now;
+  console.log(msg);
+}
+
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
 
 function checkMemory(): boolean {
@@ -477,7 +490,7 @@ async function claimOneJob(config: WorkerConfig): Promise<'no_job' | 'error' | C
 
   if (verbose) {
     const typeDesc = types.length > 0 ? types.join(', ') : 'any';
-    console.log(`[worker] Claiming job (types: ${typeDesc})...`);
+    logIdleHeartbeat(`[worker] Claiming job (types: ${typeDesc})...`, verbose);
   }
 
   const claimResult = await claimWithTypes(workerId, types);
@@ -490,9 +503,6 @@ async function claimOneJob(config: WorkerConfig): Promise<'no_job' | 'error' | C
 
   const claimed = claimResult.data.job;
   if (!claimed) {
-    if (verbose) {
-      console.log('[worker] No pending jobs available');
-    }
     consecutiveFailures = 0;
     return 'no_job';
   }
@@ -666,9 +676,7 @@ async function runWorker(config: WorkerConfig): Promise<void> {
       }
 
       const interval = getEffectivePollInterval(config.pollIntervalMs);
-      if (config.verbose) {
-        console.log(`[worker] No jobs available, waiting ${interval}ms...`);
-      }
+      logIdleHeartbeat(`[worker] No jobs available, waiting ${interval}ms...`, config.verbose);
 
       // If we have in-flight jobs, race the poll interval against job completion
       if (inFlightSlots.size > 0) {
