@@ -100,7 +100,7 @@ function parseConfig(): WorkerConfig {
 
 let shuttingDown = false;
 const activeJobIds = new Set<number>();
-const jobStartTimes = new Map<number, number>(); // jobId -> start timestamp
+const jobStartTimes = new Map<number, { start: number; type: string }>(); // jobId -> start timestamp + type
 
 for (const sig of ['SIGTERM', 'SIGINT'] as const) {
   process.on(sig, () => {
@@ -131,12 +131,16 @@ function startHealthServer(): void {
 
   healthServer = createServer((req, res) => {
     if (req.url === '/healthz' || req.url === '/health') {
-      const stuckThresholdMs = 20 * 60 * 1000; // 20 minutes
       const now = Date.now();
-      // Check if ANY individual job has been running too long (not just time since last completion)
+      // Check if ANY individual job has been running past its own handler
+      // timeout (plus a grace window) — not just time since last completion.
+      // The threshold is per-job-type so a legitimately long job (e.g.
+      // backfill-sources, ~3h) isn't flagged "stuck" and liveness-restarted
+      // mid-run. The grace keeps the watchdog above the handler timeout so the
+      // handler's own timeout/child-kill fires first on a real hang.
       let isStuck = false;
-      for (const [, startTime] of jobStartTimes) {
-        if (now - startTime > stuckThresholdMs) { isStuck = true; break; }
+      for (const [, { start, type }] of jobStartTimes) {
+        if (now - start > handlerTimeoutMs(type) + STUCK_GRACE_MS) { isStuck = true; break; }
       }
       const status = shuttingDown ? 'shutting_down' : isStuck ? 'stuck' : 'ok';
       const statusCode = (status === 'ok') ? 200 : 503;
@@ -255,6 +259,12 @@ const HANDLER_TIMEOUT_OVERRIDES_MS: Record<string, number> = {
 function handlerTimeoutMs(jobType: string): number {
   return HANDLER_TIMEOUT_OVERRIDES_MS[jobType] ?? DEFAULT_HANDLER_TIMEOUT_MS;
 }
+
+// The health watchdog flags a job "stuck" once it runs past its handler timeout
+// plus this grace, so the handler's own timeout/child-kill fires first on a real
+// hang and the watchdog only trips if that cleanup itself wedged. (Historically
+// the watchdog used a flat 20 min = the old 15-min default + 5-min grace.)
+const STUCK_GRACE_MS = 5 * 60 * 1000; // 5 minutes
 
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
 
@@ -633,7 +643,7 @@ async function runWorker(config: WorkerConfig): Promise<void> {
       // C1: Track job immediately before async dispatch to close SIGTERM race window.
       // If SIGTERM arrives between claim and executeJob, the handler sees the job as in-flight.
       activeJobIds.add(outcome.id);
-      jobStartTimes.set(outcome.id, Date.now());
+      jobStartTimes.set(outcome.id, { start: Date.now(), type: outcome.type });
       dispatched++;
       const slot = executeJob(outcome, config)
         .catch((err: unknown) => {
