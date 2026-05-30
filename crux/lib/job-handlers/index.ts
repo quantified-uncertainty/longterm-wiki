@@ -106,11 +106,8 @@ const handlers: Record<string, JobHandler> = {
       const { stdout: output } = await execFileAsync('node', args, {
         cwd: ctx.projectRoot,
         encoding: 'utf-8',
-        // 3h — a full sweep (up to 200 records/table through search + LLM
-        // verification) can run long. On timeout execFile sends killSignal to
-        // the child, so the spawned process is actually terminated (the worker
-        // backstop in run.ts is set slightly higher, at 3h5m, so this fires
-        // first and does the cleanup rather than being abandoned).
+        // 3h — a full sweep can run long. killSignal ensures the child is
+        // actually terminated on timeout (worker backstop in run.ts is 3h5m).
         timeout: 3 * 60 * 60 * 1000,
         killSignal: 'SIGKILL',
         maxBuffer: 16 * 1024 * 1024,

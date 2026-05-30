@@ -132,12 +132,8 @@ function startHealthServer(): void {
   healthServer = createServer((req, res) => {
     if (req.url === '/healthz' || req.url === '/health') {
       const now = Date.now();
-      // Check if ANY individual job has been running past its own handler
-      // timeout (plus a grace window) — not just time since last completion.
-      // The threshold is per-job-type so a legitimately long job (e.g.
-      // backfill-sources, ~3h) isn't flagged "stuck" and liveness-restarted
-      // mid-run. The grace keeps the watchdog above the handler timeout so the
-      // handler's own timeout/child-kill fires first on a real hang.
+      // Stuck if any in-flight job has run past its own handler timeout (+grace),
+      // so a legitimately long job like backfill-sources isn't restarted mid-run.
       let isStuck = false;
       for (const [, { start, type }] of jobStartTimes) {
         if (now - start > handlerTimeoutMs(type) + STUCK_GRACE_MS) { isStuck = true; break; }
@@ -243,27 +239,21 @@ function startHeartbeat(): void {
 // Memory watchdog
 // ---------------------------------------------------------------------------
 
-// Most handlers should finish quickly; a 15-min cap catches anything wedged.
 const DEFAULT_HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
-// Per-type overrides for handlers that legitimately run long. backfill-sources
-// sweeps up to 200 records/table through search + LLM verification — a full run
-// is ~30-50 min and can reach a few hours, so it needs a much higher ceiling
-// than the default (it was being killed mid-run at 15 min — every nightly run
-// failed). This is the worker-side backstop; the handler's own child-process
-// timeout fires slightly earlier and is what actually kills the spawned child.
+// Per-type overrides for handlers that legitimately run long. The handler's own
+// child-process timeout fires slightly earlier and kills the child; this is the
+// worker-side backstop.
 const HANDLER_TIMEOUT_OVERRIDES_MS: Record<string, number> = {
-  'backfill-sources': 3 * 60 * 60 * 1000 + 5 * 60 * 1000, // 3h5m backstop (handler kills child at 3h)
+  'backfill-sources': 3 * 60 * 60 * 1000 + 5 * 60 * 1000, // 3h5m (child killed at 3h)
 };
 
 function handlerTimeoutMs(jobType: string): number {
   return HANDLER_TIMEOUT_OVERRIDES_MS[jobType] ?? DEFAULT_HANDLER_TIMEOUT_MS;
 }
 
-// The health watchdog flags a job "stuck" once it runs past its handler timeout
-// plus this grace, so the handler's own timeout/child-kill fires first on a real
-// hang and the watchdog only trips if that cleanup itself wedged. (Historically
-// the watchdog used a flat 20 min = the old 15-min default + 5-min grace.)
+// Grace above the handler timeout before the watchdog flags a job "stuck",
+// so the handler's own timeout fires first on a real hang.
 const STUCK_GRACE_MS = 5 * 60 * 1000; // 5 minutes
 
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
