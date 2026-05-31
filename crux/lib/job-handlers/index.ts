@@ -87,6 +87,12 @@ const handlers: Record<string, JobHandler> = {
     const limit = typeof params.limit === 'number' ? String(params.limit) : '200';
     const maxCost =
       typeof params.maxCost === 'number' ? String(params.maxCost) : '100';
+    // QUA-1071: default to a 30-day retry window so the nightly cron skips the
+    // hard residue it already tried this month instead of re-burning ~$6/run on
+    // records that no-match every time. Pass retryAfterDays=0 to force a full
+    // re-sweep.
+    const retryAfterDays =
+      typeof params.retryAfterDays === 'number' ? String(params.retryAfterDays) : '30';
     const args = [
       '--import',
       'tsx/esm',
@@ -97,6 +103,7 @@ const handlers: Record<string, JobHandler> = {
       '--apply',
       `--limit=${limit}`,
       `--max-cost=${maxCost}`,
+      `--retry-after-days=${retryAfterDays}`,
     ];
     if (typeof params.table === 'string' && params.table.length > 0) {
       args.push(`--table=${params.table}`);

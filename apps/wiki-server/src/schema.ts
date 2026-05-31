@@ -1491,6 +1491,37 @@ export const pipelineRuns = pgTable(
   ]
 );
 
+// QUA-1071 — sourcing attempt ledger.
+//
+// The backfill-sources job re-queries the missing-sources endpoint every
+// night and re-attempts every record that still lacks a source URL. Most are
+// a hard residue (URL-less / unverifiable citations) that no-match every time,
+// so the nightly run burns LLM spend re-checking them. This table records the
+// last time each record was attempted; the missing-sources queries skip any
+// record attempted within a caller-supplied retry window, so each record is
+// retried at most once per window instead of nightly.
+//
+// One row per (table_name, record_id). record_id is stored as text so the
+// numeric-id tables (facts, page_citations, …) and the varchar-id tables
+// (personnel, investments, …) share one ledger.
+export const sourcingAttempts = pgTable(
+  "sourcing_attempts",
+  {
+    tableName: text("table_name").notNull(),
+    recordId: text("record_id").notNull(),
+    lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    attemptCount: integer("attempt_count").notNull().default(1),
+    // The outcome of the most recent attempt: 'matched' | 'no-match' | 'skipped'.
+    lastOutcome: text("last_outcome"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.tableName, table.recordId] }),
+    index("idx_sourcing_attempts_last_attempt_at").on(table.lastAttemptAt),
+  ]
+);
+
 export const serviceHealthIncidents = pgTable(
   "service_health_incidents",
   {
