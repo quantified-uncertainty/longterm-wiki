@@ -17,6 +17,12 @@ import type { MissingSourceRecord, MissingSourcesResponse } from './types.ts';
 export interface FetchOptions {
   limit: number;
   table?: string;
+  /**
+   * QUA-1071: skip records attempted within this many days (per the
+   * sourcing_attempts ledger). 0 (the default) disables the filter and keeps
+   * the legacy behaviour of re-attempting every missing record each run.
+   */
+  retryAfterDays?: number;
 }
 
 /**
@@ -30,6 +36,9 @@ export async function fetchMissingSources(
 ): Promise<{ records: MissingSourceRecord[]; totalMissing: number } | { error: string }> {
   const qs = new URLSearchParams({ limit: String(options.limit) });
   if (options.table) qs.set('table', options.table);
+  if (options.retryAfterDays && options.retryAfterDays > 0) {
+    qs.set('retryAfterDays', String(options.retryAfterDays));
+  }
 
   // typed-client-ok: QUA-770 baseline — sources backfill, internal write path
   const response = await apiRequest<MissingSourcesResponse>(
@@ -77,4 +86,33 @@ export async function updateRecordSource(
     return false;
   }
   return true;
+}
+
+export interface AttemptRecord {
+  table: string;
+  recordId: string;
+  outcome: string;
+}
+
+/**
+ * QUA-1071: stamp the sourcing_attempts ledger for every record processed
+ * this run (matched or not) so a later run can skip records re-attempted
+ * within the retry window. Best-effort: a failure here only means the records
+ * may be re-attempted sooner than intended, so it logs and returns the count
+ * written (0 on failure) rather than throwing.
+ */
+export async function recordAttempts(attempts: AttemptRecord[]): Promise<number> {
+  if (attempts.length === 0) return 0;
+
+  // typed-client-ok: QUA-770 baseline — sources backfill, internal write path
+  const response = await apiRequest<{ recorded?: number; error?: string }>(
+    'POST',
+    '/api/sourcing/missing-sources/record-attempts',
+    { attempts },
+  );
+  if (!response.ok) {
+    console.warn(`  Attempt-ledger API error: ${response.message}`);
+    return 0;
+  }
+  return response.data.recorded ?? 0;
 }

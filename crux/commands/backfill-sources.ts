@@ -12,13 +12,16 @@
  *   pnpm crux tb backfill-sources --dry-run              # Preview only
  *   pnpm crux tb backfill-sources --limit=20 --apply     # Process 20 + update
  *   pnpm crux tb backfill-sources --table=facts --apply  # Only facts
+ *   pnpm crux tb backfill-sources --apply --retry-after-days=30
+ *       # Skip records attempted in the last 30 days (QUA-1071) — avoids
+ *       # re-burning spend on the hard residue that no-matches every run.
  */
 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DEFAULT_MAX_COST, PER_RECORD_BUDGET } from '../lib/backfill-sources/config.ts';
 import { addCost, emptyCost, totalOf } from '../lib/backfill-sources/cost.ts';
-import { fetchMissingSources, updateRecordSource } from '../lib/backfill-sources/fetch.ts';
+import { fetchMissingSources, updateRecordSource, recordAttempts, type AttemptRecord } from '../lib/backfill-sources/fetch.ts';
 import { extractMatchTerms } from '../lib/backfill-sources/match-terms.ts';
 import { processRecord } from '../lib/backfill-sources/process-record.ts';
 import {
@@ -50,6 +53,8 @@ interface ParsedOptions {
   table?: string;
   recordIdFilter?: string;
   maxCost: number;
+  /** QUA-1071: skip records attempted within this many days; 0 = no filter. */
+  retryAfterDays: number;
   verbose: boolean;
   debug: boolean;
   unmatchedOut: string;
@@ -155,6 +160,11 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     return { error: `--limit must be a positive integer (got ${o.limit})` };
   }
 
+  const retryAfterDays = o.retryAfterDays ? parseInt(o.retryAfterDays as string, 10) : 0;
+  if (!Number.isFinite(retryAfterDays) || retryAfterDays < 0) {
+    return { error: `--retry-after-days must be a non-negative integer (got ${o.retryAfterDays})` };
+  }
+
   return {
     dryRun,
     apply,
@@ -162,6 +172,7 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     table: o.table as string | undefined,
     recordIdFilter: o.recordId as string | undefined,
     maxCost,
+    retryAfterDays,
     verbose: !!o.verbose,
     debug: !!o.debug,
     // Default into the OS temp dir, not dev/reports under the repo: the worker
@@ -259,9 +270,22 @@ async function processAllRecords(
   // the heavy candidate payloads live only in the file, one line at a time.
   const mode = parsed.apply ? 'apply' : 'dry-run';
   const jsonlOk = openOutcomeJsonl(parsed.unmatchedOut, mode);
-  const recordOutcome = (o: RecordOutcome): void => {
+
+  // QUA-1071: collect the (table, id, outcome) of every record we actually
+  // processed so we can stamp the sourcing_attempts ledger after the run.
+  // `stamp` is false for budget-cap skips — those weren't really attempted, so
+  // they must stay eligible for the next run rather than being suppressed.
+  const attempts: AttemptRecord[] = [];
+  const recordOutcome = (o: RecordOutcome, stamp = true): void => {
     if (jsonlOk) appendOutcomeJsonl(parsed.unmatchedOut, o);
     run.outcomes.push(stripCandidates(o));
+    if (stamp && parsed.apply) {
+      attempts.push({
+        table: o.record.record_table,
+        recordId: o.record.record_id,
+        outcome: o.outcome.kind,
+      });
+    }
   };
 
   // Build YAML target indexes once per apply-run. In dry-run we skip this
@@ -298,7 +322,7 @@ async function processAllRecords(
         console.warn(`\n[budget] Reached $${totalOf(run.totalBreakdown).toFixed(4)} / $${parsed.maxCost.toFixed(2)} cap — stopping remaining records`);
       }
       run.budgetSkipped++;
-      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'budget cap' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'budget cap' } }, false);
       continue;
     }
 
@@ -340,7 +364,9 @@ async function processAllRecords(
         const yamlOutcome = writeRecordToYaml(record, result.url, indexes);
         yamlReport = {
           status: yamlOutcome.status,
-          ...(yamlOutcome.filepath ? { filepath: yamlOutcome.filepath } : {}),
+          // filepath is a required field of YamlWriteRecordReport (string | null),
+          // so default the falsy case to null rather than omitting the key.
+          filepath: yamlOutcome.filepath ?? null,
           ...(yamlOutcome.applicable && yamlOutcome.status === 'error' && yamlOutcome.error
             ? { error: yamlOutcome.error }
             : {}),
@@ -385,6 +411,14 @@ async function processAllRecords(
         skipped,
       })
     : `  Outcomes write skipped: ${parsed.unmatchedOut} not writable`;
+
+  // QUA-1071: stamp the attempt ledger so a later run with --retry-after-days
+  // skips everything we just processed. Best-effort — failure only means
+  // records may be retried sooner, never lost.
+  if (parsed.apply && attempts.length > 0) {
+    const recorded = await recordAttempts(attempts);
+    console.log(`  Sourcing attempts recorded: ${recorded}/${attempts.length}`);
+  }
 
   return run;
 }
