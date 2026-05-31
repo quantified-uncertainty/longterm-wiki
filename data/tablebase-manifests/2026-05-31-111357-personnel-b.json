@@ -1,11 +1,11 @@
 {
   "table": "personnel",
-  "recordCount": 6,
+  "recordCount": 3,
   "recordsRejected": 0,
   "submittedAt": "2026-05-31T11:13:57.903Z",
   "sourcingSummary": {
     "withSourcing": 0,
-    "withoutSourcing": 6,
+    "withoutSourcing": 3,
     "verdicts": {
       "verified": 0,
       "contradicted": 0,
@@ -14,43 +14,6 @@
     }
   },
   "records": [
-    {
-      "personId": "y7nCfZam6C",
-      "organizationId": "sid_CyKa5eLcCl",
-      "role": "President",
-      "roleType": "key-person",
-      "startDate": "2022",
-      "isFounder": false,
-      "source": "https://www.cigionline.org/about/leadership/",
-      "notes": "Fourth president of CIGI; joined September 6, 2022. Former senior government official and co-chair of the G20 principal working group on the global economy.",
-      "id": "emh9wFjfM9",
-      "verdict": "none"
-    },
-    {
-      "personId": "dGph0sUn1V",
-      "organizationId": "sid_CyKa5eLcCl",
-      "role": "President",
-      "roleType": "key-person",
-      "startDate": "2012",
-      "endDate": "2022",
-      "isFounder": false,
-      "source": "https://en.wikipedia.org/wiki/Centre_for_International_Governance_Innovation",
-      "notes": "Third president of CIGI; joined May 2012 and served approximately one decade until 2022.",
-      "id": "rTuuoDTA8c",
-      "verdict": "none"
-    },
-    {
-      "personId": "K0n2artioI",
-      "organizationId": "sid_CyKa5eLcCl",
-      "role": "Founder and Chair",
-      "roleType": "board",
-      "startDate": "2001",
-      "isFounder": true,
-      "source": "https://www.cigionline.org/people/jim-balsillie/",
-      "notes": "Founded CIGI in 2001 with a $20M donation; chairs the board. Former co-CEO of Research In Motion (BlackBerry).",
-      "id": "hWn923uL8m",
-      "verdict": "none"
-    },
     {
       "personId": "DVBIxAHQy2",
       "organizationId": "sid_CyKa5eLcCl",
