@@ -27,6 +27,7 @@ export default tseslint.config(
       '.claude/**',
       'docker/**',
       'public/**',
+      'dev/**',
       // Drizzle migration metadata is generated.
       'apps/wiki-server/drizzle/meta/**',
       // Test fixtures and snapshot data have intentionally weird shapes.
