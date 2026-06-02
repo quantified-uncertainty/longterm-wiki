@@ -27,7 +27,9 @@
     "scripts/**/*.mts",
     "docs/**/*.ts",
     "docs/**/*.mts",
-    "data/**/*.ts"
+    "data/**/*.ts",
+    "dev/**/*.ts",
+    "dev/**/*.mts"
   ],
   "exclude": [
     "**/node_modules/**",
