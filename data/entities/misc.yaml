@@ -203,6 +203,31 @@
       type: person
   lastUpdated: 2026-02
 
+- id: frontier-labs-comparison-table
+  stableId: sid_MpPu9WTszw
+  wikiId: E2566
+  type: table
+  title: Frontier AI Labs Comparison
+  description: >-
+    Hand-curated comparison of 12 major frontier AI labs (OpenAI, Anthropic,
+    Google DeepMind, Meta, xAI, Microsoft AI, DeepSeek, Alibaba Qwen, Mistral,
+    Cohere, AI21, Inflection) on eight safety-relevant dimensions: capability
+    tier, safety investment, race posture restraint, transparency, governance
+    engagement, leadership safety alignment, employee safety culture, and
+    RSP / framework quality. Each rating anchored in observable signals.
+  tags:
+    - frontier-labs
+    - safety-comparison
+    - rsp
+    - scorecard
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: sid_P43tBraTCQ
+      type: table
+  lastUpdated: 2026-05
+
 - id: anthropic-investors
   stableId: sid_sKOD0uMVGg
   wikiId: E406
