@@ -133,6 +133,7 @@ import * as scorecardsCommands from './commands/scorecards.ts';
 import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
+import * as agentEndCommands from './commands/agent-end.ts';
 import * as costCommands from './commands/cost.ts';
 import * as benchmarksCommands from './commands/benchmarks.ts';
 import * as usagePatternsCommands from './commands/usage-patterns.ts';
@@ -245,6 +246,7 @@ const domains = {
   branches: branchesCommands,
   'deploy-tasks': deployTasksCommands,
   'agent-reset': agentResetCommands,
+  'agent-end': agentEndCommands,
   cost: costCommands,
   benchmarks: benchmarksCommands,
   'usage-patterns': usagePatternsCommands,
