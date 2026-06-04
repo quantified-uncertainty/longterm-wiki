@@ -27,6 +27,8 @@ export default tseslint.config(
       '.claude/**',
       'docker/**',
       'public/**',
+      // dev/ holds standalone utility scripts that aren't part of the typed lint project.
+      'dev/**',
       // Drizzle migration metadata is generated.
       'apps/wiki-server/drizzle/meta/**',
       // Test fixtures and snapshot data have intentionally weird shapes.
