@@ -1,0 +1,29 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-23T11:17:17.980Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_PIC4ivhNpw",
+      "name": "Seed Round",
+      "date": "2024-12",
+      "raised": 5790000,
+      "instrument": "Seed",
+      "source": "https://futuresearch.ai/company/",
+      "notes": "Seed round raised in November/December 2024 per company page and Crunchbase (December 5, 2024). Amount $5.79M per Crunchbase. Investors: Juniper Ventures, Macroscopic Ventures, Metaplanet Holdings, Safe Artificial Intelligence Fund, Twin Path Ventures. Company describes investors as having track rec… [truncated, 101 more chars]",
+      "id": "ZXzwSvks4A",
+      "verdict": "none"
+    }
+  ]
+}
