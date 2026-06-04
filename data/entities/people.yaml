@@ -2298,6 +2298,7 @@
     - ai-policy
 - id: pushmeet-kohli
   stableId: sid_6T8nglIbo6
+  wikiId: E1685
   type: person
   title: Pushmeet Kohli
   description: VP of Research at Google DeepMind. Leads the AI Safety and Alignment team. Previously at Microsoft Research.
@@ -2306,6 +2307,7 @@
     - alignment
 - id: david-silver
   stableId: sid_e7urD1sfMx
+  wikiId: E1337
   type: person
   title: David Silver
   description: Principal Research Scientist at Google DeepMind. Led the AlphaGo, AlphaZero, and AlphaFold projects. Pioneer of deep reinforcement learning.
@@ -7904,3 +7906,26 @@
     - label: Role
       value: Founder & sole maintainer, AI Lab Watch
   lastUpdated: 2026-04
+
+# DeepMind Nobel laureate
+- id: john-jumper
+  stableId: sid_8fPs3DNkvg
+  wikiId: E2562
+  type: person
+  title: John Jumper
+  description: >-
+    Principal Research Scientist at Google DeepMind. Co-recipient of the 2024
+    Nobel Prize in Chemistry (shared with Demis Hassabis and David Baker) for
+    AlphaFold and the prediction of protein structures. Led the AlphaFold 2
+    research team that solved the protein folding problem at CASP14 in 2020.
+  tags:
+    - alphafold
+    - protein-folding
+    - nobel-laureate
+    - deepmind
+  customFields:
+    - label: Role
+      value: Principal Research Scientist
+    - label: Known For
+      value: AlphaFold 2, AlphaFold 3, 2024 Nobel Prize in Chemistry
+  lastUpdated: 2026-05
