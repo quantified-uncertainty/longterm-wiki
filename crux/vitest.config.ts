@@ -26,6 +26,7 @@ export default defineConfig({
       'frameworks/**/*.test.ts',
       'scripts/**/*.test.ts',
       'git/**/*.test.ts',
+      'generate/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

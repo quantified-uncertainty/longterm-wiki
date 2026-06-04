@@ -382,6 +382,7 @@ export function getInternalNav(): NavSection[] {
         { label: "External Search APIs", href: internalHref("external-search-apis") },
         { label: "Content Database", href: internalHref("content-database") },
         { label: "DB Schema Overview", href: internalHref("db-schema-overview") },
+        { label: "DB Schema Reference", href: internalHref("db-schema-reference") },
         { label: "CLI Reference", href: internalHref("cli-reference") },
         { label: "Skills Reference", href: internalHref("skills-reference") },
       ],
