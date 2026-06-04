@@ -14,7 +14,12 @@ import type { ResourceRow } from "../../../resources/resources-table";
  * Statically generated at build time so the 17MB+ dataset is served as a
  * separate cacheable fetch rather than embedded in the page HTML.
  */
-export const dynamic = "force-static";
+// Changed from "force-static" to "force-dynamic" (2026-05-31): the static build
+// baked the entire ~19.4MB JSON into an ISR fallback file, which exceeds Vercel's
+// 19.07MB limit and broke production deploys (FALLBACK_BODY_TOO_LARGE). Nothing in
+// the app currently fetches this endpoint, so serving it on-demand is safe. Revert
+// to "force-static" once the payload is shrunk/paginated if static caching is wanted.
+export const dynamic = "force-dynamic";
 
 export function GET(): NextResponse<ResourceRow[]> {
   const resources = getAllResources();
