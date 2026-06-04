@@ -1,0 +1,65 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-31T11:16:43.098Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "FOWhy14rdY",
+      "organizationId": "sid_6PfhPgDIZg",
+      "role": "CEO and Co-Founder",
+      "roleType": "key-person",
+      "startDate": "2015",
+      "isFounder": true,
+      "source": "https://www.govocal.com/about-us",
+      "notes": "Co-founded CitizenLab (now Go Vocal) in 2015. Serves as CEO. Company rebranded from CitizenLab to Go Vocal in 2024. Selected for Obama Foundation Leaders Europe 2025-2026.",
+      "id": "UsKo41lh6W",
+      "verdict": "none"
+    },
+    {
+      "personId": "sKtujsUhT0",
+      "organizationId": "sid_6PfhPgDIZg",
+      "role": "Head of Government Success and Co-Founder",
+      "roleType": "key-person",
+      "startDate": "2015",
+      "isFounder": true,
+      "source": "https://www.govocal.com/about-us",
+      "notes": "Co-founded CitizenLab (now Go Vocal) in 2015. Serves as Head of Government Success.",
+      "id": "EPvvPqJrWc",
+      "verdict": "none"
+    },
+    {
+      "personId": "UV3zKOkkXc",
+      "organizationId": "sid_6PfhPgDIZg",
+      "role": "CTO and Co-Founder",
+      "roleType": "key-person",
+      "startDate": "2015",
+      "isFounder": true,
+      "source": "https://www.govocal.com/about-us",
+      "notes": "Co-founded CitizenLab (now Go Vocal) in 2015. Serves as Chief Technology Officer.",
+      "id": "n3cnBtZ96U",
+      "verdict": "none"
+    },
+    {
+      "personId": "6yAEbTxDwU",
+      "organizationId": "sid_6PfhPgDIZg",
+      "role": "Advisory Board Chair",
+      "roleType": "board",
+      "isFounder": false,
+      "source": "https://www.govocal.com/about-us",
+      "notes": "Chair of the Advisory Board. Former New Jersey Chief Innovation Officer and director of NYU's Governance Lab.",
+      "id": "8UuLpT6Qdt",
+      "verdict": "none"
+    }
+  ]
+}

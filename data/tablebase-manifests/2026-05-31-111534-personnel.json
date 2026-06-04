@@ -1,0 +1,62 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-31T11:15:34.263Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "ZfqZIEB1cH",
+      "organizationId": "sid_ucAYSllfeQ",
+      "role": "Co-founder and CEO",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://www.prnewswire.com/news-releases/well-healths-circle-medical-provides-corporate-update-exceeds-100m-usd-revenue-run-rate-with-profitability-and-positions-for-further-growth-302220742.html",
+      "notes": "Co-founder and CEO of Circle Medical. Confirmed as CEO in August 2024 press release. LinkedIn profile updated 2025 suggesting possible role change.",
+      "id": "0wHSJQeit7",
+      "verdict": "none"
+    },
+    {
+      "personId": "mxMQBIPAbH",
+      "organizationId": "sid_ucAYSllfeQ",
+      "role": "Co-founder and Chief Medical Officer",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://www.topionetworks.com/people/david-kagan-56544b0c2433d2497f0000a6",
+      "notes": "Co-founder and Chief Medical Officer (CMO) at Circle Medical. MD, MBA, MPH credentials.",
+      "id": "KQI232n3Au",
+      "verdict": "none"
+    },
+    {
+      "personId": "9ySFmbzMeo",
+      "organizationId": "sid_ucAYSllfeQ",
+      "role": "Co-founder and CTO",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://theorg.com/org/circlemedical/org-chart/js-boulanger",
+      "notes": "Co-founder and CTO (Jean-Sebastien Boulanger, known as JS Boulanger). Confirmed via The Org and multiple sources.",
+      "id": "TLStiQemU5",
+      "verdict": "none"
+    },
+    {
+      "personId": "ICWLVUUyl2",
+      "organizationId": "sid_ucAYSllfeQ",
+      "role": "Co-founder and VP of Product and Patient Experience",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://www.prnewswire.com/news-releases/well-healths-circle-medical-provides-corporate-update-exceeds-100m-usd-revenue-run-rate-with-profitability-and-positions-for-further-growth-302220742.html",
+      "notes": "Co-founder who returned to Circle Medical in August 2024 as VP of Product and Patient Experience. Also known as Brent LaRue, OLY.",
+      "id": "Z7GmObFlTc",
+      "verdict": "none"
+    }
+  ]
+}
