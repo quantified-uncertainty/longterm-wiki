@@ -59,6 +59,75 @@ export const PageIdSchema = z.string().min(1).max(200);
 // Record Source-Checks
 // ---------------------------------------------------------------------------
 
+/**
+ * Allowed lifecycle states for a URL suggestion.
+ * Mirrored in the PG CHECK constraint — migrations 0176 (initial set) and
+ * 0198 (added 'applied'). Keep in sync.
+ *
+ * Lives here (not next to the route) because the worker container only
+ * COPIES this file from apps/wiki-server/, and the apply-suggestions
+ * CLI imports the constant as a runtime value (not type-only).
+ */
+export const VALID_SUGGESTION_STATUSES = [
+  "pending",
+  "approved",
+  "rejected",
+  "auto_verified",
+  "applied",
+] as const;
+export type SuggestionStatus = (typeof VALID_SUGGESTION_STATUSES)[number];
+
+/**
+ * Files in `apps/wiki-server/src/routes/tablebase/` that are NOT mounted
+ * routes — helpers, schemas, test-d files. Consumed by the route detector
+ * and the two tablebase validators. Mirrors the worker-container reality
+ * (only `api-types.ts` is copied out of `apps/wiki-server/`) so the lazy
+ * route detector + the validators load without ERR_MODULE_NOT_FOUND.
+ *
+ * Keep in sync with `apps/wiki-server/src/routes/tablebase/mount-registry.ts`.
+ */
+export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
+  "index.ts",
+  "mount-registry.ts",
+  "sync-factory.ts",
+  "sync-factory.test-d.ts",
+  "sourcing-schema.ts",
+  "audit-log.ts",
+  "write-inline-verdicts.ts",
+  "entity-profile-descriptions.ts",
+  "system-card-benchmark-linker.ts",
+  "benchmark-shared.ts",
+  "policy-stakeholders-schema.ts",
+];
+
+/**
+ * Risk-domain enum for the third-party-evaluation tablebase route.
+ * Mirrors the CHECK constraint in migration 0206. Lives here so the
+ * crux third-party-eval extractor (which imports this as a value, not
+ * type) loads inside the worker container.
+ *
+ * Keep in sync with `apps/wiki-server/src/routes/tablebase/third-party-evaluations.ts`.
+ */
+export const VALID_RISK_DOMAINS = [
+  "cbrn",
+  "biological",
+  "chemical",
+  "radiological",
+  "nuclear",
+  "cyber",
+  "autonomy",
+  "agent-security",
+  "persuasion",
+  "scheming",
+  "deception",
+  "jailbreak",
+  "safeguard-efficacy",
+  "evaluation-awareness",
+  "misuse",
+  "misc",
+] as const;
+export type RiskDomain = (typeof VALID_RISK_DOMAINS)[number];
+
 export const VALID_RECORD_TYPES = [
   "grant",
   "personnel",

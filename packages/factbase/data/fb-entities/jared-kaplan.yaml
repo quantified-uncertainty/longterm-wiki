@@ -2,8 +2,9 @@ entity: sid_x16GL4gP2A
 facts:
   - id: f_clGvV7hzcA
     property: notable-for
-    value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of
-      neural scaling laws research"
+    value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of neural scaling laws research"
+    source: https://en.wikipedia.org/wiki/Jared_Kaplan
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_h7OOErJfYQ
     property: education
@@ -19,13 +20,12 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_FoEx38QdKF
     property: ea-alignment-estimate
-    value: [0.15, 0.3]
+    value: [ 0.15, 0.3 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Scaling laws pioneer and safety-motivated
-      co-founder; no documented EA pledge or EA Forum activity. Low confidence
-      of EA-aligned cause-area giving."
+    notes: "Editorial estimate. Scaling laws pioneer and safety-motivated co-founder; no documented EA pledge or EA Forum
+      activity. Low confidence of EA-aligned cause-area giving."

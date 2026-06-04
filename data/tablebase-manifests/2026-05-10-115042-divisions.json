@@ -1,0 +1,36 @@
+{
+  "table": "divisions",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-10T11:50:42.301Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Thu15x6XLh",
+      "parentOrgId": "sid_XLLyzaEaCA",
+      "name": "GovAI Policy",
+      "divisionType": "team",
+      "lead": "markus-anderljung",
+      "source": "https://www.governance.ai/people",
+      "verdict": "none"
+    },
+    {
+      "id": "sXCAcabfgs",
+      "parentOrgId": "sid_XLLyzaEaCA",
+      "name": "GovAI Research",
+      "divisionType": "team",
+      "lead": "markus-anderljung",
+      "source": "https://www.governance.ai/people",
+      "verdict": "none"
+    }
+  ]
+}

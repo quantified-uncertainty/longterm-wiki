@@ -18,11 +18,10 @@ facts:
   - id: f_9gjP5bFmol
     property: description
     value: >-
-      Nonprofit research organization and think tank focused on nanotechnology,
-      secure AI, neurotechnology, longevity biotechnology, space, and existential
-      hope. Operates through grants, prizes, fellowships, and conferences rather
-      than direct laboratory research. Known for the Feynman Prize in
-      Nanotechnology (since 1993) and recent expansion into AI safety grantmaking.
+      Nonprofit research organization and think tank focused on nanotechnology, secure AI, neurotechnology, longevity
+      biotechnology, space, and existential hope. Operates through grants, prizes, fellowships, and conferences rather
+      than direct laboratory research. Known for the Feynman Prize in Nanotechnology (since 1993) and recent expansion
+      into AI safety grantmaking.
     asOf: 2025
     source: https://foresight.org
 
@@ -75,61 +74,57 @@ facts:
   - id: f_JUTlTFjoCQ
     property: program
     value: >-
-      AI Safety Grants Program — launched August 2023 with $1M initial budget.
-      Expanded to ~$1.5M in 2024 across seven research areas: AI security,
-      private AI, decentralized/cooperative AI, AI for science/epistemics,
-      AI for neurotechnology, AI for longevity biotech, AI for molecular nanotech.
+      AI Safety Grants Program — launched August 2023 with $1M initial budget. Expanded to ~$1.5M in 2024 across seven
+      research areas: AI security, private AI, decentralized/cooperative AI, AI for science/epistemics, AI for
+      neurotechnology, AI for longevity biotech, AI for molecular nanotech.
     asOf: 2024
     source: https://foresight.org/ai-safety-grants/
 
   - id: f_y1IzIsfEAH
     property: program
     value: >-
-      Feynman Prize in Nanotechnology — annual award since 1993 recognizing
-      advances in nanotechnology. Notable winners include Sir Fraser Stoddart
-      (2007, Nobel Prize 2016) and David Baker (2004, Nobel Prize 2024).
+      Feynman Prize in Nanotechnology — annual award since 1993 recognizing advances in nanotechnology. Notable winners
+      include Sir Fraser Stoddart (2007, Nobel Prize 2016) and David Baker (2004, Nobel Prize 2024).
     asOf: 2024
     source: https://foresight.org/feynman-prize/
 
   - id: f_seSdElHSv6
     property: program
     value: >-
-      Existential Hope Fellowship — year-long fellowship for early-career
-      scientists and engineers working on frontier technologies. 43 fellows
-      supported in 2024.
+      Existential Hope Fellowship — year-long fellowship for early-career scientists and engineers working on frontier
+      technologies. 43 fellows supported in 2024.
     asOf: 2024
 
   - id: f_CeLe6WZCs4
     property: program
     value: >-
-      AI Nodes — planned physical hubs in San Francisco and Berlin providing
-      grant funding, office/event space, and compute resources for AI safety
-      and AI-for-science researchers. ~$5M raised toward $7M target as of early 2026.
+      AI Nodes — planned physical hubs in San Francisco and Berlin providing grant funding, office/event space, and
+      compute resources for AI safety and AI-for-science researchers. ~$5M raised toward $7M target as of early 2026.
     asOf: 2026
     source: https://foresight.org/ai-nodes/
 
   - id: f_N5lXc1GdyD
     property: program
     value: >-
-      Tech Trees — interactive technology roadmaps identifying key actors,
-      bottlenecks, and opportunities in Secure AI, Longevity, Human-AI Cooperation,
-      Whole Brain Emulation, Molecular Machines, and Space.
+      Tech Trees — interactive technology roadmaps identifying key actors, bottlenecks, and opportunities in Secure AI,
+      Longevity, Human-AI Cooperation, Whole Brain Emulation, Molecular Machines, and Space.
     asOf: 2025
     source: https://foresight.org/tech-trees/
 
   - id: f_Xib6e7BJRs
     property: program
     value: >-
-      Norm Hardy Prize — $10,000 award for advances in usable security.
-      2025 winner: Dr. Pardis Emami-Naeini for cybersecurity labeling for
-      smart home devices that influenced the U.S. Cyber Trust Mark.
+      Norm Hardy Prize — $10,000 award for advances in usable security. 2025 winner: Dr. Pardis Emami-Naeini for
+      cybersecurity labeling for smart home devices that influenced the U.S. Cyber Trust Mark.
     asOf: 2025
+    source: https://foresight.org/prizes/norm-hardy-prize
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_A0hbFbdJLn
     property: program
     value: >-
-      Whole Brain Emulation Endowment — ~$2.3M raised to support fast grants
-      and a $20M grand prize for achieving the first complete human brain emulation.
+      Whole Brain Emulation Endowment — ~$2.3M raised to support fast grants and a $20M grand prize for achieving the
+      first complete human brain emulation.
     asOf: 2025
 
   - id: f_StP6Vh4wkV

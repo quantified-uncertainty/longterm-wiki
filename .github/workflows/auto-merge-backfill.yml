@@ -1,0 +1,129 @@
+name: Auto-Merge Backfill PRs
+run-name: "Auto-Merge Backfill PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Auto-merges open PRs from the source-backfill auto-PR flow
+# (`crux tb backfill-sources` opens these on `claude/backfill-sources-yaml-*`
+# branches; they are mechanical YAML mirrors with nothing to review by hand).
+#
+# Merge criteria:
+#   - PR is open and on a `claude/backfill-sources-yaml-*` head branch
+#   - All status checks succeeded (statusCheckRollup is all SUCCESS)
+#   - mergeable == MERGEABLE (no conflicts)
+#
+# CodeRabbit review state is intentionally NOT checked — its reviews are
+# advisory on this repo (no branch protection requires them) and the YAML
+# diffs are mechanical.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'   # every 20 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-backfill
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  merge:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Find and merge eligible PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # List open PRs from auto-backfill branches with their CI status.
+          # base:main filter prevents accidentally merging into release branches.
+          PRS=$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --base main \
+            --limit 200 \
+            --search "head:claude/backfill-sources-yaml-" \
+            --json number,headRefName,headRefOid,baseRefName,mergeable,statusCheckRollup,title,id)
+
+          # Defense-in-depth: re-filter by baseRefName == "main" in case the
+          # --base flag is ever loosened or the search syntax changes.
+          PRS=$(echo "$PRS" | jq -c '[.[] | select(.baseRefName == "main")]')
+
+          COUNT=$(echo "$PRS" | jq 'length')
+          echo "Found $COUNT open auto-backfill PR(s)"
+
+          if [ "$COUNT" -eq 0 ]; then
+            exit 0
+          fi
+
+          # Filter to PRs that are MERGEABLE and have all checks passing.
+          # statusCheckRollup mixes two shapes:
+          #   - CheckRun entries (GitHub Actions jobs) use `.conclusion`
+          #     with values like SUCCESS / FAILURE / NEUTRAL / SKIPPED.
+          #   - StatusContext entries (external services e.g. Vercel,
+          #     CodeRabbit) use `.state` (SUCCESS / FAILURE / PENDING)
+          #     and leave `.conclusion` null.
+          # We accept either shape's "passed" signal, and reject the PR if
+          # ANY entry is in a non-passing state. Empty rollup => no checks
+          # ran => skip (don't merge a PR that hasn't been validated).
+          ELIGIBLE=$(echo "$PRS" | jq -c '[.[] |
+            select(.mergeable == "MERGEABLE") |
+            select((.statusCheckRollup | length) > 0) |
+            select([.statusCheckRollup[] |
+              (.conclusion == "SUCCESS" or .conclusion == "NEUTRAL" or .conclusion == "SKIPPED")
+              or .state == "SUCCESS"
+            ] | all)
+          ]')
+
+          ELIGIBLE_COUNT=$(echo "$ELIGIBLE" | jq 'length')
+          echo "$ELIGIBLE_COUNT PR(s) eligible to merge"
+
+          # The repo has a merge queue enabled and "Allow auto-merge" is
+          # intentionally OFF, so `gh pr merge --merge` cannot be used
+          # (it falls back to enabling auto-merge, which the repo
+          # rejects). Instead we add the PR directly to the merge queue
+          # via the GraphQL `enqueuePullRequest` mutation, which only
+          # needs the `pull-requests: write` permission this workflow
+          # already grants. `expectedHeadOid` gives optimistic
+          # concurrency: if a new commit landed on the PR branch since
+          # we listed it, GitHub rejects rather than enqueuing a stale
+          # SHA. Branch cleanup is handled by the repo's "Automatically
+          # delete head branches" setting after the queue finishes.
+          echo "$ELIGIBLE" | jq -c '.[]' | while read -r pr; do
+            NUM=$(echo "$pr" | jq -r '.number')
+            BRANCH=$(echo "$pr" | jq -r '.headRefName')
+            TITLE=$(echo "$pr" | jq -r '.title')
+            PR_ID=$(echo "$pr" | jq -r '.id')
+            HEAD_OID=$(echo "$pr" | jq -r '.headRefOid')
+            echo "::group::Enqueuing PR #$NUM ($BRANCH): $TITLE"
+            ENQUEUE_OUT=$(gh api graphql \
+              -f query='mutation($prId: ID!, $headOid: GitObjectID!) {
+                enqueuePullRequest(input: {
+                  pullRequestId: $prId,
+                  expectedHeadOid: $headOid
+                }) {
+                  mergeQueueEntry { position }
+                }
+              }' \
+              -f prId="$PR_ID" \
+              -f headOid="$HEAD_OID" 2>&1) && RC=0 || RC=$?
+            if [ "$RC" -eq 0 ]; then
+              echo "✓ PR #$NUM added to merge queue"
+            elif echo "$ENQUEUE_OUT" | grep -qiE "already in|merge queue is not enabled|MERGE_QUEUE"; then
+              # PR is already in the queue (we re-list open PRs every run, so
+              # any PR queued on a previous run will re-appear here until the
+              # queue finishes merging it). Not an error.
+              echo "PR #$NUM already in merge queue — skipping"
+            else
+              echo "::warning::Failed to enqueue PR #$NUM — will retry next run"
+              echo "$ENQUEUE_OUT"
+            fi
+            echo "::endgroup::"
+          done

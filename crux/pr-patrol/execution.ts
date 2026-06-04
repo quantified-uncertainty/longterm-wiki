@@ -63,6 +63,17 @@ import {
 } from './state.ts';
 import { buildMainBranchPrompt, buildPrompt } from './prompts.ts';
 import { computeEffectiveBudget } from './scoring.ts';
+import {
+  buildOutput,
+  newStreamJsonState,
+  processStreamJsonLine,
+} from './stream-json.ts';
+
+/**
+ * Default inline input-token cap for spawnClaude when PatrolConfig doesn't
+ * supply one explicitly. Set to QUA-1071 AC#5's 50k threshold.
+ */
+export const DEFAULT_INPUT_TOKEN_CAP = 50_000;
 
 // ── No-op detection ─────────────────────────────────────────────────────────
 
@@ -287,17 +298,29 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
   let reason = '';
 
   try {
-    const result = await spawnClaude(prompt, config, { cwd: worktreePath });
+    const result = await spawnClaude(prompt, config, {
+      cwd: worktreePath,
+      context: { label: `main-branch:${status.runId ?? '?'}` },
+    });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
-    if (result.timedOut) {
+    if (result.timedOut || result.budgetExceeded) {
       const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'timeout';
-      reason = `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
-      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`);
+      // QUA-1078: a budget kill is shaped like a timeout (daemon-initiated
+      // SIGTERM, partial work) — fold into the same branch but emit a clearer
+      // reason so operators don't see a meaningless "Exit code: null".
+      reason = result.budgetExceeded
+        ? `Killed after exceeding ${config.inputTokenCap ?? 0} cumulative input_tokens (observed ${result.inputTokens}) — attempt ${failCount}`
+        : `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
+      log(
+        result.budgetExceeded
+          ? `${cl.red}✗ Main branch fix killed for input-token budget (${result.inputTokens})${cl.reset} (attempt ${failCount})`
+          : `${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`,
+      );
 
       if (failCount >= MAIN_BRANCH_ABANDON_THRESHOLD) {
-        reason = `Abandoned after ${failCount} failures (timeout)`;
+        reason = `Abandoned after ${failCount} failures (${result.budgetExceeded ? 'budget' : 'timeout'})`;
         log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
@@ -349,11 +372,40 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
 
 // ── Claude spawning ─────────────────────────────────────────────────────────
 
+export interface SpawnClaudeResult {
+  exitCode: number;
+  /**
+   * Reconstructed agent output. Built from joined `assistant` text content +
+   * `result.result` text + `tool_result` content (and any unparseable
+   * passthrough lines), so the existing regex-based callers
+   * (`looksLikeNoOp`, `looksLikeMainRootCause`, `extractFixPrNumber`,
+   * fix-complete tail comments) keep matching without changes.
+   */
+  output: string;
+  hitMaxTurns: boolean;
+  timedOut: boolean;
+  /** True if the subprocess was SIGTERM'd because cumulative input_tokens hit the cap. */
+  budgetExceeded: boolean;
+  /** Cumulative `input_tokens` summed across stream-json `assistant` events. */
+  inputTokens: number;
+}
+
+export interface SpawnClaudeOpts {
+  cwd?: string;
+  extraEnv?: Record<string, string>;
+  /**
+   * Optional context attached to the `cycle_budget_exceeded` JSONL event
+   * when the input-token cap fires. Lets fixPr / fixMainBranch / branch-agent
+   * tag the entry without each caller having to log separately.
+   */
+  context?: { prNumber?: number | null; label?: string };
+}
+
 export function spawnClaude(
   prompt: string,
   config: PatrolConfig,
-  opts?: { cwd?: string; extraEnv?: Record<string, string> },
-): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean; timedOut: boolean }> {
+  opts?: SpawnClaudeOpts,
+): Promise<SpawnClaudeResult> {
   return new Promise((resolve, reject) => {
     const args = [
       '--print',
@@ -361,6 +413,8 @@ export function spawnClaude(
       config.model,
       '--max-turns',
       String(config.maxTurns),
+      '--output-format',
+      'stream-json',
       '--verbose',
     ];
     if (config.skipPerms) args.push('--dangerously-skip-permissions');
@@ -395,9 +449,13 @@ export function spawnClaude(
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    let output = '';
+    const state = newStreamJsonState();
+    const cap = config.inputTokenCap ?? DEFAULT_INPUT_TOKEN_CAP;
     let timedOut = false;
+    let budgetExceeded = false;
+    let killedReason: 'timeout' | 'budget' | null = null;
     let forceKillTimer: ReturnType<typeof setTimeout> | null = null;
+    let stdoutBuffer = '';
 
     const clearTimers = () => {
       clearTimeout(timer);
@@ -407,29 +465,63 @@ export function spawnClaude(
       }
     };
 
-    // Hard timeout — kill subprocess if it runs too long
-    const timeoutMs = config.timeoutMinutes * 60 * 1000;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      log(`  ${cl.yellow}⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing${cl.reset}`);
+    // Single kill path — used by both timeout and budget. Idempotent so a
+    // concurrent budget-cross + timeout doesn't double-fire SIGTERM.
+    const triggerKill = (reason: 'timeout' | 'budget') => {
+      if (killedReason) return;
+      killedReason = reason;
+      // If we got here from a close-handler drain (the partial-line buffer
+      // crossing the cap *after* the child has already exited), the child
+      // is gone — calling kill() is harmless but the SIGKILL fallback timer
+      // would leak for 10s and delay clean shutdown. Skip it.
+      if (child.exitCode !== null || child.signalCode !== null) return;
       child.kill('SIGTERM');
-      // Force kill if SIGTERM doesn't exit within 10s.
-      // Note: child.killed is true as soon as kill() is called, so we check
-      // exitCode/signalCode instead to know if the process actually exited.
       forceKillTimer = setTimeout(() => {
         if (child.exitCode === null && child.signalCode === null) {
           child.kill('SIGKILL');
         }
       }, 10_000);
+    };
+
+    // Hard timeout — kill subprocess if it runs too long
+    const timeoutMs = config.timeoutMinutes * 60 * 1000;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      log(
+        `  ${cl.yellow}⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing${cl.reset}`,
+      );
+      triggerKill('timeout');
     }, timeoutMs);
 
+    const handleLine = (line: string) => {
+      const effect = processStreamJsonLine(line, state, cap);
+      if (effect.stderrText) process.stderr.write(effect.stderrText + '\n');
+      if (effect.budgetCrossedNow && !budgetExceeded) {
+        budgetExceeded = true;
+        log(
+          `  ${cl.red}⚠ Input-token budget exceeded (observed ${state.cumulativeInputTokens} ≥ cap ${cap}) — killing claude subprocess${cl.reset}`,
+        );
+        triggerKill('budget');
+      }
+    };
+
     child.stdout.on('data', (chunk: Buffer) => {
-      const text = chunk.toString();
-      output += text;
-      process.stderr.write(text);
+      stdoutBuffer += chunk.toString();
+      let nlIdx;
+      while ((nlIdx = stdoutBuffer.indexOf('\n')) !== -1) {
+        const line = stdoutBuffer.slice(0, nlIdx);
+        stdoutBuffer = stdoutBuffer.slice(nlIdx + 1);
+        handleLine(line);
+      }
     });
     child.stderr.on('data', (chunk: Buffer) => {
-      output += chunk.toString();
+      // Surface stderr to the operator (claude warnings live here) but DO
+      // NOT append to output: stderr can include partial credentials on auth
+      // failure (e.g. truncated `sk-ant-...` echoes), and `output.slice(-500)`
+      // is posted as a public PR comment via buildFixCompleteComment. The
+      // pre-stream-json text mode concatenated stderr too — that was a
+      // pre-existing leak risk we're tightening up here.
+      process.stderr.write(chunk);
     });
 
     child.stdin.write(prompt);
@@ -437,11 +529,51 @@ export function spawnClaude(
 
     child.on('close', (code) => {
       clearTimers();
+      // Drain any final partial line so we don't lose the result event.
+      if (stdoutBuffer.trim()) handleLine(stdoutBuffer);
+      stdoutBuffer = '';
+
+      const output = buildOutput(state);
+      // hitMaxTurns is already OR'd from three signals in `handleResult`
+      // (subtype, stop_reason, regex against resultText). No need for a
+      // redundant outer substring check — if the result event carried the
+      // phrase, handleResult set the flag.
+      const hitMaxTurns = state.hitMaxTurns;
+
+      if (budgetExceeded) {
+        // The kill-signal landed; verify whether the process actually exited
+        // versus still hanging at SIGKILL deadline (close is firing now, so
+        // it did exit — but record the signal source for forensics).
+        const killSucceeded = child.exitCode !== null || child.signalCode !== null;
+        try {
+          appendJsonl(JSONL_FILE, {
+            type: 'cycle_budget_exceeded',
+            pr_num: opts?.context?.prNumber ?? null,
+            label: opts?.context?.label ?? null,
+            threshold: cap,
+            observed_input_tokens: state.cumulativeInputTokens,
+            kill_succeeded: killSucceeded,
+            exit_code: code,
+            signal: child.signalCode,
+          });
+        } catch (e) {
+          // Don't let a disk-full error stall the promise; the kill itself
+          // succeeded and the operator already has the live stderr warning.
+          log(
+            `  ${cl.yellow}Warning: could not append cycle_budget_exceeded JSONL: ${
+              e instanceof Error ? e.message : String(e)
+            }${cl.reset}`,
+          );
+        }
+      }
+
       resolve({
         exitCode: code ?? 1,
         output,
-        hitMaxTurns: output.includes('Reached max turns'),
+        hitMaxTurns,
         timedOut,
+        budgetExceeded,
+        inputTokens: state.cumulativeInputTokens,
       });
     });
     child.on('error', (err) => {
@@ -742,20 +874,29 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: worktreePath });
+    }, { cwd: worktreePath, context: { prNumber: pr.number } });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
-    if (result.timedOut) {
-      // Timeouts count toward abandonment — a PR that times out repeatedly
-      // is likely unfixable and should not keep burning compute.
+    if (result.timedOut || result.budgetExceeded) {
+      // Timeouts AND budget kills count toward abandonment — a PR that
+      // repeatedly times out or repeatedly blows the input-token cap is
+      // likely unfixable and shouldn't keep burning compute. QUA-1078: fold
+      // budget kills into this branch so the reason string doesn't read
+      // "Exit code: null" — operators need to see what actually happened.
       const failCount = recordFailure(pr.number);
       outcome = 'timeout';
-      reason = `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
-      log(`${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`);
+      reason = result.budgetExceeded
+        ? `Killed after exceeding ${config.inputTokenCap ?? 0} cumulative input_tokens (observed ${result.inputTokens}) — attempt ${failCount}`
+        : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
+      log(
+        result.budgetExceeded
+          ? `${cl.red}✗ PR #${pr.number} killed for input-token budget (${result.inputTokens})${cl.reset} (attempt ${failCount})`
+          : `${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`,
+      );
 
       if (failCount >= 2) {
         markAbandoned(pr.number);
-        reason = `Abandoned after ${failCount} failures (timeout)`;
+        reason = `Abandoned after ${failCount} failures (${result.budgetExceeded ? 'budget' : 'timeout'})`;
         log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));

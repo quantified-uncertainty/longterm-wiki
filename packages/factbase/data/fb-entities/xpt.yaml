@@ -11,6 +11,7 @@ facts:
     property: founded-date
     value: "2022"
     notes: Ran in 2022 with 169 participants across superforecasters and domain experts
+    source: https://forecastingresearch.org/xpt
 
   - id: f_kFB6HS9nNo
     property: founded-by

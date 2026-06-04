@@ -283,7 +283,7 @@ export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
         ...config,
         maxTurns: effectiveMaxTurns,
         timeoutMinutes: effectiveTimeout,
-      });
+      }, { context: { prNumber, label: 'branch-agent' } });
       const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
       if (result.timedOut) {

@@ -4,22 +4,20 @@ facts:
     property: founded-date
     value: 2010-09
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Founded September 2010 in London by Demis Hassabis, Shane Legg, and
-      Mustafa Suleyman"
+    notes: "Founded September 2010 in London by Demis Hassabis, Shane Legg, and Mustafa Suleyman"
 
   - id: f_pjpNfsuNKw
     property: headquarters
     value: "London, UK"
     source: https://deepmind.google/about
-    notes: "Headquarters remain in London; additional offices in Mountain View,
-      Paris, and other cities"
+    notes: "Headquarters remain in London; additional offices in Mountain View, Paris, and other cities"
 
   - id: f_nq7RXAwqsw
     property: legal-structure
     value: "Subsidiary of Alphabet Inc."
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Acquired by Google in January 2014 for approximately $500M; merged with
-      Google Brain in April 2023 to form Google DeepMind"
+    notes: "Acquired by Google in January 2014 for approximately $500M; merged with Google Brain in April 2023 to form
+      Google DeepMind"
 
   - id: f_AX7AnnLZQQ
     property: founded-by
@@ -34,16 +32,16 @@ facts:
     value: 1567
     asOf: 2022-12
     source: https://usesignhouse.com/blog/deepmind-stats/
-    notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023
-      merger with Google Brain to form Google DeepMind"
+    notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023 merger with Google Brain to form Google
+      DeepMind"
 
   - id: f_KtTrbGQynQ
     property: headcount
     value: 6000
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly
-      after Google Brain merger in April 2023"
+    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly after Google Brain merger in April
+      2023"
 
   # ── Revenue (UK entity filings — internal R&D remuneration from Alphabet) ──
   - id: f_Wq9Bxn5mKg
@@ -51,32 +49,28 @@ facts:
     value: 1.96e+9
     asOf: "2023"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2023-deepmind-fullaccounts.pdf
-    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for
-      2023. Represents R&D remuneration from other Alphabet group undertakings, not
-      external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for 2023. Represents R&D remuneration from
+      other Alphabet group undertakings, not external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
 
   - id: f_8pLqVz3nRg
     property: internal-revenue
     value: 1.7e+9
     asOf: "2024"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2024-deepmind-fullaccounts.pdf
-    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for
-      2024. Decrease from 2023 likely due to reorganization of internal billing after
-      Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for 2024. Decrease from 2023 likely due to
+      reorganization of internal billing after Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
 
   # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
     property: safety-researcher-count
     value: 120
     asOf: 2025-06
-    notes: "Estimated 100-150 researchers working on AI safety, alignment, and
-      responsible AI across multiple teams"
+    notes: "Estimated 100-150 researchers working on AI safety, alignment, and responsible AI across multiple teams"
 
   # ── Migrated from old facts system (google-deepmind.yaml) ──────
   - id: f_knwLHy8iXg
     property: description
-    value: "AlphaFold database: 200M+ protein structures predicted and freely
-      available (2023)"
+    value: "AlphaFold database: 200M+ protein structures predicted and freely available (2023)"
     notes: "Number of protein structures predicted by AlphaFold"
 
   - id: f_vH8oNUqEFQ
@@ -88,8 +82,8 @@ facts:
     property: context-window
     value: 2000000
     asOf: 2024-05
-    notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M
-      tokens, expanded to 2M in May 2024"
+    notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M tokens, expanded to 2M in May 2024"
+    source: https://developers.googleblog.com/en/new-features-for-the-gemini-api-and-google-ai-studio
   - id: f_zd5ye0LJT9
     property: website
     value: https://deepmind.google/
@@ -125,3 +119,80 @@ facts:
     value: https://en.wikipedia.org/wiki/Google_DeepMind
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
+
+  # ── Major milestones (added 2026-05-10) ──────
+  - id: f_isgbuxl9gf
+    property: description
+    value: "AlphaFold 2 achieved competitive-with-experimental-methods accuracy at CASP14 (Nov–Dec 2020), widely characterized as solving the protein folding problem for structural biology purposes"
+    asOf: 2020-12
+    source: https://predictioncenter.org/casp14/
+    notes: "CASP14 competition; median GDT score ~92.4 across all targets. Led by John Jumper (DeepMind)."
+
+  - id: f_7hhl7ndz3d
+    property: description
+    value: "AlphaFold Protein Structure Database released 2021; expanded to over 200 million predicted structures by 2024, covering the UniProt set of cataloged proteins"
+    asOf: 2024
+    source: https://alphafold.ebi.ac.uk/
+    notes: "Free-access database hosted by EMBL-EBI; used by over 2M researchers per Royal Swedish Academy of Sciences 2024 Nobel announcement"
+
+  - id: f_n8q0cff71a
+    property: description
+    value: "AlphaFold 3 released May 2024, extending the framework to protein-ligand and protein-nucleic-acid complexes"
+    asOf: 2024-05
+    source: https://www.nature.com/articles/s41586-024-07487-w
+    notes: "Abramson et al., Nature 2024. AlphaFold 3 access via AlphaFold Server is more restricted than AlphaFold 2's full open release."
+
+  - id: f_ehhxb57l8y
+    property: description
+    value: "2024 Nobel Prize in Chemistry awarded jointly to Demis Hassabis and John Jumper (Google DeepMind) for AlphaFold, with David Baker (University of Washington) for separate work on protein design"
+    asOf: 2024-10
+    source: https://www.nobelprize.org/prizes/chemistry/2024/summary/
+    notes: "First Nobel Prize awarded primarily for industrial AI research; Royal Swedish Academy of Sciences announcement October 9, 2024"
+
+  - id: f_xx8i6p4km5
+    property: description
+    value: "Acquired by Google in January 2014 for approximately $500–650 million; merger with Google Brain announced April 2023 to form unified Google DeepMind"
+    asOf: 2014-01
+    source: https://en.wikipedia.org/wiki/Google_DeepMind
+    notes: "Original DeepMind Technologies acquisition; 2023 merger created the current organizational structure"
+
+  - id: f_xx86qm3ra1
+    property: description
+    value: "Frontier Safety Framework launched May 2024 — DeepMind's commitment to evaluate frontier models against Critical Capability Levels (CCL-0 through CCL-4) and implement deployment safeguards accordingly"
+    asOf: 2024-05
+    source: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+    notes: "Parallel to Anthropic's Responsible Scaling Policy and OpenAI's Preparedness Framework; framework v2 published later in 2024"
+
+  - id: f_60lfh7me8a
+    property: description
+    value: "Gemma Scope (2024): 400+ openly released sparse autoencoders for Gemma 2 9B and Gemma 2 2B models, intended to support external interpretability research"
+    asOf: 2024-08
+    source: https://deepmind.google/discover/blog/gemma-scope-helping-the-safety-community-shed-light-on-the-inner-workings-of-language-models/
+    notes: "Largest open-source SAE release at time of publication; led by Neel Nanda's mechanistic interpretability team"
+
+  - id: f_rj1ii57x0o
+    property: safety-researcher-count
+    value: 200
+    asOf: 2026-01
+    notes: "Approximate count of researchers across DeepMind safety/alignment teams (Frontier Safety, Mechanistic Interpretability, Alignment, AI Policy) post-2023 reorganization. Estimate range 150-250."
+
+  - id: f_rvt15frz31
+    property: description
+    value: "AlphaGo defeated Go champion Lee Sedol 4-1 in March 2016, widely characterized as a watershed AI capability moment. Famously, 'Move 37' in Game 2 was a move AlphaGo estimated humans would play with probability ~1/10,000"
+    asOf: 2016-03
+    source: https://www.nature.com/articles/nature16961
+    notes: "Silver et al., Nature 2016. Led by David Silver."
+
+  - id: f_52cc4yjpvk
+    property: description
+    value: "Gemini 1.0 launched December 2023, claimed parity or superiority with GPT-4 on multiple benchmarks; multimodal from initial training rather than added after"
+    asOf: 2023-12
+    source: https://deepmind.google/technologies/gemini/
+    notes: "First major model release post the April 2023 DeepMind-Brain merger"
+
+  - id: f_auvgm4xdrx
+    property: description
+    value: "GNoME (Graph Networks for Materials Exploration) identified 380,000 stable inorganic crystal structures (2023), expanding the known stable materials catalog roughly 10x"
+    asOf: 2023-11
+    source: https://www.nature.com/articles/s41586-023-06735-9
+    notes: "Merchant et al., Nature 2023"

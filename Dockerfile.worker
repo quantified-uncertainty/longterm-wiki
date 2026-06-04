@@ -73,8 +73,20 @@ COPY packages/ ./packages/
 # See QUA-746.
 COPY apps/wiki-server/src/api-types.ts ./apps/wiki-server/src/api-types.ts
 
-# NOTE: No other apps/wiki-server/ files needed — all other imports are type-only (erased by tsx)
-# NOTE: No content/, data/, apps/web/ needed — worker is stateless
+# crux/lib/research-playbooks.ts, crux/lib/rules/frontmatter-schema.ts, and
+# crux/wiki-server/sync-things.ts all import entity-type vocab as runtime
+# values (ENTITY_TYPE_ALIASES, ALL_ENTITY_TYPE_NAMES, OLD_TYPE_MAP). The
+# file is pure data so copying it is cheap.
+COPY apps/web/src/data/entity-type-names.ts ./apps/web/src/data/entity-type-names.ts
+
+# crux/lib/visual-detection.ts value-imports VISUAL_COMPONENT_NAMES from
+# data/schema.ts. visual-detection is pulled into crux.mjs's static graph
+# via commands/visual.ts. data/ also holds YAML the wiki-server reads.
+COPY data/ ./data/
+
+# NOTE: No other apps/wiki-server/ or apps/web/ files needed — all other
+# imports are type-only (erased by tsx). The crux.mjs static-import graph
+# is verified by `npm run docker:smoke` and `crux/validate/validate-worker-image.ts`.
 # NOTE: Only stateless handlers (claim-verification, ping) work in this image.
 # citation-verify shells out to crux CLI (needs full monorepo deps).
 # page-improve/page-create/batch-commit need git. Both stay on GHA.

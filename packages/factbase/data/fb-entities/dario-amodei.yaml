@@ -4,19 +4,18 @@ facts:
     property: born-year
     value: 1983
     notes: "Born 1983; approximate from public reporting"
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
 
   - id: f_dA1eF2gH3i
     property: education
     value: "PhD in Biophysics, Princeton University"
     source: https://en.wikipedia.org/wiki/Dario_Amodei
-    notes: "Studied electrophysiology of neural circuits; thesis: 'Network-Scale
-      Electrophysiology: Measuring and Understanding the Collective Behavior of
-      Neural Circuits' (2011)"
+    notes: "Studied electrophysiology of neural circuits; thesis: 'Network-Scale Electrophysiology: Measuring and
+      Understanding the Collective Behavior of Neural Circuits' (2011)"
 
   - id: f_dA4jK5lM6n
     property: notable-for
-    value: "CEO and co-founder of Anthropic; formerly VP of Research at OpenAI;
-      leading proponent of responsible AI scaling"
+    value: "CEO and co-founder of Anthropic; formerly VP of Research at OpenAI; leading proponent of responsible AI scaling"
     source: https://en.wikipedia.org/wiki/Dario_Amodei
 
   - id: f_dA7oP8qR9s
@@ -27,10 +26,14 @@ facts:
   - id: f_b0znrdd1a0
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Dario_Amodei"
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_c85liwnyxb
     property: google-scholar
     value: "https://scholar.google.com/citations?user=0tSbNNgAAAAJ"
+    source: https://scholar.google.com/citations?user=0tSbNNgAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_WWpRINtcuw
     property: website
     value: https://darioamodei.com/
@@ -42,14 +45,13 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_606Pwh7C4Q
     property: ea-alignment-estimate
-    value: [0.8, 0.9]
+    value: [ 0.8, 0.9 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Dario is a Giving What We Can signatory with
-      documented EA community ties and an early GiveWell supporter; former
-      roommate of Holden Karnofsky. High confidence that donations flow to
-      EA-aligned causes."
+    notes: "Editorial estimate. Dario is a Giving What We Can signatory with documented EA community ties and an early
+      GiveWell supporter; former roommate of Holden Karnofsky. High confidence that donations flow to EA-aligned
+      causes."

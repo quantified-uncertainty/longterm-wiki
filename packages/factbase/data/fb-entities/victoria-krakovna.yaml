@@ -3,12 +3,15 @@ facts:
   - id: f_13qgbQWHbA
     property: notable-for
     value: "Research scientist at Google DeepMind working on AI safety; co-founder of the Future of Life Institute"
+    source: https://theorg.com/org/future-of-life-institute/org-chart/victoria-krakovna
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_Cv8z8DxCsw
     property: education
     value: "PhD in Statistics and Machine Learning, Harvard University"
+    source: https://vkrakovna.wordpress.com
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_YV9KvdNUQg
     property: website
     value: "https://vkrakovna.wordpress.com"
-

@@ -15,7 +15,10 @@ import { classifyCommand } from '../resource-enrichment/classify.ts';
 import { deepEnrichCommand } from '../resource-enrichment/enrich.ts';
 import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts';
 import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
-import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
+// archive-pdfs is lazy-loaded below: it pulls in @aws-sdk/client-s3 which
+// is too heavy to bundle into the worker container (the worker never
+// runs archive-pdfs, only the local CLI does). Static-importing it
+// breaks crux.mjs load in the worker image with ERR_MODULE_NOT_FOUND.
 import { enrichCrossrefCommand } from '../resource-enrichment/enrich-crossref.ts';
 import { discoverForumsCommand } from '../resource-enrichment/discover-forums.ts';
 import { enrichRandDatesCommand } from '../resource-enrichment/enrich-rand-dates.ts';
@@ -156,7 +159,10 @@ commands['deep-enrich'] = deepEnrichCommand;
 
 commands['cross-reference'] = crossReferenceCommand;
 commands['fetch-wayback'] = fetchWaybackCommand;
-commands['archive-pdfs'] = archivePdfsCommand;
+commands['archive-pdfs'] = async (args, options) => {
+  const { archivePdfsCommand } = await import('../resource-enrichment/archive-pdfs.ts');
+  return archivePdfsCommand(args, options);
+};
 commands['enrich-crossref'] = enrichCrossrefCommand;
 commands['discover-forums'] = discoverForumsCommand;
 commands['enrich-rand-dates'] = enrichRandDatesCommand;

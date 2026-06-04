@@ -13,9 +13,8 @@ facts:
 
   - id: f_pC4fG5hI6j
     property: notable-for
-    value: "Pioneer of RLHF and AI alignment research; founder of Alignment Research
-      Center (ARC); key theorist of iterated amplification and eliciting latent
-      knowledge"
+    value: "Pioneer of RLHF and AI alignment research; founder of Alignment Research Center (ARC); key theorist of iterated
+      amplification and eliciting latent knowledge"
     source: https://en.wikipedia.org/wiki/Paul_Christiano
 
   - id: f_pC7kL8mN9o
@@ -26,6 +25,8 @@ facts:
   - id: f_tpbbdlppar
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Paul_Christiano"
+    source: https://en.wikipedia.org/wiki/Paul_Christiano
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ur092jojlz
     property: website
@@ -34,6 +35,8 @@ facts:
   - id: f_vbteu6smt2
     property: google-scholar
     value: "https://scholar.google.com/citations?user=6gHkYDgAAAAJ"
+    source: https://scholar.google.com/citations?user=6gHkYDgAAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_31eZFsfK9s
     property: website
     value: https://paulfchristiano.com/

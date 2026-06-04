@@ -64,7 +64,7 @@ ${recentEntries}
       maxTurns: 10, // Reflection needs fewer turns
       model: 'haiku', // Reflection is log analysis — doesn't need sonnet
       timeoutMinutes: 5, // Should complete quickly
-    });
+    }, { context: { label: `reflection:cycle-${cycleCount}` } });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut || result.hitMaxTurns) {

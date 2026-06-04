@@ -25,6 +25,7 @@
       position: support
       importance: high
       reason: Pioneered the first AI Safety Institute in 2023; hosts the international AISI network secretariat
+      source: https://gov.uk/government/organisations/ai-security-institute
     - name: US Government (NIST)
       entityId: sid_Eac7pHF06Q
       position: support
@@ -37,7 +38,8 @@
     - name: China
       position: mixed
       importance: medium
-      reason: Pursues its own parallel AI safety evaluation approach through domestic institutions rather than joining the international AISI network
+      reason: Pursues its own parallel AI safety evaluation approach through domestic institutions rather than joining the
+        international AISI network
   lastUpdated: 2025-12
 - id: california-sb1047
   stableId: sid_XcGTez1oFw
@@ -1066,6 +1068,7 @@
       context:
         - Largest US business advocacy organization; lobbied alongside state-level industry groups
         - Advocated for strengthening existing consumer protection and civil rights laws instead
+      source: https://uschamber.com/technology/artificial-intelligence/u-s-chamber-of-commerce-letter-to-governor-polis
   keyPoliticians:
     - name: Sen. Robert Rodriguez
       role: Prime sponsor and lead author in the Colorado Senate
@@ -1600,6 +1603,7 @@
         - Members include Nvidia, Intel, AMD, Qualcomm — companies directly affected by revenue losses
         - Advocated for narrower, more targeted controls rather than broad technology restrictions
       entityId: sid_ezdMt069kA
+      source: https://semiconductors.org/sia-statement-on-biden-administrations-plan-to-publish-export-control-framework-for-artificial-intelligence-diffusion
   amendments:
     - date: October 2023
       description: First expansion; lower thresholds; A800/H800 banned
@@ -1656,22 +1660,26 @@
       position: support
       role: Primary Senate sponsor
       importance: high
+      source: https://govtrack.us/congress/bills/119/s1705
     - name: Sen. Elizabeth Warren
       entityId: sid_OyPBrUIpeS
       position: support
       role: Senate cosponsor
       importance: high
+      source: https://exportcompliancedaily.com/article/2026/02/18/key-senate-democrat-backs-bill-to-require-security-features-on-exported-chips-2602170048
     - name: Rep. Bill Huizenga
       entityId: sid_cYPfKeUa36
       position: support
       role: Primary House sponsor
       importance: high
+      source: https://foster.house.gov/media/press-releases/foster-huizenga-moolenaar-krishnamoorthi-introduce-bill-stop-smuggling
     - name: Semiconductor Industry Association
       position: oppose
       importance: high
       reason: Cannot support "blanket mandates for new, untested, and potentially infeasible on-chip mechanisms"; warns of
         undermining global trust in American semiconductor technologies.
       entityId: sid_ezdMt069kA
+      source: https://semiconductors.org/sia-statement-on-chip-security-act
   tags:
     - hardware-governance
     - export-controls
@@ -1729,11 +1737,13 @@
       role: Primary Senate sponsor
       importance: high
       entityId: sid_c3jsITFMPU
+      source: https://rounds.senate.gov/newsroom/press-releases/rounds-introduces-legislation-to-prevent-smuggling-of-american-ai-chips-into-china
     - name: Sen. Mark Warner
       position: support
       role: Senate cosponsor
       importance: high
       entityId: sid_hXFxf2aOHZ
+      source: https://rounds.senate.gov/newsroom/press-releases/rounds-introduces-legislation-to-prevent-smuggling-of-american-ai-chips-into-china
     - name: Rep. Tom Kean Jr.
       entityId: sid_bUlPBgOr3y
       position: support
@@ -2056,6 +2066,7 @@
       position: support
       importance: medium
       reason: Active participant in development; adopted AI RMF principles in its Responsible AI Standard
+      source: https://blogs.microsoft.com/on-the-issues/2023/10/26/microsofts-ai-safety-policies
     - name: Google
       entityId: sid_cMNszJMTPX
       position: support
@@ -2091,10 +2102,12 @@
       position: support
       importance: high
       reason: Co-hosted the summit with South Korea; led the Bletchley-to-Seoul AI safety summit series
+      source: https://aiseoulsummit.kr/aigf/press/?mod=document&uid=46
     - name: South Korea
       position: support
       importance: high
       reason: Host country; positioned itself as bridge between Western and Asian AI governance approaches
+      source: https://industry.gov.au/publications/seoul-declaration-countries-attending-ai-seoul-summit-21-22-may-2024
     - name: OpenAI
       entityId: sid_1LcLlMGLbw
       position: support
@@ -2427,6 +2440,7 @@
       context:
         - AWS hosts many frontier model providers; compliance with commitments affects broader ecosystem
         - Invested $4B in Anthropic (also a signatory)
+      source: https://aboutamazon.com/news/policy-news-views/amazon-responsible-ai
     - name: Meta
       entityId: sid_tt0f5PYDCw
       position: support
@@ -2436,6 +2450,7 @@
       context:
         - Open-weight Llama model releases provide a form of transparency not captured by standard indicators
         - Weaker on watermarking commitments (0% text watermarking across all signatories)
+      source: https://ailabwatch.org/resources/commitments
   customFields:
     - label: Nature
       value: Non-binding voluntary pledges
@@ -4142,7 +4157,8 @@
     - name: Academic AI safety researchers
       position: support
       importance: high
-      reason: 88 researchers from 11 countries authored the consensus; represents broad scientific agreement on safety research priorities
+      reason: 88 researchers from 11 countries authored the consensus; represents broad scientific agreement on safety
+        research priorities
     - name: AI safety organizations (MIRI, ARC, CAIS)
       position: support
       importance: high
@@ -4154,7 +4170,8 @@
     - name: AI industry (major labs)
       position: mixed
       importance: medium
-      reason: Generally supportive of research priorities but consensus remains voluntary with no binding commitments on industry
+      reason: Generally supportive of research priorities but consensus remains voluntary with no binding commitments on
+        industry
   tags:
     - international-consensus
     - ai-safety-research
@@ -4567,7 +4584,9 @@
     - name: Former OpenAI employees
       position: support
       importance: high
-      reason: Public letter from former employees highlighted restrictive NDAs preventing safety disclosures; directly motivated the legislation
+      reason: Public letter from former employees highlighted restrictive NDAs preventing safety disclosures; directly
+        motivated the legislation
+      source: https://apnews.com/article/openai-whistleblowers-chatgpt-15a02ca9c0b5170d99bfc0172c35b6ba
     - name: American Civil Liberties Union (ACLU)
       entityId: sid_7DpEvy5wQr
       position: support
@@ -4578,10 +4597,12 @@
       position: support
       importance: medium
       reason: Leading whistleblower advocacy organization supporting legal frameworks for AI safety disclosures
+      source: https://judiciary.senate.gov/press/rep/releases/support-grows-for-ai-whistleblower-protection-act
     - name: Major AI companies
       position: oppose
       importance: high
-      reason: Some companies have used restrictive NDAs and non-disparagement clauses that would be curtailed by the legislation
+      reason: Some companies have used restrictive NDAs and non-disparagement clauses that would be curtailed by the
+        legislation
     - name: Bipartisan Senate sponsors
       position: support
       importance: high
@@ -5046,28 +5067,36 @@
       position: support
       importance: high
       reason: Initiated and adopted the convention; represents 46 member states committed to human rights-based AI governance
+      source: https://coe.int/en/web/portal/-/council-of-europe-adopts-first-international-treaty-on-artificial-intelligence
     - name: European Union
       position: support
       importance: high
-      reason: Signed the convention alongside individual EU member states; complements the EU AI Act with an international treaty framework
+      reason: Signed the convention alongside individual EU member states; complements the EU AI Act with an international
+        treaty framework
+      source: https://eur-lex.europa.eu/eli/dec/2024/2218/oj/eng
     - name: United Kingdom
       position: support
       importance: medium
       reason: Early signatory despite Brexit; views the convention as compatible with its pro-innovation AI approach
+      source: https://hoganlovells.com/en/publications/uk-signs-first-treaty-on-ai-and-human-rights-democracy-and-the-rule-of-law
     - name: United States
       position: support
       importance: medium
-      reason: Participated as observer state in negotiations; signed the convention in September 2024 alongside the EU, UK, and Israel
+      reason: Participated as observer state in negotiations; signed the convention in September 2024 alongside the EU, UK,
+        and Israel
+      source: https://coe.int/en/web/portal/-/council-of-europe-opens-first-ever-global-treaty-on-ai-for-signature
     - name: Access Now
       entityId: sid_DHWH2M0Ega
       position: mixed
       importance: medium
-      reason: Supports the human rights framing but criticized the national security exemption as too broad, potentially undermining protections
+      reason: Supports the human rights framing but criticized the national security exemption as too broad, potentially
+        undermining protections
     - name: European Digital Rights (EDRi)
       entityId: sid_7h0u4ulMdb
       position: mixed
       importance: medium
       reason: Welcomed the binding nature but criticized weak enforcement mechanisms and the broad national security carve-out
+      source: https://edri.org/our-work/council-of-europe-approves-ai-convention-but-not-many-reasons-to-celebrate
   clusters:
     - governance
     - ai-safety
@@ -5717,6 +5746,7 @@
       position: oppose
       importance: medium
       reason: Called executive order unconstitutional
+      source: https://aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
   description: "Executive order signed December 11, 2025 directing federal agencies to challenge state AI laws deemed
     inconsistent with federal policy. Does NOT itself overturn state law — only Congress or courts can do that.
     Established DOJ AI Litigation Task Force (Jan 9, 2026). Triggered bipartisan opposition: 36 state AGs formed
@@ -5877,6 +5907,7 @@
       position: support
       importance: medium
       reason: Publicly championed the bill as protection for children and victims
+      source: https://whitehouse.gov/briefings-statements/2025/04/first-lady-melania-trump-applauds-the-passage-of-the-take-it-down-act-to-protect-children
   keyPoliticians:
     - name: Senator Ted Cruz
       role: Lead sponsor
@@ -5928,16 +5959,20 @@
       entityId: sid_LNfQiSo5us
       position: support
       importance: high
-      reason: Lead sponsor; views AI liability as essential consumer protection analogous to product liability for physical goods
+      reason: Lead sponsor; views AI liability as essential consumer protection analogous to product liability for physical
+        goods
+      source: https://judiciary.senate.gov/imo/media/doc/One-Pager%20-%20AI%20LEAD%20Act.pdf
     - name: Senator Josh Hawley (R-MO)
       entityId: sid_C-3CLLkSFI
       position: support
       importance: high
       reason: Co-sponsor; frames the bill as holding tech companies accountable while maintaining bipartisan approach
+      source: https://judiciary.senate.gov/imo/media/doc/One-Pager%20-%20AI%20LEAD%20Act.pdf
     - name: Technology industry (TechNet, BSA)
       position: oppose
       importance: high
-      reason: Oppose expanded liability standards as potentially chilling AI innovation and creating legal uncertainty for developers
+      reason: Oppose expanded liability standards as potentially chilling AI innovation and creating legal uncertainty for
+        developers
     - name: Trial Lawyers Association
       position: support
       importance: medium
@@ -5981,26 +6016,31 @@
     - name: AI safety research community
       position: support
       importance: high
-      reason: Supports mandatory evaluation of dangerous capabilities including self-replication, scheming, and autonomous decision-making
+      reason: Supports mandatory evaluation of dangerous capabilities including self-replication, scheming, and autonomous
+        decision-making
     - name: Senator Josh Hawley (R-MO)
       entityId: sid_C-3CLLkSFI
       position: support
       importance: high
       reason: Lead sponsor; frames mandatory evaluation as essential national security measure for advanced AI systems
+      source: https://hawley.senate.gov/hawley-blumenthal-introduce-bipartisan-ai-evaluation-legislation-to-put-americans-first
     - name: Senator Richard Blumenthal (D-CT)
       entityId: sid_33ExUKx4u_
       position: support
       importance: high
       reason: Co-sponsor; advocates for government oversight of AI capabilities testing through established DOE infrastructure
+      source: https://nextgov.com/artificial-intelligence/2025/09/senators-propose-federal-approval-framework-advanced-ai-systems-going-market/408482
     - name: Department of Energy
       entityId: sid_IZ04n3ZvIZ
       position: mixed
       importance: high
-      reason: Would gain new mandate and authority for AI evaluation but faces significant implementation burden within 90-day timeline
+      reason: Would gain new mandate and authority for AI evaluation but faces significant implementation burden within 90-day
+        timeline
     - name: AI industry (frontier labs)
       position: mixed
       importance: high
-      reason: Some labs support external evaluation in principle but oppose mandatory participation and the scale of penalties for non-compliance
+      reason: Some labs support external evaluation in principle but oppose mandatory participation and the scale of penalties
+        for non-compliance
   tags:
     - ai-evaluation
     - mandatory-testing
@@ -6041,19 +6081,23 @@
     - name: Global South nations
       position: support
       importance: high
-      reason: 61 countries signed the declaration; developing nations view inclusive AI governance as essential to avoid being left behind
+      reason: 61 countries signed the declaration; developing nations view inclusive AI governance as essential to avoid being
+        left behind
     - name: India (PM Modi)
       position: support
       importance: high
-      reason: Co-chaired the summit with France; positioned India as a bridge between developed and developing world on AI governance
+      reason: Co-chaired the summit with France; positioned India as a bridge between developed and developing world on AI
+        governance
     - name: United States
       position: oppose
       importance: high
-      reason: Refused to sign the declaration on inclusive and sustainable AI; prioritizes unilateral AI leadership over multilateral commitments
+      reason: Refused to sign the declaration on inclusive and sustainable AI; prioritizes unilateral AI leadership over
+        multilateral commitments
     - name: United Kingdom
       position: oppose
       importance: high
-      reason: Joined the US in refusing to sign the declaration despite having hosted the previous AI Safety Summit at Bletchley Park
+      reason: Joined the US in refusing to sign the declaration despite having hosted the previous AI Safety Summit at
+        Bletchley Park
   tags:
     - international
     - summit
@@ -6092,23 +6136,28 @@
     - name: China
       position: support
       importance: high
-      reason: Strongly supported the resolution; aligned with developing countries seeking multilateral AI governance through the UN system
+      reason: Strongly supported the resolution; aligned with developing countries seeking multilateral AI governance through
+        the UN system
     - name: UN Secretary-General
       position: support
       importance: high
-      reason: Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive governance
+      reason: Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive
+        governance
     - name: Global South coalition
       position: support
       importance: high
-      reason: Developing nations backed the resolution as a way to ensure their voice in AI governance, countering Western-dominated forums like the G7
+      reason: Developing nations backed the resolution as a way to ensure their voice in AI governance, countering
+        Western-dominated forums like the G7
     - name: United States
       position: oppose
       importance: high
-      reason: Explicitly rejected "centralized control and global governance" of AI at UN Security Council; views UN governance as potentially constraining US AI leadership
+      reason: Explicitly rejected "centralized control and global governance" of AI at UN Security Council; views UN
+        governance as potentially constraining US AI leadership
     - name: European Union
       position: mixed
       importance: medium
-      reason: Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism
+      reason: Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance
+        mechanism
   clusters:
     - governance
   lastUpdated: 2026-04
@@ -6141,7 +6190,8 @@
     - name: Utah tech industry (Silicon Slopes)
       position: support
       importance: high
-      reason: Supports the lighter-touch approach as business-friendly; narrower disclosure requirements reduce compliance burden compared to other states
+      reason: Supports the lighter-touch approach as business-friendly; narrower disclosure requirements reduce compliance
+        burden compared to other states
     - name: Utah State Legislature
       position: support
       importance: high
@@ -6149,7 +6199,8 @@
     - name: Consumer advocacy groups
       position: mixed
       importance: medium
-      reason: Concerned the narrowed disclosure requirements are too weak; only requiring disclosure when consumers explicitly ask limits practical transparency
+      reason: Concerned the narrowed disclosure requirements are too weak; only requiring disclosure when consumers explicitly
+        ask limits practical transparency
     - name: AI companies operating in Utah
       position: support
       importance: medium
@@ -6185,7 +6236,8 @@
     - name: Civil rights organizations
       position: support
       importance: high
-      reason: Advocate for extending anti-discrimination protections to AI-driven employment decisions under the Illinois Human Rights Act
+      reason: Advocate for extending anti-discrimination protections to AI-driven employment decisions under the Illinois
+        Human Rights Act
     - name: Labor unions
       position: support
       importance: high
@@ -6197,7 +6249,8 @@
     - name: Business and employer groups
       position: oppose
       importance: medium
-      reason: Concerned about compliance costs and legal uncertainty around proving AI systems do not discriminate in employment decisions
+      reason: Concerned about compliance costs and legal uncertainty around proving AI systems do not discriminate in
+        employment decisions
   tags:
     - state-legislation
     - employment
@@ -6235,6 +6288,7 @@
       position: support
       importance: high
       reason: Signed both bills into law as part of Arkansas's proactive approach to AI governance
+      source: https://governor.arkansas.gov/news_post/following-calls-from-sanders-ai-regulatory-moratorium-removed-from-one-big-beautiful-bill
     - name: Arkansas state government agencies
       position: support
       importance: high
@@ -6242,7 +6296,8 @@
     - name: Content creators and artists
       position: support
       importance: medium
-      reason: HB 1876 establishes ownership rights over AI-generated content, providing legal clarity for creators using AI tools
+      reason: HB 1876 establishes ownership rights over AI-generated content, providing legal clarity for creators using AI
+        tools
     - name: AI companies
       position: mixed
       importance: medium
@@ -6326,7 +6381,8 @@
     - name: Health insurance companies
       position: mixed
       importance: medium
-      reason: Required to disclose AI use in coverage decisions; compliance adds operational burden but aligns with transparency trends
+      reason: Required to disclose AI use in coverage decisions; compliance adds operational burden but aligns with
+        transparency trends
   tags:
     - state-legislation
     - healthcare
@@ -6367,7 +6423,8 @@
     - name: Child safety advocates
       position: support
       importance: medium
-      reason: Concerned about vulnerable youth relying on AI chatbots for mental health support instead of qualified professionals
+      reason: Concerned about vulnerable youth relying on AI chatbots for mental health support instead of qualified
+        professionals
     - name: AI companion chatbot companies
       position: oppose
       importance: medium
@@ -6415,7 +6472,8 @@
     - name: AI companion chatbot companies
       position: mixed
       importance: high
-      reason: Some accept disclosure requirements as reasonable while others view the regulation as potentially restricting product design and user experience
+      reason: Some accept disclosure requirements as reasonable while others view the regulation as potentially restricting
+        product design and user experience
   tags:
     - state-legislation
     - ai-chatbots
@@ -6469,7 +6527,8 @@
     - name: AI chatbot companies
       position: oppose
       importance: medium
-      reason: Concerned about compliance requirements and potential restrictions on chatbot product features in Washington state
+      reason: Concerned about compliance requirements and potential restrictions on chatbot product features in Washington
+        state
   tags:
     - state-legislation
     - ai-chatbots
@@ -6516,19 +6575,23 @@
       position: support
       importance: high
       reason: Lead sponsor; champions the bill as essential protection for victims of nonconsensual intimate imagery
+      source: https://durbin.senate.gov/newsroom/press-releases/durbin-graham-klobuchar-hawley-introduce-defiance-act-to-hold-accountable-those-responsible-for-the-proliferation-of-nonconsensual-sexually-explicit-deepfake-images-and-videos
     - name: Senator Lindsey Graham (R-SC)
       entityId: sid_iSc4TztRuB
       position: support
       importance: high
       reason: Co-sponsor; bipartisan support demonstrated by unanimous Senate passage
+      source: https://durbin.senate.gov/newsroom/press-releases/durbin-graham-klobuchar-hawley-introduce-defiance-act-to-hold-accountable-those-responsible-for-the-proliferation-of-nonconsensual-sexually-explicit-deepfake-images-and-videos
     - name: US Senate (unanimous)
       position: support
       importance: high
       reason: Passed unanimously January 13, 2026, reflecting rare complete bipartisan agreement on deepfake civil remedies
+      source: https://judiciary.senate.gov/press/dem/releases/durbin-successfully-passes-bill-to-combat-nonconsensual-sexually-explicit-deepfake-images
     - name: Technology platforms
       position: mixed
       importance: medium
-      reason: Generally support combating deepfakes but concerned about potential liability exposure and content moderation obligations
+      reason: Generally support combating deepfakes but concerned about potential liability exposure and content moderation
+        obligations
   tags:
     - deepfakes
     - civil-remedies
@@ -6571,11 +6634,14 @@
       entityId: sid_enf2UNKyDx
       position: support
       importance: high
-      reason: Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining multiple policy areas
+      reason: Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining
+        multiple policy areas
+      source: https://www.blackburn.senate.gov/index.php/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/
     - name: Content creators and artists
       position: support
       importance: high
-      reason: Support the anti-fair-use provision for AI training on copyrighted works and the NO FAKES Act digital likeness protections
+      reason: Support the anti-fair-use provision for AI training on copyrighted works and the NO FAKES Act digital likeness
+        protections
     - name: Child safety advocates
       position: support
       importance: high
@@ -6583,11 +6649,13 @@
     - name: State legislators
       position: oppose
       importance: medium
-      reason: Oppose broad federal preemption of state AI laws that would override existing and emerging state-level regulations
+      reason: Oppose broad federal preemption of state AI laws that would override existing and emerging state-level
+        regulations
     - name: AI industry
       position: mixed
       importance: high
-      reason: Support federal preemption over state patchwork but oppose the anti-fair-use copyright provision that would restrict AI training data
+      reason: Support federal preemption over state patchwork but oppose the anti-fair-use copyright provision that would
+        restrict AI training data
   tags:
     - federal-legislation
     - comprehensive-framework
@@ -6898,8 +6966,8 @@
   type: approach
   title: Voluntary AI Commitments Enforcement
   description: >-
-    An analysis of non-binding AI safety pledges made by leading AI companies, their
-    enforcement mechanisms, compliance records, and limitations as a governance approach.
+    An analysis of non-binding AI safety pledges made by leading AI companies, their enforcement mechanisms, compliance
+    records, and limitations as a governance approach.
   tags:
     - ai-governance
     - voluntary-commitments

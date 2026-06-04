@@ -3,8 +3,11 @@ facts:
   - id: f_b1ZhBzul2g
     property: notable-for
     value: "AI governance researcher; formerly at OpenAI and DeepMind; influential writer on AI alignment and x-risk"
+    source: https://mindthefuture.info/about
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_pSYvSFqMVA
     property: education
     value: "PhD candidate, University of Cambridge"
-
+    source: https://openreview.net/profile?id=%7ERichard_Ngo1
+    notes: "[auto-discovered by tb backfill-sources]"

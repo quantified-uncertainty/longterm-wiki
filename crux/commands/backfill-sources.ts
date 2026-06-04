@@ -12,15 +12,36 @@
  *   pnpm crux tb backfill-sources --dry-run              # Preview only
  *   pnpm crux tb backfill-sources --limit=20 --apply     # Process 20 + update
  *   pnpm crux tb backfill-sources --table=facts --apply  # Only facts
+ *   pnpm crux tb backfill-sources --apply --retry-after-days=30
+ *       # Skip records attempted in the last 30 days (QUA-1071) — avoids
+ *       # re-burning spend on the hard residue that no-matches every run.
  */
 
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { DEFAULT_MAX_COST, PER_RECORD_BUDGET } from '../lib/backfill-sources/config.ts';
 import { addCost, emptyCost, totalOf } from '../lib/backfill-sources/cost.ts';
-import { fetchMissingSources, updateRecordSource } from '../lib/backfill-sources/fetch.ts';
+import { fetchMissingSources, updateRecordSource, recordAttempts, type AttemptRecord } from '../lib/backfill-sources/fetch.ts';
 import { extractMatchTerms } from '../lib/backfill-sources/match-terms.ts';
 import { processRecord } from '../lib/backfill-sources/process-record.ts';
-import { buildSummaryLines, writeOutcomesJson } from '../lib/backfill-sources/report.ts';
-import type { CostBreakdown, MissingSourceRecord, RecordOutcome } from '../lib/backfill-sources/types.ts';
+import {
+  buildSummaryLines,
+  openOutcomeJsonl,
+  appendOutcomeJsonl,
+  closeOutcomeJsonl,
+} from '../lib/backfill-sources/report.ts';
+import type {
+  CostBreakdown,
+  MissingSourceRecord,
+  RecordOutcome,
+  YamlWriteRecordReport,
+} from '../lib/backfill-sources/types.ts';
+import { openYamlPr } from '../lib/backfill-sources/yaml-pr.ts';
+import {
+  buildFactbaseEntityIndex,
+  buildPolicyEntityIndex,
+} from '../lib/backfill-sources/yaml-target-resolvers.ts';
+import { writeRecordToYaml, type YamlIndexes } from '../lib/backfill-sources/yaml-write.ts';
 
 type CommandResult = { exitCode?: number; output?: string };
 type CommandOptions = Record<string, unknown>;
@@ -32,9 +53,15 @@ interface ParsedOptions {
   table?: string;
   recordIdFilter?: string;
   maxCost: number;
+  /** QUA-1071: skip records attempted within this many days; 0 = no filter. */
+  retryAfterDays: number;
   verbose: boolean;
   debug: boolean;
   unmatchedOut: string;
+  /** When true, skip the end-of-run YAML branch + commit + push + PR.
+   *  Defaults to false; set via --no-yaml-pr for local dry-application
+   *  testing where you want the YAML mutations on disk but no git activity. */
+  skipYamlPr: boolean;
 }
 
 async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions): Promise<CommandResult> {
@@ -62,6 +89,7 @@ async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions
   console.log(`Found ${fetchResult.totalMissing} records without sources.`);
   console.log(`Budget cap: $${parsed.maxCost.toFixed(2)} (per-record cap $${PER_RECORD_BUDGET.toFixed(2)})\n`);
 
+  const runStartedAt = new Date().toISOString();
   const run = await processAllRecords(records, parsed);
 
   const lines = buildSummaryLines({
@@ -81,15 +109,33 @@ async function backfillSourcesCommand(args: string[], rawOptions: CommandOptions
     verbose: parsed.verbose,
   });
 
-  const outcomeStatus = writeOutcomesJson({
-    path: parsed.unmatchedOut,
-    outcomes: run.outcomes,
-    mode: parsed.apply ? 'apply' : 'dry-run',
-    totalRecords: records.length,
-    searched: run.searched,
-    matched: run.matched,
-  });
-  if (outcomeStatus) lines.push(outcomeStatus);
+  if (run.outcomeStatus) lines.push(run.outcomeStatus);
+
+  if (parsed.apply) {
+    lines.push(
+      `  YAML writes: ${run.factsYamlWritten} facts, ${run.stakeholdersYamlWritten} policy stakeholders` +
+      ` (${run.touchedYamlPaths.size} files touched)`,
+    );
+  }
+
+  if (parsed.apply && !parsed.skipYamlPr && run.touchedYamlPaths.size > 0) {
+    const prResult = openYamlPr({
+      touchedPaths: [...run.touchedYamlPaths].sort(),
+      runStartedAt,
+      summary: {
+        matched: run.matched,
+        factsWritten: run.factsYamlWritten,
+        stakeholdersWritten: run.stakeholdersYamlWritten,
+      },
+    });
+    if (prResult.kind === 'opened') {
+      lines.push(`  YAML PR opened: ${prResult.prUrl} (branch: ${prResult.branch})`);
+    } else if (prResult.kind === 'refused') {
+      lines.push(`  YAML PR skipped: ${prResult.reason}`);
+    } else {
+      lines.push(`  YAML PR FAILED: ${prResult.error}`);
+    }
+  }
 
   return { exitCode: 0, output: lines.join('\n') };
 }
@@ -114,6 +160,11 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     return { error: `--limit must be a positive integer (got ${o.limit})` };
   }
 
+  const retryAfterDays = o.retryAfterDays ? parseInt(o.retryAfterDays as string, 10) : 0;
+  if (!Number.isFinite(retryAfterDays) || retryAfterDays < 0) {
+    return { error: `--retry-after-days must be a non-negative integer (got ${o.retryAfterDays})` };
+  }
+
   return {
     dryRun,
     apply,
@@ -121,10 +172,16 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     table: o.table as string | undefined,
     recordIdFilter: o.recordId as string | undefined,
     maxCost,
+    retryAfterDays,
     verbose: !!o.verbose,
     debug: !!o.debug,
+    // Default into the OS temp dir, not dev/reports under the repo: the worker
+    // container runs as a non-root user on a read-only repo and can't create
+    // dev/reports. Pass --unmatched-out to write somewhere specific (e.g. a dev
+    // checkout where you want the report committed/inspected).
     unmatchedOut: (o.unmatchedOut as string | undefined)
-      ?? `dev/reports/backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+      ?? join(tmpdir(), `backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`),
+    skipYamlPr: !!o.noYamlPr,
   };
 }
 
@@ -179,6 +236,12 @@ interface RunTotals {
   budgetStopped: boolean;
   totalBreakdown: CostBreakdown;
   winningProviderCounts: Record<string, number>;
+  /** YAML files mutated during this run — staged explicitly at PR time. */
+  touchedYamlPaths: Set<string>;
+  factsYamlWritten: number;
+  stakeholdersYamlWritten: number;
+  /** Status line for the JSONL outcome file (path + counts, or write error). */
+  outcomeStatus: string;
 }
 
 async function processAllRecords(
@@ -196,18 +259,61 @@ async function processAllRecords(
     budgetStopped: false,
     totalBreakdown: emptyCost(),
     winningProviderCounts: {},
+    touchedYamlPaths: new Set<string>(),
+    factsYamlWritten: 0,
+    stakeholdersYamlWritten: 0,
+    outcomeStatus: '',
   };
+
+  // Stream outcomes to a JSONL file as each record finishes. We keep only a
+  // light copy in memory (candidates stripped) for the end-of-run summary —
+  // the heavy candidate payloads live only in the file, one line at a time.
+  const mode = parsed.apply ? 'apply' : 'dry-run';
+  const jsonlOk = openOutcomeJsonl(parsed.unmatchedOut, mode);
+
+  // QUA-1071: collect the (table, id, outcome) of every record we actually
+  // processed so we can stamp the sourcing_attempts ledger after the run.
+  // `stamp` is false for budget-cap skips — those weren't really attempted, so
+  // they must stay eligible for the next run rather than being suppressed.
+  const attempts: AttemptRecord[] = [];
+  const recordOutcome = (o: RecordOutcome, stamp = true): void => {
+    if (jsonlOk) appendOutcomeJsonl(parsed.unmatchedOut, o);
+    run.outcomes.push(stripCandidates(o));
+    if (stamp && parsed.apply) {
+      attempts.push({
+        table: o.record.record_table,
+        recordId: o.record.record_id,
+        outcome: o.outcome.kind,
+      });
+    }
+  };
+
+  // Build YAML target indexes once per apply-run. In dry-run we skip this
+  // entirely — no writes happen so the index is unused.
+  const indexes: YamlIndexes | null = parsed.apply
+    ? {
+        facts: buildFactbaseEntityIndex(),
+        policies: buildPolicyEntityIndex(),
+      }
+    : null;
+  if (indexes) {
+    console.log(
+      `YAML target index: ${indexes.facts.sidToFilepath.size} factbase entities` +
+      ` (skipped ${indexes.facts.unindexedCount}), ${indexes.policies.sidToFilepath.size} policy entities` +
+      ` (parse failures: ${indexes.policies.parseFailureCount}).\n`,
+    );
+  }
 
   for (let i = 0; i < records.length; i++) {
     const record = records[i];
 
     if (extractMatchTerms(record).length === 0) {
       run.noTerms++;
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'no search terms' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'no search terms' } });
       continue;
     }
     if (isTestRecord(record)) {
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'test record' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'test record' } });
       continue;
     }
     if (totalOf(run.totalBreakdown) >= parsed.maxCost) {
@@ -216,7 +322,7 @@ async function processAllRecords(
         console.warn(`\n[budget] Reached $${totalOf(run.totalBreakdown).toFixed(4)} / $${parsed.maxCost.toFixed(2)} cap — stopping remaining records`);
       }
       run.budgetSkipped++;
-      run.outcomes.push({ record, outcome: { kind: 'skipped', reason: 'budget cap' } });
+      recordOutcome({ record, outcome: { kind: 'skipped', reason: 'budget cap' } }, false);
       continue;
     }
 
@@ -227,7 +333,15 @@ async function processAllRecords(
     addCost(run.totalBreakdown, result.cost);
 
     if (!result.matched) {
-      run.outcomes.push({ record, outcome: { kind: 'no-match', reason: result.reason, cost: result.cost } });
+      recordOutcome({
+        record,
+        outcome: {
+          kind: 'no-match',
+          reason: result.reason,
+          cost: result.cost,
+          candidates: result.candidates,
+        },
+      });
       continue;
     }
 
@@ -236,13 +350,39 @@ async function processAllRecords(
       (run.winningProviderCounts[result.provider ?? 'unknown'] ?? 0) + 1;
 
     let updated: boolean | undefined;
+    let yamlReport: YamlWriteRecordReport | undefined;
     if (parsed.apply) {
       updated = await updateRecordSource(record, result.url);
       if (updated) run.updatedCount++;
       else { run.updateFailed++; console.warn(`  ✗ Update failed — source not written`); }
+
+      // Dual-write to YAML for facts + policy_stakeholders. The PG write
+      // above is wiped by the YAML→PG sync workflow on the next push to
+      // data/entities or packages/factbase/data/fb-entities, so we mirror
+      // the write into YAML and let the sync re-populate PG durably.
+      if (updated && indexes) {
+        const yamlOutcome = writeRecordToYaml(record, result.url, indexes);
+        yamlReport = {
+          status: yamlOutcome.status,
+          // filepath is a required field of YamlWriteRecordReport (string | null),
+          // so default the falsy case to null rather than omitting the key.
+          filepath: yamlOutcome.filepath ?? null,
+          ...(yamlOutcome.applicable && yamlOutcome.status === 'error' && yamlOutcome.error
+            ? { error: yamlOutcome.error }
+            : {}),
+        };
+        if (yamlOutcome.applicable && yamlOutcome.status === 'wrote' && yamlOutcome.filepath) {
+          run.touchedYamlPaths.add(yamlOutcome.filepath);
+          if (record.record_table === 'facts') run.factsYamlWritten++;
+          if (record.record_table === 'policy_stakeholders') run.stakeholdersYamlWritten++;
+          console.log(`    → YAML write: ${yamlOutcome.filepath}`);
+        } else if (yamlOutcome.applicable) {
+          console.warn(`    → YAML write ${yamlOutcome.status}` + (yamlReport.error ? `: ${yamlReport.error}` : ''));
+        }
+      }
     }
 
-    run.outcomes.push({
+    recordOutcome({
       record,
       outcome: {
         kind: 'matched',
@@ -250,12 +390,50 @@ async function processAllRecords(
         provider: result.provider,
         quotes: result.quotes,
         updated,
+        yaml_write: yamlReport,
         cost: result.cost,
+        candidates: result.candidates,
       },
     });
   }
 
+  const unmatched = run.searched - run.matched;
+  // Count skips from the recorded outcomes rather than summing per-reason
+  // counters: that way test-record skips (which don't have a dedicated
+  // counter) are included, matching every line actually written to the file.
+  const skipped = run.outcomes.filter((o) => o.outcome.kind === 'skipped').length;
+  run.outcomeStatus = jsonlOk
+    ? closeOutcomeJsonl(parsed.unmatchedOut, {
+        records: records.length,
+        searched: run.searched,
+        matched: run.matched,
+        unmatched,
+        skipped,
+      })
+    : `  Outcomes write skipped: ${parsed.unmatchedOut} not writable`;
+
+  // QUA-1071: stamp the attempt ledger so a later run with --retry-after-days
+  // skips everything we just processed. Best-effort — failure only means
+  // records may be retried sooner, never lost.
+  if (parsed.apply && attempts.length > 0) {
+    const recorded = await recordAttempts(attempts);
+    console.log(`  Sourcing attempts recorded: ${recorded}/${attempts.length}`);
+  }
+
   return run;
+}
+
+/**
+ * Strip the heavy `candidates` payload before keeping an outcome in memory for
+ * the end-of-run summary. The full outcome (with candidates) is already written
+ * to the JSONL file; the summary only needs the light fields, so dropping
+ * candidates keeps memory flat across large batches.
+ */
+function stripCandidates(o: RecordOutcome): RecordOutcome {
+  if (o.outcome.kind === 'matched' || o.outcome.kind === 'no-match') {
+    return { record: o.record, outcome: { ...o.outcome, candidates: [] } };
+  }
+  return o;
 }
 
 /** Drop seed/test records that pollute the dataset. */

@@ -125,6 +125,21 @@ describe("MDX internal links", () => {
     "/about",
     "/knowledge-base",  // redirects
     "/races",
+    // Entity directory pages (see CLAUDE.md "Entity Directory Pages")
+    "/organizations",
+    "/people",
+    "/ai-models",
+    "/approaches",
+    "/benchmarks",
+    "/divisions",
+    "/events",
+    "/funding-programs",
+    "/funding-rounds",
+    "/grants",
+    "/investments",
+    "/legislation",
+    "/projects",
+    "/publications",
   ];
 
   it("all MDX internal links resolve to known pages or routes", () => {

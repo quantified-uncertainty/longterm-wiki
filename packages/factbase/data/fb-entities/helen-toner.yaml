@@ -2,11 +2,9 @@ entity: sid_oTieHq0pRA
 facts:
   - id: f_xzqOizPpxQ
     property: description
-    value: Comprehensive biographical profile of Helen Toner documenting her career
-      from EA Melbourne founder to CSET Interim Executive Director, with
-      detailed timeline of the November 2023 OpenAI board crisis where she voted
-      to remove Sam Altman. Compiles public testimony, publications, and media
-      appearances
+    value: Comprehensive biographical profile of Helen Toner documenting her career from EA Melbourne founder to CSET
+      Interim Executive Director, with detailed timeline of the November 2023 OpenAI board crisis where she voted to
+      remove Sam Altman. Compiles public testimony, publications, and media appearances
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_blO0ACZ8NR
@@ -21,22 +19,23 @@ facts:
     notes: From Wikidata Q123475976
   - id: f_hT6tN2pQ4v
     property: notable-for
-    value: "Former OpenAI board member who voted to remove Sam Altman in November
-      2023; Interim Executive Director of Georgetown CSET; TIME 100 Most
-      Influential People in AI 2024; expertise in US-China AI competition and AI
+    value: "Former OpenAI board member who voted to remove Sam Altman in November 2023; Interim Executive Director of
+      Georgetown CSET; TIME 100 Most Influential People in AI 2024; expertise in US-China AI competition and AI
       governance"
     asOf: 2026-03
     notes: Enriched from wiki page
+    source: https://time.com/7012863/helen-toner
   - id: f_hTcY8fL0kA
     property: born-year
     value: 1992
     notes: Enriched from wiki page; born in Melbourne, Australia
+    source: https://en.wikipedia.org/wiki/Helen_Toner
 
   - id: f_hTfB4gN2mD
     property: education
-    value: "BSc Chemical Engineering, University of Melbourne (2014); MA Security
-      Studies, Georgetown University (2021)"
+    value: "BSc Chemical Engineering, University of Melbourne (2014); MA Security Studies, Georgetown University (2021)"
     notes: Enriched from wiki page
+    source: https://cset.georgetown.edu/staff/helen-toner
   - id: f_hIjXQlR0lQ
     property: website
     value: https://cset.georgetown.edu/staff/helen-toner/

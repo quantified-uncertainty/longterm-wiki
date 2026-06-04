@@ -5,12 +5,22 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
     "@longterm-wiki/url-utils": "file:./packages/url-utils",
+    "@mdx-js/mdx": "^3.1.0",
     "dotenv": "^17.2.4",
     "gray-matter": "^4.0.3",
+    "hono": "^4.12.4",
     "js-yaml": "^4.1.0",
     "pino": "^10.3.1",
     "playwright": "^1.55.1",
+    "proper-lockfile": "^4.1.2",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-mdx": "^3.1.0",
+    "remark-mdx-frontmatter": "^5.0.0",
+    "remark-parse": "^11.0.0",
     "tsx": "4.19.0",
+    "unified": "^11.0.5",
     "yaml": "^2.7.0",
     "zod": "^3.25.76"
   }

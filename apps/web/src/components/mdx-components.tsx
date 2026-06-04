@@ -37,6 +37,8 @@ import EvalTypesTableView from "@/components/tables/views/EvalTypesTableView";
 import ArchitectureScenariosTableView from "@/components/tables/views/ArchitectureScenariosTableView";
 import DeploymentArchitecturesTableView from "@/components/tables/views/DeploymentArchitecturesTableView";
 import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGeneralizabilityTableView";
+import AGIBottlenecksTableView from "@/components/tables/views/AGIBottlenecksTableView";
+import FrontierLabsTableView from "@/components/tables/views/FrontierLabsTableView";
 
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
@@ -268,6 +270,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ArchitectureScenariosTableView,
   DeploymentArchitecturesTableView,
   SafetyGeneralizabilityTableView,
+  AGIBottlenecksTableView,
+  FrontierLabsTableView,
 
   // Starlight card components
   Card: StarlightCard,

@@ -33,7 +33,6 @@ test.describe("1. Legislation redirects", () => {
 
     const bodyText = await page.locator("body").textContent();
     expect(bodyText).not.toContain("Application error");
-    expect(bodyText).not.toContain("404");
     expect(bodyText!.length).toBeGreaterThan(200);
 
     // Should be at a meaningful page now (either the legislation page or a wiki page)

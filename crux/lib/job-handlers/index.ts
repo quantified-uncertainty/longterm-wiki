@@ -13,8 +13,19 @@
  * require(esm) cycle detection is strict.
  */
 
-import { execFileSync } from 'child_process';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import type { JobHandler } from './types.ts';
+
+// Async (non-blocking) child execution. We deliberately avoid execFileSync:
+// the worker is a single Node process that also serves the /healthz liveness
+// endpoint, and a synchronous spawn blocks the event loop for the whole job.
+// On a multi-minute job that starves /healthz, Kubernetes' liveness probe
+// fails and restarts the pod mid-job (the job is then re-claimed and
+// eventually exhausts its retries). promisify(execFile) keeps the event loop
+// free so /healthz keeps answering. On non-zero exit the returned promise
+// rejects with an Error carrying .stdout/.stderr.
+const execFileAsync = promisify(execFile);
 
 // ---------------------------------------------------------------------------
 // Lazy handler loaders — each returns the handler on first call, then caches
@@ -50,14 +61,14 @@ const handlers: Record<string, JobHandler> = {
     }
 
     try {
-      const output = execFileSync('node', [
+      const { stdout: output } = await execFileAsync('node', [
         '--import', 'tsx/esm', '--no-warnings',
         'crux/crux.mjs', 'citations', 'verify', pageId, '--json',
       ], {
         cwd: ctx.projectRoot,
         encoding: 'utf-8',
         timeout: 5 * 60 * 1000,
-        stdio: ['pipe', 'pipe', 'pipe'],
+        maxBuffer: 16 * 1024 * 1024,
       });
 
       try {
@@ -69,6 +80,58 @@ const handlers: Record<string, JobHandler> = {
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : String(err);
       return { success: false, data: { pageId }, error: error.slice(0, 500) };
+    }
+  },
+
+  'backfill-sources': async (params, ctx) => {
+    const limit = typeof params.limit === 'number' ? String(params.limit) : '200';
+    const maxCost =
+      typeof params.maxCost === 'number' ? String(params.maxCost) : '100';
+    // QUA-1071: default to a 30-day retry window so the nightly cron skips the
+    // hard residue it already tried this month instead of re-burning ~$6/run on
+    // records that no-match every time. Pass retryAfterDays=0 to force a full
+    // re-sweep.
+    const retryAfterDays =
+      typeof params.retryAfterDays === 'number' ? String(params.retryAfterDays) : '30';
+    const args = [
+      '--import',
+      'tsx/esm',
+      '--no-warnings',
+      'crux/crux.mjs',
+      'tb',
+      'backfill-sources',
+      '--apply',
+      `--limit=${limit}`,
+      `--max-cost=${maxCost}`,
+      `--retry-after-days=${retryAfterDays}`,
+    ];
+    if (typeof params.table === 'string' && params.table.length > 0) {
+      args.push(`--table=${params.table}`);
+    }
+
+    try {
+      const { stdout: output } = await execFileAsync('node', args, {
+        cwd: ctx.projectRoot,
+        encoding: 'utf-8',
+        // 3h — a full sweep can run long. killSignal ensures the child is
+        // actually terminated on timeout (worker backstop in run.ts is 3h5m).
+        timeout: 3 * 60 * 60 * 1000,
+        killSignal: 'SIGKILL',
+        maxBuffer: 16 * 1024 * 1024,
+      });
+
+      // Tail of stdout is enough to summarise outcomes; the full report is
+      // written to backfill-unmatched-*.json in the OS temp dir on the worker
+      // pod (override with --unmatched-out).
+      const tail = output.slice(-2000);
+      return { success: true, data: { limit, maxCost, table: params.table ?? null, output: tail } };
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        success: false,
+        data: { limit, maxCost, table: params.table ?? null },
+        error: error.slice(0, 500),
+      };
     }
   },
 

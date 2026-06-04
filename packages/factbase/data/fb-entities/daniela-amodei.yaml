@@ -5,6 +5,7 @@ facts:
     value: "Co-founding Anthropic; Operations and business leadership"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+    source: https://tygartmedia.com/daniela-amodei
 
   - id: f_7FXUtxYaDw
     property: born-year
@@ -27,12 +28,12 @@ facts:
     value: 0.8
     asOf: "2026-01"
     source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
-      per Fortune's January 2026 reporting. Pledge is not legally binding."
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity per Fortune's January 2026 reporting.
+      Pledge is not legally binding."
 
   - id: f_vgq29V8MAr
     property: ea-alignment-estimate
-    value: [0.8, 0.9]
+    value: [ 0.8, 0.9 ]
     asOf: "2026-04"
-    notes: "Editorial estimate. Daniela is married to Holden Karnofsky (GiveWell
-      co-founder, now at Anthropic); strong documented EA community ties."
+    notes: "Editorial estimate. Daniela is married to Holden Karnofsky (GiveWell co-founder, now at Anthropic); strong
+      documented EA community ties."

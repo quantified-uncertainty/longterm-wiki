@@ -4,9 +4,8 @@ facts:
   - id: f_QSjnEujOZC
     property: description
     value: >-
-      Delaware purpose trust established in 2023 to ensure Anthropic responsibly
-      develops AI for humanity's long-term benefit. Holds Class T Common Stock
-      with negligible economic value but phased governance power over Anthropic's
+      Delaware purpose trust established in 2023 to ensure Anthropic responsibly develops AI for humanity's long-term
+      benefit. Holds Class T Common Stock with negligible economic value but phased governance power over Anthropic's
       board of directors. Trustees are financially disinterested.
     asOf: 2026-03
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
@@ -16,16 +15,14 @@ facts:
     value: "2023-05"
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: >-
-      Charter amended to create Class T stock at Series C close (May 2023).
-      Public announcement September 2023.
+      Charter amended to create Class T stock at Series C close (May 2023). Public announcement September 2023.
 
   - id: f_GQTC3EDHXN
     property: legal-structure
     value: "Delaware purpose trust (Del. Code tit. 12 §3556)"
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
     notes: >-
-      Novel application of Delaware trust law. Purpose trusts serve a stated
-      purpose rather than specific beneficiaries.
+      Novel application of Delaware trust law. Purpose trusts serve a stated purpose rather than specific beneficiaries.
 
   - id: f_7IjcCU3Ou9
     property: headquarters
@@ -35,6 +32,8 @@ facts:
   - id: f_niWDPXutXO
     property: country
     value: United States
+    source: https://www.anthropic.com/news/the-long-term-benefit-trust
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_3G9ZjjArMX
     property: website
@@ -49,9 +48,8 @@ facts:
   - id: f_Lm6yu2M0yQ
     property: notable-for
     value: >-
-      First major AI company to establish an independent governance trust with
-      board-majority appointment power. Designed to prioritize humanity's
-      long-term interests over short-term financial pressures.
+      First major AI company to establish an independent governance trust with board-majority appointment power.
+      Designed to prioritize humanity's long-term interests over short-term financial pressures.
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
 
   # ── Governance Structure ──────────────────────────────────────
@@ -60,8 +58,7 @@ facts:
     value: 0
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: >-
-      Class T Common Stock has negligible economic rights. Trustees have
-      zero financial interest in Anthropic.
+      Class T Common Stock has negligible economic rights. Trustees have zero financial interest in Anthropic.
 
   - id: f_M8yq5Phedd
     property: board-seats-controlled
@@ -85,9 +82,8 @@ facts:
     asOf: 2024-11
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: >-
-      Phase 3 (current): board majority. Remaining seats controlled by
-      Electing Preferred Holders (investors) and Voting Common Stock
-      (founders/employees).
+      Phase 3 (current): board majority. Remaining seats controlled by Electing Preferred Holders (investors) and Voting
+      Common Stock (founders/employees).
 
   - id: f_HT3AnKXbLt
     property: amendment-threshold
@@ -96,8 +92,7 @@ facts:
     validEnd: 2025-11
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
     notes: >-
-      Supermajority of stockholder voting power required to amend trust
-      provisions before November 2025.
+      Supermajority of stockholder voting power required to amend trust provisions before November 2025.
 
   - id: f_k0D29Gu7r4
     property: amendment-threshold
@@ -105,8 +100,7 @@ facts:
     asOf: 2025-11
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
     notes: >-
-      Increased threshold after November 2025 makes amendment harder as
-      trust gains board majority.
+      Increased threshold after November 2025 makes amendment harder as trust gains board majority.
 
   - id: f_q1WSfOS73d
     property: trustee-count
@@ -114,8 +108,8 @@ facts:
     asOf: 2026-03
     source: https://www.anthropic.com/company
     notes: >-
-      Designed for 5 voting trustees plus 1 administrative trustee (Delaware
-      trust institution). Currently 2 seats vacant.
+      Designed for 5 voting trustees plus 1 administrative trustee (Delaware trust institution). Currently 2 seats
+      vacant.
 
   # ── Current Trustees ──────────────────────────────────────────
   - id: f_t1VpyYvmWV
@@ -217,8 +211,8 @@ facts:
     asOf: 2026-02
     source: https://www.anthropic.com/news/chris-liddell-appointed-anthropic-board
     notes: >-
-      Former White House Deputy Chief of Staff. Whether appointed by LTBT or
-      stockholders is not explicitly stated in the announcement.
+      Former White House Deputy Chief of Staff. Whether appointed by LTBT or stockholders is not explicitly stated in
+      the announcement.
 
   # ── Milestones & Concerns ─────────────────────────────────────
   - id: f_T93XbJHxdB
@@ -237,24 +231,21 @@ facts:
   - id: f_WFZGngTdrz
     property: notable-for
     value: >-
-      Trustee composition shifted from AI safety/EA backgrounds (Christiano,
-      Robinson) to national security and global governance expertise (Fontaine,
-      Cuéllar). Two of five trustee seats remain vacant as of March 2026.
+      Trustee composition shifted from AI safety/EA backgrounds (Christiano, Robinson) to national security and global
+      governance expertise (Fontaine, Cuéllar). Two of five trustee seats remain vacant as of March 2026.
     asOf: 2026-03
     source: https://www.anthropic.com/company
 
   - id: f_kj3zNoU2PF
     property: notable-for
     value: >-
-      Full Trust Agreement has never been published, limiting independent
-      assessment. The Certificate of Incorporation is publicly available via
-      Delaware filing but contains less detail than the Trust Agreement.
+      Full Trust Agreement has never been published, limiting independent assessment. The Certificate of Incorporation
+      is publicly available via Delaware filing but contains less detail than the Trust Agreement.
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
 
   - id: f_wWDzFKewep
     property: notable-for
     value: >-
-      Trustees are self-perpetuating: new trustees elected by existing trustees,
-      in consultation with Anthropic's directors and CEO. One-year terms with
-      regular peer re-evaluation.
+      Trustees are self-perpetuating: new trustees elected by existing trustees, in consultation with Anthropic's
+      directors and CEO. One-year terms with regular peer re-evaluation.
     source: https://www.anthropic.com/news/the-long-term-benefit-trust

@@ -4,6 +4,7 @@ facts:
     property: born-year
     value: 1976
     notes: "Born July 27, 1976 in London; awarded Nobel Prize in Chemistry 2024 for AlphaFold protein structure prediction"
+    source: https://id.loc.gov/authorities/names/n2024028460
 
   - id: f_dH1aB2cD3e
     property: education
@@ -13,7 +14,8 @@ facts:
 
   - id: f_dH4fG5hI6j
     property: notable-for
-    value: "CEO of Google DeepMind; creator of AlphaGo, AlphaFold, and Gemini; Nobel Prize in Chemistry 2024; chess prodigy and game designer"
+    value: "CEO of Google DeepMind; creator of AlphaGo, AlphaFold, and Gemini; Nobel Prize in Chemistry 2024; chess prodigy
+      and game designer"
     source: https://en.wikipedia.org/wiki/Demis_Hassabis
 
   - id: f_dH7kL8mN9o
@@ -24,7 +26,11 @@ facts:
   - id: f_lpkq3z8f0a
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Demis_Hassabis"
+    source: https://en.wikipedia.org/wiki/Demis_Hassabis
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_o8sy73d82s
     property: google-scholar
     value: "https://scholar.google.com/citations?user=tdb0t88AAAAJ"
+    source: https://scholar.google.com/citations?user=tdb0t88AAAAJ
+    notes: "[auto-discovered by tb backfill-sources]"
