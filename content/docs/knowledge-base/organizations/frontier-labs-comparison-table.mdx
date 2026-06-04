@@ -1,0 +1,80 @@
+---
+wikiId: E2566
+title: Frontier AI Labs Comparison
+description: Hand-curated comparison of 12 major frontier AI labs on safety-relevant dimensions — capability tier, safety investment, race posture restraint, transparency, governance engagement, leadership alignment, employee culture, and RSP quality.
+subcategory: labs
+contentFormat: table
+lastEdited: 2026-05-11
+update_frequency: 14
+summary: Interactive comparison table of 12 major frontier AI developers (OpenAI, Anthropic, Google DeepMind, Meta, xAI, Microsoft AI, DeepSeek, Alibaba Qwen, Mistral, Cohere, AI21, Inflection) rated on safety-relevant dimensions. Each rating anchors in observable signals (RSPs, system cards, leadership statements, departures). Designed as a cross-lab counterpart to deeper single-org pages like the Anthropic stakeholders table. Ratings reflect early-2026 public signal and should be re-checked frequently.
+clusters:
+  - ai-safety
+  - governance
+hideSidebar: true
+---
+
+import FrontierLabsTableView from '@components/tables/views/FrontierLabsTableView';
+
+## Read this before the table
+
+**Epistemic status.** Opinionated synthesis, not a peer-reviewed scorecard. Ratings reflect publicly observable signals through early 2026; internal practices that aren't in the public record are not assessed.
+
+**Direction of ratings.** For every safety dimension, HIGH means more safety-positive (more investment, more restraint, more transparency, stronger alignment, more detail). The capability "Tier" column is descriptive, not evaluative — being a frontier lab is not in itself good or bad. **UNCLEAR** means we don't have enough public signal to rate — *not* that the underlying practice is bad.
+
+**Limits.** Ratings age fast — frontier labs reorganize, ship new policies, and lose senior staff on quarterly timescales. Update cadence here is ~14 days; always check the linked references for current state. We weigh observable artifacts (published RSPs, system cards, attrition patterns) more heavily than press statements. Other scorecards weight differently — see [FLI AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/), [METR Common Elements](https://metr.org/common-elements), and [AI Lab Watch](https://ailabwatch.org/) for independent rubrics.
+
+<FrontierLabsTableView />
+
+## What this table is — and isn't
+
+It's **a cross-lab comparison overlay** on top of the FactBase / TableBase organization data this wiki already maintains. Hard numbers (funding, valuations, headcount) live in the per-org pages at [/organizations](/organizations). This table is the layer above that — the **editorial judgment** about safety practice, anchored where possible in observable artifacts.
+
+It is not:
+- A precise scoring system. The HIGH / MEDIUM / LOW levels are buckets, not measurements.
+- A prediction. We rate **revealed behavior to date**, not where each lab is heading.
+- A safety endorsement for HIGH-rated labs. A lab can score well on every column here and still be a net contributor to risk (because the underlying activity is high-risk, or because revealed safety practice can degrade fast).
+- Definitive. Other lab-scorecard efforts ([FLI](https://futureoflife.org/ai-safety-index-winter-2025/), [METR](https://metr.org/common-elements), [AI Lab Watch](https://ailabwatch.org/)) use different rubrics and reach different conclusions on the same labs. We cite ours, not theirs.
+
+## Why these eight dimensions
+
+The dimensions are chosen to track what a third-party observer can verify from public artifacts, on the theory that the gap between **stated** safety commitment and **revealed** safety behavior is more useful than either alone:
+
+- **Capability tier** — descriptive, not evaluative. Distinguishes labs whose safety choices actually matter at the global frontier from those whose choices matter mostly to their customers.
+- **Safety investment** — dedicated alignment / interpretability / red-team headcount and research output, **relative to org size**. Absolute headcount favors hyperscalers; ratio is more meaningful.
+- **Race posture restraint** — public framing plus revealed behavior on competitive deployment. We mark HIGH when restraint is both stated and demonstrated; LOW when racing is explicit or when revealed cadence contradicts safety framing.
+- **Transparency** — RSPs, system cards, training detail, AISI pre-deployment access. Weighted toward operationally specific artifacts (capability thresholds, tripwires) over PR commitments.
+- **Governance engagement** — constructive engagement with regulators, AISIs, summits. We don't credit a lab for testifying if they also lobbied against the same legislation.
+- **Leadership safety alignment** — CEO / co-founder public stance plus revealed prioritization (resourcing, who reports to whom, what gets shipped when leadership disagrees).
+- **Employee safety culture** — internal safety advocacy, public alignment-research output, attrition patterns. High-profile safety-driven departures are weighed heavily because they're a costly signal.
+- **RSP / framework quality** — operational specificity. We treat a vague public-relations document as worse than no policy, because the former forecloses scrutiny.
+
+## What HIGH means
+
+HIGH is **safety-positive**, uniformly. HIGH safety investment means more investment; HIGH transparency means more disclosure; HIGH race restraint means more restraint; HIGH leadership alignment means stronger alignment. This lets you scan the table left-to-right and read green/amber/red as a rough safety signal — at the cost of forcing some unidimensional judgments onto multidimensional realities. The per-cell notes try to recover the nuance.
+
+We use **UNCLEAR** rather than guessing when public signal is thin (especially for Chinese-jurisdiction labs and very small / very new labs). Treat UNCLEAR rows as "we don't know," not as "probably bad."
+
+## Cross-references
+
+- [Anthropic Stakeholders Table](/wiki/E815) — single-org-deep-dive prototype.
+- [/organizations](/organizations) — organization directory with FactBase facts (funding rounds, valuations, headcount).
+- [FLI AI Safety Index (Winter 2025)](https://futureoflife.org/ai-safety-index-winter-2025/) — independent scorecard, different rubric.
+- [METR: Common Elements](https://metr.org/common-elements) — frontier safety policy comparison.
+- [AI Lab Watch](https://ailabwatch.org/) — third-party scorecard with detailed rubric.
+
+## Methodology — how each rating is anchored
+
+Every rating in the table has a one- or two-sentence note linking it to an observable signal. Where multiple signals exist, the "Notable signals" column carries the longer evidence list and the "References" column links sources.
+
+When evidence conflicts (e.g., a public safety statement contradicted by revealed deployment cadence), we **weight revealed behavior over stated commitments**, on the theory that the costly-signal side carries more information. This is why labs that publish strong-sounding safety frameworks can still receive a MEDIUM or LOW rating on race-posture restraint — the frameworks are real, but so is the deployment cadence.
+
+For attribution-light claims (e.g., "small explicit safety team"), the absence of public confirmation is itself informative: frontier labs that invest heavily in safety typically advertise it. We mark these LOW, not UNCLEAR.
+
+## Limitations
+
+- **Sample is small** — 12 labs, eight dimensions, hand-curated. Per-cell error bars are wide.
+- **Western-centric public signal** — Chinese-jurisdiction labs operate under a different regulatory and disclosure regime; UNCLEAR ratings there reflect our limited visibility, not necessarily their internal practice.
+- **Race-posture restraint is the most contested column** — labs and observers disagree about what counts as racing. We use "race-conscious" as MEDIUM and reserve LOW for labs whose public framing explicitly endorses racing.
+- **Ratings age fast** — quarterly cadence at minimum. Anything older than three months should be re-verified before being cited.
+
+Suggested re-reads, in order of likely turnover: leadership safety alignment > race-posture restraint > RSP quality > safety investment > transparency > everything else.

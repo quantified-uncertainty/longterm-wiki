@@ -5,7 +5,7 @@ description: Google's merged AI research lab behind AlphaGo, AlphaFold, and Gemi
 sidebar:
   order: 3
 subcategory: labs
-lastEdited: 2026-02-26
+lastEdited: 2026-05-10
 update_frequency: 3
 summary: Comprehensive overview of DeepMind's history, achievements (AlphaGo, AlphaFold with 200M+ protein structures), and 2023 merger with Google Brain. Documents racing dynamics with OpenAI and new Frontier Safety Framework with 5-tier capability thresholds, but provides limited actionable guidance for prioritization decisions.
 clusters:
@@ -17,7 +17,7 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, Entit
 
 ## Overview
 
-<EntityLink id="E98" name="deepmind" name="deepmind" name="deepmind" name="deepmind" name="deepmind">Google DeepMind</EntityLink> represents one of the world's most influential AI research organizations, formed in April 2023 from merging <EntityLink id="E98">Google DeepMind</EntityLink> and Google Brain. The combined entity has achieved breakthrough results including AlphaGo's defeat of world Go champions, AlphaFold's solution to protein folding, and Gemini's competition with GPT-4.
+<EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> represents one of the world's most influential AI research organizations, formed in April 2023 from merging DeepMind and Google Brain. The combined entity has achieved breakthrough results including AlphaGo's defeat of world Go champions, AlphaFold's solution to protein folding, and Gemini's competition with GPT-4.
 
 Founded in 2010 by <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink>, <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>, and <EntityLink id="E1288" name="mustafa-suleyman">Mustafa Suleyman</EntityLink>, DeepMind was acquired by Google in 2014 for approximately \$500–650 million. The merger ended DeepMind's unique independence within Google, raising questions about whether commercial pressures will compromise its research-first culture and safety research.
 
@@ -95,7 +95,7 @@ AlphaFold represents a widely-cited scientific contribution of AI to biology:
 
 ### Gemini: The GPT-4 Competitor
 
-<FBRecordTable entity="sid_A4XoubikkQ" collection="model-releases" title="Model & Research Releases" columns={["name", "released", "description"]} />
+<FBRecordTable entity="sid_A4XoubikkQ" collection="entity-events" title="DeepMind Model Releases & Events" columns={["title", "date", "eventType", "description"]} />
 
 Following the merger, Gemini became DeepMind's flagship product:
 
@@ -117,14 +117,39 @@ DeepMind's Sparrow project, published in 2022, applied <EntityLink id="E259" nam
   <KeyPeople people={[
     { name: "Demis Hassabis", role: "CEO, Co-founder" },
     { name: "Shane Legg", role: "Chief AGI Scientist, Co-founder" },
-    { name: "Koray Kavukcuoglu", role: "VP Research" },
-    { name: "Pushmeet Kohli", role: "VP Research, AI Safety" },
-    { name: "Jeff Dean", role: "Chief Scientist, Google Research" },
+    { name: "Koray Kavukcuoglu", role: "CTO" },
+    { name: "Pushmeet Kohli", role: "VP Research, Head of AI Safety and Alignment" },
+    { name: "Jeff Dean", role: "Chief Scientist, Google Research / DeepMind" },
+    { name: "Allan Dafoe", role: "VP, AI Policy" },
+    { name: "John Jumper", role: "Principal Research Scientist; 2024 Nobel laureate (AlphaFold)" },
+    { name: "David Silver", role: "Principal Research Scientist; AlphaGo / AlphaZero" },
     { name: "Neel Nanda", role: "Research Scientist, Mechanistic Interpretability Lead" },
   ]} />
 </Section>
 
-<FBRecordTable entity="sid_A4XoubikkQ" collection="key-persons" title="Key People" columns={["person", "title", "start", "end", "is_founder"]} />
+### Founders, Senior Leadership, and Key Researchers
+
+The table below provides cross-links to wiki pages for major DeepMind figures. Several of these people have dedicated profile pages on this wiki with substantially more biographical detail.
+
+<FBRecordTable entity="sid_A4XoubikkQ" collection="key-persons" title="Key People (Founders & Senior Leadership)" columns={["person", "title", "start", "end", "is_founder"]} />
+
+<FBRecordTable entity="sid_A4XoubikkQ" collection="career-history" title="DeepMind Researchers (career-history)" columns={["person", "title", "start", "end"]} />
+
+| Person | Role | Notes |
+|--------|------|-------|
+| <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> | CEO, co-founder | Chess master, neuroscience PhD; 2024 Nobel in Chemistry for AlphaFold |
+| <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink> | Chief AGI Scientist, co-founder | Author of *Machine Super Intelligence* (2008); 50%-by-2028 AGI median estimate |
+| <EntityLink id="E1288" name="mustafa-suleyman">Mustafa Suleyman</EntityLink> | Co-founder (departed 2019/2022) | Now CEO of Microsoft AI; author of *The Coming Wave* (2023) |
+| Koray Kavukcuoglu | CTO | One of DeepMind's earliest research hires; leads overall technical direction |
+| <EntityLink id="E1685" name="pushmeet-kohli">Pushmeet Kohli</EntityLink> | VP Research, Head of AI Safety and Alignment | Senior author on the Frontier Safety Framework |
+| <EntityLink id="E1295" name="allan-dafoe">Allan Dafoe</EntityLink> | VP, AI Policy | Founder of GovAI; leads DeepMind's policy and governance research |
+| <EntityLink id="E2562" name="john-jumper">John Jumper</EntityLink> | Principal Research Scientist | Co-recipient, 2024 Nobel Prize in Chemistry; led AlphaFold 2 and AlphaFold 3 |
+| <EntityLink id="E1337" name="david-silver">David Silver</EntityLink> | Principal Research Scientist | Led AlphaGo / AlphaGo Zero / AlphaZero; "Reward is Enough" thesis |
+| Jeff Dean | Chief Scientist, Google Research / DeepMind | Co-founder of Google Brain; pre-merger leadership of Google's ML infrastructure |
+| <EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink> | Senior Research Scientist; Mechanistic Interpretability Team Lead | Created TransformerLens; led Gemma Scope |
+| <EntityLink id="E1296" name="victoria-krakovna">Victoria Krakovna</EntityLink> | Research Scientist, alignment | Co-founder of FLI; maintains the "Specification Gaming Examples" list |
+| <EntityLink id="E1297" name="rohin-shah">Rohin Shah</EntityLink> | Research Scientist, alignment | Founded the Alignment Newsletter (2018–2022) |
+| <EntityLink id="E1298" name="richard-ngo">Richard Ngo</EntityLink> | (Previously) AI governance researcher | Spent time at DeepMind and OpenAI; "AGI safety from first principles" |
 
 ### Demis Hassabis: The Scientific CEO
 
@@ -151,8 +176,6 @@ DeepMind's core thesis:
 ## Safety Research and Framework
 
 ### Frontier Safety Framework
-
-<FBRecordTable entity="sid_A4XoubikkQ" collection="safety-milestones" title="Safety Milestones" columns={["name", "date", "type", "description"]} />
 
 Launched in 2024, DeepMind's systematic approach to AI safety:
 
@@ -195,11 +218,25 @@ DeepMind's Frontier Safety Team conducts:
 - **External collaboration** with safety organizations
 - **Transparency reports** on safety assessments
 
+### Safety and Alignment Research Teams
+
+DeepMind's safety and alignment research is organized into several teams reporting (since the 2023 reorganization) through <EntityLink id="E1685" name="pushmeet-kohli">Pushmeet Kohli</EntityLink> as VP of Research and Head of AI Safety and Alignment. Notable researchers and their primary focus areas include:
+
+| Researcher | Focus | Notes |
+|------------|-------|-------|
+| <EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink> | <EntityLink id="E477" name="mech-interp">Mechanistic interpretability</EntityLink> | Team lead; Gemma Scope, TransformerLens |
+| <EntityLink id="E1296" name="victoria-krakovna">Victoria Krakovna</EntityLink> | Specification gaming, side effects | Co-founder of FLI; maintains the specification-gaming examples list |
+| <EntityLink id="E1297" name="rohin-shah">Rohin Shah</EntityLink> | Scalable oversight, value learning | Founded the Alignment Newsletter; influential community communicator |
+| <EntityLink id="E1295" name="allan-dafoe">Allan Dafoe</EntityLink> | AI policy and governance | VP, AI Policy; founder of GovAI |
+| Tom Everitt | Causal incentives, reward hacking | Co-author of the "Reward Hacking from a Causal Perspective" line |
+| Anca Dragan | Human-AI alignment | Former CHAI; joined DeepMind from UC Berkeley |
+| Murray Shanahan | LLM cognition, embodied reasoning | Senior research scientist; Imperial College professor |
+
+This team structure reflects a deliberate breadth across the safety problem-space: from low-level interpretability (Nanda's team), through specification and reward-modeling work (Krakovna, Everitt), to high-level oversight and governance (Shah, Dafoe). Whether the breadth is well-coordinated or constitutes a portfolio of loosely-linked projects has been debated by external commentators.
+
 ## Google Integration: Benefits and Tensions
 
 ### Resource Advantages
-
-<FBRecordTable entity="sid_A4XoubikkQ" collection="strategic-partnerships" title="Strategic Partnerships" columns={["partner", "type", "date", "notes"]} />
 
 Google's backing provides substantial capabilities:
 
