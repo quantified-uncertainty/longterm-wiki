@@ -69,7 +69,12 @@ export interface SchemaIntrospection {
   otherExports: OtherExportInfo[];
 }
 
-function collectPrimaryKeyColumns(cfg: ReturnType<typeof getTableConfig>): string[] {
+/** Stable, locale-independent string ordering (code-unit comparison). */
+function byCodeUnit(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function collectPrimaryKeyColumns(cfg: ReturnType<typeof getTableConfig>): Set<string> {
   const cols = new Set<string>();
   for (const col of cfg.columns) {
     if (col.primary) cols.add(col.name);
@@ -77,19 +82,19 @@ function collectPrimaryKeyColumns(cfg: ReturnType<typeof getTableConfig>): strin
   for (const pk of cfg.primaryKeys) {
     for (const col of pk.columns) cols.add(col.name);
   }
-  return [...cols];
+  return cols;
 }
 
 function projectTable(exportName: string, table: PgTable): TableInfo {
   const cfg = getTableConfig(table);
-  const pkColumns = new Set(collectPrimaryKeyColumns(cfg));
+  const pkColumns = collectPrimaryKeyColumns(cfg);
 
   const columns: ColumnInfo[] = cfg.columns.map((col) => ({
     name: col.name,
     sqlType: col.getSQLType(),
     notNull: col.notNull,
     primaryKey: pkColumns.has(col.name),
-    hasDefault: col.hasDefault ?? col.default !== undefined,
+    hasDefault: col.hasDefault ?? (col.default !== undefined),
   }));
 
   const foreignKeys: ForeignKeyInfo[] = cfg.foreignKeys.map((fk) => {
@@ -138,8 +143,11 @@ export function introspectSchema(): SchemaIntrospection {
     }
   }
 
-  tables.sort((a, b) => a.tableName.localeCompare(b.tableName));
-  otherExports.sort((a, b) => a.objectName.localeCompare(b.objectName));
+  // Deterministic code-unit ordering (NOT localeCompare, which is ICU/locale
+  // dependent) so the generated docs are byte-stable across environments — the
+  // drift gate fails CI on any byte difference.
+  tables.sort((a, b) => byCodeUnit(a.tableName, b.tableName));
+  otherExports.sort((a, b) => byCodeUnit(a.objectName, b.objectName));
 
   return { tables, otherExports };
 }

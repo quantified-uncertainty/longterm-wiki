@@ -73,10 +73,13 @@ export function parseSections(source: string): SectionMap {
       if (titleMatch && !isRuleLine(lines[i + 1])) {
         currentSection = titleMatch[1];
         if (!order.includes(currentSection)) order.push(currentSection);
-        // Skip the description block up to the closing rule.
+        // Skip the description block up to the closing rule. If the banner is
+        // unterminated (no closing rule before EOF), advance past only the
+        // title line so any exports that follow are still captured under this
+        // section — never jump to EOF, which would silently drop them.
         let j = i + 2;
         while (j < lines.length && !isRuleLine(lines[j])) j++;
-        i = j;
+        i = j < lines.length ? j : i + 1;
         continue;
       }
     }
@@ -90,7 +93,7 @@ export function parseSections(source: string): SectionMap {
   return { exportToSection, order };
 }
 
-function escapeCell(s: string): string {
+export function escapeCell(s: string): string {
   return s.replace(/\|/g, "\\|");
 }
 
@@ -99,7 +102,7 @@ function escapeCell(s: string): string {
  * leading-underscore names like `_archived_claims` valid under Mermaid's strict
  * ER parser, and isolates the diagram from any character in a table name.
  */
-function mermaidEntity(name: string): string {
+export function mermaidEntity(name: string): string {
   return `"${name.replace(/"/g, "")}"`;
 }
 
@@ -285,6 +288,16 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * True when the committed page no longer matches what the schema would generate.
+ * The `lastEdited` line is ignored on both sides (see {@link normalizeForDiff}),
+ * so a date change alone never counts as drift. Pure function — the gate's core
+ * comparison lives here so it can be unit-tested without spawning the CLI.
+ */
+export function isStale(fresh: string, existing: string): boolean {
+  return normalizeForDiff(fresh) !== normalizeForDiff(existing);
+}
+
 function main(): void {
   const args = process.argv.slice(2);
   const check = args.includes("--check");
@@ -301,11 +314,10 @@ function main(): void {
       console.error(`✗ ${OUTPUT_PATH} does not exist. Run: pnpm crux generate db-schema-docs`);
       process.exit(1);
     }
-    // Reuse the existing lastEdited so only structural drift is detected.
-    const existingDate =
-      existing.match(new RegExp(`^${VOLATILE_FRONTMATTER_KEY}: "(.+?)"`, "m"))?.[1] ?? todayIso();
-    const fresh = generateMdx(introspection, source, existingDate);
-    if (normalizeForDiff(fresh) !== normalizeForDiff(existing)) {
+    // The lastEdited line is stripped before comparison, so its value is
+    // irrelevant here — generate with today's date and let isStale ignore it.
+    const fresh = generateMdx(introspection, source, todayIso());
+    if (isStale(fresh, existing)) {
       console.error(
         "✗ db-schema-reference.mdx is out of date with schema.ts.\n  Regenerate with: pnpm crux generate db-schema-docs"
       );
