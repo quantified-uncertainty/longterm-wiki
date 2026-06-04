@@ -51,4 +51,13 @@ export interface PatrolConfig {
   verbose: boolean;
   reflectionInterval: number;
   timeoutMinutes: number;
+  /**
+   * Inline cap on cumulative `input_tokens` reported by the spawned `claude`
+   * stream-json events. When the spawn exceeds this threshold the daemon
+   * SIGTERMs the child (10s SIGKILL fallback) and appends a
+   * `cycle_budget_exceeded` event to runs.jsonl. Defense-in-depth on top of
+   * `--max-turns` and `timeoutMinutes`. Set to 0 (or omit) to disable.
+   * Default in buildConfig: 50_000 (QUA-1071 AC#5 / QUA-1078).
+   */
+  inputTokenCap?: number;
 }

@@ -26,8 +26,13 @@ export function findTodoComments(): CruftItem[] {
     for (const line of todoOutput.split('\n').filter(Boolean)) {
       const match = line.match(/^([^:]+):(\d+):(.+)$/);
       if (match) {
-        // Skip test files and this file itself
-        if (match[1].includes('.test.') || match[1].includes('cruft-detection.ts')) continue;
+        // Skip test files, this file itself, and scaffold/template generators
+        // (their TODOs are intentional template markers emitted into generated code).
+        if (
+          match[1].includes('.test.') ||
+          match[1].includes('cruft-detection.ts') ||
+          /-scaffold\.ts$|\/scaffold\.ts$/.test(match[1])
+        ) continue;
         // Skip comments that already have an issue number (#NNNN)
         if (/#\d+\b/.test(match[3])) continue;
         items.push({

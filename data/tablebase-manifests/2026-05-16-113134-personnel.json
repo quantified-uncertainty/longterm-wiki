@@ -1,0 +1,90 @@
+{
+  "table": "personnel",
+  "recordCount": 6,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-16T11:31:34.636Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 6,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "UjPNhMLnEK",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Chief Scientist, Microsoft AI",
+      "roleType": "key-person",
+      "startDate": "2024-03-19",
+      "isFounder": false,
+      "source": "https://blogs.microsoft.com/blog/2024/03/19/mustafa-suleyman-deepmind-and-inflection-co-founder-joins-microsoft-to-lead-copilot/",
+      "notes": "Karén Simonyan joined Microsoft AI as Chief Scientist from Inflection AI on March 19, 2024, alongside CEO Mustafa Suleyman. Previously co-invented VGGNet and worked on AlphaZero at DeepMind. Later also identified as Chief Scientist of the MAI Superintelligence Team. Source: TechCrunch https://techcr… [truncated, 88 more chars]",
+      "id": "vrk3YtnImo",
+      "verdict": "none"
+    },
+    {
+      "personId": "gxby4VWNMn",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Head of Microsoft AI London Hub",
+      "roleType": "key-person",
+      "startDate": "2024-04-07",
+      "isFounder": false,
+      "source": "https://blogs.microsoft.com/blog/2024/04/07/announcing-new-microsoft-ai-hub-in-london/",
+      "notes": "Jordan Hoffmann joined Microsoft AI from Inflection AI to lead the London Hub, announced April 7, 2024. Previously a research scientist at DeepMind (2020-2022), known for the Chinchilla scaling laws paper. Source: TechCrunch https://techcrunch.com/2024/04/08/microsoft-ai-gets-a-new-london-hub-headed… [truncated, 64 more chars]",
+      "id": "NehTCeoc3t",
+      "verdict": "none"
+    },
+    {
+      "personId": "ObK98hHSn5",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Corporate Vice President, GenAI",
+      "roleType": "key-person",
+      "startDate": "2024-03",
+      "isFounder": false,
+      "source": "https://blogs.microsoft.com/blog/2024/03/19/mustafa-suleyman-deepmind-and-inflection-co-founder-joins-microsoft-to-lead-copilot/",
+      "notes": "Misha Bilenko was already a long-tenured Microsoft executive as CVP of GenAI and was included in the initial Microsoft AI division reporting to Mustafa Suleyman when he joined in March 2024.",
+      "id": "i2JCdmo0l7",
+      "verdict": "none"
+    },
+    {
+      "personId": "Jf5QnOtBmE",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Executive Vice President, CoreAI – Platform and Tools",
+      "roleType": "key-person",
+      "startDate": "2025-01-13",
+      "isFounder": false,
+      "source": "https://blogs.microsoft.com/blog/2025/01/13/introducing-core-ai-platform-and-tools/",
+      "notes": "Jay Parikh was appointed EVP leading CoreAI, covering Dev tools, AI Platform, AI Supercomputer, and AI Agentic Runtimes. Joined Microsoft in October 2024; formal CoreAI EVP role announced January 13, 2025. Former VP of Engineering at Meta/Facebook. Source: CNBC https://www.cnbc.com/2025/01/13/micros… [truncated, 61 more chars]",
+      "id": "pKXoDIe4AA",
+      "verdict": "none"
+    },
+    {
+      "personId": "20npb5L6H4",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Corporate Vice President, Product and Growth, Microsoft AI",
+      "roleType": "key-person",
+      "startDate": "2025",
+      "isFounder": false,
+      "source": "https://blogs.microsoft.com/blog/2026/03/17/announcing-copilot-leadership-update/",
+      "notes": "Jacob Andreou joined Microsoft AI in 2025 as CVP of Product and Growth. Previously SVP Product and Growth at Snap (8 years), then General Partner at Greylock. Promoted to Executive Vice President, Copilot in March 2026 reporting directly to Satya Nadella. Source: GeekWire https://www.geekwire.com/20… [truncated, 98 more chars]",
+      "id": "f73Tq94org",
+      "verdict": "none"
+    },
+    {
+      "personId": "x3JqGtdYqk",
+      "organizationId": "sid_OIY5gaPpBA",
+      "role": "Corporate Vice President, Microsoft AI Superintelligence Team",
+      "roleType": "key-person",
+      "startDate": "2026-03",
+      "isFounder": false,
+      "source": "https://www.geekwire.com/2026/microsoft-hires-former-ai2-ceo-ali-farhadi-and-key-researchers-for-suleymans-ai-team/",
+      "notes": "Ali Farhadi joined the Microsoft AI Superintelligence Team in March 2026. Former CEO of Allen Institute for AI (Ai2); previously at Apple after Ai2 spinout Xnor.ai was acquired. Computer vision specialist.",
+      "id": "mq8X7ev3ff",
+      "verdict": "none"
+    }
+  ]
+}
