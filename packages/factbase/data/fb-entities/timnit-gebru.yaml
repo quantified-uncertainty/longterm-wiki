@@ -3,19 +3,26 @@ facts:
   - id: f_uTUXxLBdtA
     property: born-year
     value: 1983
+    source: https://open.edu/openlearncreate/mod/book/tool/print/index.php?id=226636&chapterid=35663
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_3NUOYZSdQw
     property: notable-for
-    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI
-      team; AI ethics and fairness researcher"
+    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI team; AI ethics and fairness researcher"
+    source: https://dair-institute.org/team/timnit-gebru
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_hfbDHNUaWg
     property: education
     value: "PhD in Computer Science, Stanford University"
+    source: https://ai.stanford.edu/~tgebru
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_seF7GHtJYg
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Timnit_Gebru"
+    source: https://en.wikipedia.org/wiki/Timnit_Gebru
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_BtV4Fw48RS
     property: website
     value: https://ai.stanford.edu/~tgebru/

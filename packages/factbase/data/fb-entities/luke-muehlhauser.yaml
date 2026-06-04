@@ -3,4 +3,5 @@ facts:
   - id: f_yFiXtoJMDg
     property: notable-for
     value: "Former Executive Director of MIRI; former GiveWell/Open Philanthropy researcher on AI risk"
-
+    source: https://coefficientgiving.org/team/luke-muehlhauser
+    notes: "[auto-discovered by tb backfill-sources]"

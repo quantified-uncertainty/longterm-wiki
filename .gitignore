@@ -2,6 +2,11 @@
 dev/sql/
 dev/reports/
 
+# backfill-sources analysis outputs (large, per-run, non-deterministic)
+dev/cache/
+dev/audits/
+dev/backfill-content-cache/
+
 # build output
 dist/
 
@@ -141,3 +146,6 @@ crux/calibration/data/corpus.json
 crux/calibration/data/results-*.json
 .claude/scratch/
 .claude/research-cache/
+
+# Local-only top-level scratch docs
+OVERVIEW.md

@@ -3,15 +3,20 @@ facts:
   - id: f_yfpjzZXSJA
     property: born-year
     value: 1984
+    source: https://en.wikipedia.org/wiki/Mustafa_Suleyman
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_65egajgbIQ
     property: notable-for
-    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI;
-      advocate for AI safety and governance"
+    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI; advocate for AI safety and governance"
+    source: https://blogs.microsoft.com/blog/2024/03/19/mustafa-suleyman-deepmind-and-inflection-co-founder-joins-microsoft-to-lead-copilot
+    notes: "[auto-discovered by tb backfill-sources]"
 
   - id: f_ufd9nJBdCA
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
+    source: https://en.wikipedia.org/wiki/Mustafa_Suleyman
+    notes: "[auto-discovered by tb backfill-sources]"
   - id: f_5t7JrXOmKh
     property: website
     value: https://the-coming-wave.com

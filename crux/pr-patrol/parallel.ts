@@ -201,6 +201,9 @@ interface ClaudeResult {
   output: string;
   hitMaxTurns: boolean;
   timedOut: boolean;
+  /** QUA-1078: optional fields from spawnClaude's stream-json mode. */
+  budgetExceeded?: boolean;
+  inputTokens?: number;
 }
 
 interface ClassifiedOutcome {
@@ -219,11 +222,17 @@ export function classifyFixOutcome(
   effectiveTimeout: number,
   effectiveMaxTurns: number,
 ): ClassifiedOutcome {
-  if (result.timedOut) {
+  if (result.timedOut || result.budgetExceeded) {
     const failCount = recordFailure(prNumber);
+    // QUA-1078: budget kills are shaped like timeouts (daemon-initiated,
+    // partial work) — fold both into the same branch but emit a clearer
+    // reason so the JSONL/PR-comment isn't a meaningless "Exit code: null".
+    const cause = result.budgetExceeded ? 'budget' : 'timeout';
     const reason = failCount >= 2
-      ? `Abandoned after ${failCount} failures (timeout)`
-      : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
+      ? `Abandoned after ${failCount} failures (${cause})`
+      : result.budgetExceeded
+        ? `Killed after exceeding cumulative input_tokens (observed ${result.inputTokens ?? '?'}) — attempt ${failCount}`
+        : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
     return { outcome: 'timeout', reason, mainIsRootCause: false };
   }
 
@@ -376,7 +385,7 @@ async function fixPrInWorktree(
             ...config,
             maxTurns: 60,
             timeoutMinutes: 30,
-          }, { cwd: worktreePath });
+          }, { cwd: worktreePath, context: { prNumber: pr.number, label: 'rebase-only' } });
           const elapsedS = Math.floor((Date.now() - startTime) / 1000);
           const claudeOutcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
           if (claudeOutcome === 'fixed') {
@@ -420,7 +429,7 @@ async function fixPrInWorktree(
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: worktreePath });
+    }, { cwd: worktreePath, context: { prNumber: pr.number } });
 
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
@@ -833,6 +842,11 @@ export function buildParallelConfig(
     timeoutMinutes: parseIntOpt(
       options.timeout ?? process.env.PR_PATROL_TIMEOUT_MINUTES,
       60,
+    ),
+    // QUA-1078: inline 50k input-token cap on spawnClaude. 0 disables.
+    inputTokenCap: parseIntOpt(
+      options.inputTokenCap ?? process.env.PR_PATROL_INPUT_TOKEN_CAP,
+      50_000,
     ),
   };
 
