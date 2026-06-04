@@ -1,0 +1,54 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-16T11:23:42.776Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_d9sWZtyVwg",
+      "name": "Elon Musk Grant",
+      "date": "2015-01",
+      "raised": 10000000,
+      "leadInvestor": "Elon Musk",
+      "instrument": "donation",
+      "source": "https://www.lesswrong.com/posts/FuCZdbQ3h6782bnY6/elon-musk-donates-usd10m-to-the-future-of-life-institute-to",
+      "notes": "Elon Musk donated $10M to FLI in January 2015 for AI safety research. The funds were used to run the 2015 AI Safety Grant Program, which funded 37 projects totaling $7M+ to researchers at Oxford, Berkeley, Carnegie Mellon, MIRI, and other institutions.",
+      "id": "9jPiukVli9",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_d9sWZtyVwg",
+      "name": "Open Philanthropy AI Risk Grant",
+      "date": "2015",
+      "raised": 1186000,
+      "leadInvestor": "Open Philanthropy",
+      "instrument": "grant",
+      "source": "https://www.openphilanthropy.org/grants/future-of-life-institute-artificial-intelligence-risk-reduction/",
+      "notes": "Open Philanthropy (then Open Philanthropy Project) provided $1.186M as a supplement to the Musk 2015 grant round, funding high-quality proposals that exceeded the initial Musk funding.",
+      "id": "fJMBF9V2W1",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_d9sWZtyVwg",
+      "name": "Vitalik Buterin SHIB Donation",
+      "date": "2021",
+      "raised": 500000000,
+      "leadInvestor": "Vitalik Buterin",
+      "instrument": "donation",
+      "source": "https://en.wikipedia.org/wiki/Future_of_Life_Institute",
+      "notes": "Vitalik Buterin donated ~$665.8M nominal value in SHIB tokens to FLI in 2021. Approximately $500M was realized after liquidation. The majority of funds were transferred to a donor-advised fund and eventually capitalized the Future of Life Foundation (FLF), a sister organization. FLI transferred $58.… [truncated, 95 more chars]",
+      "id": "koo5umxkgG",
+      "verdict": "none"
+    }
+  ]
+}

@@ -273,6 +273,11 @@ export function buildConfig(
       options.timeout ?? process.env.PR_PATROL_TIMEOUT_MINUTES,
       60,
     ),
+    // QUA-1078: inline 50k input-token cap on spawnClaude. 0 disables.
+    inputTokenCap: parseIntOpt(
+      options.inputTokenCap ?? process.env.PR_PATROL_INPUT_TOKEN_CAP,
+      50_000,
+    ),
   };
 }
 
