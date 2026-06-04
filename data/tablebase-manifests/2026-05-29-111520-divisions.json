@@ -1,0 +1,48 @@
+{
+  "table": "divisions",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-29T11:15:20.152Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "UpwkNrc6WY",
+      "parentOrgId": "sid_h6ntSGk8fg",
+      "name": "AI & Advanced Computing",
+      "divisionType": "program-area",
+      "lead": "TbTpiTznPY",
+      "source": "https://www.schmidtsciences.org/team",
+      "notes": "Lead confirmed on https://www.schmidtsciences.org/team as of 2026-05-29. Mike Belinsky listed as Director, AI & Advanced Computing.",
+      "verdict": "none"
+    },
+    {
+      "id": "l04GgZ7iPR",
+      "parentOrgId": "sid_h6ntSGk8fg",
+      "name": "Science Systems",
+      "divisionType": "program-area",
+      "lead": "9QKa38rnGi",
+      "source": "https://www.schmidtsciences.org/team",
+      "notes": "Lead confirmed on https://www.schmidtsciences.org/team as of 2026-05-29. James Ricci listed as Director, Science Systems. NOTE: 'Science Systems' is the canonical name for this division (not 'Health' as the PR summary mistakenly stated). Schmidt Futures rebranded to Schmidt Sciences in 2024; schmidtfutures.org redirects to schmidtsciences.org.",
+      "verdict": "none"
+    },
+    {
+      "id": "5RU37YgFdI",
+      "parentOrgId": "sid_h6ntSGk8fg",
+      "name": "Climate",
+      "divisionType": "program-area",
+      "lead": "jFEUPRnidS",
+      "source": "https://www.schmidtsciences.org/team",
+      "notes": "Lead confirmed on https://www.schmidtsciences.org/team as of 2026-05-29. Heidi Cullen listed as Director, Climate. NOTE: 'Climate' is the canonical name for this division (not 'Earth & Environment' as the PR summary mistakenly stated). Schmidt Sciences has five program areas: AI & Advanced Computing, Astrophysics & Space, Biosciences, Climate, and Science Systems.",
+      "verdict": "none"
+    }
+  ]
+}
