@@ -1,0 +1,84 @@
+---
+wikiId: E1297
+title: Rohin Shah
+description: Research scientist at Google DeepMind working on AI alignment. Founder and former author of the Alignment Newsletter, which from 2018–2022 was the most widely-read summary of AI safety research.
+sidebar:
+  order: 12
+subcategory: safety-researchers
+lastEdited: 2026-05-10
+summary: Biographical profile of Rohin Shah covering his role as a DeepMind alignment researcher and his founding influence on the AI safety community through the Alignment Newsletter (2018–2022). Documents his career trajectory from CHAI under Stuart Russell to DeepMind, his shift from value-learning to scalable-oversight research, and his framing influence on how the alignment problem has been characterized in the field.
+clusters:
+  - ai-safety
+---
+import {DataInfoBox, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Primary Role** | Research Scientist, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> (2020–present) |
+| **Education** | PhD in Computer Science, UC Berkeley (2020), advised by <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> and Anca Dragan at the <EntityLink id="E57" name="chai">Center for Human-Compatible AI (CHAI)</EntityLink> |
+| **Key Contributions** | Founded and authored the Alignment Newsletter (2018–2022, 173+ issues), which became the field's most widely-read summary publication; influential reframer of "the alignment problem" through accessible exposition; co-author on goal-misgeneralization and process-supervision research |
+| **Communication Role** | Among the field's most active synthesizers of alignment research; his "alignment 101" framings on the EA Forum and LessWrong are commonly referenced as introductory material |
+| **Research Themes** | Value learning, reward modeling, scalable oversight, process supervision, goal misgeneralization |
+
+## Overview
+
+<EntityLink id="E1297" name="rohin-shah">Rohin Shah</EntityLink> is an AI alignment researcher who works at <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>. He completed his PhD at UC Berkeley in 2020, advised by <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> and Anca Dragan, with research focused on value learning and the formalization of human preferences. He joined DeepMind in 2020 and works on alignment research within the technical AGI / safety cluster.
+
+Outside his published research, Shah is widely known in the AI safety community for founding and writing the Alignment Newsletter, a weekly summary of AI alignment research that ran from April 2018 through 2022 (173+ issues). At its peak, the newsletter was the most widely-read AI safety publication of its kind and effectively defined what "alignment research" meant for a generation of practitioners entering the field.
+
+## Background
+
+### Education
+
+Shah completed undergraduate work at the University of Virginia and joined Stuart Russell's group at UC Berkeley for his PhD. His Berkeley research, conducted at the <EntityLink id="E57" name="chai">Center for Human-Compatible AI (CHAI)</EntityLink>, focused on inverse reward design, preference learning, and the formalization of human values for AI systems. His dissertation, "Extracting and Using Preferences," extended the cooperative-inverse-reinforcement-learning framework Russell had been developing.
+
+### Pre-DeepMind Research
+
+Notable pre-DeepMind contributions include:
+
+- **"On the Feasibility of Learning, Rather than Assuming, Human Biases for Reward Inference"** (Shah et al., ICML 2019) — examined whether AI systems can learn humans' planning biases rather than presupposing the rational-actor model that earlier inverse-reinforcement-learning methods relied on
+- **"Preferences Implicit in the State of the World"** (Shah et al., ICLR 2019) — argued that the current state of the world encodes implicit human preferences that can serve as a low-cost prior for reward inference
+- **"Goal-Conditioned Reinforcement Learning with Imagined Subgoals"** (Chane-Sane, Shah, et al., ICML 2021)
+
+## Alignment Newsletter (2018–2022)
+
+The Alignment Newsletter was a weekly summary publication that Shah began in April 2018 while still at Berkeley. Each issue summarized recent papers, blog posts, and discussions across the AI safety community, accompanied by Shah's editorial commentary. The newsletter ran through 2022, ultimately publishing 173+ issues; subscriber counts at the peak reportedly exceeded 3,000.
+
+The newsletter's significance was substantial:
+
+- It served as the de facto curriculum for new entrants to the AI safety field — researchers entering the field in 2018–2022 commonly cite it as their primary on-ramp
+- It functioned as a unifying institution for a field that lacked any single conference or journal
+- Shah's editorial choices — what to summarize, which framings to emphasize, what to push back on — shaped which research directions gained traction
+
+Shah stopped writing the newsletter in 2022, citing time constraints and the increased availability of competing summary publications. There has been no widely adopted successor; the field has fragmented into specialized publications and individual Substacks rather than consolidating around any single venue.
+
+## DeepMind Research
+
+At DeepMind, Shah has worked across several alignment research lines:
+
+### Goal Misgeneralization
+
+Shah is a co-author on the influential "Goal Misgeneralization: Why Correct Specifications Aren't Enough For Correct Goals" (Shah et al., 2022) and the related "Goal Misgeneralization in Deep Reinforcement Learning" (Langosco et al., 2022). These papers operationalize the distinction between capability misgeneralization (the agent fails in new situations) and goal misgeneralization (the agent succeeds at pursuing the wrong goal), providing empirical demonstrations across reinforcement-learning environments and LLM behaviors.
+
+### Process Supervision and Scalable Oversight
+
+Shah has contributed to DeepMind's scalable-oversight research line, including work on process supervision (rewarding reasoning steps rather than only outcomes) and reward-model verification.
+
+### Public Articulations of the Alignment Problem
+
+Shah has published extensively on the EA Forum and Alignment Forum framing the alignment problem in ways that have shaped subsequent discussion. His widely-read post "What is the alignment problem?" and his series on the relationship between goal misgeneralization and outer-alignment have been cited as definitive contemporary articulations.
+
+## Style and Public Profile
+
+Shah is characterized by colleagues as one of the more careful expositors in the field. His writing tends to be measured, willing to flag uncertainty, and inclined to steelman opposing views — a style consistent with his Newsletter-era editorial role. He has been more publicly active than typical DeepMind researchers, including engagement with the LessWrong and EA Forum communities and occasional podcast appearances.
+
+He is generally regarded as one of the field's most balanced commentators across the safety-vs-capabilities-mainstream divide, taken seriously by both alignment-focused researchers and mainstream ML academics.
+
+## See Also
+
+- <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>
+- <EntityLink id="E57" name="chai">Center for Human-Compatible AI (CHAI)</EntityLink>
+- <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> — PhD advisor
+- <EntityLink id="E1296" name="victoria-krakovna">Victoria Krakovna</EntityLink> — DeepMind safety colleague

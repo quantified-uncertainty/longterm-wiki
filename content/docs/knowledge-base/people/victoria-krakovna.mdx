@@ -1,0 +1,76 @@
+---
+wikiId: E1296
+title: Victoria Krakovna
+description: Research scientist at Google DeepMind focused on AI safety, specification gaming, and side-effect avoidance. Co-founder of the Future of Life Institute.
+sidebar:
+  order: 11
+subcategory: safety-researchers
+lastEdited: 2026-05-10
+summary: Biographical profile of Victoria Krakovna covering her dual role as a DeepMind safety researcher and co-founder of the Future of Life Institute. Documents her widely-cited 'Specification Gaming Examples' list, her research on impact regularization and side-effect avoidance, and her organizational influence in shaping FLI from its 2014 founding into one of the field's most visible AI-risk organizations.
+clusters:
+  - ai-safety
+---
+import {DataInfoBox, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Primary Role** | Research Scientist, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> (2017–present) |
+| **Co-founding Role** | Co-founder, <EntityLink id="E528" name="fli">Future of Life Institute (FLI)</EntityLink> (2014) |
+| **Key Contributions** | Maintains the widely-cited "Specification Gaming Examples" public list (launched 2018); co-authored DeepMind's seminal 2020 specification-gaming blog post; lead and co-author on impact-regularization and side-effect avoidance papers (Relative Reachability, Attainable Utility Preservation) |
+| **Education** | PhD in Statistics, Harvard University (2017) |
+| **Public Profile** | Active on the Alignment Forum and Twitter/X; collaborates broadly across DeepMind's alignment, agent-safety, and goal-misgeneralization research lines |
+
+## Overview
+
+<EntityLink id="E1296" name="victoria-krakovna">Victoria Krakovna</EntityLink> is an AI safety researcher who works as a Research Scientist at <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> and is a co-founder of the <EntityLink id="E528" name="fli">Future of Life Institute</EntityLink>. Her academic background is in statistics — she completed her PhD at Harvard in 2017 — and her research at DeepMind has centered on specification gaming, side effects, goal misgeneralization, and impact regularization as approaches to making reinforcement-learning agents safer.
+
+She is most widely known among practitioners for maintaining a public "Specification Gaming Examples" list, a continuously updated catalog of real-world cases where AI systems found unintended ways to satisfy their formal objectives. The list is a frequent reference in introductory AI safety material and has been cited in research papers, talks, and policy briefings as evidence that reward hacking is not a theoretical concern.
+
+## Background
+
+### Education
+
+Krakovna completed undergraduate work in mathematics at the University of Toronto before pursuing a PhD in Statistics at Harvard University, which she finished in 2017. Her doctoral work focused on interpretable machine learning, including the development of "Interpretable Decision Sets" — a rule-based model designed to be human-readable while remaining competitive with black-box methods. This early work on interpretability prefigures themes that would recur in her later safety research.
+
+### Co-founding the Future of Life Institute (2014)
+
+In 2014, Krakovna co-founded the <EntityLink id="E528" name="fli">Future of Life Institute</EntityLink> along with Max Tegmark, Jaan Tallinn, Anthony Aguirre, and Meia Chita-Tegmark. FLI was conceived as a nonprofit organization focused on existential risk, with AI as one of several risk categories alongside biosecurity, nuclear weapons, and climate change.
+
+FLI's early work included the 2015 open letter on AI safety signed by Stephen Hawking, Elon Musk, and many leading AI researchers, and the subsequent Puerto Rico conference series that helped legitimize AI safety as a mainstream research topic. Krakovna's role in FLI has been research-oriented and advisory rather than executive — Tegmark and others have led day-to-day operations — but she retains a board-level connection.
+
+## Research at DeepMind
+
+Krakovna joined Google DeepMind in 2017 and is part of the technical AGI / alignment research cluster. Her published research has clustered around several themes:
+
+### Specification Gaming
+
+In 2018, Krakovna began maintaining a public spreadsheet collecting examples of specification gaming — instances where AI systems found ways to satisfy the literal specification of their objective without achieving the intended outcome. The list (initially hosted as a Google Doc, later moved to her personal website) has grown to include over 60 cases ranging from simple reward-hacking in Atari to evolved-circuit exploits and reinforcement-learning-from-human-feedback failure modes.
+
+A 2020 DeepMind blog post she co-authored — "Specification gaming: the flip side of AI ingenuity" — formalized the concept and articulated the standard definition: "a behaviour that satisfies the literal specification of an objective without achieving the intended outcome." The blog post was co-authored with <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>, Jonathan Uesato, Vladimir Mikulik, Matthew Rahtz, Tom Everitt, Ramana Kumar, Zac Kenton, and <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>.
+
+### Side Effects and Impact Regularization
+
+Krakovna has been a lead author on a series of papers developing impact-regularization methods designed to reduce unintended side effects from reinforcement-learning agents:
+
+- **"Penalizing Side Effects using Stepwise Relative Reachability"** (Krakovna et al., 2018) — proposes measuring side effects as the reduction in the set of future states the environment can reach
+- **"Avoiding Side Effects By Considering Future Tasks"** (Krakovna et al., 2020) — refines the framework to handle multi-task environments
+- **Contribution to "Attainable Utility Preservation"** (with Alexander Turner et al.) — a related framework that penalizes actions reducing the agent's ability to satisfy arbitrary alternative objectives
+
+These methods have not been deployed at scale in production systems, but they have shaped the conceptual vocabulary for discussing impact-regularization and remain frequently cited in alignment research.
+
+### Goal Misgeneralization
+
+Krakovna co-authored "Goal Misgeneralization in Deep Reinforcement Learning" (Langosco et al., 2022) and subsequent work distinguishing capability misgeneralization (the agent fails to act competently in new situations) from goal misgeneralization (the agent acts competently but in pursuit of a goal different from what the training objective intended). The distinction has been useful in alignment discussions as a way to operationalize "the model is competent but pursuing the wrong objective."
+
+## Public Communication
+
+Krakovna writes regularly on the Alignment Forum and LessWrong on alignment-research topics. Her posts on specification gaming, mesa-optimization, and her annual "AI alignment research overview" series are frequently linked as introductory material. She is generally regarded as one of the more accessible communicators inside DeepMind's safety team, alongside <EntityLink id="E1297" name="rohin-shah">Rohin Shah</EntityLink> and <EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink>.
+
+## See Also
+
+- <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>
+- <EntityLink id="E528" name="fli">Future of Life Institute</EntityLink>
+- <EntityLink id="E1297" name="rohin-shah">Rohin Shah</EntityLink> — DeepMind safety colleague
+- <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> — former DeepMind collaborator on specification gaming
