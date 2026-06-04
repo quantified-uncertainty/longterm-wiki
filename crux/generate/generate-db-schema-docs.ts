@@ -24,17 +24,16 @@
 
 import { readFileSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { join } from "path";
 import {
   introspectSchema,
   type SchemaIntrospection,
   type TableInfo,
 } from "../../apps/wiki-server/src/schema-introspect.ts";
+import { PROJECT_ROOT } from "../lib/content-types.ts";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..", "..");
-const SCHEMA_PATH = join(ROOT, "apps/wiki-server/src/schema.ts");
-const OUTPUT_PATH = join(ROOT, "content/docs/internal/db-schema-reference.mdx");
+const SCHEMA_PATH = join(PROJECT_ROOT, "apps/wiki-server/src/schema.ts");
+const OUTPUT_PATH = join(PROJECT_ROOT, "content/docs/internal/db-schema-reference.mdx");
 
 const WIKI_ID = "E2581";
 /** Frontmatter line ignored when diffing for staleness (it carries a date). */
@@ -110,13 +109,8 @@ function buildErDiagram(tables: TableInfo[]): string {
   const lines: string[] = ["erDiagram"];
 
   // Entity boxes: PK columns only — full columns live in the reference tables.
+  // A table with no PK renders as an empty box (the loop body just doesn't run).
   for (const t of tables) {
-    if (t.primaryKeyColumns.length === 0) {
-      // No primary key — render an empty entity box.
-      lines.push(`  ${mermaidEntity(t.tableName)} {`);
-      lines.push("  }");
-      continue;
-    }
     lines.push(`  ${mermaidEntity(t.tableName)} {`);
     for (const pk of t.primaryKeyColumns) {
       const col = t.columns.find((c) => c.name === pk);
@@ -194,10 +188,10 @@ export function generateMdx(
     if (!bySection.has(sec)) bySection.set(sec, []);
     bySection.get(sec)!.push(t);
   }
-  const orderedSections = [
-    ...sections.filter((s) => bySection.has(s)),
-    ...[...bySection.keys()].filter((s) => !sections.includes(s)).sort(),
-  ];
+  // `sections` already contains every section parseSections assigned (it seeds
+  // DEFAULT_SECTION and appends each discovered title), so filtering it to the
+  // sections that have tables yields the complete, source-ordered list.
+  const orderedSections = sections.filter((s) => bySection.has(s));
 
   const lines: string[] = [];
 
