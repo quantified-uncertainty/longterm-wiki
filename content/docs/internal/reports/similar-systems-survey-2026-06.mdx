@@ -1,0 +1,63 @@
+---
+wikiId: E3750
+title: "Similar Systems Survey: longterm-wiki (June 2026)"
+description: "Research survey comparing longterm-wiki's architecture against external systems — LLM encyclopedias, structured knowledge bases, claim-vs-URL verification tools, AI-landscape datasets, and agent-fleet maintenance — finding that no external system combines even two of the wiki's core pillars."
+sidebar:
+  order: 35
+subcategory: research
+lastEdited: "2026-06-09"
+createdAt: "2026-06-09"
+evergreen: false
+summary: "Five-angle deep-research survey (22 sources, 110 claims, 25 adversarially verified via 3-vote panels) finding that while individual components have analogs — STORM/WikiCrow for drafting, Wikibase/TerminusDB for structured facts, SemanticCite for claim-vs-cited-URL verification — no system combines continuous post-publication maintenance, per-claim URL verification with stored verdicts, and a typed temporal fact base. The integrated thing appears to be without precedent. Includes cost-reduction finding: MiniCheck (770M params) achieves GPT-4-level fact-checking at ~400× lower cost."
+---
+
+*2026-06-09. Deep-research workflow: 5 search angles, 22 sources fetched, 110 claims extracted, 25 adversarially verified by 3-vote panels (24 confirmed, 1 refuted). Full verified findings with vote counts preserved in session transcript (run wf_3a230157-073).*
+
+## Bottom line
+
+**Every individual pillar of longterm-wiki has at least one external analog, but no system combines even two of them.** The integrated thing — a public, domain-specific encyclopedia where agents maintain articles *post-publication*, every claim is re-verified against its specific cited URL with stored verdicts, and prose is coupled to a typed temporal fact base — appears to be without precedent. The reinvented parts are the storage layer, the verdict taxonomy, and first-draft generation.
+
+## (a) LLM-written encyclopedias — mature, but generation-only
+
+- **Stanford STORM / Co-STORM** (MIT, ~28.3k stars, NAACL 2024, 70k+ hosted-preview users [self-reported]): closest analog to the article-drafting pipeline — full Wikipedia-style cited articles from internet research. Its README positions it as a *pre-writing aid*; "cannot produce publication-ready articles." No maintenance, no per-claim verification. Development slowed (last push ~Sept 2025). **Could feed the drafting stage.**
+- **FutureHouse WikiCrow** (built on PaperQA2): strongest validation of the core premise — in blinded PhD-level grading, generated gene articles beat human Wikipedia on citation support (83.0% cited-and-supported vs 61.5%; 3.9× fewer uncited statements; precision 86.1% vs 71.2%, arXiv 2409.13740). Domain-specific, not adoptable. Note "accuracy" = citation support rate, not broad factual correctness. **REFUTED claim (0-3 vote): ContraCrow as productized contradiction-detection at scale — do not cite.**
+- **LLM Wiki** (nashsu/llm_wiki, GPL-3, ~11k stars, active): implements Karpathy's LLM-maintained-wiki pattern — proves the *maintenance* pattern has implementations, but it's a personal desktop KB over your own documents; no citation verification, no publishing.
+- **WikiAutoGen** (KAUST, ICCV 2025): multimodal extension of the STORM lineage; paper-companion prototype (26 stars). Field active, not adoptable.
+
+## (b) Structured knowledge bases with provenance — two credible candidates, neither has verdicts
+
+- **Wikibase** (Wikimedia Deutschland; powers Wikidata since 2012; funded through Plan 2026): natively has the FactBase shape — statements with qualifiers (temporal scoping) and per-statement references (provenance). Available as Wikibase Cloud (SaaS, novice, limited customization) or Wikibase Suite (self-hosted Docker, expert, high customization). Does NOT model per-claim LLM source-check verdicts (schema extension needed). Adoption would cost the YAML-in-git workflow the agent/validation apparatus depends on.
+- **TerminusDB** (Apache 2.0; DFRNT took over maintainership 2025; v12 Dec 2025, patches through v12.0.5 Mar 2026): git-like branch/merge versioning over JSON/RDF + temporal interval reasoning (Allen's algebra) — conceptually a fit for "agents edit facts on branches." Provenance is commit-level, not per-claim-citation; verdicts need modeling.
+
+**Verdict: don't migrate the fact store now. Revisit only if ADR-0002 lands on "replace."**
+
+## (c) Claim-vs-cited-source verification — convergent reinvention, and the most defensible component
+
+- **SemanticCite** (arXiv 2511.16198, Nov 2025; MIT; semanticcite.com): the near-twin — verifies claims against the full text of *the author's own cited source*, emits a four-class verdict taxonomy (Supported / Partially Supported / Unsupported / Uncertain) with confidence + evidence snippets, mapping ~1:1 onto longterm-wiki's confirmed/partial/contradicted/unverifiable (lt-wiki adds `outdated`/`unchecked`). Single-author, ~21 stars, benchmarked on academic PDFs — unproven on web URLs or continuous loops.
+- **Google DeepMind SAFE** (long-form-factuality, Apache 2.0): validated the atomic-claim pattern (split→self-contain→verify via search; 72% agreement with human raters, won 76% of disagreements — baseline is *crowdworkers*, 2-1 vote on the "superhuman" framing). Grounds in search results, not cited URLs. Frozen since April 2024.
+- **Loki/OpenFactVerification** (Libr-AI, MIT, COLING 2025 demo): full decompose→check→verify pipeline but retrieval-based; dormant since Oct 2024. **OpenFactCheck** (EMNLP 2024, MIT): research framework integrating FacTool/RARR/FactcheckGPT; demo-grade.
+- **Webcite** (webcite.co, live, \$20/mo tier): commercial claim-checking, but retrieval against its own indexed corpus — answers "is this claim true?", not "does the cited source support it?" All claims vendor self-description (medium confidence).
+- **Cost finding (medium confidence, 2-1 vote)**: per-claim verification likely doesn't need frontier-model spend — SemanticCite reports fine-tuned lightweight models at ~84% weighted accuracy; corroborated by **MiniCheck** (EMNLP 2024): 770M Flan-T5 at GPT-4-level fact-checking, ~400× cheaper. **Action: benchmark a MiniCheck/SemanticCite-class small model against the current sourcing pipeline spend.**
+
+## (d) AI-landscape datasets — research gap
+
+**No claims survived verification** for this angle (sources fetched: epoch.ai/data, epoch.ai/data/ai-companies, aisafety.com/map). The build-vs-buy conclusion here rests on absence of evidence. **Recommended follow-up**: focused pass on Epoch AI / OpenAlex / Crunchbase / AI Incident Database / Stampy / LW-EAF wikis as potential *upstream feeds* into TableBase — ingesting maintained upstream data is cheaper than agent-curating it.
+
+## (e) Agent-fleet-maintained wikis/codebases — research gap
+
+**Zero verified findings** (sources fetched included Steve Yegge's gastown agent-fleet orchestrator). The crux gate + slot fleet + groundskeeper architecture has no packaged equivalent this research could substantiate.
+
+## Build-vs-adopt assessment
+
+| Component | Verdict |
+|---|---|
+| The integrated system + continuous maintenance loop | **Genuinely novel — keep building.** Possibly publishable as a pattern ("continuously re-verified encyclopedia") — WikiCrow and SemanticCite each have half; nobody has the running system |
+| Claim-vs-cited-URL verification at scale | No mature replacement; steal models/patterns (MiniCheck, SemanticCite taxonomy alignment), keep orchestration |
+| Fact store storage layer | Reinvention with viable candidates (Wikibase, TerminusDB) — but adoption costs the git/YAML workflow; don't migrate now |
+| Article first-draft generation | Reinvention — STORM/WikiCrow-style generation could feed the drafting stage |
+| Verdict taxonomy | Convergent reinvention of SemanticCite's; consider aligning naming for interoperability |
+| Agent-fleet + validation-gate maintenance | No off-the-shelf equivalent found |
+
+## Caveats (from the verification stage)
+
+Questions (d) and (e) returned no verified claims — absence of evidence, not verified negatives. Webcite findings rest entirely on vendor copy; STORM's 70k users is self-reported; SemanticCite/SAFE numbers are self-reported/unreplicated (cost-feasibility and superhuman-quality claims each carried 2-1 split votes). Field moves fast — SemanticCite, TerminusDB 12, and LLM Wiki are all under a year old; maturity assessments reflect June 2026. "Productized" for SemanticCite means public repo + hosted site, not demonstrated adoption.
