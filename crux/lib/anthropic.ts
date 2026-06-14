@@ -18,6 +18,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { config } from 'dotenv';
 import { getApiKey } from './api-keys.ts';
+import { recordDirectCall } from './llm-usage/capture-payload.ts';
 
 // Load environment variables from multiple possible locations
 config({ path: '.env' });
@@ -143,6 +144,16 @@ export async function callClaude(client: Anthropic, {
         return '';
       })
       .join('\n');
+
+    // Direct SDK call (bypasses streamingCreate) — record cost + capture
+    // request/response so this flow is logged like the streaming ones.
+    recordDirectCall({
+      model: modelId,
+      request: { system: systemPrompt, messages: [{ role: 'user', content: userPrompt }], max_tokens: maxTokens, temperature },
+      responseText: text,
+      usage: response.usage,
+      label: 'callClaude',
+    });
 
     return {
       text,

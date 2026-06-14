@@ -11,6 +11,7 @@ import { appendEditLog } from '../../lib/session/edit-log.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import { ensureMdxSafeYaml } from '../../lib/yaml-mdx-safe.ts';
 import { extractText } from '../../lib/llm.ts';
+import { recordDirectCall } from '../../lib/llm-usage/capture-payload.ts';
 import { READER_IMPORTANCE_GUIDELINES, TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';
 import type { TopicPhaseContext } from './types.ts';
 
@@ -156,6 +157,14 @@ Respond with JSON:
     });
 
     const text = extractText(response);
+    // Direct SDK call — record cost + capture so grading is logged too.
+    recordDirectCall({
+      model: MODELS.sonnet,
+      request: { system: GRADING_SYSTEM_PROMPT, max_tokens: 800, messages: [{ role: 'user', content: userPrompt }] },
+      responseText: text,
+      usage: response.usage,
+      label: 'grading',
+    });
     if (!text) {
       return { success: false, error: 'Expected text response from API' };
     }

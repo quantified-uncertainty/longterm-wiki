@@ -18,7 +18,7 @@
  */
 
 import { recordLlmPayload } from '../wiki-server/llm-payloads.ts';
-import { getAmbientContext } from './ambient-tracker.ts';
+import { getAmbientContext, recordAmbient } from './ambient-tracker.ts';
 
 // No size cap: payloads are stored whole. Postgres text/jsonb handle multi-MB
 // values fine, and a clipped prompt is useless for replay — so we'd rather
@@ -86,4 +86,36 @@ export function capturePayload(input: CapturePayloadInput): void {
       `[llm-usage] capturePayload failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
     );
   }
+}
+
+/**
+ * Instrument a direct `client.messages.create` call — the ones that bypass
+ * streamingCreate. Records cost into the ambient tracker (1a) and captures the
+ * request/response (1b), mirroring what streamingCreate does automatically.
+ * Call this right after the SDK call at each direct site. Best-effort; never
+ * throws (both callees swallow their own errors).
+ *
+ * `model` must be the resolved model id. `responseText` is the already-extracted
+ * completion text. `usage` is the SDK response's `.usage`.
+ */
+export function recordDirectCall(args: {
+  model: string;
+  request: Record<string, unknown>;
+  responseText: string;
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_creation_input_tokens?: number | null;
+    cache_read_input_tokens?: number | null;
+  };
+  label?: string;
+}): void {
+  recordAmbient(args.model, args.usage, args.label);
+  capturePayload({
+    model: args.model,
+    request: args.request,
+    response: args.responseText,
+    usage: args.usage,
+    label: args.label,
+  });
 }
