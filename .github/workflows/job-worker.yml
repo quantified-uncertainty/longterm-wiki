@@ -48,6 +48,10 @@ permissions:
 env:
   LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
   LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+  # Sampling rate for LLM request/response payload capture (model-swap eval).
+  # Driven by the repo variable so it can be tuned without a workflow change;
+  # empty/unset = off. Set vars.LLM_PAYLOAD_CAPTURE_RATE to 1 to capture all.
+  LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
 
 jobs:
   paused-notice:
