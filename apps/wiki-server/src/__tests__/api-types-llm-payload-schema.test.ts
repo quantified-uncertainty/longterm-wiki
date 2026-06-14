@@ -6,11 +6,7 @@
  * are rejected (server-side backstop to the logger's own truncation).
  */
 import { describe, it, expect } from "vitest";
-import {
-  RecordLlmPayloadSchema,
-  MAX_LLM_PAYLOAD_REQUEST_BYTES,
-  MAX_LLM_PAYLOAD_RESPONSE_CHARS,
-} from "../api-types.js";
+import { RecordLlmPayloadSchema } from "../api-types.js";
 
 describe("RecordLlmPayloadSchema", () => {
   const baseValid = {
@@ -41,18 +37,13 @@ describe("RecordLlmPayloadSchema", () => {
     expect(RecordLlmPayloadSchema.safeParse(noModel).success).toBe(false);
   });
 
-  it("rejects a request that serializes over the byte cap", () => {
-    const big = { blob: "x".repeat(MAX_LLM_PAYLOAD_REQUEST_BYTES + 100) };
-    const r = RecordLlmPayloadSchema.safeParse({ ...baseValid, request: big });
-    expect(r.success).toBe(false);
-  });
-
-  it("rejects a response over the char cap", () => {
+  it("accepts a large request/response (no size cap — stored whole)", () => {
     const r = RecordLlmPayloadSchema.safeParse({
       ...baseValid,
-      response: "x".repeat(MAX_LLM_PAYLOAD_RESPONSE_CHARS + 1),
+      request: { blob: "x".repeat(500_000) },
+      response: "x".repeat(500_000),
     });
-    expect(r.success).toBe(false);
+    expect(r.success).toBe(true);
   });
 
   it("rejects a malformed runId", () => {

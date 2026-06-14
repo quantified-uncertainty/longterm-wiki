@@ -71,10 +71,12 @@ describe('capturePayload', () => {
     expect(mockRecord).toHaveBeenCalledTimes(1);
   });
 
-  it('skips (does not clip) oversize calls so the corpus stays replayable', () => {
+  it('captures large payloads whole (no size cap)', () => {
     process.env.LLM_PAYLOAD_CAPTURE_RATE = '1';
-    capturePayload({ ...baseInput, response: 'x'.repeat(300_000) });
-    expect(mockRecord).not.toHaveBeenCalled();
+    const big = 'x'.repeat(300_000);
+    capturePayload({ ...baseInput, response: big });
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockRecord.mock.calls[0][0].response).toBe(big);
   });
 
   it('never throws when the POST rejects', () => {

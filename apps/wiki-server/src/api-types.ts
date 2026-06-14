@@ -1737,13 +1737,10 @@ export const EndPipelineRunSchema = z.object({
 });
 export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
 
-// Model-swap eval step 1b: captured LLM request/response bodies. The crux
-// logger truncates request + response to a size cap before sending (and sets
-// `truncated`); these server-side bounds are a backstop so a misbehaving caller
-// can't post unbounded rows into the table.
-export const MAX_LLM_PAYLOAD_REQUEST_BYTES = 262_144; // 256 KiB
-export const MAX_LLM_PAYLOAD_RESPONSE_CHARS = 262_144; // 256 Ki chars
-
+// Model-swap eval step 1b: captured LLM request/response bodies. Stored whole
+// — no size cap. Postgres text/jsonb handle multi-MB values fine, and a clipped
+// prompt is useless for replay. Capture is sampled + off by default, so volume
+// is bounded by the sample rate rather than a per-row size limit.
 export const RecordLlmPayloadSchema = z.object({
   // Soft reference to the pipeline_runs row (no FK). Null when the call ran
   // outside any withPipelineRun lifecycle.
@@ -1752,12 +1749,8 @@ export const RecordLlmPayloadSchema = z.object({
   label: z.string().max(200).nullable().optional(),
   model: z.string().min(1).max(200),
   viaOpenrouter: z.boolean().optional(),
-  request: z
-    .record(z.unknown())
-    .refine((v) => jsonByteSize(v) <= MAX_LLM_PAYLOAD_REQUEST_BYTES, {
-      message: `request must serialize to <= ${MAX_LLM_PAYLOAD_REQUEST_BYTES} bytes`,
-    }),
-  response: z.string().max(MAX_LLM_PAYLOAD_RESPONSE_CHARS),
+  request: z.record(z.unknown()),
+  response: z.string(),
   tokensInput: TokenCountSchema,
   tokensOutput: TokenCountSchema,
 });

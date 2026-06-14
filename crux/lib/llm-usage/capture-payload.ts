@@ -20,16 +20,10 @@
 import { recordLlmPayload } from '../wiki-server/llm-payloads.ts';
 import { getAmbientContext } from './ambient-tracker.ts';
 
-// Keep in lockstep with the server-side backstop in api-types.ts
-// (MAX_LLM_PAYLOAD_REQUEST_BYTES / MAX_LLM_PAYLOAD_RESPONSE_CHARS).
-//
-// We do NOT truncate: a clipped prompt is useless for replay (you can't
-// faithfully re-run a half prompt through a candidate model). Instead, if a
-// call exceeds the cap we SKIP capturing it entirely and log — the corpus only
-// ever holds complete, replayable rows. The cap is set high so this is rare;
-// it's a safety valve against a pathological multi-MB row, not normal clipping.
-const MAX_REQUEST_BYTES = 200_000;
-const MAX_RESPONSE_CHARS = 200_000;
+// No size cap: payloads are stored whole. Postgres text/jsonb handle multi-MB
+// values fine, and a clipped prompt is useless for replay — so we'd rather
+// store the full thing. Capture is sampled and off by default, so the corpus
+// stays bounded by the sample rate, not a per-row clip.
 
 /** Sample rate from env, clamped to [0, 1]. 0 (or unset/invalid) = capture off. */
 function captureRate(): number {
@@ -38,14 +32,6 @@ function captureRate(): number {
   const n = Number.parseFloat(raw);
   if (!Number.isFinite(n) || n <= 0) return 0;
   return n >= 1 ? 1 : n;
-}
-
-function byteSize(value: unknown): number {
-  try {
-    return Buffer.byteLength(JSON.stringify(value), 'utf8');
-  } catch {
-    return Number.POSITIVE_INFINITY;
-  }
 }
 
 export interface CapturePayloadInput {
@@ -69,15 +55,6 @@ export function capturePayload(input: CapturePayloadInput): void {
     const rate = captureRate();
     if (rate <= 0) return;
     if (rate < 1 && Math.random() >= rate) return;
-
-    // Skip (don't clip) anything over the cap — a partial prompt can't be
-    // replayed faithfully, so we'd rather have no row than a corrupt one.
-    if (byteSize(input.request) > MAX_REQUEST_BYTES || input.response.length > MAX_RESPONSE_CHARS) {
-      console.warn(
-        `[llm-usage] payload skipped (over size cap, kept whole-or-nothing for replay): model=${input.model} flow=${getAmbientContext()?.flow ?? 'none'}`,
-      );
-      return;
-    }
 
     const ctx = getAmbientContext();
 
