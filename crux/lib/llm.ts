@@ -24,6 +24,7 @@ import { createClient, MODELS, resolveModel } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
 import type { CostTracker } from './cost-tracker.ts';
 import { recordAmbient, recordAmbientExternalCost } from './llm-usage/ambient-tracker.ts';
+import { capturePayload } from './llm-usage/capture-payload.ts';
 import { getApiKey } from './api-keys.ts';
 import { OpenRouterChatResponseSchema } from './openrouter-schemas.ts';
 
@@ -139,6 +140,20 @@ export async function streamingCreate(
     }
   }
 
+  // Capture request/response for replay (sampled, off by default, best-effort).
+  capturePayload({
+    model: params.model,
+    request: {
+      system: params.system,
+      messages: params.messages,
+      max_tokens: params.max_tokens,
+      temperature: params.temperature,
+    },
+    response: extractText(message),
+    usage: message.usage,
+    label: options?.label,
+  });
+
   return message;
 }
 
@@ -245,6 +260,21 @@ async function callOpenRouterAsAnthropic(
       `[llm-usage] OpenRouter cost record failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
     );
   }
+
+  // Capture request/response for replay (sampled, off by default, best-effort).
+  capturePayload({
+    model,
+    request: {
+      system: params.system,
+      messages: params.messages,
+      max_tokens: params.max_tokens,
+      temperature: params.temperature,
+    },
+    response: text,
+    usage,
+    viaOpenrouter: true,
+    label: options?.label,
+  });
 
   // Return Anthropic-compatible message shape
   return {

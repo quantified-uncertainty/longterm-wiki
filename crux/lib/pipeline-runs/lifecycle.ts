@@ -47,7 +47,7 @@ import {
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
 import { CostTracker } from '../cost-tracker.ts';
-import { runWithAmbientTracker } from '../llm-usage/ambient-tracker.ts';
+import { runWithAmbientContext } from '../llm-usage/ambient-tracker.ts';
 import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
 import { parseAgentSessionId } from './agent-session-id.ts';
 
@@ -154,7 +154,10 @@ export async function withPipelineRun<T>(
           { runId, pipelineName: options.pipelineName },
         );
       }
-      return runWithAmbientTracker(tracker, () => body(makeOfflineCtx(runId)));
+      return runWithAmbientContext(
+        { tracker, flow: options.pipelineName, runId },
+        () => body(makeOfflineCtx(runId)),
+      );
     }
 
     throw new Error(
@@ -223,7 +226,10 @@ export async function withPipelineRun<T>(
   if (typeof heartbeatTimer.unref === 'function') heartbeatTimer.unref();
 
   try {
-    const result = await runWithAmbientTracker(tracker, () => body(ctx));
+    const result = await runWithAmbientContext(
+      { tracker, flow: options.pipelineName, runId },
+      () => body(ctx),
+    );
     clearInterval(heartbeatTimer);
     await finalize({
       runId,

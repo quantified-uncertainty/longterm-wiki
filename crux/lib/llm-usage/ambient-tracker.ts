@@ -20,16 +20,42 @@
 import { AsyncLocalStorage } from 'async_hooks';
 import type { CostTracker } from '../cost-tracker.ts';
 
-const storage = new AsyncLocalStorage<CostTracker>();
+/**
+ * The ambient context threaded through a pipeline body: the cost tracker plus
+ * the flow name and run id, so both cost recording (1a) and payload capture
+ * (1b) can attribute a call without the call site passing anything.
+ */
+export interface AmbientContext {
+  tracker: CostTracker;
+  /** Pipeline/flow name (pipeline_runs.pipeline_name). */
+  flow?: string;
+  /** The pipeline run id, for joining captured payloads back to the run. */
+  runId?: string;
+}
 
-/** Run `fn` with `tracker` set as the ambient tracker for the async context. */
+const storage = new AsyncLocalStorage<AmbientContext>();
+
+/** Run `fn` with `ctx` set as the ambient context for the async context. */
+export function runWithAmbientContext<T>(ctx: AmbientContext, fn: () => T): T {
+  return storage.run(ctx, fn);
+}
+
+/**
+ * Run `fn` with just a tracker set (no flow/runId). Kept for callers/tests that
+ * only care about cost recording.
+ */
 export function runWithAmbientTracker<T>(tracker: CostTracker, fn: () => T): T {
-  return storage.run(tracker, fn);
+  return storage.run({ tracker }, fn);
+}
+
+/** The full ambient context for the current async context, or undefined. */
+export function getAmbientContext(): AmbientContext | undefined {
+  return storage.getStore();
 }
 
 /** The ambient tracker for the current async context, or undefined. */
 export function getAmbientTracker(): CostTracker | undefined {
-  return storage.getStore();
+  return storage.getStore()?.tracker;
 }
 
 /**
@@ -51,7 +77,7 @@ export function recordAmbient(
   label?: string,
 ): void {
   try {
-    const tracker = storage.getStore();
+    const tracker = storage.getStore()?.tracker;
     if (!tracker) return;
     tracker.record(model, usage, label);
   } catch (err) {
@@ -68,7 +94,7 @@ export function recordAmbient(
  */
 export function recordAmbientExternalCost(model: string, cost: number, label: string): void {
   try {
-    const tracker = storage.getStore();
+    const tracker = storage.getStore()?.tracker;
     if (!tracker) return;
     tracker.recordExternalCost(model, cost, label);
   } catch (err) {

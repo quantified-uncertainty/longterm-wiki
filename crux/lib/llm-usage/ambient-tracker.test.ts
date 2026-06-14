@@ -6,6 +6,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { CostTracker } from '../cost-tracker.ts';
 import {
   runWithAmbientTracker,
+  runWithAmbientContext,
+  getAmbientContext,
   getAmbientTracker,
   recordAmbient,
   recordAmbientExternalCost,
@@ -20,6 +22,17 @@ describe('ambient-tracker', () => {
     });
     // Restored after the context exits.
     expect(getAmbientTracker()).toBeUndefined();
+  });
+
+  it('runWithAmbientContext exposes flow + runId', () => {
+    const tracker = new CostTracker();
+    runWithAmbientContext({ tracker, flow: 'source-discover', runId: 'r-9' }, () => {
+      const ctx = getAmbientContext();
+      expect(ctx?.flow).toBe('source-discover');
+      expect(ctx?.runId).toBe('r-9');
+      expect(getAmbientTracker()).toBe(tracker);
+    });
+    expect(getAmbientContext()).toBeUndefined();
   });
 
   it('recordAmbient records into the ambient tracker', () => {
