@@ -13,8 +13,9 @@
  *   - Best-effort & fire-and-forget. The POST is never awaited in the hot
  *     path and any failure is logged and swallowed — capture must never add
  *     latency to, or break, a real LLM call.
- *   - Bounded. request + response are truncated to a size cap before sending;
- *     `truncated` records whether that happened.
+ *   - Bounded by sampling, not clipping. Payloads are stored whole (no size
+ *     cap, no truncation) because a clipped prompt can't be replayed; volume
+ *     is kept in check by the sample rate, which is off by default.
  */
 
 import { recordLlmPayload } from '../wiki-server/llm-payloads.ts';
