@@ -1737,6 +1737,25 @@ export const EndPipelineRunSchema = z.object({
 });
 export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
 
+// Model-swap eval step 1b: captured LLM request/response bodies. Stored whole
+// — no size cap. Postgres text/jsonb handle multi-MB values fine, and a clipped
+// prompt is useless for replay. Capture is sampled + off by default, so volume
+// is bounded by the sample rate rather than a per-row size limit.
+export const RecordLlmPayloadSchema = z.object({
+  // Soft reference to the pipeline_runs row (no FK). Null when the call ran
+  // outside any withPipelineRun lifecycle.
+  runId: z.string().min(1).max(128).regex(PIPELINE_RUN_ID_RE).nullable().optional(),
+  flow: z.string().max(200).nullable().optional(),
+  label: z.string().max(200).nullable().optional(),
+  model: z.string().min(1).max(200),
+  viaOpenrouter: z.boolean().optional(),
+  request: z.record(z.unknown()),
+  response: z.string(),
+  tokensInput: TokenCountSchema,
+  tokensOutput: TokenCountSchema,
+});
+export type RecordLlmPayload = z.infer<typeof RecordLlmPayloadSchema>;
+
 // ---------------------------------------------------------------------------
 // Monitoring / Incident Tracking
 // ---------------------------------------------------------------------------

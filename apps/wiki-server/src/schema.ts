@@ -1491,6 +1491,51 @@ export const pipelineRuns = pgTable(
   ]
 );
 
+// Captured LLM request/response bodies for the model-swap evaluation
+// (step 1b). One row per sampled API call: the prompt we sent and the
+// completion we got back, plus model + token usage, so we can later replay
+// the same prompts through candidate models and compare quality.
+//
+// Capture is OFF by default and sampled (see LLM_PAYLOAD_CAPTURE_RATE in the
+// crux logger) — this table only fills when we deliberately turn it on to
+// gather a corpus. `run_id` ties a payload back to its pipeline_runs row, but
+// there's no hard FK: a payload must never be lost just because the run row
+// is gone, and capture must never block on referential integrity.
+export const llmCallPayloads = pgTable(
+  "llm_call_payloads",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    // Pipeline run this call belongs to (soft reference, no FK). Null when the
+    // call happened outside any withPipelineRun lifecycle.
+    runId: text("run_id"),
+    // Flow / pipeline name the call was attributed to (ambient context).
+    flow: text("flow"),
+    // Per-call grouping label (e.g. "verify", "rewrite_section").
+    label: text("label"),
+    // Canonical model id the request used (e.g. "claude-haiku-4-5-20251001").
+    model: text("model").notNull(),
+    // Whether this call went through OpenRouter instead of the Anthropic SDK.
+    viaOpenrouter: boolean("via_openrouter").notNull().default(false),
+    // The request we sent: system + messages (and key params). Stored whole —
+    // the logger skips (does not clip) calls over its size cap so every row is
+    // a complete, replayable prompt.
+    request: jsonb("request").$type<Record<string, unknown>>().notNull(),
+    // The model's response text, stored whole (same whole-or-nothing rule).
+    response: text("response").notNull(),
+    tokensInput: integer("tokens_input"),
+    tokensOutput: integer("tokens_output"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_llm_call_payloads_flow").on(table.flow),
+    index("idx_llm_call_payloads_model").on(table.model),
+    index("idx_llm_call_payloads_run_id").on(table.runId),
+    index("idx_llm_call_payloads_created_at").on(table.createdAt),
+  ]
+);
+
 // QUA-1071 — sourcing attempt ledger.
 //
 // The backfill-sources job re-queries the missing-sources endpoint every

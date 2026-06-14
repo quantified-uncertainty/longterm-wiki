@@ -59,6 +59,7 @@ import { autoUpdateRunsRoute } from "./routes/operational/auto-update-runs.js";
 import { autoUpdateNewsRoute } from "./routes/operational/auto-update-news.js";
 import { groundskeeperRunsRoute } from "./routes/operational/groundskeeper-runs.js";
 import { pipelineRunsRoute } from "./routes/operational/pipeline-runs.js";
+import { llmPayloadsRoute } from "./routes/operational/llm-payloads.js";
 import { githubIssuesRoute } from "./routes/operational/github-issues.js";
 import { githubPullsRoute } from "./routes/operational/github-pulls.js";
 import { monitoringRoute } from "./routes/operational/monitoring.js";
@@ -249,6 +250,7 @@ export function createApp() {
   app.route("/api/github/pulls", githubPullsRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
   app.route("/api/pipeline-runs", pipelineRunsRoute);
+  app.route("/api/llm-payloads", llmPayloadsRoute);
   app.route("/api/monitoring", monitoringRoute);
   app.route("/api/build-metrics", buildMetricsRoute);
   app.route("/api/qa-checks", qaChecksRoute);
