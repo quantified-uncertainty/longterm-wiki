@@ -46,7 +46,8 @@ import {
   endPipelineRun,
   type PipelineRunEndStatus,
 } from '../wiki-server/pipeline-runs.ts';
-import type { CostTracker } from '../cost-tracker.ts';
+import { CostTracker } from '../cost-tracker.ts';
+import { runWithAmbientTracker } from '../llm-usage/ambient-tracker.ts';
 import { getCachedAuditSessionId } from '../wiki-server/audit-context.ts';
 import { parseAgentSessionId } from './agent-session-id.ts';
 
@@ -109,12 +110,20 @@ export async function withPipelineRun<T>(
 ): Promise<T> {
   const runId = randomUUID();
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
+  // Resolve the cost tracker. When the caller doesn't supply one we create a
+  // tracker so that LLM calls made inside the body still get attributed to
+  // this flow automatically (recorded via the ambient tracker below and
+  // persisted to pipeline_runs on /end). Callers that pass their own tracker
+  // keep the existing behavior — and that same instance becomes the ambient
+  // one, so un-wired calls accumulate into it rather than being lost.
+  const callerProvidedTracker = options.tracker !== undefined;
+  const tracker = options.tracker ?? new CostTracker();
   // Snapshot the tracker's entry count BEFORE the body runs so each
   // pipeline_runs row only records what its body added — not entries the
   // caller already accumulated. Required for nested wraps (e.g.
   // improve-entity → research-agent, sharing one tracker) so the inner
   // row doesn't double-count parent spend.
-  const trackerStartIndex = options.tracker?.entries.length ?? 0;
+  const trackerStartIndex = tracker.entries.length;
 
   // Start the run. Fail-closed by default.
   // Defaults `agentSessionId` to the cached audit session id when callers
@@ -145,7 +154,7 @@ export async function withPipelineRun<T>(
           { runId, pipelineName: options.pipelineName },
         );
       }
-      return body(makeOfflineCtx(runId));
+      return runWithAmbientTracker(tracker, () => body(makeOfflineCtx(runId)));
     }
 
     throw new Error(
@@ -214,7 +223,7 @@ export async function withPipelineRun<T>(
   if (typeof heartbeatTimer.unref === 'function') heartbeatTimer.unref();
 
   try {
-    const result = await body(ctx);
+    const result = await runWithAmbientTracker(tracker, () => body(ctx));
     clearInterval(heartbeatTimer);
     await finalize({
       runId,
@@ -224,7 +233,9 @@ export async function withPipelineRun<T>(
       errorCode: overrideErrorCode,
       errorPayload: null,
       followups,
-      costTotals: trackerTotals(options.tracker, trackerStartIndex),
+      costTotals: trackerTotals(tracker, trackerStartIndex, {
+        omitWhenEmpty: !callerProvidedTracker,
+      }),
     });
     return result;
   } catch (err: unknown) {
@@ -244,7 +255,9 @@ export async function withPipelineRun<T>(
         errorCode: overrideErrorCode ?? errorCodeFor(err),
         errorPayload: errorPayload(err),
         followups,
-        costTotals: trackerTotals(options.tracker, trackerStartIndex),
+        costTotals: trackerTotals(tracker, trackerStartIndex, {
+          omitWhenEmpty: !callerProvidedTracker,
+        }),
       });
     } catch (finalizeErr: unknown) {
       error(
@@ -304,8 +317,17 @@ interface CostTotals {
  * silently truncate, so rounding client-side keeps caller-side and
  * persisted values equal.
  */
-function trackerTotals(tracker: CostTracker | undefined, startIndex: number): CostTotals | null {
+function trackerTotals(
+  tracker: CostTracker | undefined,
+  startIndex: number,
+  opts?: { omitWhenEmpty?: boolean },
+): CostTotals | null {
   if (!tracker) return null;
+  // When the tracker was auto-created (caller passed none) and the body
+  // recorded no LLM calls, omit cost fields so the /end client preserves any
+  // existing values rather than overwriting with 0. A caller-supplied tracker
+  // keeps the old contract: explicit zeros are sent even when empty.
+  if (opts?.omitWhenEmpty && tracker.entries.length <= startIndex) return null;
   let costUsd = 0;
   let tokensInput = 0;
   let tokensOutput = 0;

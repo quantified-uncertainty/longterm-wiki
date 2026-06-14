@@ -23,6 +23,7 @@ import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropi
 import { createClient, MODELS, resolveModel } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
 import type { CostTracker } from './cost-tracker.ts';
+import { recordAmbient, recordAmbientExternalCost } from './llm-usage/ambient-tracker.ts';
 import { getApiKey } from './api-keys.ts';
 import { OpenRouterChatResponseSchema } from './openrouter-schemas.ts';
 
@@ -121,13 +122,21 @@ export async function streamingCreate(
   const stream = client.messages.stream(params as any);
   const message = await stream.finalMessage();
 
-  // Auto-record if tracker provided
-  if (options?.tracker && message.usage) {
-    options.tracker.record(
-      params.model,
-      message.usage,
-      options.label,
-    );
+  // Record spend. Prefer the caller-supplied tracker; otherwise fall back to
+  // the ambient tracker set by withPipelineRun so the call is still attributed
+  // to its flow. Best-effort — instrumentation must never break the call.
+  if (message.usage) {
+    if (options?.tracker) {
+      try {
+        options.tracker.record(params.model, message.usage, options.label);
+      } catch (err) {
+        console.warn(
+          `[llm-usage] tracker.record failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    } else {
+      recordAmbient(params.model, message.usage, options?.label);
+    }
   }
 
   return message;
@@ -216,13 +225,25 @@ async function callOpenRouterAsAnthropic(
     output_tokens: data.usage?.completion_tokens || 0,
   };
 
-  // Record cost
-  if (options?.tracker) {
+  // Record cost. Prefer the caller-supplied tracker; otherwise fall back to
+  // the ambient tracker so OpenRouter calls are attributed to their flow too.
+  // Best-effort — instrumentation must never break the call.
+  try {
     if (data.usage?.cost) {
-      options.tracker.recordExternalCost(model, data.usage.cost, options.label || 'openrouter');
-    } else {
+      if (options?.tracker) {
+        options.tracker.recordExternalCost(model, data.usage.cost, options.label || 'openrouter');
+      } else {
+        recordAmbientExternalCost(model, data.usage.cost, options?.label || 'openrouter');
+      }
+    } else if (options?.tracker) {
       options.tracker.record(model, usage, options.label);
+    } else {
+      recordAmbient(model, usage, options?.label);
     }
+  } catch (err) {
+    console.warn(
+      `[llm-usage] OpenRouter cost record failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 
   // Return Anthropic-compatible message shape
