@@ -1516,15 +1516,14 @@ export const llmCallPayloads = pgTable(
     model: text("model").notNull(),
     // Whether this call went through OpenRouter instead of the Anthropic SDK.
     viaOpenrouter: boolean("via_openrouter").notNull().default(false),
-    // The request we sent: system + messages (and key params). Truncated to a
-    // size cap by the logger before it ever reaches here.
+    // The request we sent: system + messages (and key params). Stored whole —
+    // the logger skips (does not clip) calls over its size cap so every row is
+    // a complete, replayable prompt.
     request: jsonb("request").$type<Record<string, unknown>>().notNull(),
-    // The model's response text (truncated to the same size cap).
+    // The model's response text, stored whole (same whole-or-nothing rule).
     response: text("response").notNull(),
     tokensInput: integer("tokens_input"),
     tokensOutput: integer("tokens_output"),
-    // True when the logger truncated request and/or response to the size cap.
-    truncated: boolean("truncated").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

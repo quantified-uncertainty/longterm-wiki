@@ -63,7 +63,6 @@ const llmPayloadsApp = new Hono()
           response: d.response,
           tokensInput: d.tokensInput ?? null,
           tokensOutput: d.tokensOutput ?? null,
-          truncated: d.truncated ?? false,
         })
         .returning({ id: llmCallPayloads.id });
     });

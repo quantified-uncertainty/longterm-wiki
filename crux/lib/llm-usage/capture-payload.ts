@@ -21,8 +21,13 @@ import { recordLlmPayload } from '../wiki-server/llm-payloads.ts';
 import { getAmbientContext } from './ambient-tracker.ts';
 
 // Keep in lockstep with the server-side backstop in api-types.ts
-// (MAX_LLM_PAYLOAD_REQUEST_BYTES / MAX_LLM_PAYLOAD_RESPONSE_CHARS). We truncate
-// below the server cap so a captured row is never rejected for size.
+// (MAX_LLM_PAYLOAD_REQUEST_BYTES / MAX_LLM_PAYLOAD_RESPONSE_CHARS).
+//
+// We do NOT truncate: a clipped prompt is useless for replay (you can't
+// faithfully re-run a half prompt through a candidate model). Instead, if a
+// call exceeds the cap we SKIP capturing it entirely and log — the corpus only
+// ever holds complete, replayable rows. The cap is set high so this is rare;
+// it's a safety valve against a pathological multi-MB row, not normal clipping.
 const MAX_REQUEST_BYTES = 200_000;
 const MAX_RESPONSE_CHARS = 200_000;
 
@@ -65,23 +70,13 @@ export function capturePayload(input: CapturePayloadInput): void {
     if (rate <= 0) return;
     if (rate < 1 && Math.random() >= rate) return;
 
-    let truncated = false;
-
-    // Bound the request: if it serializes over the cap, store a truncated
-    // string preview instead of the full object.
-    let request: Record<string, unknown> = input.request;
-    if (byteSize(request) > MAX_REQUEST_BYTES) {
-      truncated = true;
-      request = {
-        truncated: true,
-        preview: JSON.stringify(input.request).slice(0, MAX_REQUEST_BYTES),
-      };
-    }
-
-    let response = input.response;
-    if (response.length > MAX_RESPONSE_CHARS) {
-      truncated = true;
-      response = response.slice(0, MAX_RESPONSE_CHARS);
+    // Skip (don't clip) anything over the cap — a partial prompt can't be
+    // replayed faithfully, so we'd rather have no row than a corrupt one.
+    if (byteSize(input.request) > MAX_REQUEST_BYTES || input.response.length > MAX_RESPONSE_CHARS) {
+      console.warn(
+        `[llm-usage] payload skipped (over size cap, kept whole-or-nothing for replay): model=${input.model} flow=${getAmbientContext()?.flow ?? 'none'}`,
+      );
+      return;
     }
 
     const ctx = getAmbientContext();
@@ -93,11 +88,10 @@ export function capturePayload(input: CapturePayloadInput): void {
       label: input.label ?? null,
       model: input.model,
       viaOpenrouter: input.viaOpenrouter ?? false,
-      request,
-      response,
+      request: input.request,
+      response: input.response,
       tokensInput: input.usage?.input_tokens ?? null,
       tokensOutput: input.usage?.output_tokens ?? null,
-      truncated,
     }).then(
       (res) => {
         if (!res.ok) {

@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS "llm_call_payloads" (
 	"response" text NOT NULL,
 	"tokens_input" integer,
 	"tokens_output" integer,
-	"truncated" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint

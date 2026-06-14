@@ -1760,7 +1760,6 @@ export const RecordLlmPayloadSchema = z.object({
   response: z.string().max(MAX_LLM_PAYLOAD_RESPONSE_CHARS),
   tokensInput: TokenCountSchema,
   tokensOutput: TokenCountSchema,
-  truncated: z.boolean().optional(),
 });
 export type RecordLlmPayload = z.infer<typeof RecordLlmPayloadSchema>;
 

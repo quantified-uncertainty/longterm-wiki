@@ -32,7 +32,6 @@ describe("RecordLlmPayloadSchema", () => {
       viaOpenrouter: true,
       tokensInput: 10,
       tokensOutput: 5,
-      truncated: false,
     });
     expect(r.success).toBe(true);
   });

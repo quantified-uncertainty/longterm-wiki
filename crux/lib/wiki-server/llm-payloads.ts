@@ -26,7 +26,6 @@ export interface RecordLlmPayloadInput {
   response: string;
   tokensInput?: number | null;
   tokensOutput?: number | null;
-  truncated?: boolean;
 }
 
 /** Record one captured LLM call. */

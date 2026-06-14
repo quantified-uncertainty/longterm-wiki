@@ -57,7 +57,6 @@ describe('capturePayload', () => {
       response: 'hello',
       tokensInput: 10,
       tokensOutput: 5,
-      truncated: false,
     });
   });
 
@@ -72,13 +71,10 @@ describe('capturePayload', () => {
     expect(mockRecord).toHaveBeenCalledTimes(1);
   });
 
-  it('truncates oversize responses and flags truncated', () => {
+  it('skips (does not clip) oversize calls so the corpus stays replayable', () => {
     process.env.LLM_PAYLOAD_CAPTURE_RATE = '1';
     capturePayload({ ...baseInput, response: 'x'.repeat(300_000) });
-    expect(mockRecord).toHaveBeenCalledTimes(1);
-    const arg = mockRecord.mock.calls[0][0];
-    expect(arg.truncated).toBe(true);
-    expect(arg.response.length).toBeLessThanOrEqual(200_000);
+    expect(mockRecord).not.toHaveBeenCalled();
   });
 
   it('never throws when the POST rejects', () => {
