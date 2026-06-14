@@ -36,6 +36,11 @@ const SCRIPTS = {
     description: 'Generate documentation from schema',
     passthrough: ['ci'],
   },
+  'db-schema-docs': {
+    script: 'generate/generate-db-schema-docs.ts',
+    description: 'Generate the DB schema reference page from the Drizzle schema',
+    passthrough: ['ci', 'check', 'stdout'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS);

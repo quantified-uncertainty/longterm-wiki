@@ -1,0 +1,52 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-31T11:13:57.903Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "DVBIxAHQy2",
+      "organizationId": "sid_CyKa5eLcCl",
+      "role": "Board Member and Treasurer",
+      "roleType": "board",
+      "startDate": "2007",
+      "isFounder": false,
+      "source": "https://www.cigionline.org/about/leadership/",
+      "notes": "Member of CIGI's Board of Directors since 2007; serves as treasurer.",
+      "id": "hfwZNT36dF",
+      "verdict": "none"
+    },
+    {
+      "personId": "TN6xJ4osKz",
+      "organizationId": "sid_CyKa5eLcCl",
+      "role": "Board Member",
+      "roleType": "board",
+      "isFounder": false,
+      "source": "https://www.cigionline.org/about/leadership/",
+      "notes": "Board member; former Chief Statistician of Canada; adjunct lecturer at Harvard Kennedy School.",
+      "id": "8oQlyJsUnb",
+      "verdict": "none"
+    },
+    {
+      "personId": "essA0oPnmm",
+      "organizationId": "sid_CyKa5eLcCl",
+      "role": "Board Member",
+      "roleType": "board",
+      "isFounder": false,
+      "source": "https://www.cigionline.org/about/leadership/",
+      "notes": "Board member; Ambassador of Canada to Italy, Albania, Malta, San Marino, and Permanent Representative to UN Agencies in Rome as of 2025.",
+      "id": "qcX6nXtotO",
+      "verdict": "none"
+    }
+  ]
+}

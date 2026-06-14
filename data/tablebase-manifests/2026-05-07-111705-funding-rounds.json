@@ -1,0 +1,28 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-07T11:17:05.916Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_eBYk2wn75Q",
+      "name": "Early Stage VC",
+      "date": "2025-08",
+      "leadInvestor": "Macroscopic Ventures",
+      "source": "https://macroscopic.org/investments",
+      "notes": "Early stage VC round per PitchBook and Premier Alternatives. Amount and valuation not publicly disclosed. Lead investor Macroscopic Ventures confirmed on their investments page. Confirmed 2026-05-07.",
+      "id": "ZSXU3chcI0",
+      "verdict": "none"
+    }
+  ]
+}

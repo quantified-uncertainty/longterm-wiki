@@ -550,6 +550,35 @@ describe('withPipelineRun', () => {
       expect(endPayload).not.toHaveProperty('tokensCacheWrite');
     });
 
+    it('auto-attributes ambient LLM calls when no tracker is configured', async () => {
+      // The win: a pipeline that makes LLM calls without manually wiring a
+      // CostTracker still records real spend, because withPipelineRun sets an
+      // ambient tracker that the LLM helpers record into. Here we simulate an
+      // LLM call by recording into the ambient tracker directly.
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockResolvedValue({ ok: true, data: {} });
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+      const { recordAmbient } = await import('../llm-usage/ambient-tracker.ts');
+
+      await withPipelineRun(
+        { pipelineName: 'research-agent', heartbeatIntervalMs: 1_000_000_000 },
+        async () => {
+          recordAmbient(
+            'claude-haiku-4-5-20251001',
+            { input_tokens: 1000, output_tokens: 500 },
+            'verify',
+          );
+          return 'done';
+        },
+      );
+
+      const [, endPayload] = mockEnd.mock.calls[0];
+      expect(endPayload.costUsd).toBeGreaterThan(0);
+      expect(endPayload.tokensInput).toBe(1000);
+      expect(endPayload.tokensOutput).toBe(500);
+    });
+
     it('warns and skips tracker persistence when allowOffline=true and /start fails', async () => {
       mockStart.mockResolvedValue({
         ok: false,

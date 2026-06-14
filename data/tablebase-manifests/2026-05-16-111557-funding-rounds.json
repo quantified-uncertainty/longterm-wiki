@@ -1,0 +1,30 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-16T11:15:57.665Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_pg7Ym4EQ9A",
+      "name": "Launch Fundraising",
+      "date": "2025-08-26",
+      "raised": 75535802,
+      "leadInvestor": "Greg Brockman, Anna Brockman, Marc Andreessen, Ben Horowitz",
+      "instrument": "political contributions",
+      "source": "https://www.fec.gov/data/committee/C00916114/",
+      "notes": "Super PAC launched August 26, 2025. FEC filing (C00916114) shows $75,535,801.59 total receipts through 3/31/2026. Largest donors: Brockman family ($25M combined), Marc Andreessen ($12.5M), Ben Horowitz ($12.5M). Network total including affiliated Build American AI 501(c)(4) was ~$125M in H2 2025. So… [truncated, 175 more chars]",
+      "id": "ejYsIFpM3m",
+      "verdict": "none"
+    }
+  ]
+}

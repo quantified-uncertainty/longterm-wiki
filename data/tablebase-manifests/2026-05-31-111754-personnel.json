@@ -1,0 +1,54 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-05-31T11:17:54.050Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "t9RkRoVfX9",
+      "organizationId": "sid_s8pyCzz4bJ",
+      "role": "Co-founder and CEO/President",
+      "roleType": "key-person",
+      "startDate": "2008",
+      "isFounder": true,
+      "source": "https://citizens.is/2021/09/18/interview-robert-bjarnason-co-founder-ceo",
+      "notes": "Co-founded the Citizens Foundation in 2008. Serves as CEO/President and also fulfills a CTO-level role. Pioneer of the internet in Iceland; introduced the Web to Iceland in 1993.",
+      "id": "gaPoG7O31k",
+      "verdict": "none"
+    },
+    {
+      "personId": "t9xBKxPJPb",
+      "organizationId": "sid_s8pyCzz4bJ",
+      "role": "Co-founder and former CEO",
+      "roleType": "key-person",
+      "startDate": "2008",
+      "isFounder": true,
+      "source": "https://en.wikipedia.org/wiki/Citizens_Foundation",
+      "notes": "Co-founded the Citizens Foundation in 2008. Served as CEO. Experienced process and interface designer who worked on citizens engagement projects globally.",
+      "id": "hWqNWSxKPI",
+      "verdict": "none"
+    },
+    {
+      "personId": "vXbjSgsato",
+      "organizationId": "sid_s8pyCzz4bJ",
+      "role": "Co-founder",
+      "roleType": "key-person",
+      "startDate": "2008",
+      "isFounder": true,
+      "source": "https://en.wikipedia.org/wiki/Citizens_Foundation",
+      "notes": "Co-founded the Citizens Foundation in 2008. Part of the founding team that developed the Better Reykjavik platform and the Your Priorities engagement tool.",
+      "id": "jQ4Uh83bkR",
+      "verdict": "none"
+    }
+  ]
+}

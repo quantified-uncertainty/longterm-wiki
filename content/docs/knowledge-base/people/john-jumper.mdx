@@ -1,0 +1,95 @@
+---
+wikiId: E2562
+title: John Jumper
+description: Principal Research Scientist at Google DeepMind. Co-recipient of the 2024 Nobel Prize in Chemistry for AlphaFold. Led the AlphaFold 2 team that solved the protein folding problem at CASP14 (2020).
+sidebar:
+  order: 5
+subcategory: lab-leadership
+lastEdited: 2026-05-10
+summary: Biographical profile of John Jumper, the DeepMind researcher who led the AlphaFold 2 team and shared the 2024 Nobel Prize in Chemistry with Demis Hassabis and David Baker. Documents his career trajectory from theoretical chemistry through D.E. Shaw Research to DeepMind, the AlphaFold 2 breakthrough at CASP14 (2020), and the subsequent AlphaFold Database which provides over 200 million predicted protein structures freely to researchers.
+clusters:
+  - ai-safety
+---
+import {DataInfoBox, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Primary Role** | Principal Research Scientist, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> (joined 2017) |
+| **Key Recognition** | Co-recipient, 2024 Nobel Prize in Chemistry (with <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> of DeepMind and David Baker of the University of Washington for separate protein-design work) |
+| **Education** | PhD in Theoretical Chemistry, University of Chicago (2017); BS in Physics & Mathematics, Vanderbilt; MPhil in Physics, Cambridge |
+| **Key Contributions** | Led the AlphaFold 2 team (CASP14, 2020); first author on AlphaFold 2 *Nature* paper (Jumper et al., 2021); led AlphaFold 3 (2024) extending the system to protein-ligand and protein-nucleic-acid complexes |
+| **Scientific Impact** | AlphaFold's free protein-structure database has been used by over 2 million researchers and cited in tens of thousands of papers; widely described as a "grand challenge" of biology solved |
+
+## Overview
+
+<EntityLink id="E2562" name="john-jumper">John Jumper</EntityLink> is a research scientist at <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> whose work on the AlphaFold protein-structure prediction system is widely regarded as one of the most consequential applications of AI to science. He led the team that developed AlphaFold 2, the system whose 2020 CASP14 performance was the first to solve protein structure prediction at competitive accuracy with experimental methods for a substantial fraction of proteins. In October 2024, the Royal Swedish Academy of Sciences awarded him the Nobel Prize in Chemistry — shared with <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> of DeepMind for AlphaFold, and with David Baker of the University of Washington for separate work on protein design.
+
+Jumper is not widely known to general audiences — he gives few media interviews and maintains a low public profile — but he is regarded inside the structural biology and machine learning communities as the technical lead behind one of the most impactful single AI projects to date.
+
+## Background
+
+### Education
+
+Jumper studied Physics and Mathematics at Vanderbilt University (undergraduate), then completed an MPhil in Physics at Cambridge as a Marshall Scholar before pursuing a PhD in Theoretical Chemistry at the University of Chicago. His doctoral work, completed in 2017, focused on computational methods for molecular dynamics simulation under the supervision of Tobin Sosnick and Karl Freed.
+
+### Pre-DeepMind Career
+
+Before joining DeepMind, Jumper worked at D.E. Shaw Research, the New York–based computational biology research group founded by hedge fund manager David Shaw. D.E. Shaw Research has been a notable contributor to long-timescale molecular dynamics simulation through its custom Anton supercomputers. Jumper's work at D.E. Shaw — combining physics-based simulation with statistical methods — provided important groundwork for the hybrid approach that AlphaFold 2 would later adopt.
+
+## AlphaFold and AlphaFold 2
+
+Jumper joined Google DeepMind in 2017, becoming part of the small initial AlphaFold team. The first version of AlphaFold competed in the CASP13 protein-structure-prediction competition in 2018 and placed first, demonstrating that machine learning approaches could be competitive with established physics-based methods. The success motivated DeepMind to invest substantially more in the project.
+
+### CASP14 (2020)
+
+AlphaFold 2 was developed by a team Jumper led, with Hassabis providing overall direction. The system entered CASP14 in late 2020 and achieved a median Global Distance Test (GDT) score of approximately 92.4 across all targets — a level the competition organizers characterized as "competitive with experimental methods" for a substantial fraction of proteins. The CASP14 result was widely covered in the scientific press (*Nature*, *Science*) and described as a watershed moment for computational biology, with the protein-folding problem characterized as having been "essentially solved" for the structural-biology purposes for which CASP had been the field's standard test.
+
+### *Nature* Paper (2021)
+
+In July 2021, Jumper was first author on the AlphaFold 2 *Nature* paper, "Highly accurate protein structure prediction with AlphaFold" (Jumper et al., *Nature* 596, 583–589). The paper:
+
+- Described the AlphaFold 2 architecture, which combines transformer-style attention with geometric reasoning about protein structure
+- Reported median backbone accuracy within 1 angstrom of experimental structures on the CASP14 set
+- Provided the open-source codebase and pretrained model weights, enabling worldwide adoption
+
+The paper became one of *Nature*'s most-cited recent publications and the standard citation for AlphaFold 2.
+
+### AlphaFold Database
+
+In partnership with the European Bioinformatics Institute (EMBL-EBI), DeepMind released the AlphaFold Protein Structure Database in 2021, initially containing approximately 350,000 predicted structures. The database has since grown to contain over 200 million predicted structures, covering essentially the entire UniProt set of cataloged proteins. The database is freely accessible to researchers worldwide and has been used in tens of thousands of subsequent research papers.
+
+## AlphaFold 3 (2024)
+
+In May 2024, DeepMind released AlphaFold 3, which extends the AlphaFold framework to:
+
+- Protein-protein interactions
+- Protein-ligand (small molecule) binding
+- Protein-nucleic acid (DNA, RNA) interactions
+- Post-translational modifications
+
+The AlphaFold 3 paper (Abramson, Adler, Dunger, Evans, et al., *Nature*, 2024) was led by Jumper's team, with Jumper as a senior author. Unlike AlphaFold 2, the AlphaFold 3 model is not fully open-source — access is provided through the AlphaFold Server with usage restrictions — a decision that attracted criticism from some scientific community members for departing from the AlphaFold 2 model of full open release.
+
+## 2024 Nobel Prize in Chemistry
+
+In October 2024, the Royal Swedish Academy of Sciences awarded the 2024 Nobel Prize in Chemistry jointly to:
+
+- **John Jumper** and **<EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink>** (Google DeepMind), "for protein structure prediction"
+- **David Baker** (University of Washington), "for computational protein design"
+
+The prize was widely described in coverage as a first-of-its-kind recognition for an industrial AI research lab's scientific contribution. The Royal Swedish Academy's announcement noted that AlphaFold's predicted structures had been used by "more than two million researchers from 190 countries."
+
+Jumper became, at age 39, one of the younger Nobel laureates in chemistry in recent decades.
+
+## Public Profile
+
+Jumper is notably press-shy. He has given few major media interviews and rarely speaks in public venues outside scientific conferences. The Nobel Prize coverage produced increased media exposure, but his interactions have remained primarily technical and conference-based rather than oriented toward general-audience communication.
+
+Within structural biology and machine-learning circles, he is regarded as a serious technical scientist who has avoided the AGI-discourse, capability-trajectory, and AI-policy commentary that other DeepMind figures (Hassabis, <EntityLink id="E280" name="shane-legg">Legg</EntityLink>, <EntityLink id="E1295" name="allan-dafoe">Dafoe</EntityLink>) have engaged with.
+
+## See Also
+
+- <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>
+- <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> — DeepMind CEO, Nobel co-recipient
+- <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>

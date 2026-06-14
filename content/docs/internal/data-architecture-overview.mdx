@@ -4,7 +4,7 @@ title: "Data Architecture Overview"
 description: "High-level overview of the wiki's three data layers — Resources, Source-Check, and the Three Bases (TableBase, FactBase, WikiBase). Includes diagrams, tables, population mechanisms, and a guide to common naming confusions."
 subcategory: architecture
 contentFormat: article
-lastEdited: "2026-04-09"
+lastEdited: "2026-06-03"
 update_frequency: 90
 ---
 import { EntityLink, Mermaid, FBFactValue } from '@components/wiki';
@@ -21,7 +21,7 @@ For the detailed naming guide and PG table reference, see <EntityLink id="E1334"
 flowchart TB
     subgraph L1["Resources Layer"]
         L1A["External content archive\ncitation_content,\nresource_content_versions"]
-        L1B["News collection\n25 RSS/web sources"]
+        L1B["News collection\n30 RSS/web sources"]
     end
     subgraph L2["Source-Check Layer"]
         L2A["Verification pipeline\nclaim extraction + LLM check"]
@@ -56,17 +56,17 @@ The Resources layer is the wiki's interface with the outside world. It collects,
 | `citation_content` | Latest HTML/text from cited URLs (hot cache) | Fetched on-demand during sourcing and citation verification |
 | `resource_content_versions` | **Versioned** content snapshots with content-hash dedup | Fetched by sourcing pipeline and website monitors |
 | `website_source_pages` | Monitored pages from tracked websites | Configured per `resource_tabular_sources` entry |
-| `website_source_page_snapshots` | Point-in-time snapshots of monitored pages | Periodic fetches; diffed against previous to detect changes |
+| `page_snapshots` | Point-in-time snapshots of monitored pages (`website_source_pages.last_snapshot_id` points at the latest) | Periodic fetches; diffed against previous to detect changes |
 | `auto_update_news_items` | Discovered news items from RSS/web search | Auto-update pipeline (daily) |
 | `auto_update_runs` | Execution history of auto-update pipeline | Recorded per run |
 
 ### News Collection (Auto-Update)
 
-The auto-update system is the primary way new content enters the Resources layer. It scrapes 25 configured sources and routes news to wiki pages.
+The auto-update system is the primary way new content enters the Resources layer. It scrapes 30 configured sources (14 RSS feeds + 16 web searches) and routes news to wiki pages.
 
 <Mermaid chart={`
 flowchart TB
-    subgraph Sources["25 Configured Sources"]
+    subgraph Sources["30 Configured Sources"]
         RSS["RSS/Atom Feeds"]
         WEB["Web Searches"]
     end
@@ -93,12 +93,13 @@ flowchart TB
 |----------------|-------|------|---------|
 | AI Lab Blogs | 4 | RSS + web-search | OpenAI, Anthropic, DeepMind, Meta AI |
 | AI Safety / Alignment | 3 | RSS | Alignment Forum, LessWrong, EA Forum |
-| Newsletters / Aggregators | 7 | RSS | Import AI, The Gradient, ML Safety Newsletter, Zvi, CAIS, etc. |
+| Newsletters / Aggregators | 7 | RSS + web-search | Import AI, The Gradient, ML Safety Newsletter, Zvi, CAIS, Last Week in AI |
 | Arxiv | 3 | RSS | arXiv cs.AI, cs.CL, cs.LG |
+| Model / System Cards | 5 | Web-search | Anthropic, OpenAI, DeepMind, Meta Llama, xAI |
 | Political / AI Policy | 4 | Web-search | AI policy in Congress, PAC elections, state legislation, biosecurity |
 | Policy / Governance | 2 | Web-search | AI safety news, executive orders |
 | Compute / Industry | 1 | Web-search | AI industry news |
-| Watchlist-Supporting | 1 | Web-search | Entity-specific monitoring searches |
+| Watchlist-Supporting | 1 | Web-search | Entity-specific monitoring searches (e.g. Epstein–AI connections) |
 
 ### CLI
 
@@ -220,9 +221,9 @@ The Three Bases layer is the wiki's own knowledge — the entities, facts, and p
 
 | Base | What It Stores | Source of Truth | Build Artifact | Key CLI Group |
 |------|---------------|----------------|---------------|--------------|
-| **TableBase** | Typed entity catalog (≈2,000 entities: orgs, people, models, risks, concepts) | `data/entities/*.yaml` (15 files) + MDX frontmatter | `database.json` | `crux tb` |
-| **FactBase** | Structured temporal facts with provenance | `packages/factbase/data/fb-entities/*.yaml` (539 files) | `factbase-data.json` | `crux fb` |
-| **WikiBase** | Long-form prose articles | `content/docs/**/*.mdx` (≈720 pages) | `database.json` (pages section) | `crux w` |
+| **TableBase** | Typed entity catalog (≈2,000 entities: orgs, people, models, risks, concepts) | `data/entities/*.yaml` (17 files) + MDX frontmatter | `database.json` | `crux tb` |
+| **FactBase** | Structured temporal facts with provenance | `packages/factbase/data/fb-entities/*.yaml` (551 files) | `factbase-data.json` | `crux fb` |
+| **WikiBase** | Long-form prose articles | `content/docs/**/*.mdx` (≈770 pages) | `database.json` (pages section) | `crux w` |
 
 Each base has:
 - **A source of truth** (YAML or MDX files in git)
@@ -418,7 +419,7 @@ Each layer has its own health infrastructure:
 |-------|-----------|--------------|------------|
 | **Resources** | Link health checks, CI audit | Content freshness, auto-update run tracking | <EntityLink id="E2131">Data Sources</EntityLink>, <EntityLink id="E914">Auto-Update Runs</EntityLink>, <EntityLink id="E915">Auto-Update News</EntityLink> |
 | **Source-Check** | Source-check coverage metrics | Verdict freshness tracking | <EntityLink id="E2200">Source Checks</EntityLink>, <EntityLink id="E2600">Data Quality</EntityLink> |
-| **Three Bases** | 96 validators in `crux/validate/`, build phase validation | Gate checks (6 CI-blocking), build-time error detection | <EntityLink id="E908">Entities</EntityLink>, <EntityLink id="E909">Page Changes</EntityLink>, <EntityLink id="E900">Update Schedule</EntityLink>, <EntityLink id="E1054">DB Schema</EntityLink> |
+| **Three Bases** | 118 validators in `crux/validate/`, build phase validation | Gate checks (6 CI-blocking), build-time error detection | <EntityLink id="E908">Entities</EntityLink>, <EntityLink id="E909">Page Changes</EntityLink>, <EntityLink id="E900">Update Schedule</EntityLink>, <EntityLink id="E1054">DB Schema</EntityLink> |
 
 ### CI-Blocking Gate Checks
 
@@ -460,7 +461,7 @@ flowchart TB
     end
     subgraph ThreeBases["Three Bases Layer"]
         YAML_E["TableBase: entities/\norganizations.yaml"]
-        FB_E["FactBase: things/\nanthropic.yaml"]
+        FB_E["FactBase: fb-entities/\nanthropic.yaml"]
         MDX_E["WikiBase: content/docs/\nanthropic.mdx"]
         BUILD_E["build-data.mjs →\ndatabase.json → /wiki/E22"]
     end

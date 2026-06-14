@@ -300,6 +300,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // The generated db-schema-reference.mdx is derived from schema.ts. Blocking
+    // so the schema and its reference page can never drift the way the
+    // hand-written db-schema-overview.mdx did (documented 42 tables while the
+    // schema grew to 114). Regenerate with: pnpm crux generate db-schema-docs
+    id: 'db-schema-docs-fresh',
+    name: 'DB schema reference page is in sync with schema.ts',
+    command: 'npx',
+    args: ['tsx', 'crux/generate/generate-db-schema-docs.ts', '--check'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-609: enforces FK-swap migrations drop BOTH the Drizzle-generated
     // `<table>_<col>_resources_id_fk` AND the postgres-default
     // `<table>_<col>_fkey` names. Migration 0186 only dropped the first and
