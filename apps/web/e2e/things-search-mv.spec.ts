@@ -1,6 +1,17 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 // QUA-506 smoke tests — exercises the things_search MV read path end-to-end.
+
+// Scope assertions to the things_search section. A page-wide getByText(...).first()
+// matched unrelated "Stale" badges elsewhere on the data-quality dashboard, whose
+// first DOM match is hidden (#4920).
+function thingsSearchPanel(page: Page) {
+  return page
+    .locator("section", {
+      has: page.getByRole("heading", { name: /things_search materialized view/i }),
+    })
+    .first();
+}
 
 test("data-quality dashboard renders the things_search staleness panel", async ({
   page,
@@ -18,17 +29,10 @@ test("data-quality dashboard renders the things_search staleness panel", async (
 
   await expect(page.getByText("(QUA-506 — hourly refresh via groundskeeper)")).toBeVisible();
 
-  // Scope the staleness-badge assertion to the things_search section. A page-wide
-  // getByText(...).first() matched unrelated "Stale" badges elsewhere on the
-  // data-quality dashboard, whose first DOM match is hidden (#4920).
-  const panel = page
-    .locator("section", {
-      has: page.getByRole("heading", { name: /things_search materialized view/i }),
-    })
-    .first();
-
   await expect(
-    panel.getByText(/^healthy$|^warning$|^stale$|^unknown$/i).first(),
+    thingsSearchPanel(page)
+      .getByText(/^healthy$|^warning$|^stale$|^unknown$/i)
+      .first(),
   ).toBeVisible();
 
   await expect(page.getByText(/^Rows$/)).toBeVisible();
@@ -43,13 +47,7 @@ test("things_search panel uses non-NaN metrics from the /status endpoint", async
 }) => {
   await page.goto("/internal/data-quality", { waitUntil: "networkidle" });
 
-  const panel = page
-    .locator("section", {
-      has: page.getByRole("heading", { name: /things_search materialized view/i }),
-    })
-    .first();
-
-  const panelText = await panel.innerText();
+  const panelText = await thingsSearchPanel(page).innerText();
   expect(panelText).not.toContain("NaN");
   // Real data should show a row count with a digit AND a size
   expect(panelText).toMatch(/\d+,?\d*/);
