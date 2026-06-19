@@ -15,6 +15,7 @@ import { readFileSync, existsSync, writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import type { CallClaudeResult } from "../../anthropic.ts";
 import { createClient, MODELS, callClaude, parseJsonResponse } from "../../anthropic.ts";
+import { recordDirectCall } from "../../llm-usage/capture-payload.ts";
 import { escapeXml } from "../../prompt-utils.ts";
 import { stripHtmlForLlm, fetchToCache } from "./html-utils.ts";
 import type { FLIWaveFile } from "../sources/fli.ts";
@@ -303,6 +304,20 @@ async function defaultPdfCall(wave: FliWaveConfig, pdfBuf: Buffer): Promise<Call
     .map((b) => (b.type === "text" ? b.text : ""))
     .filter((s) => s.length > 0)
     .join("\n");
+  // Direct SDK call — record cost + capture. The request carries a PDF
+  // document; we note it rather than storing the megabytes of base64.
+  recordDirectCall({
+    model: MODELS.sonnet,
+    request: {
+      system: EXTRACTOR_SYSTEM,
+      max_tokens: 4000,
+      temperature: 0,
+      messages: [{ role: "user", content: `[PDF document attached]\n${buildPdfPrompt(wave)}` }],
+    },
+    responseText: text,
+    usage: response.usage,
+    label: "fli-pdf-extract",
+  });
   return { text, usage: response.usage, model: MODELS.sonnet };
 }
 

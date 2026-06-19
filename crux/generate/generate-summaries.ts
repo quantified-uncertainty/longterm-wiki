@@ -31,6 +31,7 @@ import { upsertSummary } from '../lib/wiki-server/summaries.ts';
 import { getColors } from '../lib/output.ts';
 import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
 import { extractText } from '../lib/llm.ts';
+import { recordDirectCall } from '../lib/llm-usage/capture-payload.ts';
 import { findPageFile, findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
@@ -217,6 +218,14 @@ async function generateSummary(prompt: string): Promise<SummaryResult> {
   });
 
   const text = extractText(response);
+  // Direct SDK call — record cost + capture so summary generation is logged.
+  recordDirectCall({
+    model: MODEL_ID,
+    request: { max_tokens: 1500, messages: [{ role: 'user', content: prompt }] },
+    responseText: text,
+    usage: response.usage,
+    label: 'generate-summaries',
+  });
   if (!text) {
     throw new Error('Expected text content block from API response');
   }

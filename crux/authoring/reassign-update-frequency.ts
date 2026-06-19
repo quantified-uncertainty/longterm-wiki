@@ -28,6 +28,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLlmClient, extractText, MODELS } from '../lib/llm.ts';
+import { recordDirectCall } from '../lib/llm-usage/capture-payload.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
@@ -325,6 +326,14 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
     });
 
     const text = extractText(response).trim();
+    // Direct SDK call — record cost + capture so this flow is logged too.
+    recordDirectCall({
+      model: MODELS.haiku,
+      request: { max_tokens: 60, messages: [{ role: 'user', content: prompt }] },
+      responseText: text,
+      usage: response.usage,
+      label: 'reassign-update-frequency',
+    });
     if (!text) throw new Error('No text block in response');
     const parsed = parseJsonFromLlm<{ frequency: number; reason: string }>(
       text,
