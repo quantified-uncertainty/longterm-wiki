@@ -1,0 +1,46 @@
+name: Trivy — Default Branch Scan
+
+# The wiki-server deploy workflow only scans the production image on pushes to
+# `production`, so the Trivy code-scanning tool never analyzes the default
+# branch (`main`). GitHub flags that as a "configuration error" on the security
+# tab. This job gives Trivy a regular analysis of `main` (repo dependencies +
+# Dockerfiles), clearing the banner and catching dependency CVEs before deploy.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pnpm-lock.yaml"
+      - "**/package.json"
+      - "**/Dockerfile"
+  schedule:
+    - cron: "0 7 * * 1" # weekly, Monday 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  trivy-fs:
+    name: Trivy filesystem scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (filesystem)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-default-branch
