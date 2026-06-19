@@ -18,7 +18,18 @@ test("data-quality dashboard renders the things_search staleness panel", async (
 
   await expect(page.getByText("(QUA-506 — hourly refresh via groundskeeper)")).toBeVisible();
 
-  await expect(page.getByText(/^healthy$|^warning$|^stale$|^unknown$/i).first()).toBeVisible();
+  // Scope the staleness-badge assertion to the things_search section. A page-wide
+  // getByText(...).first() matched unrelated "Stale" badges elsewhere on the
+  // data-quality dashboard, whose first DOM match is hidden (#4920).
+  const panel = page
+    .locator("section", {
+      has: page.getByRole("heading", { name: /things_search materialized view/i }),
+    })
+    .first();
+
+  await expect(
+    panel.getByText(/^healthy$|^warning$|^stale$|^unknown$/i).first(),
+  ).toBeVisible();
 
   await expect(page.getByText(/^Rows$/)).toBeVisible();
   await expect(page.getByText(/^Size$/)).toBeVisible();
