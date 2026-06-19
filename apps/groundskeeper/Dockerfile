@@ -22,6 +22,7 @@ WORKDIR /repo
 #
 # See docs/agent-rules/dockerfile-postinstall-trap.md.
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY patches/ ./patches/
 COPY apps/groundskeeper/package.json ./apps/groundskeeper/
 
 # Install only groundskeeper dependencies
