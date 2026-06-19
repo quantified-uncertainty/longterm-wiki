@@ -15,6 +15,7 @@ WORKDIR /repo
 #
 # See docs/agent-rules/dockerfile-postinstall-trap.md.
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY patches/ ./patches/
 COPY apps/wiki-server/package.json ./apps/wiki-server/
 COPY packages/id-utils/package.json ./packages/id-utils/
 COPY packages/factbase/package.json ./packages/factbase/
