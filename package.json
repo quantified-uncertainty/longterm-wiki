@@ -46,6 +46,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/proper-lockfile": "^4.1.4",
     "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
     "ccusage": "^18.0.11",
     "cheerio": "^1.2.0",
     "esbuild": "^0.28.0",
@@ -65,9 +66,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.1",
     "unified": "^11.0.5",
-    "vitest": "^4.0.18",
-    "@vitest/ui": "^4.1.0",
-    "vite": "7.3.5"
+    "vite": "7.3.5",
+    "vitest": "^4.0.18"
   },
   "pnpm": {
     "overrides": {
@@ -135,7 +135,6 @@
       "ws@>=8.0.0 <8.21.0": ">=8.21.0",
       "form-data@>=4.0.0 <4.0.6": ">=4.0.6",
       "vite@>=7.0.0 <=7.3.4": "7.3.5",
-      "js-yaml@<=4.1.1": ">=4.2.0",
       "@babel/core@<=7.29.0": ">=7.29.6",
       "dompurify@<3.4.7": ">=3.4.7",
       "dompurify@<=3.4.5": ">=3.4.6",
@@ -149,7 +148,11 @@
       "vite": "7.3.5",
       "undici@>=7.0.0 <8.0.0": ">=7.28.0 <8",
       "lodash-es": ">=4.18.0",
-      "esbuild@<0.28.1": ">=0.28.1"
+      "esbuild@<0.28.1": ">=0.28.1",
+      "js-yaml@<=4.1.1": ">=4.2.0"
+    },
+    "patchedDependencies": {
+      "gray-matter@4.0.3": "patches/gray-matter@4.0.3.patch"
     }
   },
   "engines": {
