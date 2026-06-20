@@ -32,7 +32,7 @@ function normalize(text) {
 /**
  * Extract content from MDX, removing frontmatter, imports, code, etc.
  */
-function extractContent(content) {
+export function extractContent(content) {
   if (!content) return '';
 
   // Remove MDX imports, frontmatter, code blocks

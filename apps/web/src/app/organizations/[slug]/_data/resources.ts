@@ -100,7 +100,7 @@ function isSectionPage(title: string, orgName: string): boolean {
 }
 
 /** Decode common HTML entities in titles. */
-function decodeHtmlEntities(s: string): string {
+export function decodeHtmlEntities(s: string): string {
   return s
     .replace(/&#x27;/g, "'")
     .replace(/&#39;/g, "'")
@@ -114,7 +114,10 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&nbsp;/g, " ")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#(\d+);/g, (m, n) => {
+      const cp = Number(n);
+      return cp >= 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : m;
+    })
     // Decode &amp; LAST so inputs like &amp;lt; round-trip to the literal
     // &lt; instead of being double-unescaped to <.
     .replace(/&amp;/g, "&");

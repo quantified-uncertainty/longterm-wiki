@@ -387,6 +387,35 @@ Anthropic raised \\$30 billion.`;
     expect(result).toMatch(/<F e="test" f="c0d01200">\\\$100M<\/F>\./);
     expect(result).toContain('[^1]: Report shows $100M');
   });
+
+  it('skips numbers inside markdown link with deeply nested parens in URL', () => {
+    // The markdownLink skip-range regex allows one level of nested parens.
+    const content = 'See [x](/wiki/30_billion_(amount)) then 30 alone.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '30', entityId: 'anthropic', factId: '5b0663a0', displayText: '30' },
+    ];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // The 30 inside the link URL must stay untouched; the bare 30 is wrapped.
+    expect(result).toContain('[x](/wiki/30_billion_(amount))');
+    expect(applied).toBe(1);
+    expect(result).toContain('<F e="anthropic" f="5b0663a0">30</F> alone');
+  });
+
+  it('runs in linear time on pathological markdown-link input (ReDoS guard)', () => {
+    // Markdown link prefix + a long run of `(` triggers catastrophic
+    // backtracking in a naive nested-paren regex. The hardened pattern is linear.
+    const content = '30 ' + '[a](' + '('.repeat(40000) + ' tail 30';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '30', entityId: 'anthropic', factId: '5b0663a0', displayText: '30' },
+    ];
+
+    const start = performance.now();
+    applyFactRefReplacements(content, replacements);
+    const elapsed = performance.now() - start;
+
+    expect(elapsed).toBeLessThan(1000);
+  });
 });
 
 describe('fixDoubleNestedFTags', () => {

@@ -3,6 +3,7 @@
  */
 
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
+import { replaceUntilStable } from '../lib/html-utils.ts';
 
 /**
  * Build a list of cleaned text from paragraphs that contain footnotes.
@@ -22,12 +23,7 @@ export function extractFootnotedSentences(rawContent: string): string[] {
 
     // Strip tags to a fixed point so spliced-together angle brackets can't
     // re-form a tag.
-    let tagless = para;
-    let taglessPrev: string;
-    do {
-      taglessPrev = tagless;
-      tagless = tagless.replace(/<[^>]+>/g, '').replace(/<\/[^>]+>/g, '');
-    } while (tagless !== taglessPrev);
+    const tagless = replaceUntilStable(/<[^>]+>/g, para, '');
     const clean = tagless
       .replace(/\[\^[\w:.-]+\]/g, '')
       .replace(/\*\*([^*]+)\*\*/g, '$1')

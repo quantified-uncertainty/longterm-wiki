@@ -219,7 +219,7 @@ function blendedScore(r: UnifiedResult, query: string): number {
 }
 
 /** Decode HTML entities from server-generated snippets. */
-function decodeEntities(text: string): string {
+export function decodeEntities(text: string): string {
   return text
     .replace(/&#x27;/g, "'")
     .replace(/&#x2F;/g, "/")
@@ -801,7 +801,7 @@ function formatRelativeDate(dateStr: string): string {
 
 // ── Utilities ────────────────────────────────────────────────────────
 
-function sanitizeSnippet(html: string): string {
+export function sanitizeSnippet(html: string): string {
   let out = html
     .replace(/<mark\b[^>]*>/gi, "<mark>")
     .replace(/<\/mark\s*>/gi, "</mark>");

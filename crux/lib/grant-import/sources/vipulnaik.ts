@@ -216,6 +216,57 @@ function parseSQLTuple(tuple: string): (string | null)[] {
  * Generic parser for Vipul Naik SQL INSERT statements.
  * Handles multiple INSERT blocks with different column sets per file.
  */
+/**
+ * Extract top-level `(...)` tuples from a SQL VALUES block in linear time.
+ *
+ * Tracks single-quoted strings (with `''` and `\.` escapes) so a `)` inside a
+ * string doesn't end a tuple. A char-scan avoids the catastrophic backtracking
+ * a quote-aware regex suffers on unterminated input.
+ */
+export function extractSqlTuples(s: string): string[] {
+  const tuples: string[] = [];
+  const n = s.length;
+  let i = 0;
+  while (i < n) {
+    if (s[i] !== "(") {
+      i++;
+      continue;
+    }
+    const start = i;
+    i++; // consume '('
+    let inQuote = false;
+    let closed = false;
+    while (i < n) {
+      const c = s[i];
+      if (inQuote) {
+        if (c === "\\") {
+          i += 2; // skip an escaped character
+        } else if (c === "'") {
+          if (s[i + 1] === "'") {
+            i += 2; // doubled-quote escape stays inside the string
+          } else {
+            inQuote = false;
+            i++;
+          }
+        } else {
+          i++;
+        }
+      } else if (c === "'") {
+        inQuote = true;
+        i++;
+      } else if (c === ")") {
+        i++;
+        closed = true;
+        break;
+      } else {
+        i++;
+      }
+    }
+    if (closed) tuples.push(s.slice(start, i));
+  }
+  return tuples;
+}
+
 export function parseVNSQLFile(content: string): VNSQLGrant[] {
   const grants: VNSQLGrant[] = [];
   const insertRegex = /insert\s+into\s+donations\s*\(([^)]+)\)\s*values\s*/gi;
@@ -241,11 +292,10 @@ export function parseVNSQLFile(content: string): VNSQLGrant[] {
       ? content.substring(valuesStart, nextInsert)
       : content.substring(valuesStart);
 
-    const tupleRegex = /\((?:'(?:[^'\\]|'')*'|[^')])*\)/g;
-    let tupleMatch;
-
-    while ((tupleMatch = tupleRegex.exec(blockContent)) !== null) {
-      const fields = parseSQLTuple(tupleMatch[0]);
+    // A single regex for `(...)` tuples that respects quoted strings backtracks
+    // catastrophically on unterminated quotes (ReDoS). Scan linearly instead.
+    for (const tuple of extractSqlTuples(blockContent)) {
+      const fields = parseSQLTuple(tuple);
       if (fields.length < Math.max(donorIdx, doneeIdx, amountIdx) + 1) continue;
 
       const donor = fields[donorIdx];

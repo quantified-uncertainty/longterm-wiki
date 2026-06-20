@@ -133,11 +133,11 @@ export async function fetchToCache(
 // Closing tags tolerate trailing whitespace (`</script >`) so a crafted page
 // can't slip a block past the filter with `</script\n>`.
 const RE_DROP_BLOCKS: ReadonlyArray<RegExp> = [
-  /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi,
-  /<style\b[^>]*>[\s\S]*?<\/style\s*>/gi,
-  /<noscript\b[^>]*>[\s\S]*?<\/noscript\s*>/gi,
-  /<svg\b[^>]*>[\s\S]*?<\/svg\s*>/gi,   // logos: lots of bytes, no signal
-  /<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, // favicon/meta/links
+  /<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi,
+  /<style\b[^>]*>[\s\S]*?<\/style[^>]*>/gi,
+  /<noscript\b[^>]*>[\s\S]*?<\/noscript[^>]*>/gi,
+  /<svg\b[^>]*>[\s\S]*?<\/svg[^>]*>/gi,   // logos: lots of bytes, no signal
+  /<head\b[^>]*>[\s\S]*?<\/head[^>]*>/gi, // favicon/meta/links
   /<!--[\s\S]*?-->/g,
 ];
 const RE_OPEN_TAG = /<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*?)(\/?)>/g;

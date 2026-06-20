@@ -125,28 +125,35 @@ function checkDuplicateWikiIds(): CheckResult {
   const yamlIds = new Map<string, number>();
   const mdxIds = new Map<string, number>();
 
+  let grepOut = '';
   try {
-    let grepOut = '';
-    try {
-      grepOut = execFileSync('grep', ['-rh', 'wikiId:', entitiesDir], {
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-      }).trim();
-    } catch { /* grep exits non-zero when no matches */ }
-    for (const line of grepOut.split('\n')) {
-      const m = line.match(/wikiId:\s*"?(E\d+)"?/);
-      if (m) yamlIds.set(m[1], (yamlIds.get(m[1]) ?? 0) + 1);
+    grepOut = execFileSync('grep', ['-rh', 'wikiId:', entitiesDir], {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+  } catch (e) {
+    // grep exits 1 when there are no matches; any other status is a real
+    // failure and must not be swallowed into a false "no duplicates" pass.
+    if ((e as { status?: number }).status !== 1) {
+      return { name: 'Duplicate wikiIds', status: 'fail', message: `grep failed: ${(e as Error).message}`, tier: 'basic' };
     }
-  } catch { /* empty */ }
+  }
+  for (const line of grepOut.split('\n')) {
+    const m = line.match(/wikiId:\s*"?(E\d+)"?/);
+    if (m) yamlIds.set(m[1], (yamlIds.get(m[1]) ?? 0) + 1);
+  }
 
-  try {
+  {
     let findOut = '';
     try {
       findOut = execFileSync('find', [contentDir, '-type', 'f', '(', '-name', '*.mdx', '-o', '-name', '*.md', ')'], {
         encoding: 'utf-8',
         stdio: ['pipe', 'pipe', 'pipe'],
       }).trim();
-    } catch { /* find may exit non-zero */ }
+    } catch (e) {
+      // find returns 0 even with no results, so any non-zero exit is a real error.
+      return { name: 'Duplicate wikiIds', status: 'fail', message: `find failed: ${(e as Error).message}`, tier: 'basic' };
+    }
     for (const fp of findOut.split('\n').filter(Boolean)) {
       try {
         const fm = readFileSync(fp, 'utf-8').match(/^---\n([\s\S]*?)\n---/);
@@ -155,9 +162,9 @@ function checkDuplicateWikiIds(): CheckResult {
           const m = line.match(/^wikiId:\s*"?(E\d+)"?/);
           if (m) mdxIds.set(m[1], (mdxIds.get(m[1]) ?? 0) + 1);
         }
-      } catch { /* skip */ }
+      } catch { /* skip individual unreadable files */ }
     }
-  } catch { /* empty */ }
+  }
 
   const dupes: string[] = [];
   for (const [id, n] of yamlIds) if (n > 1) dupes.push(`${id}: ${n}x in YAML`);

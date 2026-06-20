@@ -21,6 +21,14 @@ describe('stripMarkup', () => {
     expect(stripMarkup('Hello <em>world</em>!')).toBe('Hello world!');
   });
 
+  it('strips spliced/nested tags to a fixed point', () => {
+    // Removing the inner <script> splices the outer fragments into a fresh
+    // <script ...> tag, so a single pass would leave "<script" behind.
+    const out = stripMarkup('<scr<script>ipt>alert(1)</script>');
+    expect(out.toLowerCase()).not.toContain('<script');
+    expect(out).not.toContain('<');
+  });
+
   it('strips markdown links but keeps text', () => {
     expect(stripMarkup('[OpenAI](https://openai.com)')).toBe('OpenAI');
     expect(stripMarkup('See [this paper](http://arxiv.org/123) for details')).toBe('See this paper for details');

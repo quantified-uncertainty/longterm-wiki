@@ -16,6 +16,7 @@ import fs from 'fs';
 import path from 'path';
 import type { CommandResult } from '../lib/command-types.ts';
 import { findPageById } from '../lib/page-resolution.ts';
+import { replaceUntilStable } from '../lib/html-utils.ts';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
@@ -440,13 +441,9 @@ export async function auditAllPagesCommand(
     // blocks to a fixed point so nested or spliced-together markup can't survive
     // a single pass.
     let stripped = body.replace(/^(?:import|export)\s.*$/gm, '');
-    let strippedPrev: string;
-    do {
-      strippedPrev = stripped;
-      stripped = stripped
-        .replace(/<[^>]+\/>/g, '')           // self-closing tags
-        .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, ''); // component blocks
-    } while (stripped !== strippedPrev);
+    stripped = replaceUntilStable(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, stripped, ''); // component blocks
+    stripped = replaceUntilStable(/<[^>]+\/>/g, stripped, '');                 // self-closing tags
+    stripped = replaceUntilStable(/<[^>]+>/g, stripped, '');                   // stray tags
     const prose = stripped
       .replace(/^\[\^[\w:.-]+\]:.*$/gm, '') // footnote defs
       .replace(/^#{1,6}\s.*$/gm, '')        // headings

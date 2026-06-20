@@ -19,7 +19,7 @@ function safeFromCodePoint(cp: number): string {
  * two fragments into a new tag (e.g. `<scr<script>ipt>`), so sanitization that
  * removes markup must run to a fixed point.
  */
-function replaceUntilStable(re: RegExp, input: string, replacement: string): string {
+export function replaceUntilStable(re: RegExp, input: string, replacement: string): string {
   let prev: string;
   let out = input;
   do {
@@ -54,13 +54,13 @@ export function decodeHtmlEntities(s: string): string {
  * or null if none found (content must be > 200 chars to qualify).
  */
 export function extractMainContent(html: string): string | null {
-  const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main\s*>/i);
+  const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main[^>]*>/i);
   if (mainMatch && mainMatch[1].length > 200) return mainMatch[1];
 
-  const roleMainMatch = html.match(/<[^>]+role=["']main["'][^>]*>([\s\S]*?)<\/\w+\s*>/i);
+  const roleMainMatch = html.match(/<[^>]+role=["']main["'][^>]*>([\s\S]*?)<\/\w+[^>]*>/i);
   if (roleMainMatch && roleMainMatch[1].length > 200) return roleMainMatch[1];
 
-  const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article\s*>/i);
+  const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article[^>]*>/i);
   if (articleMatch && articleMatch[1].length > 200) return articleMatch[1];
 
   return null;
@@ -77,7 +77,7 @@ export function htmlToText(html: string): string {
   // Remove whole non-content blocks (content included) to a fixed point.
   // Closing tags tolerate whitespace (`</script >`) so they can't be bypassed.
   for (const tag of ["script", "style", "nav", "header", "footer", "aside"]) {
-    text = replaceUntilStable(new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}\\s*>`, "gi"), text, "");
+    text = replaceUntilStable(new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}[^>]*>`, "gi"), text, "");
   }
 
   text = text

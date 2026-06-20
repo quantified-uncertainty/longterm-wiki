@@ -391,6 +391,36 @@ Anthropic is a company.`;
     expect(applied).toBe(1);
     expect(result).toContain('<EntityLink id="E80">OpenAI</EntityLink>');
   });
+
+  it('skips entity name inside markdown link with deeply nested parens in URL', () => {
+    // The markdownLink regex allows one level of nested parens in URLs.
+    const content = 'See [x](/wiki/Anthropic_(company)) and then Anthropic separately.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The Anthropic in the link URL must stay untouched; the bare one is linked.
+    expect(result).toContain('[x](/wiki/Anthropic_(company))');
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> separately');
+  });
+
+  it('runs in linear time on pathological markdown-link input (ReDoS guard)', () => {
+    // A markdown link prefix followed by a long run of `(` is the classic
+    // catastrophic-backtracking trigger for a naive nested-paren regex inside
+    // buildSkipRanges. The hardened pattern is linear.
+    const content = 'Anthropic ' + '[a](' + '('.repeat(40000) + ' tail Anthropic';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const start = performance.now();
+    applyEntityLinkReplacements(content, replacements);
+    const elapsed = performance.now() - start;
+
+    expect(elapsed).toBeLessThan(1000);
+  });
 });
 
 // buildEnrichmentChunks is a thin wrapper over splitContentForEnrichment.
