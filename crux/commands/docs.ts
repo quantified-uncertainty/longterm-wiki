@@ -14,10 +14,11 @@ function stripAnsi(text: string): string {
 }
 
 /** Escape MDX-sensitive characters ($ and <) outside code blocks */
-function escapeMdx(text: string): string {
+export function escapeMdx(text: string): string {
   // Escape $ followed by digits (would be parsed as math)
   // and bare < followed by lowercase (would be parsed as JSX)
   return text
+    .replace(/\\/g, '\\\\')
     .replace(/\$/g, '\\$')
     .replace(/<(?=[a-z])/g, '\\<');
 }
