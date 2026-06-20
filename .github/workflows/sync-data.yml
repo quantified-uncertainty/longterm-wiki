@@ -11,6 +11,9 @@ concurrency:
   group: sync-data-${{ github.sha }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml

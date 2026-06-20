@@ -11,6 +11,9 @@ on:
     branches: [production]
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     # Only run if CI succeeded (or on manual trigger)

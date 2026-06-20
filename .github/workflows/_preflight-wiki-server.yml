@@ -6,6 +6,8 @@ on:
         description: "Whether the wiki-server is reachable and healthy"
         value: ${{ jobs.check.outputs.healthy }}
 
+permissions: {}
+
 # Reusable workflow that checks wiki-server health before running dependent jobs.
 # Replaces the duplicated preflight pattern across 8+ workflows.
 #
