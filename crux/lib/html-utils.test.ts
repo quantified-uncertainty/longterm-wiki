@@ -78,10 +78,12 @@ describe('replaceUntilStable', () => {
     expect(replaceUntilStable(/ab/g, 'aabb', '')).toBe('');
   });
 
-  it('removes a tag that only forms after a first pass (no bypass)', () => {
-    // Stripping the inner <script> splices '<scr'+'ipt>' = '<script>', which the
-    // fixpoint loop then removes too.
-    expect(replaceUntilStable(/<script>/g, '<scr<script>ipt>', '')).toBe('');
+  it('removes a match that only forms after a first pass (no bypass)', () => {
+    // Removing the inner "XY" splices "X"+"Y" into a fresh "XY", which the
+    // fixpoint loop then removes too. (The HTML splice case is covered by the
+    // htmlToText test above; a non-tag pattern here keeps this unit focused on
+    // the loop itself.)
+    expect(replaceUntilStable(/XY/g, 'XXYY', '')).toBe('');
   });
   it('is a no-op when nothing matches', () => {
     expect(replaceUntilStable(/x/g, 'abc', '')).toBe('abc');
