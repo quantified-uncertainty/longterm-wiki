@@ -29,6 +29,9 @@ concurrency:
   group: sync-entities-${{ github.sha }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml
@@ -47,6 +50,8 @@ jobs:
     if: github.ref == 'refs/heads/production'
     needs: [preflight]
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
       - name: Wait for wiki-server deploy
         env:

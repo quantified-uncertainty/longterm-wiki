@@ -20,6 +20,8 @@ concurrency:
   group: wiki-server-export
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml

@@ -16,6 +16,9 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.sha }}-${{ (github.event.action == 'labeled' || github.event.action == 'unlabeled') && 'label' || 'main' }}
   cancel-in-progress: ${{ github.event.action != 'labeled' && github.event.action != 'unlabeled' }}
 
+permissions:
+  contents: read
+
 jobs:
   # ---------------------------------------------------------------------------
   # Phase 1: Build data (shared by validate and test jobs via artifact)
@@ -415,6 +418,9 @@ jobs:
     needs: [ci]
     if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:

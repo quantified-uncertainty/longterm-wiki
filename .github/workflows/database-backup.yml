@@ -19,6 +19,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml
