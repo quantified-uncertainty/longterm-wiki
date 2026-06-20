@@ -93,7 +93,9 @@ export function parseSections(source: string): SectionMap {
 }
 
 export function escapeCell(s: string): string {
-  return s.replace(/\|/g, "\\|");
+  // Escape backslashes first so an existing `\` can't combine with the escape
+  // we add for `|`, then escape the pipe that would otherwise break the column.
+  return s.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
 }
 
 /**

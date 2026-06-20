@@ -12,6 +12,7 @@ import { hashId } from '../../lib/hash-utils.ts';
 import { SOURCES_DIR } from '../../lib/cache-paths.ts';
 import { getResourceByUrl } from '../../lib/search/resource-lookup.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
+import { htmlToText } from '../../lib/html-utils.ts';
 import type { TopicPhaseContext, ResearchPhaseContext } from './types.ts';
 
 type RegisterContext = TopicPhaseContext;
@@ -388,15 +389,7 @@ export async function processDirections(topic: string, directions: string | null
         }
       } else {
         const html = await response.text();
-        content = html
-          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-          .replace(/<[^>]+>/g, ' ')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '"')
+        content = htmlToText(html)
           .replace(/\s+/g, ' ')
           .trim()
           .slice(0, 15000);

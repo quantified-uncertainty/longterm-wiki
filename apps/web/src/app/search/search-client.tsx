@@ -223,10 +223,12 @@ function decodeEntities(text: string): string {
   return text
     .replace(/&#x27;/g, "'")
     .replace(/&#x2F;/g, "/")
-    .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"');
+    .replace(/&quot;/g, '"')
+    // Decode &amp; LAST so inputs like &amp;lt; round-trip to the literal
+    // &lt; instead of being double-unescaped to <.
+    .replace(/&amp;/g, "&");
 }
 
 // ── Component ────────────────────────────────────────────────────────
@@ -800,10 +802,17 @@ function formatRelativeDate(dateStr: string): string {
 // ── Utilities ────────────────────────────────────────────────────────
 
 function sanitizeSnippet(html: string): string {
-  return html
+  let out = html
     .replace(/<mark\b[^>]*>/gi, "<mark>")
-    .replace(/<\/mark\s*>/gi, "</mark>")
-    .replace(/<(?!\/?mark>)[^>]*>/gi, "");
+    .replace(/<\/mark\s*>/gi, "</mark>");
+  // Strip all non-<mark> tags to a fixed point: removing one tag can splice
+  // fragments into a fresh tag, so a single pass can be bypassed.
+  let prev: string;
+  do {
+    prev = out;
+    out = out.replace(/<(?!\/?mark>)[^>]*>/gi, "");
+  } while (out !== prev);
+  return out;
 }
 
 function Highlight({ text, query }: { text: string; query: string }) {

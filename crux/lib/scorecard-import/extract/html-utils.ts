@@ -130,12 +130,14 @@ export async function fetchToCache(
 // Compiled once and reused per call — avoids re-parsing 8 regex literals
 // every invocation. The strip helper sees one ~840KB FLI page per
 // extraction, so this is not hot, but the cost is also free.
+// Closing tags tolerate trailing whitespace (`</script >`) so a crafted page
+// can't slip a block past the filter with `</script\n>`.
 const RE_DROP_BLOCKS: ReadonlyArray<RegExp> = [
-  /<script\b[^>]*>[\s\S]*?<\/script>/gi,
-  /<style\b[^>]*>[\s\S]*?<\/style>/gi,
-  /<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi,
-  /<svg\b[^>]*>[\s\S]*?<\/svg>/gi,   // logos: lots of bytes, no signal
-  /<head\b[^>]*>[\s\S]*?<\/head>/gi, // favicon/meta/links
+  /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi,
+  /<style\b[^>]*>[\s\S]*?<\/style\s*>/gi,
+  /<noscript\b[^>]*>[\s\S]*?<\/noscript\s*>/gi,
+  /<svg\b[^>]*>[\s\S]*?<\/svg\s*>/gi,   // logos: lots of bytes, no signal
+  /<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, // favicon/meta/links
   /<!--[\s\S]*?-->/g,
 ];
 const RE_OPEN_TAG = /<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*?)(\/?)>/g;

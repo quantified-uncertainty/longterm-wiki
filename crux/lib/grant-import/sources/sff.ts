@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { decodeHtmlEntities } from "../../html-utils.ts";
 import { QUARTER_TO_MONTH } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
@@ -91,17 +92,16 @@ export const source: GrantSource = {
       const cells: string[] = [];
       let tdMatch;
       while ((tdMatch = tdRegex.exec(rowHtml)) !== null) {
-        cells.push(
-          tdMatch[1]
-            .replace(/<[^>]+>/g, "")
-            .replace(/&amp;/g, "&")
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&quot;/g, '"')
-            .replace(/&#39;/g, "'")
-            .replace(/\s+/g, " ")
-            .trim()
-        );
+        // Strip tags to a fixed point so spliced-together angle brackets can't
+        // re-form a tag, then decode entities (decodeHtmlEntities handles
+        // `&amp;` last to avoid double-unescaping).
+        let cell = tdMatch[1];
+        let prev: string;
+        do {
+          prev = cell;
+          cell = cell.replace(/<[^>]+>/g, "");
+        } while (cell !== prev);
+        cells.push(decodeHtmlEntities(cell).replace(/\s+/g, " ").trim());
       }
 
       if (cells.length < 6) continue;

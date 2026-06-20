@@ -81,7 +81,7 @@ export function generateCreateScaffold(
   const frontmatter = [
     '---',
     wikiId ? `wikiId: ${wikiId}` : null,
-    `title: "${topic.replace(/"/g, '\\"')}"`,
+    `title: "${topic.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`,
     `description: ""`,
     'sidebar:',
     '  order: 50',

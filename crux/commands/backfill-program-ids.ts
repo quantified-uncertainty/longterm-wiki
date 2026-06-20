@@ -18,6 +18,7 @@ import {
   batchedRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
+import { hostMatches } from "@longterm-wiki/url-utils";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,17 +54,17 @@ function detectSource(sourceUrl: string | null): string | null {
   if (!sourceUrl) return null;
   const url = sourceUrl.toLowerCase();
 
-  if (url.includes("coefficientgiving.org") || url.includes("openphilanthropy.org"))
+  if (hostMatches(url, "coefficientgiving.org") || hostMatches(url, "openphilanthropy.org"))
     return "coefficient-giving";
-  if (url.includes("effectivealtruism.org/grants") || url.includes("funds.effectivealtruism.org"))
+  if ((hostMatches(url, "effectivealtruism.org") && url.includes("/grants")) || hostMatches(url, "funds.effectivealtruism.org"))
     return "ea-funds";
   if (url.includes("survivalandflourishing"))
     return "sff";
-  if (url.includes("ftxfuturefund") || (url.includes("web.archive.org") && url.includes("ftx")))
+  if (url.includes("ftxfuturefund") || (hostMatches(url, "web.archive.org") && url.includes("ftx")))
     return "ftx-future-fund";
-  if (url.includes("manifund.org"))
+  if (hostMatches(url, "manifund.org"))
     return "manifund";
-  if (url.includes("givewell.org"))
+  if (hostMatches(url, "givewell.org"))
     return "givewell";
   if (url.includes("astralcodexten"))
     return "acx-grants";

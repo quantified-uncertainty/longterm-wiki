@@ -18,6 +18,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { runResearch } from './research-agent.ts';
 import type { ResearchRequest } from './research-agent.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ---------------------------------------------------------------------------
 // Mock source-fetcher — avoid real network calls
@@ -231,7 +232,7 @@ describe('runResearch', () => {
 
     // 'shared.example.com/page' appears in both Exa and Perplexity
     const urls = result.sources.map(s => s.url);
-    const sharedCount = urls.filter(u => u.includes('shared.example.com')).length;
+    const sharedCount = urls.filter(u => hostMatches(u, 'shared.example.com')).length;
     expect(sharedCount).toBe(1); // deduplicated to 1
 
     expect(result.metadata.urlsDeduplicated).toBeGreaterThan(0);
@@ -405,10 +406,10 @@ describe('runResearch', () => {
 
   it('degrades gracefully when SCRY returns HTTP error', async () => {
     const fetchMock = vi.fn(async (url: string) => {
-      if ((url as string).includes('scry.io')) {
+      if (hostMatches(url as string, 'scry.io')) {
         return { ok: false, status: 429, json: async () => ({ error: 'rate limited' }) };
       }
-      if ((url as string).includes('exa.ai')) {
+      if (hostMatches(url as string, 'exa.ai')) {
         return { ok: true, status: 200, json: async () => mockExaResponse };
       }
       return { ok: false, status: 404, json: async () => ({}) };
@@ -500,7 +501,7 @@ describe('runResearch', () => {
     expect(result.metadata.sourcesSearched).toContain('pg');
     // PG resource should be included in fetched sources
     const urls = result.sources.map(s => s.url);
-    expect(urls.some(u => u.includes('pg-resource.example.com'))).toBe(true);
+    expect(urls.some(u => hostMatches(u, 'pg-resource.example.com'))).toBe(true);
   });
 
   it('counts urlsAlreadyInPG when PG and web search overlap', async () => {

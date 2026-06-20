@@ -357,8 +357,15 @@ export async function fetchDoiContent(url: string): Promise<StrategyResult | nul
 
     // Clean abstract (strip JATS/HTML tags)
     const abstractRaw = work.abstract ?? '';
-    const abstract = abstractRaw
-      .replace(/<[^>]+>/g, '')
+    // Strip tags to a fixed point so spliced-together angle brackets can't
+    // re-form a tag after a single pass.
+    let abstractStripped = abstractRaw;
+    let prevAbstract: string;
+    do {
+      prevAbstract = abstractStripped;
+      abstractStripped = abstractStripped.replace(/<[^>]+>/g, '');
+    } while (abstractStripped !== prevAbstract);
+    const abstract = abstractStripped
       .replace(/\s+/g, ' ')
       .trim();
 

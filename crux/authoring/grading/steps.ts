@@ -68,7 +68,14 @@ export function computeMetrics(content: string): Metrics {
   const withoutTables = withoutFm.replace(/\|[^\n]+\|/g, '');
   const withoutCodeBlocks = withoutTables.replace(/```[\s\S]*?```/g, '');
   const withoutImports = withoutCodeBlocks.replace(/^import\s+.*$/gm, '');
-  const withoutComponents = withoutImports.replace(/<[^>]+\/>/g, '').replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '');
+  // Remove markup to a fixed point: stripping one tag can splice fragments
+  // into a fresh tag, so a single pass can be bypassed.
+  let withoutComponents = withoutImports;
+  let prevComponents: string;
+  do {
+    prevComponents = withoutComponents;
+    withoutComponents = withoutComponents.replace(/<[^>]+\/>/g, '').replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '');
+  } while (withoutComponents !== prevComponents);
   const proseWords = withoutComponents.split(/\s+/).filter(w => w.length > 0).length;
 
   const rComponents = (withoutFm.match(/<R\s+id=/g) || []).length;

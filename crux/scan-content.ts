@@ -26,6 +26,7 @@ import { findMdxFiles } from './lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
 import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
+import { hostMatches, hostHasLabel } from "@longterm-wiki/url-utils";
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
@@ -118,12 +119,20 @@ function getEntityIdFromPath(filePath: string): string {
  * Extract plain text content from MDX, removing imports and JSX
  */
 function extractTextContent(mdxContent: string): string {
-  return mdxContent
+  let text = mdxContent
     // Remove import statements
     .replace(/^import\s+.*$/gm, '')
-    // Remove JSX components (both self-closing and with children)
-    .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '')
-    .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '')
+    // Remove self-closing JSX components
+    .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '');
+  // Remove paired JSX components. Loop until stable so nested components
+  // (and angle brackets spliced together by an earlier removal) are fully
+  // stripped instead of leaving inner markup behind after one pass.
+  let prev: string;
+  do {
+    prev = text;
+    text = text.replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '');
+  } while (text !== prev);
+  return text
     // Remove HTML comments
     .replace(/<!--[\s\S]*?-->/g, '')
     // Remove MDX expressions
@@ -198,26 +207,26 @@ function inferSourceType(url: string | undefined): string {
   if (!url) return 'unknown';
   const lower = url.toLowerCase();
 
-  if (lower.includes('arxiv.org')) return 'paper';
-  if (lower.includes('doi.org')) return 'paper';
-  if (lower.includes('papers.ssrn.com')) return 'paper';
-  if (lower.includes('nature.com')) return 'paper';
-  if (lower.includes('science.org')) return 'paper';
-  if (lower.includes('openai.com/research')) return 'paper';
-  if (lower.includes('anthropic.com/research')) return 'paper';
-  if (lower.includes('deepmind.com/research')) return 'paper';
+  if (hostMatches(url, 'arxiv.org')) return 'paper';
+  if (hostMatches(url, 'doi.org')) return 'paper';
+  if (hostMatches(url, 'papers.ssrn.com')) return 'paper';
+  if (hostMatches(url, 'nature.com')) return 'paper';
+  if (hostMatches(url, 'science.org')) return 'paper';
+  if (hostMatches(url, 'openai.com') && lower.includes('/research')) return 'paper';
+  if (hostMatches(url, 'anthropic.com') && lower.includes('/research')) return 'paper';
+  if (hostMatches(url, 'deepmind.com') && lower.includes('/research')) return 'paper';
 
-  if (lower.includes('lesswrong.com')) return 'blog';
-  if (lower.includes('alignmentforum.org')) return 'blog';
-  if (lower.includes('substack.com')) return 'blog';
-  if (lower.includes('medium.com')) return 'blog';
+  if (hostMatches(url, 'lesswrong.com')) return 'blog';
+  if (hostMatches(url, 'alignmentforum.org')) return 'blog';
+  if (hostMatches(url, 'substack.com')) return 'blog';
+  if (hostMatches(url, 'medium.com')) return 'blog';
 
-  if (lower.includes('.gov')) return 'government';
-  if (lower.includes('congress.gov')) return 'government';
-  if (lower.includes('whitehouse.gov')) return 'government';
+  if (hostHasLabel(url, 'gov')) return 'government';
+  if (hostMatches(url, 'congress.gov')) return 'government';
+  if (hostMatches(url, 'whitehouse.gov')) return 'government';
 
-  if (lower.includes('wikipedia.org')) return 'reference';
-  if (lower.includes('grokipedia.com')) return 'reference';
+  if (hostMatches(url, 'wikipedia.org')) return 'reference';
+  if (hostMatches(url, 'grokipedia.com')) return 'reference';
 
   if (lower.includes('.pdf')) return 'report';
 

@@ -34,8 +34,15 @@ export function preprocessMdx(source: string): string {
     ""
   );
 
-  // Strip Astro client directives (client:load, client:idle, etc.)
-  processed = processed.replace(/\s+client:(load|idle|visible|only|media)(\s*=\s*"[^"]*")?/g, "");
+  // Strip Astro client directives (client:load, client:idle, etc.) to a fixed
+  // point: removing one directive can leave adjacent ones matchable in a way a
+  // single pass misses.
+  const clientDirective = /\s+client:(load|idle|visible|only|media)(\s*=\s*"[^"]*")?/g;
+  let prevProcessed: string;
+  do {
+    prevProcessed = processed;
+    processed = processed.replace(clientDirective, "");
+  } while (processed !== prevProcessed);
 
   return processed;
 }

@@ -46,6 +46,16 @@ export interface NormalizeUrlOptions {
  * the same key — callers that route normalized output to a redirect / link
  * rewriter cannot accidentally cross schemes.
  */
+/**
+ * Strip trailing `/` characters with a linear scan. Replaces `/\/+$/`, whose
+ * backtracking on long slash runs is flagged as polynomial ReDoS.
+ */
+function stripTrailingSlashes(s: string): string {
+  let end = s.length;
+  while (end > 0 && s.charCodeAt(end - 1) === 47 /* "/" */) end--;
+  return s.slice(0, end);
+}
+
 export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): string {
   const { stripProtocol, lowercasePath, sortParams, keepTracking } = opts;
 
@@ -53,13 +63,13 @@ export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): strin
   try {
     url = new URL(raw);
   } catch {
-    return raw.trim().replace(/\/+$/, "").toLowerCase();
+    return stripTrailingSlashes(raw.trim()).toLowerCase();
   }
 
   // Reject non-http(s) schemes via the fallback path so they cannot collide
   // with http(s) URLs under stripProtocol: true.
   if (url.protocol !== "http:" && url.protocol !== "https:") {
-    return raw.trim().replace(/\/+$/, "").toLowerCase();
+    return stripTrailingSlashes(raw.trim()).toLowerCase();
   }
 
   let host = url.hostname.toLowerCase();
@@ -84,7 +94,7 @@ export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): strin
   if (sortParams) params.sort();
   const qs = params.toString();
 
-  let path = url.pathname === "/" ? "" : url.pathname.replace(/\/+$/, "");
+  let path = url.pathname === "/" ? "" : stripTrailingSlashes(url.pathname);
   if (lowercasePath) path = path.toLowerCase();
 
   const scheme = stripProtocol ? "" : `${url.protocol}//`;
@@ -123,4 +133,30 @@ export function extractHost(raw: string): string {
   } catch {
     return "(invalid-url)";
   }
+}
+
+/**
+ * True when `hostOrUrl` is `base` or a subdomain of `base` (case-insensitive).
+ *
+ * Accepts either a bare hostname (e.g. `sub.example.com`) or a full URL — URLs
+ * are reduced to their host first. Use this for domain classification and
+ * allow-list checks instead of `url.includes("example.com")`, which also
+ * matches look-alikes like `evil-example.com` and `attacker.com/?x=example.com`.
+ */
+export function hostMatches(hostOrUrl: string, base: string): boolean {
+  const host =
+    /[/:]/.test(hostOrUrl) ? extractHost(hostOrUrl) : hostOrUrl.toLowerCase().replace(/^www\./, "");
+  const b = base.toLowerCase().replace(/^www\./, "");
+  return host === b || host.endsWith("." + b);
+}
+
+/**
+ * True when any dot-separated label of the host equals `label`
+ * (case-insensitive). Use for matching a host segment that is not a full
+ * registrable domain — e.g. the `pubmed` in `pubmed.ncbi.nlm.nih.gov` —
+ * instead of `host.includes("pubmed")`, which also matches `pubmed-evil.com`.
+ */
+export function hostHasLabel(hostOrUrl: string, label: string): boolean {
+  const host = /[/:]/.test(hostOrUrl) ? extractHost(hostOrUrl) : hostOrUrl.toLowerCase();
+  return host.split(".").includes(label.toLowerCase());
 }

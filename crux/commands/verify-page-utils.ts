@@ -20,9 +20,15 @@ export function extractFootnotedSentences(rawContent: string): string[] {
     if (/^#{1,6}\s/.test(para.trim())) continue;
     if (!/\[\^[\w:.-]+\]/.test(para)) continue;
 
-    const clean = para
-      .replace(/<[^>]+>/g, '')
-      .replace(/<\/[^>]+>/g, '')
+    // Strip tags to a fixed point so spliced-together angle brackets can't
+    // re-form a tag.
+    let tagless = para;
+    let taglessPrev: string;
+    do {
+      taglessPrev = tagless;
+      tagless = tagless.replace(/<[^>]+>/g, '').replace(/<\/[^>]+>/g, '');
+    } while (tagless !== taglessPrev);
+    const clean = tagless
       .replace(/\[\^[\w:.-]+\]/g, '')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\*([^*]+)\*/g, '$1')

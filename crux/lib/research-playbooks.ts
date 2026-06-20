@@ -225,5 +225,5 @@ export function formatPlaybookForPrompt(playbook: ResearchPlaybook): string {
 }
 
 function escapeCell(s: string): string {
-  return s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return s.replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
 }

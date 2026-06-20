@@ -83,7 +83,7 @@ function analyzeMermaidSyntax(code: string): SyntaxIssue[] {
   // Count nodes (rough estimate)
   const nodeCount = new Set(
     code.match(/\b([A-Z][a-zA-Z0-9_]*)\s*[\[\(\{]/g)?.map((m) =>
-      m.replace(/[\[\(\{]/, '').trim(),
+      m.replace(/[\[\(\{]/g, '').trim(),
     ) || [],
   ).size;
   if (nodeCount > 20) {

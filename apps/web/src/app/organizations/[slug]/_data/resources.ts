@@ -110,12 +110,14 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&#8217;/g, "\u2019")
     .replace(/&#8220;/g, "\u201C")
     .replace(/&#8221;/g, "\u201D")
-    .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&nbsp;/g, " ")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    // Decode &amp; LAST so inputs like &amp;lt; round-trip to the literal
+    // &lt; instead of being double-unescaped to <.
+    .replace(/&amp;/g, "&");
 }
 
 /** Fix common AI acronym casing from URL-slug-derived titles. */

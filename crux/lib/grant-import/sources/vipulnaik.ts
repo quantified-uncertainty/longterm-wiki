@@ -241,7 +241,7 @@ export function parseVNSQLFile(content: string): VNSQLGrant[] {
       ? content.substring(valuesStart, nextInsert)
       : content.substring(valuesStart);
 
-    const tupleRegex = /\((?:'(?:[^'\\]|'')*'|[^)]*)*\)/g;
+    const tupleRegex = /\((?:'(?:[^'\\]|'')*'|[^')])*\)/g;
     let tupleMatch;
 
     while ((tupleMatch = tupleRegex.exec(blockContent)) !== null) {

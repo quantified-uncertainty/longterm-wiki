@@ -17,6 +17,7 @@ import { fetchSource } from '../lib/search/source-fetcher.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { escapeXml } from '../lib/prompt-utils.ts';
 import { labForUrl, renderLabHintsForPrompt, loadLabHints } from './lab-hints.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -476,12 +477,12 @@ export function mapContentType(
   url: string,
 ): 'pdf' | 'html' | 'markdown' | 'arxiv-paper' | 'missing' {
   const lower = url.toLowerCase();
-  if (lower.includes('arxiv.org/abs') || lower.includes('arxiv.org/pdf') || lower.includes('ar5iv.labs.arxiv.org')) {
+  if ((hostMatches(url, 'arxiv.org') && (lower.includes('/abs') || lower.includes('/pdf'))) || hostMatches(url, 'ar5iv.labs.arxiv.org')) {
     return 'arxiv-paper';
   }
   if (contentType === 'pdf') return 'pdf';
   if (lower.endsWith('.md') || lower.endsWith('.markdown')) return 'markdown';
-  if (lower.includes('github.com') && (lower.includes('blob/') || lower.includes('raw/'))) return 'markdown';
+  if (hostMatches(url, 'github.com') && (lower.includes('blob/') || lower.includes('raw/'))) return 'markdown';
   if (contentType === 'html') return 'html';
   return 'html';
 }

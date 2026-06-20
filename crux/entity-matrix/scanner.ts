@@ -540,6 +540,9 @@ function scanDedicatedApiRoute(meta: EntityTypeMeta): CellValue {
   const candidates = [
     `${meta.id}.ts`,
     `${meta.id}s.ts`,
+    // NOTE: `.replace(/-/g, "-")` is a no-op (replaces "-" with itself), so this
+    // candidate is identical to `${meta.id}.ts` above. The intended alternate
+    // naming pattern is unclear, so behavior is left unchanged.
     `${meta.id.replace(/-/g, "-")}.ts`,
   ];
   for (const candidate of candidates) {

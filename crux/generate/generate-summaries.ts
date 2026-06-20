@@ -108,12 +108,19 @@ function getEntityIdFromPath(filePath: string): string {
  * Extract plain text content from MDX, removing imports and JSX
  */
 function extractTextContent(mdxContent: string): string {
-  return mdxContent
-    .replace(/^import\s+.*$/gm, '')
-    .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '')
-    .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+  // Remove JSX components/comments to a fixed point so nested or
+  // spliced-together markup can't survive a single pass.
+  let stripped = mdxContent.replace(/^import\s+.*$/gm, '');
+  let strippedPrev: string;
+  do {
+    strippedPrev = stripped;
+    stripped = stripped
+      .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '')
+      .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+  } while (stripped !== strippedPrev);
+  return stripped
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }

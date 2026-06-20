@@ -436,11 +436,18 @@ export async function auditAllPagesCommand(
     // Strip frontmatter
     const body = content.replace(/^---[\s\S]*?---\n/, '');
 
-    // Strip imports, components, footnote definitions
-    const prose = body
-      .replace(/^(?:import|export)\s.*$/gm, '')
-      .replace(/<[^>]+\/>/g, '')           // self-closing tags
-      .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, '') // component blocks
+    // Strip imports, components, footnote definitions. Remove tags/component
+    // blocks to a fixed point so nested or spliced-together markup can't survive
+    // a single pass.
+    let stripped = body.replace(/^(?:import|export)\s.*$/gm, '');
+    let strippedPrev: string;
+    do {
+      strippedPrev = stripped;
+      stripped = stripped
+        .replace(/<[^>]+\/>/g, '')           // self-closing tags
+        .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, ''); // component blocks
+    } while (stripped !== strippedPrev);
+    const prose = stripped
       .replace(/^\[\^[\w:.-]+\]:.*$/gm, '') // footnote defs
       .replace(/^#{1,6}\s.*$/gm, '')        // headings
       .replace(/\s+/g, ' ')

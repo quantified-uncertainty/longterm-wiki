@@ -12,6 +12,7 @@
 import { loadResources } from '../resource-io.ts';
 import { extractArxivId, sleep } from '../resource-utils.ts';
 import { fetchArxivBatch } from '../resource-metadata.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
@@ -88,7 +89,7 @@ interface FetcherResult {
 // ─── Fetchers (one per API) ─────────────────────────────────────────────────
 
 async function findArxivFixes(resources: Resource[], limit: number): Promise<FetcherResult> {
-  const arxiv = resources.filter(r => r.url?.includes('arxiv.org'));
+  const arxiv = resources.filter(r => r.url && hostMatches(r.url, 'arxiv.org'));
   console.log(`   Found ${arxiv.length} arXiv resources`);
 
   const idMap = new Map<string, Resource>();
@@ -136,9 +137,7 @@ async function findArxivFixes(resources: Resource[], limit: number): Promise<Fet
 }
 
 async function findWikipediaFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
-  const wiki = resources.filter(r =>
-    r.url?.includes('wikipedia.org/wiki/') || r.url?.includes('en.wikipedia.org')
-  );
+  const wiki = resources.filter(r => r.url != null && hostMatches(r.url, 'wikipedia.org'));
   console.log(`   Found ${wiki.length} Wikipedia resources`);
 
   const fixes: ResourceFix[] = [];
@@ -176,8 +175,8 @@ async function findWikipediaFixes(resources: Resource[], limit: number, verbose?
 
 async function findDoiFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
   const dois = resources.filter(r => {
-    if (r.url?.includes('arxiv.org')) return false;
-    return r.doi || r.url?.includes('doi.org/') || r.url?.match(/10\.\d{4,}\/[^\s]+/);
+    if (r.url && hostMatches(r.url, 'arxiv.org')) return false;
+    return r.doi || (r.url != null && hostMatches(r.url, 'doi.org')) || r.url?.match(/10\.\d{4,}\/[^\s]+/);
   });
   console.log(`   Found ${dois.length} resources with DOIs`);
 
@@ -217,7 +216,7 @@ async function findDoiFixes(resources: Resource[], limit: number, verbose?: bool
 async function findForumFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
   const forums = resources.filter(r => {
     const u = r.url || '';
-    return u.includes('lesswrong.com') || u.includes('alignmentforum.org') || u.includes('forum.effectivealtruism.org');
+    return hostMatches(u, 'lesswrong.com') || hostMatches(u, 'alignmentforum.org') || hostMatches(u, 'forum.effectivealtruism.org');
   });
   console.log(`   Found ${forums.length} forum resources`);
 
@@ -231,8 +230,8 @@ async function findForumFixes(resources: Resource[], limit: number, verbose?: bo
       const postId = resource.url.match(/\/posts\/([a-zA-Z0-9]+)/)?.[1];
       if (!postId) continue;
 
-      const apiUrl = resource.url.includes('lesswrong.com') ? 'https://www.lesswrong.com/graphql'
-        : resource.url.includes('alignmentforum.org') ? 'https://www.alignmentforum.org/graphql'
+      const apiUrl = hostMatches(resource.url, 'lesswrong.com') ? 'https://www.lesswrong.com/graphql'
+        : hostMatches(resource.url, 'alignmentforum.org') ? 'https://www.alignmentforum.org/graphql'
         : 'https://forum.effectivealtruism.org/graphql';
 
       const resp = await fetch(apiUrl, {

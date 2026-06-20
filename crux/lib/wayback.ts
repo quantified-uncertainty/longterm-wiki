@@ -2,6 +2,8 @@
  * Wayback Machine Utilities — shared lookup and content fetching.
  */
 
+import { htmlToText } from './html-utils.ts';
+
 const USER_AGENT = 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)';
 /** Pages shorter than this are likely error pages or empty shells. */
 const MIN_CONTENT_LENGTH = 100;
@@ -69,18 +71,15 @@ export async function lookupWaybackSnapshot(url: string): Promise<WaybackSnapsho
   return null;
 }
 
-/** Strip HTML to plain text, removing Wayback toolbar and common entities. */
+/** Strip HTML to plain text, removing the Wayback toolbar first. */
 function htmlToPlainText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
+  // Remove Wayback-specific chrome before the generic strip. The shared
+  // htmlToText handles whitespace-tolerant script/style removal, fixed-point
+  // tag stripping, and correct entity decoding (`&amp;` decoded last).
+  const withoutToolbar = html
     .replace(/<!-- BEGIN WAYBACK TOOLBAR[\s\S]*?END WAYBACK TOOLBAR -->/gi, '')
-    .replace(/<div id="wm-ipp-base"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '')
-    .replace(/<\/?(p|div|br|h[1-6]|li|tr|blockquote|section|article)[^>]*>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&nbsp;/g, ' ')
-    .replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+    .replace(/<div id="wm-ipp-base"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
+  return htmlToText(withoutToolbar);
 }
 
 /** Extract <title> text from HTML. */

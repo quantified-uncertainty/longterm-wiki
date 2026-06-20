@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { extractClaimSentence, extractCitationsFromContent, verifyCitationsForPage } from './citation-archive.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ---------------------------------------------------------------------------
 // Mocks for verifyCitationsForPage tests
@@ -459,7 +460,7 @@ describe('verifyCitationsForPage', () => {
 
   it('handles mixed verifiable and unverifiable citations', async () => {
     mockFetchSource.mockImplementation(({ url }: { url: string }) => {
-      if (url.includes('twitter.com')) {
+      if (hostMatches(url, 'twitter.com')) {
         return Promise.resolve(makeFetchedSource({
           url,
           status: 'error',

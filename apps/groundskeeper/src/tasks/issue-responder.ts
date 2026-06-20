@@ -538,7 +538,7 @@ ${item.body ?? "(no description)"}${extra}
 5. Create a new branch: \`git checkout -b claude/fix-issue-${item.number}\`
 6. Commit your changes with a descriptive message that includes "Closes #${item.number}"
 7. Push the branch: \`git push -u origin claude/fix-issue-${item.number}\`
-8. Create a PR using: \`gh pr create --title "Fix: ${item.title.replace(/"/g, '\\"')}" --body "Closes #${item.number}"\`
+8. Create a PR using: \`gh pr create --title "Fix: ${item.title.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}" --body "Closes #${item.number}"\`
 
 ## Safety rules
 

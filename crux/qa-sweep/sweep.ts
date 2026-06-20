@@ -25,7 +25,7 @@
  *   crux qa-sweep --json       JSON output for scripting
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
@@ -126,14 +126,28 @@ function checkDuplicateWikiIds(): CheckResult {
   const mdxIds = new Map<string, number>();
 
   try {
-    for (const line of run(`grep -rh 'wikiId:' ${entitiesDir}`).split('\n')) {
+    let grepOut = '';
+    try {
+      grepOut = execFileSync('grep', ['-rh', 'wikiId:', entitiesDir], {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      }).trim();
+    } catch { /* grep exits non-zero when no matches */ }
+    for (const line of grepOut.split('\n')) {
       const m = line.match(/wikiId:\s*"?(E\d+)"?/);
       if (m) yamlIds.set(m[1], (yamlIds.get(m[1]) ?? 0) + 1);
     }
   } catch { /* empty */ }
 
   try {
-    for (const fp of run(`find ${contentDir} -type f \\( -name '*.mdx' -o -name '*.md' \\)`).split('\n').filter(Boolean)) {
+    let findOut = '';
+    try {
+      findOut = execFileSync('find', [contentDir, '-type', 'f', '(', '-name', '*.mdx', '-o', '-name', '*.md', ')'], {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      }).trim();
+    } catch { /* find may exit non-zero */ }
+    for (const fp of findOut.split('\n').filter(Boolean)) {
       try {
         const fm = readFileSync(fp, 'utf-8').match(/^---\n([\s\S]*?)\n---/);
         if (!fm) continue;

@@ -12,6 +12,7 @@
  */
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';
+import { randomInt } from 'node:crypto';
 import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
@@ -153,7 +154,9 @@ Options:
   if (err) return err;
 
   // Use branch as sessionId if available, otherwise generate one
-  const sessionId = options.branch || `agent-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const SUFFIX_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
+  const suffix = Array.from({ length: 6 }, () => SUFFIX_CHARS[randomInt(SUFFIX_CHARS.length)]).join('');
+  const sessionId = options.branch || `agent-${Date.now()}-${suffix}`;
 
   const result = await registerAgent({
     sessionId,

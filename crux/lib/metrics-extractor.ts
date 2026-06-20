@@ -129,8 +129,13 @@ export function countWords(content: string): number {
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
   // Remove URLs
   text = text.replace(/https?:\/\/\S+/g, '');
-  // Remove HTML tags
-  text = text.replace(/<[^>]+>/g, '');
+  // Remove HTML tags — loop until stable so spliced-together angle brackets
+  // can't re-form a tag after one pass.
+  let prevText: string;
+  do {
+    prevText = text;
+    text = text.replace(/<[^>]+>/g, '');
+  } while (text !== prevText);
   // Count words
   const words = text.split(/\s+/).filter(w => w.length > 0);
   return words.length;

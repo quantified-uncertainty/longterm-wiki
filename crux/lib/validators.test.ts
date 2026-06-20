@@ -303,7 +303,9 @@ describe('Placeholder validator helpers', () => {
   function isInComment(content: string, position: number): boolean {
     const before = content.slice(0, position);
     const opens = (before.match(/<!--/g) || []).length;
-    const closes = (before.match(/-->/g) || []).length;
+    // HTML allows comments to close with `--!>` as well as `-->`; count both
+    // so a `--!>`-terminated comment isn't treated as still open.
+    const closes = (before.match(/--!?>/g) || []).length;
     return opens > closes;
   }
 

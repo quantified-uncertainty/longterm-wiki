@@ -71,8 +71,10 @@ function hasReferencesBlock(content: string): boolean {
 /** Derive pageId from file path */
 function fileToPageId(filePath: string): string {
   const rel = path.relative(CONTENT_DIR, filePath);
-  // Remove .mdx extension and convert path separators
-  return rel.replace(/\.mdx$/, '').replace(/\//g, '/');
+  // Remove .mdx extension and normalize OS path separators to '/'. The
+  // previous `.replace(/\//g, '/')` was a no-op; on Windows `path.relative`
+  // returns '\\'-separated paths, so convert those to forward slashes.
+  return rel.replace(/\.mdx$/, '').replace(/\\/g, '/');
 }
 
 /** Derive the slug (last segment) used in cited_by from a full page path */
