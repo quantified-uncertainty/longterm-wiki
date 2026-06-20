@@ -14,7 +14,7 @@
 
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 
@@ -28,8 +28,7 @@ function randomAlphanumeric10(): string {
     .split("")
     .map((ch) => {
       if (ch === "-" || ch === "_") {
-        const byte = randomBytes(1)[0];
-        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+        return REPLACEMENT_CHARS[randomInt(REPLACEMENT_CHARS.length)];
       }
       return ch;
     })

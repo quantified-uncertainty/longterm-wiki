@@ -267,7 +267,7 @@ describe('fake-urls rule', () => {
     const content = mockContent('[link](https://example.com/page)');
     const issues = check(fakeUrlsRule, content);
     expect(issues.length >= 1).toBe(true);
-    expect(issues[0].message.includes('example.com')).toBe(true);
+    expect(issues[0].message).toContain('example.com');
   });
 
   it('detects localhost URLs', () => {

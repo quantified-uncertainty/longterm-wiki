@@ -6,7 +6,7 @@
  */
 
 import { Hono } from "hono";
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { getDb, beginTransaction } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
 import {
@@ -63,8 +63,7 @@ function generateBatchId(): string {
     .split("")
     .map((ch) => {
       if (ch === "-" || ch === "_") {
-        const byte = randomBytes(1)[0];
-        return CHARS[byte % CHARS.length];
+        return CHARS[randomInt(CHARS.length)];
       }
       return ch;
     })

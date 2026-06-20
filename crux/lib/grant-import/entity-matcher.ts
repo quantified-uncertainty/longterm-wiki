@@ -41,7 +41,7 @@ export function normalizeGranteeName(name: string): string {
 
   for (const suffix of STRIP_SUFFIXES) {
     // Match suffix at end of string, optionally preceded by comma/space
-    const pattern = new RegExp(`[,\\s]+${suffix.replace(/\./g, "\\.")}\\s*$`, "i");
+    const pattern = new RegExp(`[,\\s]+${suffix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i");
     if (pattern.test(normalized)) {
       normalized = normalized.replace(pattern, "").trim();
       break; // Only strip one suffix

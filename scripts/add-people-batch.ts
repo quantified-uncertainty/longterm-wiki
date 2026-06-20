@@ -8,7 +8,7 @@
  * - Allocates wiki IDs via crux
  */
 
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { writeFileSync, readFileSync, appendFileSync, existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { resolve } from "node:path";
@@ -22,8 +22,7 @@ function generateId(): string {
     .split("")
     .map((ch) => {
       if (ch === "-" || ch === "_") {
-        const byte = randomBytes(1)[0];
-        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+        return REPLACEMENT_CHARS[randomInt(REPLACEMENT_CHARS.length)];
       }
       return ch;
     })

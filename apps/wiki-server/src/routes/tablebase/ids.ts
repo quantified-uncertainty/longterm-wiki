@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, sql, asc } from "drizzle-orm";
@@ -24,8 +24,7 @@ function generateStableId(): string {
     .split("")
     .map((ch) => {
       if (ch === "-" || ch === "_") {
-        const byte = randomBytes(1)[0];
-        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+        return REPLACEMENT_CHARS[randomInt(REPLACEMENT_CHARS.length)];
       }
       return ch;
     })

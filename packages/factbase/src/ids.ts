@@ -8,7 +8,7 @@
  * - generateContentFactId(...) — `f_` + contentHash (idempotent sync helper)
  */
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomInt } from "node:crypto";
 
 /** Characters used to replace `-` and `_` from base64url output. */
 const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -27,8 +27,7 @@ function randomAlphanumeric10(): string {
       if (ch === "-" || ch === "_") {
         // Replace with a deterministic-looking but effectively random char by
         // drawing a fresh byte mod the replacement alphabet length.
-        const byte = randomBytes(1)[0];
-        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+        return REPLACEMENT_CHARS[randomInt(REPLACEMENT_CHARS.length)];
       }
       return ch;
     })
