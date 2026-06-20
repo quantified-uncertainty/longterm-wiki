@@ -27,6 +27,7 @@ import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
 import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
 import { hostMatches, hostHasLabel } from "@longterm-wiki/url-utils";
+import { replaceUntilStable } from "./lib/html-utils.ts";
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
@@ -118,25 +119,15 @@ function getEntityIdFromPath(filePath: string): string {
 /**
  * Extract plain text content from MDX, removing imports and JSX
  */
-function extractTextContent(mdxContent: string): string {
-  let text = mdxContent
-    // Remove import statements
-    .replace(/^import\s+.*$/gm, '')
-    // Remove self-closing JSX components
-    .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '');
-  // Remove paired JSX components. Loop until stable so nested components
-  // (and angle brackets spliced together by an earlier removal) are fully
-  // stripped instead of leaving inner markup behind after one pass.
-  let prev: string;
-  do {
-    prev = text;
-    text = text.replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '');
-  } while (text !== prev);
+export function extractTextContent(mdxContent: string): string {
+  // Strip imports, then remove JSX components / comments / expressions to a
+  // fixed point so nested or spliced-together markup can't survive one pass.
+  let text = mdxContent.replace(/^import\s+.*$/gm, '');
+  text = replaceUntilStable(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, text, '');
+  text = replaceUntilStable(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, text, '');
+  text = replaceUntilStable(/<!--[\s\S]*?-->/g, text, '');
+  text = replaceUntilStable(/\{\/\*[\s\S]*?\*\/\}/g, text, '');
   return text
-    // Remove HTML comments
-    .replace(/<!--[\s\S]*?-->/g, '')
-    // Remove MDX expressions
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
     // Clean up excessive whitespace
     .replace(/\n{3,}/g, '\n\n')
     .trim();
