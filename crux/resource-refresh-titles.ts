@@ -15,6 +15,8 @@
 import type { Resource, ParsedOpts } from './resource-types.ts';
 import { loadResourcesPGFirst } from './resource-io.ts';
 import { apiRequest } from './lib/wiki-server/client.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
+import { decodeHtmlEntities as decodeEntities } from './lib/html-utils.ts';
 
 // ── Configuration ──────────────────────────────────────────────────────────
 
@@ -38,13 +40,9 @@ const SKIP_DOMAINS = new Set([
 // ── Title extraction ───────────────────────────────────────────────────────
 
 function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&#x27;/g, "'")
-    .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/&#(\d+);/g, (_m, code) => String.fromCharCode(Number(code)))
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ').trim();
+  // Delegate to the shared helper (decodes `&amp;` last, avoiding the
+  // double-unescaping bug) then collapse whitespace as before.
+  return decodeEntities(text).replace(/\s+/g, ' ').trim();
 }
 
 function extractTitleFromHtml(html: string): string | null {
@@ -98,7 +96,7 @@ function titleQuality(title: string | null | undefined): number {
   if (t.length <= 5) score -= 3;              // Very short
   if (/^[a-z]/.test(t)) score -= 2;           // Starts lowercase
   if (t.endsWith('.pdf') || t.endsWith('.Pdf')) score -= 2; // Filename
-  if (t.includes('doi.org')) score -= 3;       // DOI URL
+  if (hostMatches(t, 'doi.org')) score -= 3;       // DOI URL
   if (t === '(PDF)') score -= 5;              // PDF placeholder
   // Garbage/obfuscated text (long strings with no spaces)
   if (t.length > 30 && !t.includes(' ')) score -= 5;

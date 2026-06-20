@@ -26,6 +26,8 @@ concurrency:
   # landed in quick succession (incident 2026-03-29, issue #3418).
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   build-and-push:
     name: Build & push to GHCR

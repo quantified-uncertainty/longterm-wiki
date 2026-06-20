@@ -18,6 +18,7 @@ import { writeFileSync } from 'node:fs';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getEvidenceByRecord } from '../lib/wiki-server/sourcing-client.ts';
 import { fetchSourceContent } from '../lib/sourcing/source-fetcher.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ── Types ───────────────────────────────────────────────────────────
 
@@ -301,7 +302,7 @@ async function buildForType(recordType: RecordType): Promise<CorpusItem[]> {
     if (!sourceUrl) continue;
 
     // 2. Skip archive/wayback URLs and dead-known domains.
-    if (sourceUrl.includes('web.archive.org') || sourceUrl.startsWith('mailto:')) continue;
+    if (hostMatches(sourceUrl, 'web.archive.org') || sourceUrl.startsWith('mailto:')) continue;
 
     // 3. Fetch the full record (fields) from the typed endpoint.
     let row: Record<string, unknown> | null = null;

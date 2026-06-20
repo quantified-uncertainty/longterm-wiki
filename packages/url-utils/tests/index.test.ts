@@ -1,5 +1,58 @@
 import { describe, it, expect } from "vitest";
-import { normalizeUrl, extractHost } from "../src/index.js";
+import { normalizeUrl, extractHost, hostMatches, hostHasLabel } from "../src/index.js";
+
+describe("hostMatches", () => {
+  it("matches exact host and subdomains", () => {
+    expect(hostMatches("lesswrong.com", "lesswrong.com")).toBe(true);
+    expect(hostMatches("www.lesswrong.com", "lesswrong.com")).toBe(true);
+    expect(hostMatches("sub.lesswrong.com", "lesswrong.com")).toBe(true);
+  });
+
+  it("accepts full URLs", () => {
+    expect(hostMatches("https://www.arxiv.org/abs/1234", "arxiv.org")).toBe(true);
+    expect(hostMatches("http://export.arxiv.org/pdf/9", "arxiv.org")).toBe(true);
+  });
+
+  it("rejects look-alike and embedded hosts (the CodeQL concern)", () => {
+    expect(hostMatches("evil-lesswrong.com", "lesswrong.com")).toBe(false);
+    expect(hostMatches("lesswrong.com.attacker.com", "lesswrong.com")).toBe(false);
+    expect(hostMatches("https://attacker.com/?x=lesswrong.com", "lesswrong.com")).toBe(false);
+    expect(hostMatches("notarxiv.org", "arxiv.org")).toBe(false);
+  });
+
+  it("is case-insensitive and www-insensitive on the base", () => {
+    expect(hostMatches("LessWrong.com", "lesswrong.com")).toBe(true);
+    expect(hostMatches("lesswrong.com", "www.lesswrong.com")).toBe(true);
+  });
+});
+
+describe("hostHasLabel", () => {
+  it("matches a whole dot-separated label", () => {
+    expect(hostHasLabel("pubmed.ncbi.nlm.nih.gov", "pubmed")).toBe(true);
+    expect(hostHasLabel("a.gov", "gov")).toBe(true);
+    expect(hostHasLabel("https://pubmed.ncbi.nlm.nih.gov/123", "pubmed")).toBe(true);
+  });
+
+  it("does not match partial labels or look-alikes", () => {
+    expect(hostHasLabel("pubmed-evil.com", "pubmed")).toBe(false);
+    expect(hostHasLabel("mypubmed.com", "pubmed")).toBe(false);
+    expect(hostHasLabel("government.org", "gov")).toBe(false);
+  });
+});
+
+describe("normalizeUrl — trailing-slash stripping (ReDoS-safe)", () => {
+  it("strips many trailing slashes without catastrophic backtracking", () => {
+    const raw = "not a url" + "/".repeat(50000);
+    const start = performance.now();
+    const out = normalizeUrl(raw);
+    expect(performance.now() - start).toBeLessThan(1000);
+    expect(out).toBe("not a url");
+  });
+
+  it("strips trailing slashes on the non-http fallback path", () => {
+    expect(normalizeUrl("mailto:foo@bar.com///")).toBe("mailto:foo@bar.com");
+  });
+});
 
 describe("normalizeUrl — defaults", () => {
   it("strips trailing slash", () => {

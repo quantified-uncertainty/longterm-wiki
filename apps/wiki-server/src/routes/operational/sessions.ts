@@ -503,7 +503,7 @@ const sessionsApp = new Hono()
     const whereClause = branchPrefix
       ? like(
           sessions.branch,
-          `${branchPrefix.replace(/%/g, "\\%").replace(/_/g, "\\_")}%`
+          `${branchPrefix.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_")}%`
         )
       : undefined;
 

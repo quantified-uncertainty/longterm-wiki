@@ -14,6 +14,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: [
+      '*.test.ts',
       'lib/**/*.test.ts',
       'authoring/**/*.test.ts',
       'auto-update/**/*.test.ts',

@@ -28,6 +28,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@data/factbase": path.resolve(__dirname, "./src/data/factbase.ts"),
+      "@data/entity-ontology": path.resolve(__dirname, "./src/data/entity-ontology.ts"),
       "@": path.resolve(__dirname, "./src"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@data": path.resolve(__dirname, "./src/data/index.ts"),

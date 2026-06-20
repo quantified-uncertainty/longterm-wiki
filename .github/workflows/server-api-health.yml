@@ -19,6 +19,8 @@ concurrency:
   group: server-api-health
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   preflight:
     # Global circuit breaker — skip when automation is paused.

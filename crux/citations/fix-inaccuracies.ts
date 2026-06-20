@@ -1440,9 +1440,15 @@ export async function findReplacementSources(
 
 /** Build a concise search query from a claim text. */
 export function buildSearchQuery(claimText: string): string {
-  // Strip MDX components and footnote markers
-  let clean = claimText
-    .replace(/<[^>]+>/g, '')
+  // Strip MDX components and footnote markers. Remove tags to a fixed point so
+  // spliced-together angle brackets (e.g. `<a<b>c>`) can't re-form a tag.
+  let stripped = claimText;
+  let prev: string;
+  do {
+    prev = stripped;
+    stripped = stripped.replace(/<[^>]+>/g, '');
+  } while (stripped !== prev);
+  let clean = stripped
     .replace(/\[\^\d+\]/g, '')
     .replace(/\*\*/g, '')
     .replace(/\s+/g, ' ')

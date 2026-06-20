@@ -49,7 +49,7 @@ function generateMdxStub(entity) {
   if (entity.content?.intro) {
     const desc = extractDescriptionFromIntro(entity.content.intro);
     if (desc) {
-      descriptionLine = `\ndescription: "${desc.replace(/"/g, '\\"')}"`;
+      descriptionLine = `\ndescription: "${desc.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
   }
 

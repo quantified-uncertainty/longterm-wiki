@@ -8,6 +8,7 @@ import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { createHash } from "crypto";
 import { upsertResourceBatch } from "../../../crux/lib/wiki-server/resources.ts";
+import { hostMatches } from "@longterm-wiki/url-utils";
 
 const KB_DATA_DIR = join(import.meta.dirname, "../data");
 
@@ -18,7 +19,7 @@ function urlToId(url: string): string {
 function guessType(
   url: string
 ): "paper" | "blog" | "web" | "report" | "reference" {
-  if (url.includes("arxiv.org")) return "paper";
+  if (hostMatches(url, "arxiv.org")) return "paper";
   if (
     url.includes("anthropic.com/research") ||
     url.includes("transformer-circuits.pub")

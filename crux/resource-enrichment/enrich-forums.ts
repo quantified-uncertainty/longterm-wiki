@@ -10,6 +10,7 @@ import { extractForumSlug, sleep } from '../resource-utils.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ── Forum GraphQL queries ───────────────────────────────────────────────────
 
@@ -50,10 +51,10 @@ query PostById($id: String!) {
 `;
 
 function getForumEndpoint(url: string): { endpoint: string; forum: string } {
-  if (url.includes('forum.effectivealtruism.org')) {
+  if (hostMatches(url, 'forum.effectivealtruism.org')) {
     return { endpoint: 'https://forum.effectivealtruism.org/graphql', forum: 'eaforum' };
   }
-  if (url.includes('alignmentforum.org')) {
+  if (hostMatches(url, 'alignmentforum.org')) {
     return { endpoint: 'https://www.alignmentforum.org/graphql', forum: 'alignmentforum' };
   }
   return { endpoint: 'https://www.lesswrong.com/graphql', forum: 'lesswrong' };

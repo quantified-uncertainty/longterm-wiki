@@ -44,3 +44,16 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
           category: trivy-default-branch
+
+      # The wiki-server deploy workflow uploaded image-scan results under this
+      # category for `main` once (Feb 2026), then moved to `production`-only.
+      # That left ~96 stale CRITICAL/HIGH alerts frozen open on `main`, because
+      # GitHub only closes an alert when the SAME category re-runs on the same
+      # ref. Re-uploading this clean scan under that category lets GitHub
+      # reconcile and close those orphaned alerts.
+      - name: Re-upload under deploy scan category to clear stale main alerts
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+          category: .github/workflows/wiki-server-docker.yml:security-scan

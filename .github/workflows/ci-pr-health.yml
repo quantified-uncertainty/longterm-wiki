@@ -22,6 +22,8 @@ concurrency:
   group: ci-pr-health
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml

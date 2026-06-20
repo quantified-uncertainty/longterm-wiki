@@ -21,6 +21,7 @@ import {
   type FetchRequest,
   type FetchedSource,
 } from './source-fetcher.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // Mock the in-memory citation content cache so tests are deterministic.
 // The session-level in-memory cache is still exercised (it lives in source-fetcher.ts).
@@ -1320,7 +1321,7 @@ describe('arXiv URL rewriting', () => {
 
   it('rewrites arxiv.org/abs/ to ar5iv HTML for clean extraction', async () => {
     const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (url.includes('ar5iv.labs.arxiv.org')) {
+      if (hostMatches(url, 'ar5iv.labs.arxiv.org')) {
         return Promise.resolve(
           new Response('<html><head><title>Attention Is All You Need</title></head><body><p>Full text of the transformer paper.</p></body></html>', {
             status: 200,
@@ -1346,7 +1347,7 @@ describe('arXiv URL rewriting', () => {
 
   it('rewrites arxiv.org/pdf/ to ar5iv HTML', async () => {
     const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (url.includes('ar5iv.labs.arxiv.org')) {
+      if (hostMatches(url, 'ar5iv.labs.arxiv.org')) {
         return Promise.resolve(
           new Response('<html><head><title>PDF Paper Title</title></head><body><p>PDF paper content extracted as HTML.</p></body></html>', {
             status: 200,

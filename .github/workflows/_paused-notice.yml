@@ -2,6 +2,8 @@ name: Paused Notice
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   paused-notice:
     if: vars.AUTOMATION_PAUSED == 'true'

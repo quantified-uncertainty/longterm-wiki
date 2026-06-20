@@ -10,7 +10,7 @@
  *   generateSid()        — create a new sid_-prefixed stableId
  */
 
-import { randomBytes } from "crypto";
+import { randomInt } from "crypto";
 
 // ── Constants ──────────────────────────────────────────────────────────
 
@@ -59,10 +59,9 @@ export function generateSid(): string {
 const ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 function randomAlphanumeric10(): string {
-  const bytes = randomBytes(10);
   let result = "";
   for (let i = 0; i < 10; i++) {
-    result += ALPHANUMERIC[bytes[i] % ALPHANUMERIC.length];
+    result += ALPHANUMERIC[randomInt(ALPHANUMERIC.length)];
   }
   return result;
 }

@@ -86,6 +86,20 @@ describe("preprocessMdx", () => {
     const input = `The import of goods increased.`;
     expect(preprocessMdx(input)).toBe(input);
   });
+
+  it("strips spliced client directives to a fixed point", () => {
+    // Removing the inner ` client:load` splices the outer fragments back into a
+    // fresh ` client:load`, so a single pass would leave a directive behind.
+    const input = `<Component client:loa client:loadd />`;
+    const result = preprocessMdx(input);
+    expect(result).not.toContain("client:load");
+  });
+
+  it("strips deeply nested spliced directives to a fixed point", () => {
+    const input = `<Component client:cl client:lient:idledle />`;
+    const result = preprocessMdx(input);
+    expect(result).not.toContain("client:idle");
+  });
 });
 
 describe("extractMdxIntroSection", () => {

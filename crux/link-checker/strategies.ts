@@ -9,6 +9,7 @@ import https from 'https';
 import http from 'http';
 import { sleep, extractArxivId } from '../resource-utils.ts';
 import { getHostname, matchesDomainList } from '../lib/url-utils.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 import type { CheckStrategy } from './types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -43,9 +44,9 @@ export function getCheckStrategy(url: string): CheckStrategy {
   if (matchesDomainList(hostname, UNVERIFIABLE_DOMAINS)) return 'unverifiable';
   if (matchesDomainList(hostname, SKIP_DOMAINS)) return 'skip';
   if (matchesDomainList(hostname, DOI_CHECK_DOMAINS)) return 'doi';
-  if (hostname.includes('arxiv.org')) return 'arxiv';
-  if (hostname.includes('lesswrong.com') || hostname.includes('alignmentforum.org') ||
-      hostname.includes('forum.effectivealtruism.org')) return 'forum-api';
+  if (hostMatches(hostname, 'arxiv.org')) return 'arxiv';
+  if (hostMatches(hostname, 'lesswrong.com') || hostMatches(hostname, 'alignmentforum.org') ||
+      hostMatches(hostname, 'forum.effectivealtruism.org')) return 'forum-api';
 
   return 'http';
 }
@@ -172,9 +173,9 @@ async function forumApiCheck(url: string): Promise<{ status: number; ok: boolean
 
   const postId = postMatch[1];
   let apiUrl: string;
-  if (url.includes('lesswrong.com')) {
+  if (hostMatches(url, 'lesswrong.com')) {
     apiUrl = 'https://www.lesswrong.com/graphql';
-  } else if (url.includes('alignmentforum.org')) {
+  } else if (hostMatches(url, 'alignmentforum.org')) {
     apiUrl = 'https://www.alignmentforum.org/graphql';
   } else {
     apiUrl = 'https://forum.effectivealtruism.org/graphql';

@@ -202,8 +202,15 @@ function extractDateString(work: CrossrefWork): string | null {
  * Strip JATS/HTML tags from Crossref abstract text.
  */
 function cleanAbstract(raw: string): string {
-  return raw
-    .replace(/<[^>]+>/g, '')
+  // Strip tags to a fixed point so spliced-together angle brackets can't
+  // re-form a tag after a single pass.
+  let out = raw;
+  let prev: string;
+  do {
+    prev = out;
+    out = out.replace(/<[^>]+>/g, '');
+  } while (out !== prev);
+  return out
     .replace(/\s+/g, ' ')
     .trim();
 }

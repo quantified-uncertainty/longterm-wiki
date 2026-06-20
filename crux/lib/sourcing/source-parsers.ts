@@ -8,6 +8,7 @@
  */
 
 import { parseCSVLine, reassembleCSVRows } from '../grant-import/csv.ts';
+import { decodeHtmlEntities } from '../html-utils.ts';
 
 /**
  * Parse CSV content into an array of row objects, using the header row for keys.
@@ -66,7 +67,18 @@ export function parseHTMLTable(raw: string): Record<string, string>[] {
 
 function parseOneHTMLTable(tableHtml: string): Record<string, string>[] {
   // Extract header cells from <thead> or first <tr>
-  const stripTags = (html: string) => html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim();
+  const stripTags = (html: string) => {
+    // Strip tags to a fixed point so spliced-together angle brackets can't
+    // re-form a tag after one pass, then decode entities via the shared helper
+    // (which decodes `&amp;` last, avoiding double-unescaping).
+    let out = html;
+    let prev: string;
+    do {
+      prev = out;
+      out = out.replace(/<[^>]+>/g, '');
+    } while (out !== prev);
+    return decodeHtmlEntities(out).trim();
+  };
 
   const theadMatch = tableHtml.match(/<thead[^>]*>([\s\S]*?)<\/thead>/i);
   const headerMatch = theadMatch ?? tableHtml.match(/<tr[^>]*>([\s\S]*?)<\/tr>/i);

@@ -13,8 +13,15 @@
  */
 export function stripMarkup(text) {
   if (!text) return '';
-  return text
-    .replace(/<[^>]+>/g, '')                 // Strip JSX/HTML tags
+  // Strip JSX/HTML tags to a fixed point: removing one tag can splice
+  // fragments into a fresh tag, so a single pass can be bypassed.
+  let stripped = text;
+  let prevStripped;
+  do {
+    prevStripped = stripped;
+    stripped = stripped.replace(/<[^>]+>/g, ''); // Strip JSX/HTML tags
+  } while (stripped !== prevStripped);
+  return stripped
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links (keep text)
     .replace(/\*\*([^*]+)\*\*/g, '$1')       // Strip bold markers
     .replace(/\*([^*]+)\*/g, '$1')           // Strip italic markers

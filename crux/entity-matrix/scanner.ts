@@ -540,7 +540,6 @@ function scanDedicatedApiRoute(meta: EntityTypeMeta): CellValue {
   const candidates = [
     `${meta.id}.ts`,
     `${meta.id}s.ts`,
-    `${meta.id.replace(/-/g, "-")}.ts`,
   ];
   for (const candidate of candidates) {
     if (existsSync(join(WIKI_SERVER_ROUTES, candidate))) {

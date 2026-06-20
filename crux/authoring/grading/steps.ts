@@ -11,6 +11,7 @@
 import { callLlm } from '../../lib/llm.ts';
 import { parseJsonResponse } from '../../lib/anthropic.ts';
 import { parseJsonFromLlm } from '../../lib/json-parsing.ts';
+import { replaceUntilStable } from '../../lib/html-utils.ts';
 import { readFileSync } from 'fs';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 import { ValidationEngine, ContentFile } from '../../lib/validation/validation-engine.ts';
@@ -68,7 +69,11 @@ export function computeMetrics(content: string): Metrics {
   const withoutTables = withoutFm.replace(/\|[^\n]+\|/g, '');
   const withoutCodeBlocks = withoutTables.replace(/```[\s\S]*?```/g, '');
   const withoutImports = withoutCodeBlocks.replace(/^import\s+.*$/gm, '');
-  const withoutComponents = withoutImports.replace(/<[^>]+\/>/g, '').replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '');
+  // Remove markup to a fixed point: stripping one tag can splice fragments
+  // into a fresh tag, so a single pass can be bypassed.
+  let withoutComponents = replaceUntilStable(/<[^>]+>[\s\S]*?<\/[^>]+>/g, withoutImports, '');
+  withoutComponents = replaceUntilStable(/<[^>]+\/>/g, withoutComponents, '');
+  withoutComponents = replaceUntilStable(/<[^>]+>/g, withoutComponents, '');
   const proseWords = withoutComponents.split(/\s+/).filter(w => w.length > 0).length;
 
   const rComponents = (withoutFm.match(/<R\s+id=/g) || []).length;

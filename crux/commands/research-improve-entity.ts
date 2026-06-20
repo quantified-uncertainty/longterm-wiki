@@ -713,7 +713,7 @@ function buildExtractPrompt(
   const truncated = sourceContent.slice(0, 8000);
   const gapsXml = gaps
     .map((g) =>
-      `  <gap key="${escapeXml(g.key)}" target="${escapeXml(g.target)}">${escapeXml(g.description)}</gap>`,
+      `  <gap key="${escapeXml(g.key).replace(/"/g, "&quot;")}" target="${escapeXml(g.target).replace(/"/g, "&quot;")}">${escapeXml(g.description)}</gap>`,
     )
     .join("\n");
   const guide = extractFieldGuide(entity.type);
@@ -722,7 +722,7 @@ function buildExtractPrompt(
     entity.type,
   )} entity "${escapeXml(entity.title ?? entity.id)}".
 
-<entity id="${escapeXml(entity.id)}">
+<entity id="${escapeXml(entity.id).replace(/"/g, "&quot;")}">
   <type>${escapeXml(entity.type)}</type>
   <title>${escapeXml(entity.title ?? "")}</title>
   <description>${escapeXml(description.slice(0, 500))}</description>
@@ -732,7 +732,7 @@ function buildExtractPrompt(
 ${gapsXml}
 </gaps_to_fill>
 
-<source url="${escapeXml(sourceUrl)}">
+<source url="${escapeXml(sourceUrl).replace(/"/g, "&quot;")}">
 ${escapeXml(truncated)}
 </source>
 
