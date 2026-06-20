@@ -16,6 +16,7 @@ import fs from 'fs';
 import path from 'path';
 import type { CommandResult } from '../lib/command-types.ts';
 import { findPageById } from '../lib/page-resolution.ts';
+import { replaceUntilStable } from '../lib/html-utils.ts';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
@@ -436,11 +437,14 @@ export async function auditAllPagesCommand(
     // Strip frontmatter
     const body = content.replace(/^---[\s\S]*?---\n/, '');
 
-    // Strip imports, components, footnote definitions
-    const prose = body
-      .replace(/^(?:import|export)\s.*$/gm, '')
-      .replace(/<[^>]+\/>/g, '')           // self-closing tags
-      .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, '') // component blocks
+    // Strip imports, components, footnote definitions. Remove tags/component
+    // blocks to a fixed point so nested or spliced-together markup can't survive
+    // a single pass.
+    let stripped = body.replace(/^(?:import|export)\s.*$/gm, '');
+    stripped = replaceUntilStable(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, stripped, ''); // component blocks
+    stripped = replaceUntilStable(/<[^>]+\/>/g, stripped, '');                 // self-closing tags
+    stripped = replaceUntilStable(/<[^>]+>/g, stripped, '');                   // stray tags
+    const prose = stripped
       .replace(/^\[\^[\w:.-]+\]:.*$/gm, '') // footnote defs
       .replace(/^#{1,6}\s.*$/gm, '')        // headings
       .replace(/\s+/g, ' ')

@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildSearchQuery, suggestUrls } from './suggest-urls.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // Mock the research-agent module's search fns + api-keys.
 vi.mock('../search/research-agent.ts', () => ({
@@ -91,7 +92,7 @@ describe('suggestUrls', () => {
     expect(result.candidates).toHaveLength(3);
     const urls = result.candidates.map((c) => c.url);
     // b.com appears once (dedup).
-    expect(urls.filter((u) => u.includes('b.com'))).toHaveLength(1);
+    expect(urls.filter((u) => hostMatches(u, 'b.com'))).toHaveLength(1);
     expect(urls).toEqual(
       expect.arrayContaining(['https://a.com/page', 'https://b.com/page', 'https://c.com/page'])
     );

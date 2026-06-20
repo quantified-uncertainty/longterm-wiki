@@ -7,6 +7,7 @@
 
 import { loadResources } from './resource-io.ts';
 import { extractArxivId, sleep } from './resource-utils.ts';
+import { hostMatches } from "@longterm-wiki/url-utils";
 import { fetchArxivBatch } from './resource-metadata.ts';
 import type { Resource, ParsedOpts, ValidationIssue } from './resource-types.ts';
 
@@ -49,7 +50,7 @@ function titlesAreSimilar(stored: string, fetched: string): boolean {
 async function validateArxiv(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
   const limit = (opts.limit as number) || 50;
 
-  const arxivResources = resources.filter(r => r.url?.includes('arxiv.org'));
+  const arxivResources = resources.filter(r => r.url ? hostMatches(r.url, 'arxiv.org') : false);
   console.log(`   Found ${arxivResources.length} arXiv resources`);
 
   const toCheck = arxivResources.slice(0, limit);
@@ -138,7 +139,7 @@ async function validateUrls(resources: Resource[], opts: ParsedOpts): Promise<Va
 
   // Sample random resources to check
   const toCheck = resources
-    .filter(r => r.url && !r.url.includes('arxiv.org')) // Skip arXiv (checked separately)
+    .filter(r => r.url && !hostMatches(r.url, 'arxiv.org')) // Skip arXiv (checked separately)
     .sort(() => Math.random() - 0.5)
     .slice(0, limit);
 
@@ -203,7 +204,7 @@ async function validateWikipedia(resources: Resource[], opts: ParsedOpts): Promi
   const limit = (opts.limit as number) || 50;
 
   const wikiResources = resources.filter(r =>
-    r.url?.includes('wikipedia.org/wiki/') || r.url?.includes('en.wikipedia.org')
+    r.url ? hostMatches(r.url, 'wikipedia.org') : false
   );
   console.log(`   Found ${wikiResources.length} Wikipedia resources`);
 
@@ -276,9 +277,9 @@ async function validateForumPosts(resources: Resource[], opts: ParsedOpts): Prom
 
   const forumResources = resources.filter(r => {
     const url = r.url || '';
-    return url.includes('lesswrong.com') ||
-           url.includes('alignmentforum.org') ||
-           url.includes('forum.effectivealtruism.org');
+    return hostMatches(url, 'lesswrong.com') ||
+           hostMatches(url, 'alignmentforum.org') ||
+           hostMatches(url, 'forum.effectivealtruism.org');
   });
   console.log(`   Found ${forumResources.length} forum resources`);
 
@@ -299,9 +300,9 @@ async function validateForumPosts(resources: Resource[], opts: ParsedOpts): Prom
 
       // Determine which API to use
       let apiUrl: string;
-      if (resource.url.includes('lesswrong.com')) {
+      if (hostMatches(resource.url, 'lesswrong.com')) {
         apiUrl = 'https://www.lesswrong.com/graphql';
-      } else if (resource.url.includes('alignmentforum.org')) {
+      } else if (hostMatches(resource.url, 'alignmentforum.org')) {
         apiUrl = 'https://www.alignmentforum.org/graphql';
       } else {
         apiUrl = 'https://forum.effectivealtruism.org/graphql';
@@ -425,9 +426,9 @@ async function validateDois(resources: Resource[], opts: ParsedOpts): Promise<Va
   // Find resources with DOIs (in URL or doi field)
   // Exclude arXiv URLs which have similar patterns but aren't DOIs
   const doiResources = resources.filter(r => {
-    if (r.url?.includes('arxiv.org')) return false; // arXiv IDs look like DOIs but aren't
+    if (r.url && hostMatches(r.url, 'arxiv.org')) return false; // arXiv IDs look like DOIs but aren't
     if (r.doi) return true;
-    if (r.url?.includes('doi.org/')) return true;
+    if (r.url && hostMatches(r.url, 'doi.org')) return true;
     if (r.url?.match(/10\.\d{4,}\/[^\s]+/)) return true; // DOIs have format 10.XXXX/something
     return false;
   });

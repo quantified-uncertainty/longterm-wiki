@@ -316,8 +316,15 @@ function findInsertionPoint(
     // Skip self-closing component lines like <Mermaid ... /> or <Aside ...>
     if (/^<[A-Z]\w+[^>]*\/>$/.test(rawTrimmed)) continue;
 
-    const lineLower = lines[i].toLowerCase()
-      .replace(/<[^>]+>/g, '')        // strip tags for matching
+    // Strip tags for matching to a fixed point so spliced-together angle
+    // brackets can't re-form a tag.
+    let lineStripped = lines[i].toLowerCase();
+    let linePrev: string;
+    do {
+      linePrev = lineStripped;
+      lineStripped = lineStripped.replace(/<[^>]+>/g, '');
+    } while (lineStripped !== linePrev);
+    const lineLower = lineStripped
       .replace(/\[\^[\w:.-]+\]/g, '') // strip existing footnotes
       .replace(/\\(\$)/g, '$1');      // unescape
 

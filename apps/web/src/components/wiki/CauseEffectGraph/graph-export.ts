@@ -28,8 +28,8 @@ export function toYaml(
     if (node.data.type) lines.push(`    type: ${node.data.type}`);
     if (node.data.confidence !== undefined) lines.push(`    confidence: ${node.data.confidence}`);
     if (node.data.confidenceLabel) lines.push(`    confidenceLabel: "${node.data.confidenceLabel}"`);
-    if (node.data.description) lines.push(`    description: "${node.data.description.replace(/"/g, '\\"')}"`);
-    if (node.data.details) lines.push(`    details: "${node.data.details.replace(/"/g, '\\"')}"`);
+    if (node.data.description) lines.push(`    description: "${node.data.description.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+    if (node.data.details) lines.push(`    details: "${node.data.details.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
     if (node.data.relatedConcepts?.length) {
       lines.push(`    relatedConcepts:`);
       for (const concept of node.data.relatedConcepts) lines.push(`      - "${concept}"`);

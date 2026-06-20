@@ -16,6 +16,7 @@ import type { VerifyItem, VerifyResult, FactItemData } from './orchestrator-type
 import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { nameMatches, dateMatches } from './fuzzy-match.ts';
 import { urlMatches } from './fuzzy-match.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ── Types ───────────────────────────────────────────────────────────
 
@@ -161,7 +162,7 @@ const WIKIDATA_REF_RE = /wikidata\.org\/(?:wiki|entity)\/(Q\d+)/i;
  * non-item pages (e.g. `Property:P856`).
  */
 export function extractQid(url: string): string | null {
-  if (!url.includes('wikidata.org')) return null;
+  if (!hostMatches(url, 'wikidata.org')) return null;
   const match = url.match(QID_REGEX);
   return match ? `Q${match[1]}` : null;
 }

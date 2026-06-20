@@ -6,6 +6,7 @@
 
 import { loadResourcesPGFirst, saveResources } from './resource-io.ts';
 import { extractArxivId, extractForumSlug, extractDOI, isScholarlyUrl, sleep } from './resource-utils.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 import { getApiKey } from './lib/api-keys.ts';
 import type { Resource, ParsedOpts, ArxivMetadata, ForumMetadata, ScholarMetadata } from './resource-types.ts';
 
@@ -66,7 +67,7 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
 
   const resources: Resource[] = (opts._resources as Resource[] | undefined) || await loadResourcesPGFirst();
   const arxivResources = resources.filter(r => {
-    if (!r.url || !r.url.includes('arxiv.org')) return false;
+    if (!r.url || !hostMatches(r.url, 'arxiv.org')) return false;
     if (r.authors && r.authors.length > 0) return false;
     return extractArxivId(r.url) !== null;
   });
@@ -182,7 +183,7 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
   const updatedResources: Resource[] = [];
   for (const r of toProcess) {
     const slug = extractForumSlug(r.url);
-    const isEA = r.url.includes('forum.effectivealtruism.org');
+    const isEA = hostMatches(r.url, 'forum.effectivealtruism.org');
     try {
       const meta = await fetchForumMetadata(slug ?? '', isEA);
       if (meta && meta.authors && meta.authors.length > 0) {
@@ -245,7 +246,7 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
   const scholarResources = resources.filter(r => {
     if (!r.url) return false;
     if (r.authors && r.authors.length > 0) return false;
-    if (r.url.includes('arxiv.org')) return false; // ArXiv handled separately
+    if (hostMatches(r.url, 'arxiv.org')) return false; // ArXiv handled separately
     return isScholarlyUrl(r.url);
   });
 
@@ -331,11 +332,11 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
   const webResources = resources.filter(r => {
     if (!r.url) return false;
     if (r.authors && r.authors.length > 0) return false;
-    if (r.url.includes('arxiv.org')) return false;
+    if (hostMatches(r.url, 'arxiv.org')) return false;
     if (extractForumSlug(r.url)) return false;
     if (isScholarlyUrl(r.url)) return false;
-    if (r.url.includes('wikipedia.org')) return false;
-    if (r.url.includes('github.com')) return false;
+    if (hostMatches(r.url, 'wikipedia.org')) return false;
+    if (hostMatches(r.url, 'github.com')) return false;
     return true;
   });
 
@@ -468,10 +469,10 @@ export async function showMetadataStats(): Promise<void> {
   console.log(`With summary: ${withSummary} (${Math.round(withSummary/total*100)}%)`);
 
   // Count by extractable source
-  const arxiv = resources.filter(r => r.url?.includes('arxiv.org') && !r.authors?.length).length;
+  const arxiv = resources.filter(r => r.url && hostMatches(r.url, 'arxiv.org') && !r.authors?.length).length;
   const forum = resources.filter(r => r.url && extractForumSlug(r.url) && !r.authors?.length).length;
-  const scholarly = resources.filter(r => r.url && isScholarlyUrl(r.url) && !r.url.includes('arxiv.org') && !r.authors?.length).length;
-  const web = resources.filter(r => r.url && !r.authors?.length && !r.url.includes('arxiv.org') && !(r.url && extractForumSlug(r.url)) && !isScholarlyUrl(r.url)).length;
+  const scholarly = resources.filter(r => r.url && isScholarlyUrl(r.url) && !hostMatches(r.url, 'arxiv.org') && !r.authors?.length).length;
+  const web = resources.filter(r => r.url && !r.authors?.length && !hostMatches(r.url, 'arxiv.org') && !(r.url && extractForumSlug(r.url)) && !isScholarlyUrl(r.url)).length;
 
   console.log('\nPending extraction:');
   console.log(`  ArXiv: ${arxiv}`);

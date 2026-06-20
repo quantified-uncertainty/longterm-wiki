@@ -29,6 +29,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { upsertSummary } from '../lib/wiki-server/summaries.ts';
 import { getColors } from '../lib/output.ts';
+import { replaceUntilStable } from '../lib/html-utils.ts';
 import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
 import { extractText } from '../lib/llm.ts';
 import { recordDirectCall } from '../lib/llm-usage/capture-payload.ts';
@@ -107,13 +108,15 @@ function getEntityIdFromPath(filePath: string): string {
 /**
  * Extract plain text content from MDX, removing imports and JSX
  */
-function extractTextContent(mdxContent: string): string {
-  return mdxContent
-    .replace(/^import\s+.*$/gm, '')
-    .replace(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, '')
-    .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+export function extractTextContent(mdxContent: string): string {
+  // Remove JSX components/comments to a fixed point so nested or
+  // spliced-together markup can't survive a single pass.
+  let stripped = mdxContent.replace(/^import\s+.*$/gm, '');
+  stripped = replaceUntilStable(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, stripped, '');
+  stripped = replaceUntilStable(/<[A-Z][a-zA-Z]*\s*[^>]*\/>/g, stripped, '');
+  stripped = replaceUntilStable(/<!--[\s\S]*?-->/g, stripped, '');
+  stripped = replaceUntilStable(/\{\/\*[\s\S]*?\*\/\}/g, stripped, '');
+  return stripped
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }

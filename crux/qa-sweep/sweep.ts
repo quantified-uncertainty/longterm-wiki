@@ -25,7 +25,7 @@
  *   crux qa-sweep --json       JSON output for scripting
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
@@ -125,15 +125,36 @@ function checkDuplicateWikiIds(): CheckResult {
   const yamlIds = new Map<string, number>();
   const mdxIds = new Map<string, number>();
 
+  let grepOut = '';
   try {
-    for (const line of run(`grep -rh 'wikiId:' ${entitiesDir}`).split('\n')) {
-      const m = line.match(/wikiId:\s*"?(E\d+)"?/);
-      if (m) yamlIds.set(m[1], (yamlIds.get(m[1]) ?? 0) + 1);
+    grepOut = execFileSync('grep', ['-rh', 'wikiId:', entitiesDir], {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+  } catch (e) {
+    // grep exits 1 when there are no matches; any other status is a real
+    // failure and must not be swallowed into a false "no duplicates" pass.
+    if ((e as { status?: number }).status !== 1) {
+      return { name: 'Duplicate wikiIds', status: 'fail', message: `grep failed: ${(e as Error).message}`, tier: 'basic' };
     }
-  } catch { /* empty */ }
+  }
+  for (const line of grepOut.split('\n')) {
+    const m = line.match(/wikiId:\s*"?(E\d+)"?/);
+    if (m) yamlIds.set(m[1], (yamlIds.get(m[1]) ?? 0) + 1);
+  }
 
-  try {
-    for (const fp of run(`find ${contentDir} -type f \\( -name '*.mdx' -o -name '*.md' \\)`).split('\n').filter(Boolean)) {
+  {
+    let findOut = '';
+    try {
+      findOut = execFileSync('find', [contentDir, '-type', 'f', '(', '-name', '*.mdx', '-o', '-name', '*.md', ')'], {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      }).trim();
+    } catch (e) {
+      // find returns 0 even with no results, so any non-zero exit is a real error.
+      return { name: 'Duplicate wikiIds', status: 'fail', message: `find failed: ${(e as Error).message}`, tier: 'basic' };
+    }
+    for (const fp of findOut.split('\n').filter(Boolean)) {
       try {
         const fm = readFileSync(fp, 'utf-8').match(/^---\n([\s\S]*?)\n---/);
         if (!fm) continue;
@@ -141,9 +162,9 @@ function checkDuplicateWikiIds(): CheckResult {
           const m = line.match(/^wikiId:\s*"?(E\d+)"?/);
           if (m) mdxIds.set(m[1], (mdxIds.get(m[1]) ?? 0) + 1);
         }
-      } catch { /* skip */ }
+      } catch { /* skip individual unreadable files */ }
     }
-  } catch { /* empty */ }
+  }
 
   const dupes: string[] = [];
   for (const [id, n] of yamlIds) if (n > 1) dupes.push(`${id}: ${n}x in YAML`);

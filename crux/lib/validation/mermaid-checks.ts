@@ -505,10 +505,16 @@ export const STATIC_CHECKS: StaticCheck[] = [
         const bracketContent = line.match(/\[([^\]]+)\]/g);
         if (bracketContent) {
           for (const bracket of bracketContent) {
-            // Remove known safe patterns before checking
-            const cleaned = bracket
-              .replace(/<br\s*\/?>/gi, '') // <br>, <br/>, <br />
-              .replace(/<\/?[a-z]+>/gi, ''); // Other HTML-like tags
+            // Remove known safe patterns before checking. Loop until stable so
+            // nested/spliced tags can't survive a single pass.
+            let cleaned = bracket;
+            let prevCleaned: string;
+            do {
+              prevCleaned = cleaned;
+              cleaned = cleaned
+                .replace(/<br\s*\/?>/gi, '') // <br>, <br/>, <br />
+                .replace(/<\/?[a-z]+>/gi, ''); // Other HTML-like tags
+            } while (cleaned !== prevCleaned);
 
             // Now check for remaining problematic < or >
             if (/<(?![a-z])/i.test(cleaned) || /(?<![a-z\/])>/i.test(cleaned)) {

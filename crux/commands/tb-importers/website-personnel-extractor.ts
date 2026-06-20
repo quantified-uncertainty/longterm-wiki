@@ -154,7 +154,7 @@ Return strictly valid JSON matching this schema — no prose, no markdown fences
 {"people": [{"name": "...", "role": "...", "evidence": "...", "isFounder": false, "roleType": "research"}]}
 </instructions>
 
-<organization name="${escapeXml(ctx.orgName)}" slug="${escapeXml(ctx.orgSlug)}" />
+<organization name="${escapeXml(ctx.orgName).replace(/"/g, "&quot;")}" slug="${escapeXml(ctx.orgSlug).replace(/"/g, "&quot;")}" />
 <source_url>${escapeXml(ctx.sourceUrl)}</source_url>
 
 <page_content>

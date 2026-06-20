@@ -28,6 +28,8 @@ import "dotenv/config";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { apiRequest } from "../lib/wiki-server/client.ts";
+import { hostMatches } from "@longterm-wiki/url-utils";
+import { decodeHtmlEntities as decodeEntities } from "../lib/html-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,14 +92,9 @@ export function extractTitleFromHtml(html: string): string | null {
 }
 
 function decodeHtmlEntities(s: string): string {
-  return s
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#x27;/g, "'")
-    .replace(/&#x2F;/g, "/");
+  // Delegate to the shared helper, which decodes `&amp;` last to avoid
+  // double-unescaping inputs like `&amp;lt;`.
+  return decodeEntities(s);
 }
 
 // ---------------------------------------------------------------------------
@@ -294,8 +291,8 @@ async function main() {
       // Skip non-fetchable URLs
       if (
         r.url.toLowerCase().endsWith(".pdf") ||
-        r.url.includes("glassdoor.com") ||
-        r.url.includes("bloomberg.com")
+        hostMatches(r.url, "glassdoor.com") ||
+        hostMatches(r.url, "bloomberg.com")
       ) {
         failed++;
         continue;

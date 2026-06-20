@@ -18,6 +18,7 @@ import { loadResourcesPGFirst, saveResources } from '../resource-io.ts';
 import { sleep } from '../resource-utils.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
@@ -193,7 +194,7 @@ export async function enrichRandDatesCommand(
   const rand = resources.filter(
     (r) =>
       r.url &&
-      r.url.includes('rand.org') &&
+      hostMatches(r.url, 'rand.org') &&
       !r.published_date &&
       !isNonPublicationUrl(r.url),
   );
@@ -201,7 +202,7 @@ export async function enrichRandDatesCommand(
   const skippedNonPub = resources.filter(
     (r) =>
       r.url &&
-      r.url.includes('rand.org') &&
+      hostMatches(r.url, 'rand.org') &&
       !r.published_date &&
       isNonPublicationUrl(r.url),
   ).length;

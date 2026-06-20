@@ -6,7 +6,7 @@
 
 import { basename } from 'path';
 import { createHash, randomBytes } from 'crypto';
-import { normalizeUrl } from "@longterm-wiki/url-utils";
+import { normalizeUrl, hostMatches, hostHasLabel } from "@longterm-wiki/url-utils";
 import { CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
 import { findMdxFiles } from './lib/file-utils.ts';
 import type { Resource, MarkdownLink } from './resource-types.ts';
@@ -78,18 +78,18 @@ export function isYoutubeUrl(url: string): boolean {
 
 export function guessResourceType(url: string): string {
   const domain = new URL(url).hostname.toLowerCase();
-  if (domain.includes('arxiv.org')) return 'paper';
-  if (domain.includes('nature.com') || domain.includes('science.org')) return 'paper';
-  if (domain.includes('springer.com') || domain.includes('wiley.com')) return 'paper';
-  if (domain.includes('ncbi.nlm.nih.gov') || domain.includes('pubmed')) return 'paper';
-  if (domain.includes('gov') || domain.includes('government')) return 'government';
-  if (domain.includes('wikipedia.org')) return 'reference';
-  if (domain.includes('grokipedia.com')) return 'reference';
+  if (hostMatches(domain, 'arxiv.org')) return 'paper';
+  if (hostMatches(domain, 'nature.com') || hostMatches(domain, 'science.org')) return 'paper';
+  if (hostMatches(domain, 'springer.com') || hostMatches(domain, 'wiley.com')) return 'paper';
+  if (hostMatches(domain, 'ncbi.nlm.nih.gov') || hostHasLabel(domain, 'pubmed')) return 'paper';
+  if (hostHasLabel(domain, 'gov') || hostHasLabel(domain, 'government')) return 'government';
+  if (hostMatches(domain, 'wikipedia.org')) return 'reference';
+  if (hostMatches(domain, 'grokipedia.com')) return 'reference';
   if (isYoutubeUrl(url)) return 'talk';
-  if (domain.includes('podcast') || domain.includes('spotify.com')) return 'podcast';
-  if (domain.includes('substack.com') || domain.includes('medium.com')) return 'blog';
-  if (domain.includes('forum.effectivealtruism.org')) return 'blog';
-  if (domain.includes('lesswrong.com') || domain.includes('alignmentforum.org')) return 'blog';
+  if (hostHasLabel(domain, 'podcast') || hostHasLabel(domain, 'podcasts') || hostMatches(domain, 'spotify.com')) return 'podcast';
+  if (hostMatches(domain, 'substack.com') || hostMatches(domain, 'medium.com')) return 'blog';
+  if (hostMatches(domain, 'forum.effectivealtruism.org')) return 'blog';
+  if (hostMatches(domain, 'lesswrong.com') || hostMatches(domain, 'alignmentforum.org')) return 'blog';
   return 'web';
 }
 

@@ -517,6 +517,24 @@ export function SearchDialog() {
 // ---------------------------------------------------------------------------
 
 /**
+ * Sanitize a server-generated snippet: strip all HTML except bare <mark>
+ * and </mark> (no attributes). Tags are stripped to a fixed point because
+ * removing one tag can splice fragments into a fresh tag, so a single pass
+ * can be bypassed.
+ */
+export function sanitizeSnippet(snippet: string): string {
+  let safe = snippet
+    .replace(/<mark\b[^>]*>/gi, "<mark>")
+    .replace(/<\/mark\s*>/gi, "</mark>");
+  let prevSafe: string;
+  do {
+    prevSafe = safe;
+    safe = safe.replace(/<(?!\/?mark>)[^>]*>/gi, "");
+  } while (safe !== prevSafe);
+  return safe;
+}
+
+/**
  * Renders a description snippet with highlighted matching terms.
  * Prefers server-generated ts_headline() snippets (HTML with <mark> tags)
  * when available, falling back to client-side term highlighting.
@@ -529,11 +547,7 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
 
   // Prefer server-generated snippet with <mark> tags from ts_headline()
   if (snippet && snippet.includes("<mark>")) {
-    // Sanitize: strip all HTML except bare <mark> and </mark> (no attributes)
-    const safe = snippet
-      .replace(/<mark\b[^>]*>/gi, "<mark>")
-      .replace(/<\/mark\s*>/gi, "</mark>")
-      .replace(/<(?!\/?mark>)[^>]*>/gi, "");
+    const safe = sanitizeSnippet(snippet);
     return (
       <div
         className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_mark]:bg-yellow-200/70 dark:[&_mark]:bg-yellow-500/30 [&_mark]:text-foreground [&_mark]:rounded-sm [&_mark]:px-0.5"

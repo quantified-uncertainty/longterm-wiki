@@ -481,7 +481,7 @@ export function getSafetyOutlookClass(rating: string): string {
  * Get architecture relevance badge class
  */
 export function getArchRelevanceClass(level: string): string {
-  const l = level.toLowerCase().replace('_', '_');
+  const l = level.toLowerCase();
   return archRelevanceColors[l] || "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400";
 }
 

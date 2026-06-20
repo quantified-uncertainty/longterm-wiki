@@ -32,15 +32,24 @@ function normalize(text) {
 /**
  * Extract content from MDX, removing frontmatter, imports, code, etc.
  */
-function extractContent(content) {
+export function extractContent(content) {
   if (!content) return '';
 
   // Remove MDX imports, frontmatter, code blocks
-  const cleaned = content
+  let cleaned = content
     .replace(/^---[\s\S]*?---/m, '')           // Frontmatter
     .replace(/^import\s+.*$/gm, '')            // Imports
-    .replace(/```[\s\S]*?```/g, '')            // Code blocks
-    .replace(/<[^>]+>/g, '')                   // JSX/HTML tags
+    .replace(/```[\s\S]*?```/g, '');           // Code blocks
+
+  // Strip JSX/HTML tags to a fixed point: removing one tag can splice
+  // fragments into a fresh tag, so a single pass can be bypassed.
+  let prevCleaned;
+  do {
+    prevCleaned = cleaned;
+    cleaned = cleaned.replace(/<[^>]+>/g, ''); // JSX/HTML tags
+  } while (cleaned !== prevCleaned);
+
+  cleaned = cleaned
     .replace(/\|[^\n]+\|/g, '')                // Table rows
     .replace(/#+\s+/g, '')                     // Headers
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')   // Links -> text

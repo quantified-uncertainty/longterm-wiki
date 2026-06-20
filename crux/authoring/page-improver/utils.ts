@@ -204,8 +204,8 @@ export function repairFrontmatter(content: string): string {
     if (/^["']/.test(value)) continue;
     // Check for YAML-breaking patterns: colon-space in the value
     if (/:\s/.test(value)) {
-      // Escape any internal double quotes, then wrap
-      const escaped = value.replace(/"/g, '\\"');
+      // Escape backslashes first, then any internal double quotes, then wrap
+      const escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
       fmLines[i] = `${key}: "${escaped}"`;
     }
   }

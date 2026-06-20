@@ -334,7 +334,7 @@ async function researchSourcesForRecords(
 
   // Build a batch prompt: describe all records and ask for URLs
   const recordDescriptions = records
-    .map((r, i) => `  <record index="${i}" id="${escapeXml(r.recordId)}" type="${escapeXml(r.recordType)}">
+    .map((r, i) => `  <record index="${i}" id="${escapeXml(r.recordId).replace(/"/g, "&quot;")}" type="${escapeXml(r.recordType).replace(/"/g, "&quot;")}">
     <name>${escapeXml(r.displayName)}</name>
     <current_verdict>${escapeXml(r.verdict)}</current_verdict>
     <current_source>${escapeXml(r.source ?? 'none')}</current_source>
@@ -1048,6 +1048,9 @@ export function formatSummaryMarkdown(
     //   - replace backticks so an unbalanced backtick can't open inline code
     const safeTitle = r.entity.title
       .replace(/[\r\n\t]+/g, ' ')
+      // Escape backslashes first so an existing `\` can't combine with the
+      // escapes we add below for `|` and `[`.
+      .replace(/\\/g, '\\\\')
       .replace(/\|/g, '\\|')
       .replace(/\[/g, '\\[')
       .replace(/`/g, "'");

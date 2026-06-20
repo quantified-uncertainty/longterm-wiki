@@ -11,6 +11,7 @@ import { fetchArxivBatch } from '../resource-metadata.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 
 // ── Semantic Scholar extended data ──────────────────────────────────────────
 
@@ -71,7 +72,7 @@ export async function enrichPapersCommand(
   const paperResources = resources.filter((r) => {
     if (!r.url) return false;
     // arXiv papers
-    if (r.url.includes('arxiv.org')) return true;
+    if (hostMatches(r.url, 'arxiv.org')) return true;
     // Papers with DOIs
     if (extractDOI(r.url)) return true;
     // Scholarly URLs (nature.com, science.org, etc.)

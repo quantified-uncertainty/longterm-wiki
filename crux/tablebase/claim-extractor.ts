@@ -72,17 +72,20 @@ export function buildExtractionPrompt(
     : sourceContent;
 
   const recordsXml = records.map(r => {
-    const displayPart = r.displayName ? ` displayName="${escapeXml(r.displayName)}"` : '';
-    const fieldPart = r.fieldName ? ` fieldName="${escapeXml(r.fieldName)}"` : '';
+    // Values placed inside double-quoted attributes must also escape `"` so a
+    // crafted value can't break out of the attribute (escapeXml only handles
+    // & < >). Element text below doesn't need the quote escape.
+    const displayPart = r.displayName ? ` displayName="${escapeXml(r.displayName).replace(/"/g, '&quot;')}"` : '';
+    const fieldPart = r.fieldName ? ` fieldName="${escapeXml(r.fieldName).replace(/"/g, '&quot;')}"` : '';
     const reasoningPart = r.reasoning
       ? `\n    <reasoning>${escapeXml(r.reasoning)}</reasoning>`
       : '';
-    return `  <record id="${escapeXml(r.recordId)}" type="${escapeXml(r.recordType)}"${displayPart}${fieldPart}>${reasoningPart}\n  </record>`;
+    return `  <record id="${escapeXml(r.recordId).replace(/"/g, '&quot;')}" type="${escapeXml(r.recordType).replace(/"/g, '&quot;')}"${displayPart}${fieldPart}>${reasoningPart}\n  </record>`;
   }).join('\n');
 
   return `You are a structured data extraction assistant. Given a source document and a list of database records that need verification, extract factual claims from the source that could verify or update those records.
 
-<source url="${escapeXml(sourceUrl)}">
+<source url="${escapeXml(sourceUrl).replace(/"/g, '&quot;')}">
 ${escapeXml(truncatedContent)}
 </source>
 

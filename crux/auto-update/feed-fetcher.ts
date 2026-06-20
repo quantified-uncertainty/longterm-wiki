@@ -17,6 +17,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { htmlToText } from '../lib/html-utils.ts';
 import { executeWebSearch } from '../authoring/page-improver/api.ts';
 import type { NewsSource, SourcesConfig, FeedItem } from './types.ts';
 
@@ -176,13 +177,7 @@ function extractAttr(xml: string, tag: string, attr: string): string {
 }
 
 function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+  return htmlToText(html)
     .replace(/\s+/g, ' ')
     .trim();
 }

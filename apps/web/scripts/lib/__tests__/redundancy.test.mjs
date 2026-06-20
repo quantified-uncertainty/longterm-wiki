@@ -7,7 +7,17 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { computeRedundancy } from '../redundancy.mjs';
+import { computeRedundancy, extractContent } from '../redundancy.mjs';
+
+describe('extractContent tag stripping', () => {
+  it('strips spliced/nested tags to a fixed point', () => {
+    // Removing the inner <script> splices the outer fragments into a fresh
+    // <script ...> tag, so a single pass would leave "<script" behind.
+    const out = extractContent('<scr<script>ipt>alert(1)</script> hello');
+    expect(out.toLowerCase()).not.toContain('<script');
+    expect(out).not.toContain('<');
+  });
+});
 
 // Build a fake page with enough words to pass the `words.size > 10` filter
 function makePage(id, text, contentFormat = 'article') {

@@ -28,6 +28,7 @@ import { tryWikidataMatch } from './wikidata-matcher.ts';
 import { tryOpenAlexMatch } from './openalex-matcher.ts';
 import { tryUrlResolvesVerify } from './url-resolves-verifier.ts';
 import { searchForEntity } from './item-collectors.ts';
+import { hostMatches } from '@longterm-wiki/url-utils';
 import { isRelevanceGateEnabled, runRelevanceGate } from './relevance-gate.ts';
 import type {
   VerifyItem,
@@ -348,7 +349,7 @@ export async function verifySingleItem(
   // ── Wikidata deterministic matching (QUA-92) ──
   // For fact-type items sourced from Wikidata, use the structured API to verify
   // instead of fetching HTML + LLM. Saves ~$4.25/week for ~414 Wikidata-sourced facts.
-  if (item.data.kind === 'fact' && item.sourceUrl?.includes('wikidata.org')) {
+  if (item.data.kind === 'fact' && item.sourceUrl && hostMatches(item.sourceUrl, 'wikidata.org')) {
     try {
       const wikidataResult = await tryWikidataMatch(item);
       if (wikidataResult) return wikidataResult;
