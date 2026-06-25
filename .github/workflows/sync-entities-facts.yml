@@ -125,9 +125,11 @@ jobs:
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
 
       - name: Sync facts to wiki-server
         run: pnpm crux wiki-server sync-facts
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}

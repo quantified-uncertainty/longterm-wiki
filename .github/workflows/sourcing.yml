@@ -51,6 +51,7 @@ jobs:
       # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
       PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
       INPUT_BUDGET: ${{ inputs.budget || '50' }}
