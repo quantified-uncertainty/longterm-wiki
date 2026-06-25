@@ -67,6 +67,7 @@ jobs:
       # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
       PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
       # Assign inputs to env vars to avoid shell injection (GH Actions best practice)
       INPUT_LIMIT: ${{ inputs.limit || '5' }}
       INPUT_BUDGET: ${{ inputs.budget || '10' }}
