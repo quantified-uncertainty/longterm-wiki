@@ -18,11 +18,21 @@ test("data-quality dashboard renders the things_search staleness panel", async (
 
   await expect(page.getByText("(QUA-506 — hourly refresh via groundskeeper)")).toBeVisible();
 
-  await expect(page.getByText(/^healthy$|^warning$|^stale$|^unknown$/i).first()).toBeVisible();
+  // Scope all panel assertions to the things_search section. The data-quality
+  // page renders many other staleness badges and "Rows"/"Size" labels, so an
+  // unscoped locator's .first() would resolve to a hidden badge elsewhere on
+  // the page (#4920).
+  const panel = page
+    .locator("section", {
+      has: page.getByRole("heading", { name: /things_search materialized view/i }),
+    })
+    .first();
 
-  await expect(page.getByText(/^Rows$/)).toBeVisible();
-  await expect(page.getByText(/^Size$/)).toBeVisible();
-  await expect(page.getByText(/^Last refreshed$/)).toBeVisible();
+  await expect(panel.getByText(/^healthy$|^warning$|^stale$|^unknown$/i).first()).toBeVisible();
+
+  await expect(panel.getByText(/^Rows$/)).toBeVisible();
+  await expect(panel.getByText(/^Size$/)).toBeVisible();
+  await expect(panel.getByText(/^Last refreshed$/)).toBeVisible();
 
   expect(consoleErrors.filter((e) => !/favicon/i.test(e))).toEqual([]);
 });
