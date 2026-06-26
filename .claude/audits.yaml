@@ -507,7 +507,7 @@ audits:
     frequency: daily
     added: "2026-04-13"
     added_by_pr: 4319
-    last_checked: "2026-06-15"
+    last_checked: "2026-06-26"
     last_result: fail
     history:
       - date: "2026-04-14"
@@ -533,6 +533,9 @@ audits:
         result: fail
         checked_by: "manual"
       - date: "2026-06-15"
+        result: fail
+        checked_by: "manual"
+      - date: "2026-06-26"
         result: fail
         checked_by: "manual"
   - id: audits-system-adoption
