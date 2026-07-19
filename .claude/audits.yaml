@@ -118,8 +118,8 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-06-15"
-    last_result: fail
+    last_checked: "2026-07-19"
+    last_result: pass
     last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
       - date: "2026-03-29"
@@ -177,6 +177,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-19"
+        result: pass
+        checked_by: "maintenance-weekly-139"
+        notes: "2026-07-19: all 5 scheduled workflows (server-api-health, frontend-data-health, ci-pr-health, scheduled-maintenance, server-health-monitor) ran within expected windows with success; auto-update intentionally disabled (PR #2592)."
   - id: vercel-production-only
     category: infrastructure
     description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
@@ -258,7 +262,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-19"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -311,6 +315,10 @@ audits:
       - date: "2026-06-15"
         result: pass
         checked_by: "manual"
+      - date: "2026-07-19"
+        result: pass
+        checked_by: "maintenance-weekly-139"
+        notes: "2026-07-19: unit tests for exact-match ranking pass (tests 7-9, case-insensitive + whitespace handling)."
   - id: gate-override-frequency
     category: process
     description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
@@ -329,7 +337,7 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-19"
     last_result: fail
     last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
@@ -397,6 +405,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-19"
+        result: fail
+        checked_by: "maintenance-weekly-139"
+        notes: "2026-07-19: 5 gate:rules-ok overrides of 13 merged PRs (38%) in last 30 days — exceeds 20% threshold. Context: nearly all merges 2026-06-19..06-25 were a security sweep (CodeQL/Dependabot/base-image), where content-gate overrides are often legitimate. No new merges since 2026-06-25. Re-evaluate once normal PR cadence resumes."
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -408,8 +420,8 @@ audits:
       4. Also check crux/lib/llm.ts for any hardcoded model references.
     frequency: monthly
     added: "2026-03-30"
-    last_checked: "2026-04-11"
-    last_result: pass
+    last_checked: "2026-07-19"
+    last_result: fail
     last_result_note: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. Current."
     history:
       - date: "2026-04-01"
@@ -437,6 +449,10 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. Current per system context."
+      - date: "2026-07-19"
+        result: fail
+        checked_by: "maintenance-weekly-139"
+        notes: "2026-07-19: STALE. crux/lib/anthropic.ts pins opus=claude-opus-4-6 and sonnet=claude-sonnet-4-6, but latest are Opus 4.8 (claude-opus-4-8) and Sonnet 5 (claude-sonnet-5). haiku=claude-haiku-4-5-20251001 still current. Upgrade tracked in #4933 (target now 4-8, not 4-7). Not fixed here: default-model change affects cost/behavior across pipeline; needs a dedicated tested PR."
   - id: hallucination-risk-snapshots-rowcount
     category: data-pipeline
     description: "hallucination_risk_snapshots row count stays under 140,000 (2× the ~70K target). Growth beyond this threshold indicates the retention task or FK cascade has stopped working — historically this has been a prod-stability issue (QUA-352, QUA-302)."
@@ -507,7 +523,7 @@ audits:
     frequency: daily
     added: "2026-04-13"
     added_by_pr: 4319
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-19"
     last_result: fail
     history:
       - date: "2026-04-14"
@@ -535,6 +551,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-19"
+        result: fail
+        checked_by: "maintenance-weekly-139"
+        notes: "2026-07-19: 4/5 recent e2e-post-deploy runs failed (all 2026-06-14..06-20). Already tracked by open issue #4866 (React hydration error #418 on org pages). No newer runs recorded."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
