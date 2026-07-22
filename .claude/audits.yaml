@@ -258,7 +258,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-22"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -309,6 +309,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-06-15"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-07-22"
         result: pass
         checked_by: "manual"
   - id: gate-override-frequency
