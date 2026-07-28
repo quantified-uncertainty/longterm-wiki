@@ -30,7 +30,7 @@
     "@radix-ui/react-popover": "^1.1.15",
     "dotenv": "^17.2.4",
     "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.3.0",
     "pdf-parse": "^2.4.5",
     "yaml": "^2.7.0",
     "youtube-transcript": "^1.2.1",
