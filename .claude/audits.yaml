@@ -118,8 +118,8 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-06-15"
-    last_result: fail
+    last_checked: "2026-07-29"
+    last_result: pass
     last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
       - date: "2026-03-29"
@@ -177,6 +177,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-29"
+        result: pass
+        checked_by: "maintenance-sweep-2026-07-29"
+        notes: "All 5 scheduled workflows ran within window; latest scheduled-maintenance run is this sweep (in progress)."
   - id: vercel-production-only
     category: infrastructure
     description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
@@ -258,7 +262,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-29"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -311,6 +315,9 @@ audits:
       - date: "2026-06-15"
         result: pass
         checked_by: "manual"
+      - date: "2026-07-29"
+        result: pass
+        checked_by: "maintenance-sweep-2026-07-29"
   - id: gate-override-frequency
     category: process
     description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
@@ -329,8 +336,8 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
-    last_checked: "2026-06-15"
-    last_result: fail
+    last_checked: "2026-07-29"
+    last_result: pass
     last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
       - date: "2026-03-30"
@@ -397,6 +404,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-29"
+        result: pass
+        checked_by: "maintenance-sweep-2026-07-29"
+        notes: "0 overrides / 0 merged PRs in last 30 days (no merge activity on main since 2026-06-25)."
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -507,7 +518,7 @@ audits:
     frequency: daily
     added: "2026-04-13"
     added_by_pr: 4319
-    last_checked: "2026-06-15"
+    last_checked: "2026-07-29"
     last_result: fail
     history:
       - date: "2026-04-14"
@@ -535,6 +546,10 @@ audits:
       - date: "2026-06-15"
         result: fail
         checked_by: "manual"
+      - date: "2026-07-29"
+        result: fail
+        checked_by: "maintenance-sweep-2026-07-29"
+        notes: "4/5 recent post-deploy runs red (2026-06-14..2026-06-20), all the same assertion: things-search-mv.spec.ts:21 - unscoped getByText resolved to a hidden .page-status-dev-only badge instead of the MV panel's own label. Reproduced against prod 2026-07-29; still failing. Fix already exists in OPEN PR #4961 (unmerged since 2026-06-22) - needs merging, not re-fixing."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
