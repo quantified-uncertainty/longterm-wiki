@@ -2,11 +2,11 @@
 
 Read this before running a `/maintain` sweep (any cadence), before investigating a failing audit item, and before recording an audit result during a merge drought.
 
-These entries were repeatedly re-derived from scratch by sweeps on 2026-05-25, 06-01, 06-17, 06-22, 07-27, 07-31 and 08-02. They belong in `.claude/common-issues.md`, but **the sweep cannot write `.claude/*`** — see "The sweep cannot write its own prevention docs" below. This file is the writable home.
+Per #4980, the entries below were re-derived from scratch by sweeps on 2026-05-25, 06-01, 06-17, 06-22, 07-27 and 07-31. They belong in `.claude/common-issues.md`, but **the sweep cannot write `.claude/*`** — see "The sweep cannot write its own prevention docs" below. This file is the writable home, written by the 2026-08-02 sweep.
 
 ## Check for an existing fix PR before investigating a failing audit
 
-The `e2e-post-deploy-red-streak` audit has been failing continuously since 2026-05-24. Six sweeps each re-derived the same root cause from scratch — pulling `--log-failed` for multiple multi-MB run logs, reading the spec, tracing components — and the fix had *already been written and pushed* in PR #4961 on 2026-06-22. The 2026-07-31 sweep independently reproduced an equivalent diff before discovering the PR existed.
+The `e2e-post-deploy-red-streak` audit has been failing continuously since 2026-05-24. Per #4980, six sweeps each re-derived the same root cause from scratch — pulling `--log-failed` for multiple multi-MB run logs, reading the spec, tracing components — and the fix had *already been written and pushed* in PR #4961 on 2026-06-22. The 2026-07-31 sweep independently reproduced an equivalent diff before discovering the PR existed.
 
 This is a dominant consumer of sweep turn budget and a direct contributor to the recurring `Reached maximum number of turns` aborts (#4975).
 

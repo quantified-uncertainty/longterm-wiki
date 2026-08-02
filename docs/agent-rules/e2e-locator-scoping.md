@@ -4,13 +4,15 @@ Read this before writing or debugging any Playwright spec that navigates to an `
 
 ## Page-wide locators in `/internal/*` specs match wiki chrome, not just the dashboard
 
-Several `/internal/*` dashboard routes are now `redirect()` stubs pointing at a wiki page that hosts the dashboard via an MDX component. Example: `apps/web/src/app/internal/data-quality/page.tsx` is just `redirect("/wiki/E2600")`, and the dashboard renders inside E2600 through `data-quality-content` registered in `mdx-components.tsx`.
+Several `/internal/*` dashboard routes are now `redirect()` stubs pointing at a wiki page that hosts the dashboard via an MDX component. Example: `apps/web/src/app/internal/data-quality/page.tsx` is just `redirect("/wiki/E2600")`, and the dashboard renders inside E2600 through `DataQualityContent` (from `@/app/internal/data-quality/data-quality-content`), registered in the component map in `apps/web/src/components/mdx-components.tsx`.
 
 Consequence: a spec that does `page.goto("/internal/data-quality")` lands on a **full wiki page**. Every page-wide locator then competes with wiki chrome — `PageStatus`, sidebar, info boxes — and `PageStatus` is deliberately rendered *above* the article (`apps/web/src/app/wiki/[id]/page.tsx`), so its elements come **earlier in the DOM** than the dashboard's.
 
 **How it fails**: `page.getByText(/^healthy$|^stale$|…/).first()` in `e2e/things-search-mv.spec.ts` resolved to `PageStatus`'s collapsed `Stale` issue badge instead of the panel's own label. The badge is hidden, so `toBeVisible()` failed while the panel was perfectly healthy. Red for ~5 weeks across 5 post-deploy runs (#4920, fix in #4961).
 
-**The trigger is time, not code.** `PageStatus` only emits a `Stale` badge once a page's `lastEdited` exceeds 60 days (`PageStatus.tsx`). The test passed for months, then broke because the *page aged past the threshold*. Nothing about the dashboard changed. Expect this class to fire on any long-lived spec whenever content goes stale.
+As of 2026-08-02 the unscoped locator is still on `main` at `apps/web/e2e/things-search-mv.spec.ts:21` — #4961 carries the fix but has not merged.
+
+**The trigger is time, not code.** `PageStatus` pushes a `Stale` issue only when `lastEdited` is more than 60 days old *and* the page is not marked `evergreen: false` (`apps/web/src/components/PageStatus.tsx:542-553`). The test passed for months, then broke because the *page aged past the threshold*. Nothing about the dashboard changed. Expect this class to fire on any long-lived spec whenever content goes stale.
 
 **Prevention**: in any spec targeting an `/internal/*` route, scope assertions to the panel instead of the page:
 
