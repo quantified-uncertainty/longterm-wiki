@@ -19,7 +19,7 @@
     "@longterm-wiki/url-utils": "workspace:*",
     "@hono/node-server": "^1.19.10",
     "drizzle-orm": "^0.45.1",
-    "hono": "^4.12.4",
+    "hono": "^4.12.34",
     "pino": "^10.3.1",
     "postgres": "^3.4.5",
     "yaml": "^2.7.0",
