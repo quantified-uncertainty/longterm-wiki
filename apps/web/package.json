@@ -32,7 +32,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.3.1",
     "katex": "^0.16.32",
     "lucide-react": "^0.562.0",
     "mermaid": "^11.12.2",
