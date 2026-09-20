@@ -560,6 +560,26 @@ Examples:
 // run-auto command
 // ---------------------------------------------------------------------------
 
+/** Max characters of captured stdout/stderr echoed per failing audit check. */
+const MAX_CAPTURED_OUTPUT_CHARS = 4000;
+
+/**
+ * Pull `stdout`/`stderr` off an execSync error. Node attaches them as Buffers
+ * (or as strings when `encoding` is set); either way they carry whatever the
+ * check printed before exiting non-zero. Returns '' when unavailable.
+ */
+export function execOutput(err: unknown, stream: 'stdout' | 'stderr'): string {
+  if (typeof err !== 'object' || err === null) return '';
+  const raw = (err as Record<string, unknown>)[stream];
+  let text: string;
+  if (typeof raw === 'string') text = raw;
+  else if (Buffer.isBuffer(raw)) text = raw.toString('utf-8');
+  else return '';
+  text = text.trim();
+  if (text.length <= MAX_CAPTURED_OUTPUT_CHARS) return text;
+  return `${text.slice(0, MAX_CAPTURED_OUTPUT_CHARS)}\n… (truncated)`;
+}
+
 async function runAutoCommand(
   _args: string[],
   options: CommandOptions,
@@ -596,8 +616,22 @@ async function runAutoCommand(
         lines.push(`    ${ol}`);
       }
     } catch (err: unknown) {
+      // A non-zero exit is the *interesting* case — it is where the check
+      // writes its diagnosis (which runs failed, with URLs). Printing only
+      // err.message throws all of that away and leaves "Command failed: <cmd>",
+      // which is why sweeps kept re-deriving root causes by hand (#4980).
       const message = err instanceof Error ? err.message : String(err);
       lines.push(`  \x1b[31mCommand failed:\x1b[0m ${message.split('\n')[0]}`);
+      for (const [label, text] of [
+        ['stdout', execOutput(err, 'stdout')],
+        ['stderr', execOutput(err, 'stderr')],
+      ] as const) {
+        if (!text) continue;
+        lines.push(`  \x1b[2m${label}:\x1b[0m`);
+        for (const ol of text.split('\n')) {
+          lines.push(`    ${ol}`);
+        }
+      }
     }
 
     lines.push('');
@@ -870,13 +904,38 @@ export interface WorkflowRun {
 }
 
 export interface RedStreakResult {
-  status: 'pass' | 'fail';
+  status: 'pass' | 'fail' | 'stale';
   failures: number;
   totalConsidered: number;
   threshold: number;
   message: string;
-  /** Included on fail so the caller can print offending runs. */
+  /** Included on fail and stale so the caller can print offending runs. */
   failingRuns?: WorkflowRun[];
+  /** Age in whole days of the newest run, when it could be determined. */
+  newestRunAgeDays?: number;
+}
+
+/** Default recency window for the staleness guard. */
+export const DEFAULT_MAX_AGE_DAYS = 7;
+
+/**
+ * Age in whole days of the most recent run that carries a parseable
+ * `createdAt`. Returns undefined when no run has a usable timestamp — the
+ * caller then skips the staleness guard rather than guessing.
+ *
+ * Scans every run instead of trusting `runs[0]`: `gh run list` returns
+ * newest-first today, but the evaluator is also fed from tests and future
+ * callers, and a mis-ordered list must not silently produce a stale verdict.
+ */
+function newestRunAgeDays(runs: WorkflowRun[], now: Date): number | undefined {
+  let newest = Number.NEGATIVE_INFINITY;
+  for (const r of runs) {
+    if (!r.createdAt) continue;
+    const t = Date.parse(r.createdAt);
+    if (Number.isFinite(t) && t > newest) newest = t;
+  }
+  if (!Number.isFinite(newest)) return undefined;
+  return Math.floor((now.getTime() - newest) / 86_400_000);
 }
 
 /**
@@ -887,20 +946,53 @@ export interface RedStreakResult {
  * and `startup_failure` are intentionally NOT counted — they are usually
  * infra flakes rather than test regressions. Tighten the set here if the
  * audit needs to be stricter.
+ *
+ * Staleness guard (#4989 (c)): when the newest run in the window is older
+ * than `maxAgeDays`, the verdict is `stale` rather than `fail`. A workflow
+ * that has stopped running is otherwise indistinguishable from one that is
+ * actively failing, and the FAIL can never self-clear — nothing new will
+ * ever enter the window. `e2e-post-deploy-red-streak` sat red for 92 days
+ * that way, citing runs from June, and was re-derived from scratch by six
+ * separate maintenance sweeps (#4980). Workflow *liveness* is a different
+ * question and belongs in an external check (#4989 (a)), not here.
+ *
+ * Pass `maxAgeDays: 0` to disable the guard.
  */
 export function evaluateWorkflowRedStreak(
   runs: WorkflowRun[],
   threshold: number,
+  opts: { maxAgeDays?: number; now?: Date } = {},
 ): RedStreakResult {
+  const maxAgeDays = opts.maxAgeDays ?? DEFAULT_MAX_AGE_DAYS;
+  const now = opts.now ?? new Date();
+
   const failingRuns = runs.filter(r => r.conclusion === 'failure');
   const failures = failingRuns.length;
   const totalConsidered = runs.length;
+  const ageDays = newestRunAgeDays(runs, now);
+
+  if (maxAgeDays > 0 && ageDays !== undefined && ageDays > maxAgeDays) {
+    return {
+      status: 'stale',
+      failures,
+      totalConsidered,
+      threshold,
+      newestRunAgeDays: ageDays,
+      message:
+        `STALE: newest run is ${ageDays}d old (> ${maxAgeDays}d) — the workflow has stopped running, ` +
+        `so a red-streak verdict is unavailable (${failures}/${totalConsidered} of the stale window failed). ` +
+        `Investigate why it stopped, not why it failed.`,
+      failingRuns,
+    };
+  }
+
   if (failures >= threshold) {
     return {
       status: 'fail',
       failures,
       totalConsidered,
       threshold,
+      newestRunAgeDays: ageDays,
       message: `FAIL: ${failures}/${totalConsidered} recent runs failed — red streak likely (threshold=${threshold})`,
       failingRuns,
     };
@@ -910,6 +1002,7 @@ export function evaluateWorkflowRedStreak(
     failures,
     totalConsidered,
     threshold,
+    newestRunAgeDays: ageDays,
     message: `PASS: ${failures}/${totalConsidered} recent runs failed — within tolerance (threshold=${threshold})`,
   };
 }
@@ -959,22 +1052,32 @@ async function workflowRedStreakCommand(
   if (!workflow) {
     return {
       exitCode: 1,
-      output: `Usage: crux sys audits workflow-red-streak --workflow=<name> [--limit=5] [--threshold=3] [--repo=owner/name]
+      output: `Usage: crux sys audits workflow-red-streak --workflow=<name> [--limit=5] [--threshold=3] [--max-age=7] [--repo=owner/name]
 
   Check a GitHub Actions workflow's recent run history for a red streak.
   Exits 1 if >= threshold of the last <limit> runs failed, or if the run
   history could not be fetched (fail-closed).
 
+  If the newest run is older than --max-age days the result is STALE
+  (exit 0): the workflow has stopped running, so a red-streak verdict is
+  unavailable. Liveness is a separate concern — see #4989.
+
 Options:
   --workflow=X      Workflow file name (e.g. e2e-post-deploy.yml) — required
   --limit=N         How many recent runs to consider [default: 5]
   --threshold=N     Fail if at least N of the last <limit> runs failed [default: 3]
+  --max-age=N       Report STALE if the newest run is older than N days
+                    [default: ${DEFAULT_MAX_AGE_DAYS}; 0 disables the guard]
   --repo=owner/name GitHub repo [default: quantified-uncertainty/longterm-wiki]`,
     };
   }
 
   const limit = parsePositiveInt(options.limit, 5);
   const threshold = parsePositiveInt(options.threshold, 3);
+  const maxAgeDays = parseNonNegativeInt(
+    options['max-age'] ?? options.maxAge,
+    DEFAULT_MAX_AGE_DAYS,
+  );
   const repo = (options.repo as string | undefined) ?? 'quantified-uncertainty/longterm-wiki';
 
   const runs = fetchWorkflowRuns(workflow, repo, limit);
@@ -987,12 +1090,13 @@ Options:
     };
   }
 
-  const result = evaluateWorkflowRedStreak(runs, threshold);
-  const lines: string[] = [
-    `workflow=${workflow} failures_in_last_${result.totalConsidered}=${result.failures} threshold=${result.threshold}`,
-    result.message,
-  ];
-  if (result.status === 'fail' && result.failingRuns) {
+  const result = evaluateWorkflowRedStreak(runs, threshold, { maxAgeDays });
+  const header =
+    `workflow=${workflow} failures_in_last_${result.totalConsidered}=${result.failures}` +
+    ` threshold=${result.threshold}` +
+    (result.newestRunAgeDays !== undefined ? ` newest_run_age_days=${result.newestRunAgeDays}` : '');
+  const lines: string[] = [header, result.message];
+  if (result.status !== 'pass' && result.failingRuns) {
     for (const r of result.failingRuns) {
       lines.push(`  ${r.createdAt ?? '?'} ${r.conclusion} ${r.url ?? ''}`.trimEnd());
     }
@@ -1008,6 +1112,16 @@ function parsePositiveInt(v: unknown, fallback: number): number {
   if (typeof v === 'string') {
     const n = Number(v);
     if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
+  return fallback;
+}
+
+/** Like parsePositiveInt but accepts 0 (used by --max-age to disable the guard). */
+function parseNonNegativeInt(v: unknown, fallback: number): number {
+  if (typeof v === 'number' && Number.isFinite(v) && v >= 0) return Math.floor(v);
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    if (Number.isFinite(n) && n >= 0) return Math.floor(n);
   }
   return fallback;
 }
