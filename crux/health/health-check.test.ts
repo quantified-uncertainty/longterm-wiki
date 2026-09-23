@@ -10,6 +10,7 @@
 import { describe, it, expect } from 'vitest';
 
 import {
+  classifyWorkflowHealth,
   describeFetchError,
   fetchJson,
   parseLocalModeUrl,
@@ -260,4 +261,168 @@ describe('fetchJson', () => {
     // Should mention the unresolvable hostname so the user can spot typos.
     expect(result.errorDetail).toContain('does-not-exist-qua-479.invalid');
   }, 10_000);
+});
+
+describe('classifyWorkflowHealth', () => {
+  describe('activity-triggered workflows (ci.yml)', () => {
+    it('does not fail the check when ci.yml is stale because no PR landed', () => {
+      // The Sept 2026 regression: ci.yml last ran 218h ago simply because the
+      // repo had been quiet. That is repo activity, not a broken workflow, and
+      // it must not put ci-pr-health.yml into a red streak.
+      const v = classifyWorkflowHealth({
+        workflow: 'ci.yml',
+        ageHours: 218,
+        maxAgeHours: 168,
+        conclusions: ['success'],
+      });
+
+      expect(v.level).toBe('WARN');
+      expect(v.failure).toBeUndefined();
+      expect(v.message).toContain('218h ago');
+      expect(v.message).toContain('activity-triggered');
+    });
+
+    it('passes a fresh ci.yml run even when its latest conclusion is a failure', () => {
+      // CI fails legitimately on in-progress PRs.
+      const v = classifyWorkflowHealth({
+        workflow: 'ci.yml',
+        ageHours: 3,
+        maxAgeHours: 168,
+        conclusions: ['failure', 'failure'],
+      });
+
+      expect(v.level).toBe('PASS');
+      expect(v.failure).toBeUndefined();
+    });
+
+    it('does not fail a stale ci.yml whose only recent runs failed', () => {
+      // Staleness short-circuits before the conclusion rules, so a quiet repo
+      // whose last CI run happened to be red still does not raise an issue.
+      const v = classifyWorkflowHealth({
+        workflow: 'ci.yml',
+        ageHours: 500,
+        maxAgeHours: 168,
+        conclusions: ['failure'],
+      });
+
+      expect(v.level).toBe('WARN');
+      expect(v.failure).toBeUndefined();
+    });
+  });
+
+  describe('scheduled workflows', () => {
+    it('fails a stale scheduled workflow', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'database-backup.yml',
+        ageHours: 40,
+        maxAgeHours: 36,
+        conclusions: ['success'],
+      });
+
+      expect(v.level).toBe('FAIL');
+      expect(v.failure).toBe('stale (40h ago, max 36h)');
+    });
+
+    it('passes a fresh, successful scheduled workflow', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'database-backup.yml',
+        ageHours: 16,
+        maxAgeHours: 36,
+        conclusions: ['success'],
+      });
+
+      expect(v.level).toBe('PASS');
+      expect(v.failure).toBeUndefined();
+      expect(v.message).toBe('16h ago (success)');
+    });
+
+    it('fails a non-flaky scheduled workflow whose latest run failed', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'server-health-monitor.yml',
+        ageHours: 10,
+        maxAgeHours: 192,
+        conclusions: ['failure', 'success'],
+      });
+
+      expect(v.level).toBe('FAIL');
+      expect(v.failure).toBe("last run 'failure'");
+    });
+
+    it('warns (does not fail) when a flaky workflow has any recent success', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'scheduled-maintenance.yml',
+        ageHours: 10,
+        maxAgeHours: 216,
+        conclusions: ['failure', 'success', 'failure', 'success'],
+      });
+
+      expect(v.level).toBe('WARN');
+      expect(v.failure).toBeUndefined();
+      expect(v.message).toContain('2/4 recent runs succeeded');
+    });
+
+    it('fails a flaky workflow when every recent run failed', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'scheduled-maintenance.yml',
+        ageHours: 10,
+        maxAgeHours: 216,
+        conclusions: ['failure', 'failure', 'failure'],
+      });
+
+      expect(v.level).toBe('FAIL');
+      expect(v.failure).toBe("all recent runs failed ('failure')");
+      expect(v.message).toContain('all 3 recent runs failed');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('treats a null conclusion on a scheduled workflow as a failure', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'server-health-monitor.yml',
+        ageHours: 1,
+        maxAgeHours: 192,
+        conclusions: [null],
+      });
+
+      expect(v.level).toBe('FAIL');
+      expect(v.failure).toBe("last run 'null'");
+    });
+
+    it('handles an empty conclusions list without throwing', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'scheduled-maintenance.yml',
+        ageHours: 1,
+        maxAgeHours: 216,
+        conclusions: [],
+      });
+
+      expect(v.level).toBe('FAIL');
+      expect(v.message).toContain('all 0 recent runs failed');
+    });
+
+    it('treats age exactly at the threshold as fresh, not stale', () => {
+      const v = classifyWorkflowHealth({
+        workflow: 'database-backup.yml',
+        ageHours: 36,
+        maxAgeHours: 36,
+        conclusions: ['success'],
+      });
+
+      expect(v.level).toBe('PASS');
+    });
+
+    it('treats an unknown workflow as activity-triggered', () => {
+      // Anything not registered in SCHEDULED_ONLY_WORKFLOWS has no cadence
+      // guarantee, so it must not be failed for staleness.
+      const v = classifyWorkflowHealth({
+        workflow: 'some-new-workflow.yml',
+        ageHours: 10_000,
+        maxAgeHours: 48,
+        conclusions: ['failure'],
+      });
+
+      expect(v.level).toBe('WARN');
+      expect(v.failure).toBeUndefined();
+    });
+  });
 });

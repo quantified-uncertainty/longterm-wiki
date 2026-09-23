@@ -489,6 +489,80 @@ const SCHEDULED_ONLY_WORKFLOWS = new Set([
   'server-health-monitor.yml',
 ]);
 
+export interface WorkflowHealthVerdict {
+  level: 'PASS' | 'WARN' | 'FAIL';
+  /** Human-readable detail line, rendered as `<level>  <workflow>: <message>`. */
+  message: string;
+  /** Present iff the verdict should count against the overall check status. */
+  failure?: string;
+}
+
+/**
+ * Decide whether a monitored workflow is healthy from its recent run history.
+ *
+ * The scheduled/activity split drives both rules below. A workflow in
+ * SCHEDULED_ONLY_WORKFLOWS has a guaranteed cadence, so a stale run and a failed
+ * run both mean something is broken. Everything else (currently just ci.yml) is
+ * triggered by push / pull_request / merge_group:
+ *
+ *   - Staleness measures how quiet the repo has been, not workflow health.
+ *     Reporting it as a failure put ci-pr-health.yml into a 5-run red streak in
+ *     Sept 2026 (no PR had landed in >168h) and re-opened the wellness issue on
+ *     every run.
+ *   - A failed conclusion is also not a health signal — CI fails legitimately on
+ *     in-progress PRs.
+ */
+export function classifyWorkflowHealth(input: {
+  workflow: string;
+  ageHours: number;
+  maxAgeHours: number;
+  /** Conclusions of recent completed runs, most recent first. */
+  conclusions: (string | null)[];
+}): WorkflowHealthVerdict {
+  const { workflow, ageHours, maxAgeHours, conclusions } = input;
+  const latest = conclusions[0] ?? null;
+  const scheduled = SCHEDULED_ONLY_WORKFLOWS.has(workflow);
+
+  if (ageHours > maxAgeHours) {
+    if (!scheduled) {
+      return {
+        level: 'WARN',
+        message: `last run ${ageHours}h ago (max ${maxAgeHours}h) — activity-triggered, no push/PR in this window`,
+      };
+    }
+    return {
+      level: 'FAIL',
+      message: `last run ${ageHours}h ago (max ${maxAgeHours}h)`,
+      failure: `stale (${ageHours}h ago, max ${maxAgeHours}h)`,
+    };
+  }
+
+  if (!scheduled || latest === 'success') {
+    return { level: 'PASS', message: `${ageHours}h ago (${latest})` };
+  }
+
+  if (FLAKY_WORKFLOWS.has(workflow)) {
+    const successCount = conclusions.filter(c => c === 'success').length;
+    if (successCount > 0) {
+      return {
+        level: 'WARN',
+        message: `last run failed but ${successCount}/${conclusions.length} recent runs succeeded`,
+      };
+    }
+    return {
+      level: 'FAIL',
+      message: `all ${conclusions.length} recent runs failed (latest: '${latest}' ${ageHours}h ago)`,
+      failure: `all recent runs failed ('${latest}')`,
+    };
+  }
+
+  return {
+    level: 'FAIL',
+    message: `last run concluded '${latest}' (${ageHours}h ago)`,
+    failure: `last run '${latest}'`,
+  };
+}
+
 export async function checkActions(): Promise<CheckResult> {
   const name = 'GitHub Actions';
   const detail: string[] = [];
@@ -552,31 +626,15 @@ export async function checkActions(): Promise<CheckResult> {
         continue;
       }
 
-      const ageH = hoursAgo(latest.created_at);
-      const requireSuccess = wf !== 'ci.yml'; // CI may fail legitimately on PRs
-
-      if (ageH > maxAgeH) {
-        detail.push(`FAIL  ${wf}: last run ${ageH}h ago (max ${maxAgeH}h)`);
-        failures.push(`${wf}: stale (${ageH}h ago, max ${maxAgeH}h)`);
-      } else if (requireSuccess && latest.conclusion !== 'success') {
-        // For flaky workflows, check if ANY recent run succeeded
-        if (FLAKY_WORKFLOWS.has(wf)) {
-          const anySuccess = runs.some(r => r.conclusion === 'success');
-          if (anySuccess) {
-            const successCount = runs.filter(r => r.conclusion === 'success').length;
-            detail.push(`WARN  ${wf}: last run failed but ${successCount}/${runs.length} recent runs succeeded`);
-            // WARN — not added to failures, so it won't trigger an issue
-          } else {
-            detail.push(`FAIL  ${wf}: all ${runs.length} recent runs failed (latest: '${latest.conclusion}' ${ageH}h ago)`);
-            failures.push(`${wf}: all recent runs failed ('${latest.conclusion}')`);
-          }
-        } else {
-          detail.push(`FAIL  ${wf}: last run concluded '${latest.conclusion}' (${ageH}h ago)`);
-          failures.push(`${wf}: last run '${latest.conclusion}'`);
-        }
-      } else {
-        detail.push(`PASS  ${wf}: ${ageH}h ago (${latest.conclusion})`);
-      }
+      const verdict = classifyWorkflowHealth({
+        workflow: wf,
+        ageHours: hoursAgo(latest.created_at),
+        maxAgeHours: maxAgeH,
+        conclusions: runs.map(r => r.conclusion ?? null),
+      });
+      detail.push(`${verdict.level}  ${wf}: ${verdict.message}`);
+      // WARN verdicts carry no `failure`, so they never trigger a wellness issue.
+      if (verdict.failure) failures.push(`${wf}: ${verdict.failure}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       detail.push(`SKIP  ${wf}: ${msg}`);
