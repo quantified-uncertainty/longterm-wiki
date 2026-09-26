@@ -45,6 +45,20 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Legacy detail URLs (previously App Router pages that only redirected).
+      // Status codes match the old pages: permanentRedirect() → 308,
+      // redirect() → 307.
+      { source: "/source/:id", destination: "/resources/:id", permanent: true },
+      {
+        source: "/sources/publications/:id",
+        destination: "/publications/:id",
+        permanent: true,
+      },
+      {
+        source: "/factbase/publications/:id",
+        destination: "/publications/:id",
+        permanent: false,
+      },
       // Vanity URL: /about → wiki page E755
       {
         source: "/about",
