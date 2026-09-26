@@ -1,0 +1,148 @@
+diff --git a/crux/commands/agents.ts b/crux/commands/agents.ts
+index ad5d30fe0..78ee25e30 100644
+--- a/crux/commands/agents.ts
++++ b/crux/commands/agents.ts
+@@ -506,9 +506,10 @@ async function closeCommand(
+       output += `${c.yellow}⚠ Failed to look up agent session for ${branch}: ${msg}${c.reset}\n`;
+       output += `${c.dim}  Skipping cleanup so you can retry. Re-run \`crux sys agents close\` once the wiki-server is reachable.${c.reset}\n`;
+       sessionCloseFailed = true;
+-    } else if (sessionResult && 'ok' in sessionResult && !sessionResult.ok && sessionResult.error !== 'not_found') {
+-      // Wiki-server returned a non-2xx that isn't 404 — same blast
+-      // radius as a thrown error.
++    } else if (sessionResult && 'ok' in sessionResult && !sessionResult.ok) {
++      // Wiki-server returned a non-2xx — same blast radius as a thrown
++      // error. (ApiError has no 'not_found' member, so a former
++      // `error !== 'not_found'` clause here was always true; removed.)
+       const msg = (sessionResult as { message?: string }).message ?? 'unknown error';
+       output += `${c.yellow}⚠ Wiki-server lookup error for ${branch}: ${msg}${c.reset}\n`;
+       output += `${c.dim}  Skipping cleanup so you can retry.${c.reset}\n`;
+diff --git a/crux/lib/aiid/fetch.ts b/crux/lib/aiid/fetch.ts
+index 52634acf9..5f1027a25 100644
+--- a/crux/lib/aiid/fetch.ts
++++ b/crux/lib/aiid/fetch.ts
+@@ -14,7 +14,7 @@
+ import { mkdtempSync, createWriteStream, readdirSync, readFileSync, rmSync, statSync } from "fs";
+ import { join } from "path";
+ import { tmpdir } from "os";
+-import { execFileSync } from "child_process";
++import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from "child_process";
+ import { Readable } from "stream";
+ import { pipeline } from "stream/promises";
+ import { escapeRegex } from "../claim-text-utils.ts";
+@@ -121,9 +121,9 @@ export interface TarEntry {
+  * See QUA-733 (the regression) and its review-pass for the full story.
+  */
+ export function listTarEntries(archivePath: string): TarEntry[] {
+-  const tarOpts = {
+-    stdio: ["ignore", "pipe", "pipe"] as const,
+-    encoding: "utf-8" as const,
++  const tarOpts: ExecFileSyncOptionsWithStringEncoding = {
++    stdio: ["ignore", "pipe", "pipe"],
++    encoding: "utf-8",
+     maxBuffer: 64 * 1024 * 1024, // AIID dump has ~30k entries; 64 MB string is plenty
+   };
+ 
+diff --git a/crux/lib/improve-entity/mutex.test.ts b/crux/lib/improve-entity/mutex.test.ts
+index c151f5813..b10ad08c1 100644
+--- a/crux/lib/improve-entity/mutex.test.ts
++++ b/crux/lib/improve-entity/mutex.test.ts
+@@ -112,7 +112,9 @@ describe('checkImproveEntityMutex', () => {
+     // startedAt is 1 min ago → within freshness.
+     const row = makeRow({
+       runId: 'fresh-no-beat',
+-      heartbeatAt: null,
++      // The inferred RPC type says string | undefined, but the column is
++      // nullable in PG and the route can return null.
++      heartbeatAt: null as unknown as PipelineRunRow['heartbeatAt'],
+       startedAt: new Date(T0 - 60_000).toISOString(),
+     });
+     const result = await checkImproveEntityMutex({
+diff --git a/crux/lib/pipeline-runs/lifecycle.test.ts b/crux/lib/pipeline-runs/lifecycle.test.ts
+index 9e07e01d3..f93f9d64f 100644
+--- a/crux/lib/pipeline-runs/lifecycle.test.ts
++++ b/crux/lib/pipeline-runs/lifecycle.test.ts
+@@ -243,7 +243,7 @@ describe('withPipelineRun', () => {
+ 
+       // The body waits for a manually-resolved promise so we control
+       // exactly when it returns.
+-      let releaseBody: (() => void) | null = null;
++      let releaseBody = null as (() => void) | null;
+       const blocked = new Promise<void>((resolve) => {
+         releaseBody = resolve;
+       });
+@@ -290,7 +290,7 @@ describe('withPipelineRun', () => {
+ 
+       const { withPipelineRun } = await import('./lifecycle.ts');
+ 
+-      let releaseBody: (() => void) | null = null;
++      let releaseBody = null as (() => void) | null;
+       const blocked = new Promise<void>((resolve) => {
+         releaseBody = resolve;
+       });
+@@ -490,10 +490,10 @@ describe('withPipelineRun', () => {
+       // for outer (full spend = 0.10 + 0.05 + 0.20 = 0.35).
+       expect(mockEnd).toHaveBeenCalledTimes(2);
+       const innerCall = mockEnd.mock.calls.find(
+-        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.05,
++        ([, payload]) => (payload as { costUsd?: number }).costUsd === 0.05,
+       );
+       const outerCall = mockEnd.mock.calls.find(
+-        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.35,
++        ([, payload]) => (payload as { costUsd?: number }).costUsd === 0.35,
+       );
+       expect(innerCall).toBeDefined();
+       expect(outerCall).toBeDefined();
+diff --git a/crux/next-fetch.d.ts b/crux/next-fetch.d.ts
+new file mode 100644
+index 000000000..8e1b5dbf1
+--- /dev/null
++++ b/crux/next-fetch.d.ts
+@@ -0,0 +1,6 @@
++// apps/web modules reached through crux's `@/` path aliases (e.g.
++// apps/web/src/lib/wiki-server.ts) pass Next.js's `next` extension to fetch().
++// crux does not load Next's global types, so declare just that field here.
++interface RequestInit {
++  next?: { revalidate?: number | false; tags?: string[] };
++}
+diff --git a/crux/tsconfig.json b/crux/tsconfig.json
+index 4e6fe5f28..a60398492 100644
+--- a/crux/tsconfig.json
++++ b/crux/tsconfig.json
+@@ -38,7 +38,11 @@
+       "@wiki-server/political-offices-route": ["../apps/wiki-server/src/routes/tablebase/political-offices.ts"],
+       "@wiki-server/political-votes-route": ["../apps/wiki-server/src/routes/tablebase/political-votes.ts"],
+       "@wiki-server/campaign-finance-route": ["../apps/wiki-server/src/routes/tablebase/campaign-finance.ts"],
+-      "@wiki-server/resources-route": ["../apps/wiki-server/src/routes/wikibase/resources.ts"]
++      "@wiki-server/resources-route": ["../apps/wiki-server/src/routes/wikibase/resources.ts"],
++      "@wiki-server/model-system-cards-route": ["../apps/wiki-server/src/routes/tablebase/model-system-cards.ts"],
++      "@wiki-server/framework-review-route": ["../apps/wiki-server/src/routes/operational/framework-review.ts"],
++      "@wiki-server/benchmark-results-pending-route": ["../apps/wiki-server/src/routes/tablebase/benchmark-results-pending.ts"],
++      "@wiki-server/model-aliases-route": ["../apps/wiki-server/src/routes/tablebase/model-aliases.ts"]
+     }
+   },
+   "include": [
+diff --git a/crux/validate/crux-tsc-baseline.txt b/crux/validate/crux-tsc-baseline.txt
+deleted file mode 100644
+index 7273c0fa8..000000000
+--- a/crux/validate/crux-tsc-baseline.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-25
+diff --git a/crux/validate/validate-gate.ts b/crux/validate/validate-gate.ts
+index 436913bdc..0df0e9afc 100644
+--- a/crux/validate/validate-gate.ts
++++ b/crux/validate/validate-gate.ts
+@@ -280,9 +280,10 @@ const PARALLEL_STEPS: Step[] = [
+     command: tsc.command,
+     args: [...tsc.args, '--noEmit', '-p', '../../crux/tsconfig.json'],
+     cwd: APP_DIR,
+-    // Fail-open: crux has its own tsconfig with relaxed settings and
+-    // a known baseline of pre-existing errors. Blocking on crux type
+-    // errors would prevent shipping app-only fixes.
++    // Advisory until the last known error is fixed: ENTITY_REF_FK_MAP in
++    // crux/commands/tb-importers/propose-client.ts lacks `publication` /
++    // `organization-fact` entries (a real crash for T1 publication
++    // proposals with entityRefs). Once tsc is clean, drop this flag.
+     advisory: true,
+   },
+   {

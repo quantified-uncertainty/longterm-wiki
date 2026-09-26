@@ -1,0 +1,159 @@
+diff --git a/.github/workflows/auto-merge-backfill.yml b/.github/workflows/auto-merge-backfill.yml
+index d259d37b4..ae59d3acd 100644
+--- a/.github/workflows/auto-merge-backfill.yml
++++ b/.github/workflows/auto-merge-backfill.yml
+@@ -15,8 +15,10 @@ run-name: "Auto-Merge Backfill PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAU
+ # diffs are mechanical.
+ 
+ on:
+-  schedule:
+-    - cron: '*/20 * * * *'   # every 20 minutes
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '*/20 * * * *'   # every 20 minutes
+   workflow_dispatch:
+ 
+ permissions:
+diff --git a/.github/workflows/auto-rebase.yml b/.github/workflows/auto-rebase.yml
+index 32283c870..71c60cda3 100644
+--- a/.github/workflows/auto-rebase.yml
++++ b/.github/workflows/auto-rebase.yml
+@@ -12,8 +12,10 @@ run-name: "Auto-Rebase PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
+ #   5. Skip PRs with the `stage:merging` label (in merge queue — rebase would invalidate entry)
+ 
+ on:
+-  schedule:
+-    - cron: '0 */4 * * *'   # every 4 hours
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '0 */4 * * *'   # every 4 hours
+   workflow_dispatch:          # allow manual trigger
+ 
+ permissions:
+diff --git a/.github/workflows/ci-pr-health.yml b/.github/workflows/ci-pr-health.yml
+index a0950c139..a7a33d7a6 100644
+--- a/.github/workflows/ci-pr-health.yml
++++ b/.github/workflows/ci-pr-health.yml
+@@ -13,9 +13,11 @@ run-name: "CI & PR Health${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
+ # Issues are created/updated/closed automatically under the "wellness" label.
+ 
+ on:
+-  schedule:
+-    - cron: "10 8 * * *" # 8:10 AM UTC daily (staggered +10min from server-api-health to avoid duplicate issue creation)
+-    - cron: "10 20 * * *" # 8:10 PM UTC daily
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: "10 8 * * *" # 8:10 AM UTC daily (staggered +10min from server-api-health to avoid duplicate issue creation)
++  #  - cron: "10 20 * * *" # 8:10 PM UTC daily
+   workflow_dispatch:
+ 
+ concurrency:
+diff --git a/.github/workflows/flagship-curate.yml b/.github/workflows/flagship-curate.yml
+index 2e95324c7..7256deb50 100644
+--- a/.github/workflows/flagship-curate.yml
++++ b/.github/workflows/flagship-curate.yml
+@@ -9,8 +9,10 @@ run-name: "Flagship Curate${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
+ # trust loop has a single rolling thread to monitor.
+ 
+ on:
+-  schedule:
+-    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
+   workflow_dispatch:
+     inputs:
+       limit:
+diff --git a/.github/workflows/improve-pipeline-baseline.yml b/.github/workflows/improve-pipeline-baseline.yml
+index 597dff4e1..24df9dcbf 100644
+--- a/.github/workflows/improve-pipeline-baseline.yml
++++ b/.github/workflows/improve-pipeline-baseline.yml
+@@ -18,8 +18,10 @@ run-name: "Improve Pipeline Baseline${{ vars.AUTOMATION_PAUSED == 'true' && ' [P
+ # gives a stable rolling baseline with at most one day of staleness.
+ 
+ on:
+-  schedule:
+-    - cron: '0 7 * * *'  # Daily 07:00 UTC (after auto-update at ~06:00)
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '0 7 * * *'  # Daily 07:00 UTC (after auto-update at ~06:00)
+   workflow_dispatch:
+     inputs:
+       budget:
+diff --git a/.github/workflows/job-worker.yml b/.github/workflows/job-worker.yml
+index a44f2f3f1..6729d9268 100644
+--- a/.github/workflows/job-worker.yml
++++ b/.github/workflows/job-worker.yml
+@@ -19,8 +19,10 @@ run-name: "Job Worker${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }
+ #   - auto-update-digest: fetch news digest and create page-improve jobs
+ 
+ on:
+-  schedule:
+-    - cron: '*/30 * * * *'
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '*/30 * * * *'
+   workflow_dispatch:
+     inputs:
+       job_type:
+diff --git a/.github/workflows/scheduled-maintenance.yml b/.github/workflows/scheduled-maintenance.yml
+index 65ccb6395..37ceb2402 100644
+--- a/.github/workflows/scheduled-maintenance.yml
++++ b/.github/workflows/scheduled-maintenance.yml
+@@ -12,10 +12,12 @@ run-name: "Scheduled Maintenance${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSE
+ # the "Run maintenance" step's env (see QUA-612).
+ 
+ on:
+-  schedule:
+-    - cron: "30 7 * * 1-5" # Daily: weekdays 7:30am UTC
+-    - cron: "0 9 * * 0" # Weekly: Sunday 9am UTC
+-    - cron: "0 10 1 * *" # Monthly: 1st of month 10am UTC
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: "30 7 * * 1-5" # Daily: weekdays 7:30am UTC
++  #  - cron: "0 9 * * 0" # Weekly: Sunday 9am UTC
++  #  - cron: "0 10 1 * *" # Monthly: 1st of month 10am UTC
+   workflow_dispatch:
+     inputs:
+       cadence:
+diff --git a/.github/workflows/sourcing-recheck.yml b/.github/workflows/sourcing-recheck.yml
+index 13ebfdaef..3998efdda 100644
+--- a/.github/workflows/sourcing-recheck.yml
++++ b/.github/workflows/sourcing-recheck.yml
+@@ -5,8 +5,10 @@ run-name: "Sourcing Recheck${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' |
+ # Detects when previously-verified data becomes contradicted by updated sources.
+ 
+ on:
+-  schedule:
+-    - cron: '0 8 * * 1'  # Every Monday at 08:00 UTC
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '0 8 * * 1'  # Every Monday at 08:00 UTC
+   workflow_dispatch:
+     inputs:
+       budget:
+diff --git a/.github/workflows/sourcing.yml b/.github/workflows/sourcing.yml
+index ca17aa094..e73791799 100644
+--- a/.github/workflows/sourcing.yml
++++ b/.github/workflows/sourcing.yml
+@@ -5,8 +5,10 @@ run-name: "Source-Check${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || ''
+ # Uses the Anthropic Batch API (50% cost discount) via `crux verify-orchestrate --batch`.
+ 
+ on:
+-  schedule:
+-    - cron: '0 4 * * 1'  # Weekly Monday 4am UTC
++  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
++  # Manual runs still work via workflow_dispatch.
++  # schedule:
++  #  - cron: '0 4 * * 1'  # Weekly Monday 4am UTC
+   workflow_dispatch:
+     inputs:
+       budget:

@@ -1,0 +1,273 @@
+diff --git a/apps/wiki-server/.env.example b/apps/wiki-server/.env.example
+index bed15dae8..3605b83d5 100644
+--- a/apps/wiki-server/.env.example
++++ b/apps/wiki-server/.env.example
+@@ -10,7 +10,8 @@ DATABASE_URL=postgresql://user:password@localhost:5432/longterm_wiki
+ # Falls back to DATABASE_URL if not set.
+ # DATABASE_MIGRATION_URL=postgresql://migration_user:password@localhost:5432/longterm_wiki
+ 
+-# API key for authenticating requests. If not set, auth is skipped (dev mode).
++# API key for authenticating requests. If not set, auth is skipped in dev;
++# with NODE_ENV=production (the Docker image) reads stay open and writes get 503.
+ LONGTERMWIKI_SERVER_API_KEY=your-api-key-here
+ 
+ # Optional: HTTP port (default: 3100)
+diff --git a/apps/wiki-server/src/__tests__/auth.test.ts b/apps/wiki-server/src/__tests__/auth.test.ts
+index c87e3bb5d..e969fa788 100644
+--- a/apps/wiki-server/src/__tests__/auth.test.ts
++++ b/apps/wiki-server/src/__tests__/auth.test.ts
+@@ -1,18 +1,23 @@
+ import { describe, it, expect, beforeEach, afterEach } from "vitest";
+ import { Hono } from "hono";
+-import { validateApiKey, verifyToken } from "../auth.js";
++import { resolveAuthMode, validateApiKey, verifyToken } from "../auth.js";
+ 
+ describe("validateApiKey middleware", () => {
+   let savedKey: string | undefined;
++  let savedNodeEnv: string | undefined;
+ 
+   beforeEach(() => {
+     savedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
++    savedNodeEnv = process.env.NODE_ENV;
+     delete process.env.LONGTERMWIKI_SERVER_API_KEY;
++    process.env.NODE_ENV = "test";
+   });
+ 
+   afterEach(() => {
+     if (savedKey === undefined) delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+     else process.env.LONGTERMWIKI_SERVER_API_KEY = savedKey;
++    if (savedNodeEnv === undefined) delete process.env.NODE_ENV;
++    else process.env.NODE_ENV = savedNodeEnv;
+   });
+ 
+   function buildApp() {
+@@ -37,6 +42,48 @@ describe("validateApiKey middleware", () => {
+     });
+   });
+ 
++  describe("no key configured, NODE_ENV=production (misconfigured prod)", () => {
++    beforeEach(() => {
++      process.env.NODE_ENV = "production";
++    });
++
++    it("keeps reads working so a missing secret cannot take the site down", async () => {
++      const app = buildApp();
++      const res = await app.request("/api/pages");
++      expect(res.status).toBe(200);
++    });
++
++    it("refuses writes with 503 even with an arbitrary token", async () => {
++      const app = buildApp();
++      const cases: Record<string, string>[] = [{}, { Authorization: "Bearer anything" }];
++      for (const headers of cases) {
++        const res = await app.request("/api/pages/sync", { method: "POST", headers });
++        expect(res.status).toBe(503);
++      }
++    });
++
++    it("refuses PUT/PATCH/DELETE too", async () => {
++      const app = new Hono();
++      app.use("/api/*", validateApiKey());
++      app.all("/api/x", (c) => c.json({ ok: true }));
++      for (const method of ["PUT", "PATCH", "DELETE"]) {
++        const res = await app.request("/api/x", { method });
++        expect(res.status).toBe(503);
++      }
++    });
++
++    it("once the key is set, behaves exactly like keyed mode", async () => {
++      process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
++      const app = buildApp();
++      expect((await app.request("/api/pages")).status).toBe(401);
++      const ok = await app.request("/api/pages/sync", {
++        method: "POST",
++        headers: { Authorization: "Bearer test-secret" },
++      });
++      expect(ok.status).toBe(200);
++    });
++  });
++
+   describe("key configured", () => {
+     beforeEach(() => {
+       process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
+@@ -92,3 +139,21 @@ describe("verifyToken", () => {
+     expect(verifyToken("secret", "secret-key")).toBe(false);
+   });
+ });
++
++describe("resolveAuthMode", () => {
++  it("is keyed whenever a key is set, regardless of NODE_ENV", () => {
++    expect(resolveAuthMode({ LONGTERMWIKI_SERVER_API_KEY: "k", NODE_ENV: "production" })).toBe("key");
++    expect(resolveAuthMode({ LONGTERMWIKI_SERVER_API_KEY: "k" })).toBe("key");
++  });
++
++  it("treats an empty key as unset", () => {
++    expect(resolveAuthMode({ LONGTERMWIKI_SERVER_API_KEY: "", NODE_ENV: "production" })).toBe("prod-no-key");
++  });
++
++  it("is open only outside production", () => {
++    expect(resolveAuthMode({})).toBe("open-dev");
++    expect(resolveAuthMode({ NODE_ENV: "development" })).toBe("open-dev");
++    expect(resolveAuthMode({ NODE_ENV: "test" })).toBe("open-dev");
++    expect(resolveAuthMode({ NODE_ENV: "production" })).toBe("prod-no-key");
++  });
++});
+diff --git a/apps/wiki-server/src/__tests__/rate-limit.test.ts b/apps/wiki-server/src/__tests__/rate-limit.test.ts
+index 121668382..9c8b5c925 100644
+--- a/apps/wiki-server/src/__tests__/rate-limit.test.ts
++++ b/apps/wiki-server/src/__tests__/rate-limit.test.ts
+@@ -672,3 +672,42 @@ describe("createDefaultRateLimiters", () => {
+     expect(writeLimiter.maxKeys).toBe(10_000);
+   });
+ });
++
++describe("no API key configured", () => {
++  const savedNodeEnv = process.env.NODE_ENV;
++
++  function buildNoKeyApp() {
++    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
++    const app = new Hono();
++    app.use(
++      "*",
++      rateLimitMiddleware({
++        readLimiter: new RateLimiter({ maxRequests: 1, windowMs: 60_000 }),
++        writeLimiter: new RateLimiter({ maxRequests: 1, windowMs: 60_000 }),
++        skipPaths: ["/health"],
++      })
++    );
++    app.get("/api/pages", (c) => c.json({ ok: true }));
++    return app;
++  }
++
++  afterEach(() => {
++    process.env.NODE_ENV = savedNodeEnv;
++  });
++
++  const req = { headers: { Authorization: "Bearer anything", "X-Forwarded-For": "7.7.7.7" } };
++
++  it("treats any Bearer token as authenticated in local dev", async () => {
++    process.env.NODE_ENV = "test";
++    const app = buildNoKeyApp();
++    expect((await app.request("/api/pages", req)).status).toBe(200);
++    expect((await app.request("/api/pages", req)).status).toBe(200);
++  });
++
++  it("does not let an arbitrary token skip the limiter in production", async () => {
++    process.env.NODE_ENV = "production";
++    const app = buildNoKeyApp();
++    expect((await app.request("/api/pages", req)).status).toBe(200);
++    expect((await app.request("/api/pages", req)).status).toBe(429);
++  });
++});
+diff --git a/apps/wiki-server/src/auth.ts b/apps/wiki-server/src/auth.ts
+index 13b8df343..524368deb 100644
+--- a/apps/wiki-server/src/auth.ts
++++ b/apps/wiki-server/src/auth.ts
+@@ -2,12 +2,32 @@
+  * API key authentication middleware.
+  *
+  * Uses a single key (`LONGTERMWIKI_SERVER_API_KEY`) for all API access.
+- * If no key is configured, all requests pass through (dev mode).
++ *
++ * Modes (see `resolveAuthMode`):
++ *   - "key"          — key configured: a valid Bearer token is required.
++ *   - "open-dev"     — no key, NODE_ENV !== "production": everything passes
++ *                      (local dev, vitest).
++ *   - "prod-no-key"  — no key but NODE_ENV === "production" (the Dockerfile
++ *                      sets it): a misconfiguration. Reads keep working so
++ *                      a missing secret can never take the site down, but
++ *                      writes are refused with 503 and the condition is
++ *                      logged loudly, instead of silently letting anyone on
++ *                      the internet write to the production database.
+  */
+ 
+ import { timingSafeEqual } from "node:crypto";
+ import type { Context, Next, MiddlewareHandler } from "hono";
+ import { HTTPException } from "hono/http-exception";
++import { logger } from "./logger.js";
++
++export type AuthMode = "key" | "open-dev" | "prod-no-key";
++
++export function resolveAuthMode(env: NodeJS.ProcessEnv = process.env): AuthMode {
++  if (env.LONGTERMWIKI_SERVER_API_KEY) return "key";
++  return env.NODE_ENV === "production" ? "prod-no-key" : "open-dev";
++}
++
++const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+ 
+ /** Constant-time token comparison to prevent timing side-channel attacks. */
+ export function verifyToken(token: string, expectedKey: string): boolean {
+@@ -24,21 +44,39 @@ function extractBearerToken(c: Context): string | null {
+ }
+ 
+ /**
+- * Middleware that validates the API key.
+- *
+- * If no key is configured, all requests pass through (dev mode).
+- * If a key is configured, a valid Bearer token is required.
++ * Middleware that validates the API key. Behaviour per `AuthMode` above.
+  */
+ export function validateApiKey(): MiddlewareHandler {
++  if (resolveAuthMode() === "prod-no-key") {
++    logger.error(
++      "LONGTERMWIKI_SERVER_API_KEY is not set while NODE_ENV=production — " +
++        "/api writes will be refused (503) until it is set; reads stay open."
++    );
++  }
++
+   return async (c: Context, next: Next) => {
+-    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
++    const mode = resolveAuthMode();
+ 
+-    // If no key is configured, skip auth (dev mode)
+-    if (!expectedKey) {
++    if (mode === "open-dev") {
+       await next();
+       return;
+     }
+ 
++    if (mode === "prod-no-key") {
++      if (READ_METHODS.has(c.req.method)) {
++        await next();
++        return;
++      }
++      logger.error(
++        { method: c.req.method, path: c.req.path },
++        "Refusing write: LONGTERMWIKI_SERVER_API_KEY is not configured in production"
++      );
++      throw new HTTPException(503, {
++        message: "Server auth not configured; writes are disabled",
++      });
++    }
++
++    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY as string;
+     const token = extractBearerToken(c);
+     if (!token) {
+       throw new HTTPException(401, { message: "Bearer token required" });
+diff --git a/apps/wiki-server/src/rate-limit.ts b/apps/wiki-server/src/rate-limit.ts
+index 7766a6957..2bf7462b2 100644
+--- a/apps/wiki-server/src/rate-limit.ts
++++ b/apps/wiki-server/src/rate-limit.ts
+@@ -28,7 +28,7 @@
+  */
+ 
+ import type { Context, MiddlewareHandler } from "hono";
+-import { verifyToken } from "./auth.js";
++import { resolveAuthMode, verifyToken } from "./auth.js";
+ import { logger } from "./logger.js";
+ 
+ // ---------------------------------------------------------------------------
+@@ -328,8 +328,12 @@ export function rateLimitMiddleware(
+     const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+     const authHeader = c.req.header("Authorization");
+     const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
++    // With no key, any token counts as authenticated only in local dev;
++    // in production that would let anyone skip the limiter (see auth.ts).
+     const isAuthenticated = token != null && (
+-      !expectedKey || verifyToken(token, expectedKey)
++      expectedKey
++        ? verifyToken(token, expectedKey)
++        : resolveAuthMode() === "open-dev"
+     );
+ 
+     if (isAuthenticated) {

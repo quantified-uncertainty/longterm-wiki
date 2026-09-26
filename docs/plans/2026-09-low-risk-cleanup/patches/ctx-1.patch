@@ -1,0 +1,1675 @@
+diff --git a/.agents/skills/worktree/SKILL.md b/.agents/skills/worktree/SKILL.md
+index f6d49631a..e0497d907 100644
+--- a/.agents/skills/worktree/SKILL.md
++++ b/.agents/skills/worktree/SKILL.md
+@@ -16,7 +16,7 @@ Coord sessions can't edit files on `main` (PreToolUse hook blocks it), so every
+ /worktree -b <new-branch>    # create new branch from origin/main
+ ```
+ 
+-`<branch>` may be either form (`codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `codex/` automatically when missing. The lowercase prefix matches the convention in `.claude/rules/agent-session-workflow.md`.
++`<branch>` may be either form (`codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `codex/` automatically when missing. The lowercase prefix matches the convention in `docs/agent-rules/agent-session-workflow.md`.
+ 
+ ## Implementation
+ 
+diff --git a/.agents/skills/worktree/worktree.sh b/.agents/skills/worktree/worktree.sh
+index 839643983..76bf2672b 100755
+--- a/.agents/skills/worktree/worktree.sh
++++ b/.agents/skills/worktree/worktree.sh
+@@ -54,7 +54,7 @@ if [[ ! -e "$ENV_FILE" ]]; then
+ fi
+ 
+ # Auto-prefix `codex/` if missing (so `worktree qua-665-foo` works).
+-# Lowercase per .claude/rules/agent-session-workflow.md branch convention.
++# Lowercase per docs/agent-rules/agent-session-workflow.md branch convention.
+ if [[ ! "$BRANCH" =~ ^(codex/|claude/|main$|production$) ]]; then
+   BRANCH="codex/$BRANCH"
+ fi
+diff --git a/.claude/commands/batch.md b/.claude/commands/batch.md
+index 1c2b81ce0..f92c6e412 100644
+--- a/.claude/commands/batch.md
++++ b/.claude/commands/batch.md
+@@ -7,5 +7,5 @@ effort: low
+ 
+ `/batch` has no implementation here. If you landed on it via a harness default prompt, ignore that prompt.
+ 
+-- **Bulk codebase changes** (rename, move, enforce a rule across >5 files): follow the validator-first sweep pattern in `.claude/rules/implementation-quality.md` § "Codebase-Wide Sweeps — Validator-First". Write a `crux/validate/validate-<rule>.ts` first, use its output as the work queue, then wire it into `validate-gate.ts`.
+-- **Isolated branch work**: use an agent slot (`lw/a1`–`lw/a20`) via `./ws open <N> --claude`, or a `/tmp` worktree off the `lw/main` clone. See `.claude/rules/slot-isolation.md` and `.claude/rules/worktree-isolation-bug.md` (never use `Agent(isolation:"worktree")`).
++- **Bulk codebase changes** (rename, move, enforce a rule across >5 files): follow the validator-first sweep pattern in `docs/agent-rules/implementation-quality.md` § "Codebase-Wide Sweeps — Validator-First". Write a `crux/validate/validate-<rule>.ts` first, use its output as the work queue, then wire it into `validate-gate.ts`.
++- **Isolated branch work**: use an agent slot (`lw/a1`–`lw/a20`) via `./ws open <N> --claude`, or a `/tmp` worktree off the `lw/main` clone. See `docs/agent-rules/slot-isolation.md` and `docs/agent-rules/worktree-isolation-bug.md` (never use `Agent(isolation:"worktree")`).
+diff --git a/.claude/commands/maintain-qa-sweep.md b/.claude/commands/maintain-qa-sweep.md
+index fb6a4d474..c13e996d8 100644
+--- a/.claude/commands/maintain-qa-sweep.md
++++ b/.claude/commands/maintain-qa-sweep.md
+@@ -331,7 +331,7 @@ Include the coverage table in the report.
+ 
+ - **File one Linear issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
+ - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
+-- Use `pnpm crux linear create "title" --description="..." --project="<Project Name>"` for each (`--project` is required; see `.claude/rules/linear-project-ownership.md`).
++- Use `pnpm crux linear create "title" --description="..." --project="<Project Name>"` for each (`--project` is required; see `docs/agent-rules/linear-project-ownership.md`).
+ - **Expected volume:** 5-15 issues per deep sweep is normal.
+ - **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a Linear issue. If you compiled it into the report, file it.
+ 
+diff --git a/.claude/commands/maintain.md b/.claude/commands/maintain.md
+index 59b4296af..bd2270075 100644
+--- a/.claude/commands/maintain.md
++++ b/.claude/commands/maintain.md
+@@ -55,7 +55,7 @@ The report categorizes work into priority tiers. Review the output and decide wh
+ 
+ ### Filing new issues
+ 
+-When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost. `--project` is required (see `.claude/rules/linear-project-ownership.md` to pick one):
++When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost. `--project` is required (see `docs/agent-rules/linear-project-ownership.md` to pick one):
+ ```bash
+ pnpm crux linear create "Descriptive title" \
+   --description="What's wrong and why it matters" \
+diff --git a/.claude/commands/plan-feature.md b/.claude/commands/plan-feature.md
+index 27c8f337d..7f63c3d8c 100644
+--- a/.claude/commands/plan-feature.md
++++ b/.claude/commands/plan-feature.md
+@@ -14,7 +14,7 @@ Deep, multi-pass planning process for significant new functionality. Uses ~17 pa
+ 
+ **Cost:** ~$15-25, 20-40 minutes.
+ 
+-**Discipline this skill enforces:** `.claude/rules/agent-planning-discipline.md` (auto-loaded). Read it now if you haven't this session — it explains the failure modes (over-scoping, additive-only red-teams, framing without empirical evidence, sunk-cost commitment from early Phase 0 PRs) that this skill's structure exists to prevent.
++**Discipline this skill enforces:** `docs/agent-rules/agent-planning-discipline.md` (auto-loaded). Read it now if you haven't this session — it explains the failure modes (over-scoping, additive-only red-teams, framing without empirical evidence, sunk-cost commitment from early Phase 0 PRs) that this skill's structure exists to prevent.
+ 
+ ---
+ 
+@@ -88,7 +88,7 @@ Read both agent results. Then write `/tmp/plan-feature-evidence.md` with:
+ 
+ If the user wants to proceed despite weak evidence, document the choice in the eventual plan body under "Open Questions" — "Empirical evidence weak; proceeded anyway because [user reason]." This makes the assumption legible to the next reader.
+ 
+-**Why this gate is non-negotiable:** see `.claude/rules/agent-planning-discipline.md` § "Don't outsource framing to agents." The QUA-943 v4 plan locked in 5 months of scope without this gate — it cannot be re-introduced as a soft guideline.
++**Why this gate is non-negotiable:** see `docs/agent-rules/agent-planning-discipline.md` § "Don't outsource framing to agents." The QUA-943 v4 plan locked in 5 months of scope without this gate — it cannot be re-introduced as a soft guideline.
+ 
+ ---
+ 
+@@ -229,7 +229,7 @@ If an area doesn't apply, write "N/A — [reason]" rather than omitting it.
+ 
+ ### 5c. Red team — ≥3 parallel agents with explicitly different mandates
+ 
+-Write the draft plan to `/tmp/feature-plan-draft.md` using the Write tool. **Each reviewer below has a different mandate by design** — see `.claude/rules/agent-planning-discipline.md` § "Watch the additive-only red-team smell" for why two same-mandate red-teams (the QUA-943 v4 anti-pattern) produce 19 mitigations and 0 deletions. The deletion-only reviewer is non-negotiable.
++Write the draft plan to `/tmp/feature-plan-draft.md` using the Write tool. **Each reviewer below has a different mandate by design** — see `docs/agent-rules/agent-planning-discipline.md` § "Watch the additive-only red-team smell" for why two same-mandate red-teams (the QUA-943 v4 anti-pattern) produce 19 mitigations and 0 deletions. The deletion-only reviewer is non-negotiable.
+ 
+ Each agent reads `/tmp/feature-plan-draft.md` from disk before evaluating.
+ 
+@@ -396,7 +396,7 @@ Step 3 — if the umbrella has a sibling epic (e.g. this plan complements QUA-54
+ pnpm crux linear comment QUA-544 "Sibling: QUA-NNN tracks [complementary axis]. See [link]."
+ ```
+ 
+-Project picking: follow `.claude/rules/linear-project-ownership.md`. If unsure, ask the user.
++Project picking: follow `docs/agent-rules/linear-project-ownership.md`. If unsure, ask the user.
+ 
+ ### 7d. CHECKPOINT 3 — Final report
+ 
+diff --git a/.claude/hooks/block-cat-polling.sh b/.claude/hooks/block-cat-polling.sh
+index 84d5739cb..dfdf1007c 100755
+--- a/.claude/hooks/block-cat-polling.sh
++++ b/.claude/hooks/block-cat-polling.sh
+@@ -111,7 +111,7 @@ If you genuinely need a one-shot forensic read of a finished task file,
+ that's fine — the counter only fires on the third occurrence in a
+ session. To unblock the current call, switch to Monitor.
+ 
+-See .claude/rules/wait-on-subagents.md for the full pattern guide and
++See docs/agent-rules/wait-on-subagents.md for the full pattern guide and
+ QUA-1069 for the data behind this hook.
+ EOF
+ exit 2
+diff --git a/.claude/hooks/cleanup-worktrees.sh b/.claude/hooks/cleanup-worktrees.sh
+index 316ad5b79..dae5d5162 100755
+--- a/.claude/hooks/cleanup-worktrees.sh
++++ b/.claude/hooks/cleanup-worktrees.sh
+@@ -154,7 +154,7 @@ for i in "${!PATHS[@]}"; do
+   if [ "$SHOULD_REMOVE" = true ]; then
+     # Safety: check if any process has its CWD inside this worktree.
+     # This prevents removing a worktree that a concurrent agent session
+-    # is still using (addresses CWD corruption bug — see .claude/rules/worktree-isolation-bug.md).
++    # is still using (addresses CWD corruption bug — see docs/agent-rules/worktree-isolation-bug.md).
+     if command -v lsof >/dev/null 2>&1; then
+       # lsof -d cwd lists only CWD file descriptors — fast and targeted
+       if lsof -d cwd 2>/dev/null | grep -qF "$WT_PATH"; then
+diff --git a/.claude/hooks/require-checklist.sh b/.claude/hooks/require-checklist.sh
+index 97a249640..30073def4 100755
+--- a/.claude/hooks/require-checklist.sh
++++ b/.claude/hooks/require-checklist.sh
+@@ -29,5 +29,5 @@ if [[ "$FILE_PATH" == *"/.claude/"* ]] || [[ "$FILE_PATH" == *".claude/"* ]]; th
+ fi
+ 
+ # Block: no checklist and trying to edit a non-.claude file
+-echo "BLOCKED: No agent checklist found. Run 'pnpm crux sys agent-checklist init --issue=N' (or 'pnpm crux sys agent-checklist init \"task description\"') before editing code. This is mandatory — see .claude/rules/agent-session-workflow.md" >&2
++echo "BLOCKED: No agent checklist found. Run 'pnpm crux sys agent-checklist init --issue=N' (or 'pnpm crux sys agent-checklist init \"task description\"') before editing code. This is mandatory — see docs/agent-rules/agent-session-workflow.md" >&2
+ exit 2
+diff --git a/.claude/memory/feedback_dev_server_ports.md b/.claude/memory/feedback_dev_server_ports.md
+index 86a1e6702..55c055522 100644
+--- a/.claude/memory/feedback_dev_server_ports.md
++++ b/.claude/memory/feedback_dev_server_ports.md
+@@ -4,7 +4,7 @@ description: Always use slot-specific port from .env DEV_PORT, never guess or us
+ type: feedback
+ ---
+ 
+-Always check `.env` for `DEV_PORT` and `.claude/rules/environment-setup.md` before starting a dev server. Port 3001 belongs to the user's main dev server — never use it from agent slots. Convention is `3010 + slot number` (a6 = 3016).
++Always check `.env` for `DEV_PORT` and `docs/agent-rules/environment-setup.md` before starting a dev server. Port 3001 belongs to the user's main dev server — never use it from agent slots. Convention is `3010 + slot number` (a6 = 3016).
+ 
+ **Why:** User corrected after agent started dev servers on wrong ports (3001, then 3099). The port info was in `.env` and documented in environment-setup.md but was not checked.
+ 
+diff --git a/.claude/session-log.md b/.claude/session-log.md
+index 327aa9a36..29aaf175f 100644
+--- a/.claude/session-log.md
++++ b/.claude/session-log.md
+@@ -1,6 +1,6 @@
+ # Session Log
+ 
+-Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
++Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `docs/agent-rules/session-logging.md` for the format.
+ 
+ ## 2026-02-13 | claude/fix-broken-wiki-links-RWnZ9 | Fix broken EntityLinks on E689
+ 
+@@ -224,7 +224,7 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
+ 
+ ## 2026-02-13 | claude/session-logging-tracking-d4d6K | Add session logging system
+ 
+-**What was done:** Created a session logging and common-issues tracking system. Added `.claude/rules/session-logging.md` (instructs each session to log a summary), `.claude/session-log.md` (the log itself), and `.claude/common-issues.md` (recurring issues and solutions seeded from CLAUDE.md knowledge).
++**What was done:** Created a session logging and common-issues tracking system. Added `docs/agent-rules/session-logging.md` (instructs each session to log a summary), `.claude/session-log.md` (the log itself), and `.claude/common-issues.md` (recurring issues and solutions seeded from CLAUDE.md knowledge).
+ 
+ **Issues encountered:**
+ - None
+diff --git a/.claude/settings.fleet.json b/.claude/settings.fleet.json
+new file mode 100644
+index 000000000..c3f11dff7
+--- /dev/null
++++ b/.claude/settings.fleet.json
+@@ -0,0 +1,114 @@
++{
++  "hooks": {
++    "SessionStart": [
++      {
++        "matcher": "startup",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
++            "statusMessage": "Setting up environment..."
++          }
++        ]
++      }
++    ],
++    "PreToolUse": [
++      {
++        "matcher": "Edit|Write",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-checklist.sh\""
++          }
++        ]
++      },
++      {
++        "matcher": "Bash",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-git-stash.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-branch-switch.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-tmux-kill.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-other-slots.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-raw-gh-pr.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-cat-polling.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-stage-approved.sh\"",
++            "timeout": 15
++          }
++        ]
++      }
++    ],
++    "PostToolUse": [
++      {
++        "matcher": "",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/heartbeat.sh\"",
++            "timeout": 5,
++            "async": true
++          }
++        ]
++      }
++    ],
++    "SessionEnd": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/cleanup-worktrees.sh\"",
++            "timeout": 60,
++            "async": true
++          },
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-finalize.sh\"",
++            "timeout": 30,
++            "async": true
++          }
++        ]
++      }
++    ],
++    "UserPromptSubmit": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/inject-wip-checklist.sh\"",
++            "timeout": 5
++          }
++        ]
++      }
++    ],
++    "Stop": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/verify-checklist-on-stop.sh\"",
++            "timeout": 5
++          }
++        ]
++      }
++    ]
++  }
++}
+diff --git a/.claude/settings.json b/.claude/settings.json
+index 6be2b34a9..c3da81480 100644
+--- a/.claude/settings.json
++++ b/.claude/settings.json
+@@ -16,18 +16,6 @@
+     ]
+   },
+   "hooks": {
+-    "SessionStart": [
+-      {
+-        "matcher": "startup",
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+-            "statusMessage": "Setting up environment..."
+-          }
+-        ]
+-      }
+-    ],
+     "PreToolUse": [
+       {
+         "matcher": "Edit|Write",
+@@ -36,10 +24,6 @@
+             "type": "command",
+             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/approve-claude-configs.sh\""
+           },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-checklist.sh\""
+-          },
+           {
+             "type": "command",
+             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/warn-main-branch.sh\""
+@@ -49,54 +33,14 @@
+       {
+         "matcher": "Bash",
+         "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-git-stash.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-branch-switch.sh\""
+-          },
+           {
+             "type": "command",
+             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-no-verify.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-tmux-kill.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-other-slots.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-raw-gh-pr.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-cat-polling.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-stage-approved.sh\"",
+-            "timeout": 15
+           }
+         ]
+       }
+     ],
+     "PostToolUse": [
+-      {
+-        "matcher": "",
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/heartbeat.sh\"",
+-            "timeout": 5,
+-            "async": true
+-          }
+-        ]
+-      },
+       {
+         "matcher": "Agent",
+         "hooks": [
+@@ -107,46 +51,6 @@
+           }
+         ]
+       }
+-    ],
+-    "SessionEnd": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/cleanup-worktrees.sh\"",
+-            "timeout": 60,
+-            "async": true
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-finalize.sh\"",
+-            "timeout": 30,
+-            "async": true
+-          }
+-        ]
+-      }
+-    ],
+-    "UserPromptSubmit": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/inject-wip-checklist.sh\"",
+-            "timeout": 5
+-          }
+-        ]
+-      }
+-    ],
+-    "Stop": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/verify-checklist-on-stop.sh\"",
+-            "timeout": 5
+-          }
+-        ]
+-      }
+     ]
+   }
+ }
+diff --git a/.codex/hooks.fleet.json b/.codex/hooks.fleet.json
+new file mode 100644
+index 000000000..04503ee3f
+--- /dev/null
++++ b/.codex/hooks.fleet.json
+@@ -0,0 +1,115 @@
++{
++  "_comment": "Fleet-mode Codex hooks (see .claude/settings.fleet.json and docs/agent-rules/fleet-mode.md). To enable in a slot, merge these entries into .codex/hooks.json locally.",
++  "hooks": {
++    "PreToolUse": [
++      {
++        "matcher": "Edit|Write",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-checklist.sh\""
++          }
++        ]
++      },
++      {
++        "matcher": "Bash",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-git-stash.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-branch-switch.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-tmux-kill.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-other-slots.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-raw-gh-pr.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-cat-polling.sh\""
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-stage-approved.sh\"",
++            "timeout": 15
++          }
++        ]
++      }
++    ],
++    "PostToolUse": [
++      {
++        "matcher": "",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/heartbeat.sh\"",
++            "timeout": 5,
++            "async": true
++          }
++        ]
++      }
++    ],
++    "SessionStart": [
++      {
++        "matcher": "startup",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-start.sh\"",
++            "statusMessage": "Setting up environment..."
++          }
++        ]
++      }
++    ],
++    "SessionEnd": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/cleanup-worktrees.sh\"",
++            "timeout": 60,
++            "async": true
++          },
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-finalize.sh\"",
++            "timeout": 30,
++            "async": true
++          }
++        ]
++      }
++    ],
++    "UserPromptSubmit": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/inject-wip-checklist.sh\"",
++            "timeout": 5
++          }
++        ]
++      }
++    ],
++    "Stop": [
++      {
++        "hooks": [
++          {
++            "type": "command",
++            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/verify-checklist-on-stop.sh\"",
++            "timeout": 5
++          }
++        ]
++      }
++    ]
++  }
++}
+diff --git a/.codex/hooks.json b/.codex/hooks.json
+index 889b10e8a..c19ef3337 100644
+--- a/.codex/hooks.json
++++ b/.codex/hooks.json
+@@ -9,10 +9,6 @@
+             "type": "command",
+             "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/approve-claude-configs.sh\""
+           },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-checklist.sh\""
+-          },
+           {
+             "type": "command",
+             "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/warn-main-branch.sh\""
+@@ -22,54 +18,14 @@
+       {
+         "matcher": "Bash",
+         "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-git-stash.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-branch-switch.sh\""
+-          },
+           {
+             "type": "command",
+             "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-no-verify.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-tmux-kill.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-other-slots.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-raw-gh-pr.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/block-cat-polling.sh\""
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/require-stage-approved.sh\"",
+-            "timeout": 15
+           }
+         ]
+       }
+     ],
+     "PostToolUse": [
+-      {
+-        "matcher": "",
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/heartbeat.sh\"",
+-            "timeout": 5,
+-            "async": true
+-          }
+-        ]
+-      },
+       {
+         "matcher": "Agent",
+         "hooks": [
+@@ -80,58 +36,6 @@
+           }
+         ]
+       }
+-    ],
+-    "SessionStart": [
+-      {
+-        "matcher": "startup",
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-start.sh\"",
+-            "statusMessage": "Setting up environment..."
+-          }
+-        ]
+-      }
+-    ],
+-    "SessionEnd": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/cleanup-worktrees.sh\"",
+-            "timeout": 60,
+-            "async": true
+-          },
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/session-finalize.sh\"",
+-            "timeout": 30,
+-            "async": true
+-          }
+-        ]
+-      }
+-    ],
+-    "UserPromptSubmit": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/inject-wip-checklist.sh\"",
+-            "timeout": 5
+-          }
+-        ]
+-      }
+-    ],
+-    "Stop": [
+-      {
+-        "hooks": [
+-          {
+-            "type": "command",
+-            "command": "bash \"${CODEX_PROJECT_DIR:-$PWD}/.claude/hooks/verify-checklist-on-stop.sh\"",
+-            "timeout": 5
+-          }
+-        ]
+-      }
+     ]
+   }
+ }
+diff --git a/.github/workflows/refresh-frameworks.yml b/.github/workflows/refresh-frameworks.yml
+index 2a1efc847..c73406c38 100644
+--- a/.github/workflows/refresh-frameworks.yml
++++ b/.github/workflows/refresh-frameworks.yml
+@@ -19,7 +19,7 @@ on:
+   # schedule disabled — labs rarely change frameworks AND the script's first
+   # production run benefits from manual oversight (some URLs may have moved
+   # since the manifest was authored). Re-enable once the manual runs settle.
+-  # Treatment matches `auto-update.yml` per `.claude/rules/auto-update-system.md`:
++  # Treatment matches `auto-update.yml` per `docs/agent-rules/auto-update-system.md`:
+   # if you uncomment the schedule, also add `refresh-frameworks.yml` to the
+   # workflow-staleness list in `crux/health/health-check.ts::workflowFiles`.
+   # Tracked in QUA-31 alongside the auto-update re-enable question.
+diff --git a/.squawk.toml b/.squawk.toml
+index b6ef62052..e93c3e5d8 100644
+--- a/.squawk.toml
++++ b/.squawk.toml
+@@ -29,7 +29,7 @@ pg_version = "16"
+ #   two-step pattern for FK constraints requires two separate transactions — both impossible
+ #   with Drizzle. Tables are small (hundreds of rows) so brief locking is acceptable.
+ #   If large-table migrations are needed in the future, use a separate raw SQL runner
+-#   outside Drizzle (see .claude/rules/database-migrations.md for the manual migration pattern).
++#   outside Drizzle (see docs/agent-rules/database-migrations.md for the manual migration pattern).
+ #
+ # ban-drop-column:
+ #   Intentional column removals are part of the deliberate consolidation/cleanup migrations
+diff --git a/AGENTS.md b/AGENTS.md
+index 0f61dda0e..c949f5243 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -2,7 +2,7 @@
+ 
+ This file exists because Codex (and a few other agent runtimes) look for `AGENTS.md` by convention. The canonical instructions live in `CLAUDE.md` and are agent-neutral despite the filename.
+ 
+-**Read `CLAUDE.md` and follow it as written.** It is the single source of truth for repo conventions, the MANDATORY first action (`pnpm crux sys agent-checklist init`), the wiki architecture, the issue-tracking workflow, and the tier-1/tier-2 rule split. Do not duplicate or paraphrase its content here.
++**Read `CLAUDE.md` and follow it as written.** It is the single source of truth for repo conventions, the wiki architecture, the hard safety rules, and the table of on-demand docs under `docs/agent-rules/`. Do not duplicate or paraphrase its content here.
+ 
+ ## Agent runtime — what's specific to Codex (vs Claude Code)
+ 
+@@ -11,7 +11,7 @@ This file exists because Codex (and a few other agent runtimes) look for `AGENTS
+ | Claude Code | `CLAUDE.md` | `.claude/settings.json` | `.claude/commands/` | `docs/agent-workflows/` when extracted; otherwise `.claude/commands/` | `CLAUDE_PROJECT_DIR` |
+ | Codex | `AGENTS.md` (this file → reads `CLAUDE.md`) | `.codex/hooks.json` | `.agents/skills/` | `docs/agent-workflows/` when extracted; otherwise `.claude/commands/` | `CODEX_PROJECT_DIR` |
+ 
+-The hook scripts themselves live in `.claude/hooks/*.sh` (single source of truth — Codex's `.codex/hooks.json` references the same files). Each script reads `${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-...}}` so it works in both runtimes.
++The hook scripts themselves live in `.claude/hooks/*.sh` (single source of truth — Codex's `.codex/hooks.json` references the same files). Each script reads `${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-...}}` so it works in both runtimes. Only the safety hooks are registered by default; the parallel-slot hooks live in `.codex/hooks.fleet.json` / `.claude/settings.fleet.json` (see `docs/agent-rules/fleet-mode.md`).
+ 
+ The `.agents/skills/source-command-*` directories are thin pointers to
+ canonical command bodies. The canonical body lives in
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 7d770a0b2..3a6d798d6 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,244 +1,114 @@
+-# Longterm Wiki - Claude Code Config
++# Longterm Wiki
+ 
+-AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
++AI-safety wiki: ~780 MDX pages, a YAML data layer, a Next.js 15 site, a
++Hono/Drizzle/Postgres API ("wiki-server"), and the `crux` CLI that validates,
++generates and syncs it all. Production: `https://www.longtermwiki.com`
++(never `longterm.wiki` or `longtermwiki.org`). "Open Philanthropy" is now
++called **Coefficient Giving** in all content.
+ 
+-**Production URL**: `https://www.longtermwiki.com` — do NOT use `longterm.wiki`, `longtermwiki.org`, or any other domain.
++## Repo map
+ 
+-**This is a routing document.** Detailed guides live in `content/docs/internal/`, `.claude/rules/` (Tier 1 — auto-loaded session rules), and `docs/agent-rules/` (Tier 2 — subsystem maps, read on-demand). Use `pnpm crux --help` for full CLI reference.
+-
+-**Agent memory**: Read `.claude/memory/MEMORY.md` at session start for cross-session facts and corrections. Update it when you learn stable new facts.
+-
+-## MANDATORY FIRST ACTION — Do this before anything else
+-
+-Before reading files, running commands, or writing any code, run:
++| Path | What |
++|---|---|
++| `content/docs/` | MDX wiki pages |
++| `data/entities/*.yaml` | Entity catalog (orgs, people, models, concepts…) |
++| `data/*.yaml` | Glossary, experts, literature and other catalogs |
++| `packages/factbase/data/fb-entities/` | FactBase: structured, dated facts per entity |
++| `apps/web/` | Next.js site (has its own `CLAUDE.md`) |
++| `apps/wiki-server/` | API + Postgres schema (`src/schema.ts`) and migrations (`drizzle/`) |
++| `crux/` | CLI: `pnpm crux --help`, `pnpm crux <group> --help` |
++| `.claude/commands/` | Slash commands (`/page-authoring`, `/agent-review-pr`, …) |
++| `docs/agent-rules/` | On-demand reference docs (table below) |
++
++## Where data lives (who is authoritative)
++
++`apps/web/scripts/build-data.mjs` builds `apps/web/src/data/database.json`,
++which pages read at build time (no runtime API calls from wiki pages).
++
++- **Authored in git, mirrored to PG**: entities (`data/entities/`) and
++  FactBase facts (`fb-entities/`). CI syncs them to the PG `entities` /
++  `facts` tables on merge; the full build reads facts back from PG when
++  reachable. Edit the YAML, never the PG copy.
++- **PG only** (via wiki-server, no YAML source): resources, grants,
++  personnel, funding rounds, investments, equity positions, divisions,
++  funding programs, publications, entity events/assessments, benchmark
++  results, research areas, record verdicts. Change these through the API /
++  `pnpm crux tb …`, not by adding YAML.
++- **Pages**: MDX in `content/docs/`.
++- New features with their own directory page or aggregatable numeric data
++  go in PG tables, not YAML.
++- `--scope=content` builds skip every PG fetch, so that data is simply
++  absent locally without server credentials; that is expected.
++
++Naming: TableBase = PG entities/records; FactBase = dated triples;
++WikiBase = MDX prose. The PG `things` table is a cross-base search index.
++
++## Commands
+ 
+ ```bash
+-pnpm crux sys agent-checklist init --issue=N   # if working on a GitHub issue
+-# or
+-pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an issue
++pnpm setup:quick                     # install + build data (first run)
++pnpm build-data:content              # rebuild database.json, no server needed
++pnpm dev                             # site on $DEV_PORT (default 3001)
++pnpm test                            # all vitest suites; pnpm test:crux for crux only
++cd apps/web && npx tsc --noEmit      # app typecheck (also apps/wiki-server)
++pnpm crux w fix escaping             # run after editing any MDX
++pnpm crux w fix markdown             # run after editing any MDX
++pnpm crux w validate gate --scope=content --fix   # fast content gate (~15s)
++pnpm crux w validate gate --fix      # full pre-push gate (the git pre-push hook runs it)
+ ```
+ 
+-**"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
+-
+-At session end, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not). Never push directly to `main`.
+-
+-**Track what you discover.** Before ending any session, enumerate every problem you observed and mark each `fixed | filed:QUA-NNN | deferred:<reason>`. Certain red flags (prod incidents, symptom patches, misdiagnoses, premature "Done", N+ repeated symptoms) MUST produce a Linear ticket — "I'll remember" is not a valid disposition. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking" and `.claude/rules/agent-session-workflow.md` § "Step 2a".
+-
+-## Quick Reference
+-
+-Commands are organized into groups by data layer. Use short prefixes for convenience:
+-
+-```bash
+-pnpm setup:quick                 # Install + build data (first-time)
+-pnpm dev                         # Dev server on port 3001
+-pnpm build                      # Production build
+-pnpm test                        # Run vitest tests
+-
+-# Playwright e2e tests (run from apps/web/)
+-cd apps/web && npx playwright test                    # All e2e tests (local server)
+-cd apps/web && npx playwright test e2e/render-audit.spec.ts  # Render quality audit
+-cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test  # Against prod
+-
+-# Wiki content (w = wiki)
+-pnpm crux w validate gate --fix              # Pre-push gate (CI-blocking checks)
+-pnpm crux w validate gate --scope=content --fix  # Fast content-only (~15s)
+-pnpm crux w create "Title" --tier=standard   # Create a new page
+-pnpm crux w improve <id> --tier=standard --apply  # Improve a page
+-pnpm crux w fix escaping                     # After any page edit
+-pnpm crux w fix markdown                     # After any page edit
+-
+-# FactBase (fb = factbase)
+-pnpm crux fb show <entity>                   # Show FactBase entity
+-pnpm crux fb sourcing                    # Source-check FactBase facts against URLs
+-
+-# TableBase (tb = tablebase)
+-pnpm crux tb ids allocate <slug>             # Wiki entity: allocate numericId + stableId
+-pnpm crux tb ensure-entities --type=person   # Lightweight: stableId only (no wiki page)
+-pnpm crux tb people discover                 # Discover people entities
+-
+-# Linear (primary issue tracker)
+-pnpm crux linear search "query"              # Search Linear issues
+-pnpm crux linear create "title" --description="..." --project="..."  # Create a new Linear issue (--project required)
+-pnpm crux linear start QUA-NNN              # Signal work start on issue
+-pnpm crux linear done QUA-NNN --pr=URL      # Signal completion
+-pnpm crux linear view QUA-NNN              # View issue details
+-
+-# GitHub (gh) — PRs, CI, legacy issues
+-pnpm crux gh ci status --wait               # Poll CI until green
+-pnpm crux gh deploy-tasks detect             # Auto-detect deploy tasks from diff
+-pnpm crux gh deploy-tasks pending            # Find unchecked tasks from merged PRs
+-pnpm crux gh deploy-tasks inject --pr=N      # Inject deploy checklist into PR
+-pnpm crux gh issues start <N>               # Signal work start (legacy GitHub issues only)
+-pnpm crux gh issues done <N> --pr=URL       # Signal completion (legacy GitHub issues only)
+-
+-# System (sys = system)
+-pnpm crux sys audits list                    # Show audit items, highlight overdue
+-pnpm crux sys audits check <id> --pass       # Record a check result
+-pnpm crux sys agent-checklist init --linear=QUA-NNN  # Init session checklist (Linear)
+-pnpm crux sys agent-checklist init --issue=N # Init session checklist (legacy GitHub)
+-pnpm crux sys agent-reset                   # Show stale processes (MCP, dev servers)
+-pnpm crux sys agent-reset --kill             # Kill stale processes
+-pnpm crux sys dispatch --linear=QUA-NNN --slot=N  # Open a slot after pre-flight dedup checks
+-
+-# Cross-cutting (top-level)
+-pnpm crux query search "topic"               # Full-text search
+-pnpm crux context for-page <id>              # Full context for a page
+-pnpm crux context for-issue <N>              # Context for a GitHub issue
+-
+-pnpm crux --help                             # Full CLI reference
+-pnpm crux w --help                           # Wiki group help
+-```
+-
+-> **Legacy flat syntax still works**: `pnpm crux validate gate --fix` = `pnpm crux w validate gate --fix`
+-
+-## Repository Structure
+-
+-```
+-longterm-wiki/
+-├── content/docs/               # ~700 MDX wiki pages
+-├── data/                       # YAML source data (entities, resources, etc.)
+-├── apps/web/                    # Next.js 15 frontend (see apps/web/CLAUDE.md)
+-├── crux/                       # Crux CLI + validation (see crux/README.md)
+-└── package.json                # Workspace root
+-```
+-
+-## Entity Directory Pages
+-
+-The site has structured directory pages for browsing entities by type. Before creating a new directory, check if one already exists:
+-
+-| Directory | Entity Type | Route | Description |
+-|-----------|------------|-------|-------------|
+-| Organizations | `organization` | `/organizations` | Companies, labs, nonprofits with FactBase facts, funding, people |
+-| People | `person` | `/people` | Researchers, executives with roles, affiliations, publications |
+-| AI Models | `ai-model` | `/ai-models` | Models with benchmarks, pricing, safety levels |
+-| Benchmarks | `benchmark` | `/benchmarks` | Evaluation benchmarks with scores across models |
+-| Legislation | `policy` | `/legislation` | Laws, regulations, executive orders with provisions, stakeholders, votes |
+-| Projects | `project` | `/projects` | Tools, platforms, research projects |
+-| Grants | — | `/grants` | Grant records from funding sources |
+-| Funding Programs | — | `/funding-programs` | Open funding opportunities |
+-| Divisions | — | `/divisions` | Organizational sub-units |
+-| Publications | — | `/publications` | Research papers and publications |
+-| Investments | — | `/investments` | Investment records |
+-| Funding Rounds | — | `/funding-rounds` | Company funding rounds |
+-| Approaches | `approach` | `/approaches` | Safety approaches, techniques, and strategies |
+-| Events | `event` | `/events` | Notable AI safety events |
+-
+-Entity types without directories (too abstract or sparse for tables): `risk`, `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5).
+-
+-Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
+-
+-**YAML entities vs PG-primary tables**: Strongly prefer PG-primary tables for new features with dedicated UI/directory pages and structured relational data (the grants, investments, funding-rounds, benchmarks, divisions pattern). YAML entities (`data/entities/`) are for lightweight catalog entries that mainly serve as link targets or wiki page metadata. If the data has numeric fields to aggregate, many-to-many relationships, or its own directory page — use PG.
+-
+-## Data Layer Terminology — Three Bases
+-
+-| Name | What it is | Key files |
+-|------|-----------|-----------|
+-| **TableBase** | Typed relational records (Postgres/YAML entities) | `apps/web/src/data/tablebase.ts`, `data/entities/` |
+-| **FactBase** | Structured triples with temporal data, provenance | `packages/factbase/`, `apps/web/src/data/factbase.ts` |
+-| **WikiBase** | Long-form prose MDX articles | `content/docs/`, `Page` interface in `tablebase.ts` |
+-
+-**Naming clarifications** (common confusions):
+-- The PG `entities` table = **TableBase** (a read mirror of `data/entities/*.yaml`). FactBase also has "entities" with separate 10-char IDs — these are different.
+-- The PG `facts` table = **FactBase mirror** (a read mirror of `packages/factbase/data/fb-entities/` YAML). Not the same as the legacy `data/facts/*.yaml`.
+-- The PG `things` table = **cross-base universal index** (NOT a FactBase concept). It indexes items from ALL domains (entities, facts, grants, resources, etc.).
+-- `packages/factbase/data/fb-entities/` = FactBase entity YAML files. Not related to the PG `things` table (the directory was renamed from `things/` in QUA-501 to eliminate the name collision).
+-- Full naming guide: `content/docs/internal/data-architecture.mdx`
+-
+-## Data Flow
+-
+-1. YAML files in `data/` define entities and resources; FactBase data in `packages/factbase/data/fb-entities/`
+-2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json` + `factbase-data.json`
+-3. Next.js app reads `database.json` and `factbase-data.json` at build time
+-4. MDX pages in `content/docs/` are compiled via next-mdx-remote
+-
+-## Implementation Quality
+-
+-- **Thorough over fast.** Robust implementations that handle edge cases beat quick ones that only cover the happy path. See `.claude/rules/implementation-quality.md`.
+-
+-## Problem-Solving: Fix Systems, Not Instances
+-
+-When you encounter any problem — a bug, a process failure, a repeated mistake — **do not jump to fixing the specific instance.** First, think one or more levels up:
+-
+-1. **What class of problem is this?** (e.g., "patrol missed a check" → "check name matching is brittle")
+-2. **What systemic change prevents the entire class?** (e.g., use substring matching instead of exact strings)
+-3. **Can you go even more meta?** (e.g., "why do we have hardcoded names at all? Can we derive them from the API?")
+-4. **Implement the systemic fix** — update code, rules, hooks, docs, or tests
+-5. **Then** fix the specific instance
+-
+-This applies to everything: code bugs, process failures, documentation gaps, agent behavior issues. The goal is that each problem you encounter makes the system permanently more robust, not just patches the symptom. Inspired by Toyota's 5 Whys, Google SRE blameless postmortems, and the principle that you can't fix behavior but you can fix systems.
+-
+-## Key Conventions
+-
+-- **Slot isolation — CRITICAL**: Each agent slot (`a1`–`a20`) is an independent workspace that may have an active Claude session. **NEVER** interact with slots you don't own: no `cd` into them, no dispatching subagents to them, no killing their tmux windows, no running commands in their directories. If you need branch isolation for PR fixes, use `/tmp/` worktrees from the `main/` clone. If you need to kill a process or tmux window, **ask the user first** — what looks idle from outside may have active work. Violating this rule has caused data loss (destroyed active sessions with in-progress work). See `.claude/rules/slot-isolation.md`.
+-- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. **Do NOT use `isolation: "worktree"` in Agent calls** — it has a [confirmed Claude Code bug](https://github.com/anthropics/claude-code/issues/42282) that corrupts the parent session's working directory and bricks the session (reconfirmed 2026-04-16 during QUA-554 scoping — the bug is unpatched). For headless coordinator work use `./ws dispatch <N> "<prompt>"` (QUA-554); for interactive work use `./ws open <N> --claude`. For branch isolation, use agent workspace slots (`lw/a1`–`lw/a15`). See `.claude/rules/worktree-isolation-bug.md`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
+-- **`tmux send-keys` to user-visible panes**: when sending a command into a tmux pane the user is watching (e.g. their right pane), do **not** pipe through `head`, `tail`, or `grep`. Those filters hide live progress (the user sees a frozen prompt until the whole pipeline finishes) and discard the lines they actually want to see. Send the bare command and let the full output stream into the pane.
+-- **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
+-- **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`
+-- **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
+-- **Tailwind CSS v4** with shadcn/ui components
+-- **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
+-- **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/fb-entities/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
+-- **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
+-- **Issue tracking**: **Linear is the primary issue tracker** — use `crux linear` commands for issue creation, tracking, and updates. GitHub is used for PRs, CI, and legacy issues only. Use `crux gh pr/ci/epic` commands for GitHub — never raw `curl`
+-- **Entity IDs — two tiers**:
+-  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux tb ids allocate <slug>` to get a `numericId` (E-number) + `stableId` (`sid_` prefix, e.g. `sid_1LcLlMGLbw`). These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
+-  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only (`sid_` prefix). NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
+-  - All stableIds use the `sid_` prefix format. Use `isSid()` from `@longterm-wiki/id-utils` to detect them.
+-  - **Never manually invent IDs** — use the functions above.
+-- **Hono RPC**: Mandatory for new wiki-server routes — use method-chaining (`const app = new Hono().get(...).post(...)` + `export type Route = typeof app`). See the `/agent-review-pr` skill ("Code review rules to enforce") for the full code-review rule set.
+-- **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
+-- **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_BILLING_KEY`, `OPENROUTER_API_KEY`. Named `BILLING` (not `API_KEY`) so the `claude` CLI — which auto-reads `ANTHROPIC_API_KEY` — can never silently pick up the billing key and bypass OAuth. See [QUA-612](https://linear.app/quantifieduncertainty/issue/QUA-612).
+-- **Wiki-server from agent slots (auto-prod, QUA-616)**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. Crux now **auto-detects that CWD is inside a slot and forces `WIKI_SERVER_ENV=prod`** — you no longer need to prefix every command with `WIKI_SERVER_ENV=prod`. The manual prefix still works and takes precedence; set `WIKI_SERVER_ENV=local` to force local from inside a slot (e.g. when testing against a locally-run wiki-server). The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available.
+-- **No new bash scripts**: Write new scripts/tools as TypeScript in `crux/`. Bash is only acceptable for git hooks (`.githooks/`), Claude Code hooks (`.claude/hooks/`), and CI glue where Node.js isn't available.
+-
+-## Tier 1 — Always-loaded session rules (`.claude/rules/`)
+-
+-These cover the session lifecycle and the always-applicable conventions. They auto-load on every turn.
+-
+-- `.claude/rules/agent-session-workflow.md` — Session start/end workflow
+-- `.claude/rules/agent-planning-discipline.md` — Multi-week plans require human framing approval, empirical evidence before scope, ≥3 diverse-mandate reviewers (QUA-1045)
+-- `.claude/rules/environment-setup.md` — Worktree, LSP, slot ports, wiki-server auto-prod
+-- `.claude/rules/github-issue-tracking.md` — Issue tracking (Linear primary, GitHub legacy)
+-- `.claude/rules/proactive-github-filing.md` — When/how to file issues (in Linear)
+-- `.claude/rules/session-logging.md` — Session log format and storage
+-- `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns
+-- `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
+-- `.claude/rules/slot-isolation.md` — Don't touch other agent slots
+-- `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+-- `.claude/rules/wait-on-subagents.md` — Use `Monitor` to wait on dispatched subagents; `cat`-polling is hook-blocked at 3 occurrences (QUA-1069)
+-
+-Phase-loaded guidance (only fires when the corresponding skill runs):
+-
+-- `/agent-ship` — Pre-PR build/test/gate/Playwright verification, PR-body shell safety, GitHub auto-close syntax, post-merge audit entries, the "do not offer /schedule" rule (was: `pr-review-guidelines.md`, `pre-pr-verification.md`)
+-- `/agent-push-and-verify` — CodeRabbit "Addressed in commit X" markers — DO NOT TRUST; push-failure detection
+-- `/agent-review-pr` — Code review rules (no `(r: any)`, Hono RPC, typed clients, batch endpoints, etc.)
+-- `/page-authoring` — Crux content pipeline, post-edit fixes, page self-review checklist
+-
+-## Tier 2 — Subsystem maps (read on-demand, NOT auto-loaded)
+-
+-These live in `docs/agent-rules/`. They are **NOT** auto-loaded — to keep cache cost down, the agent must `Read` the relevant map at task-start when its work touches that subsystem. **MANDATORY: if your task lands in any row below, your first action after `agent-checklist init` is to Read the map.** Each map opens with "Read this before X" — that "X" describes when it applies.
+-
+-| When your task touches… | Read first |
++Commands that talk to the wiki-server need `LONGTERMWIKI_SERVER_URL` /
++`..._API_KEY` (or the `PROD_` pair with `WIKI_SERVER_ENV=prod`). Without
++them, `tb ids allocate`, `query`, `context` and sourcing checks fail; say so
++rather than working around it.
++
++## Hard rules
++
++- **Never push to `main` or `production`.** Work on a branch, open a PR.
++  Production deploys are a release PR `main` → `production` (`/deploy`), and
++  merging it runs wiki-server migrations against the prod DB.
++- **Never `--no-verify`** a commit or push; the pre-push gate is the check.
++- **MDX escaping**: `\$100`, not `$100`; `\<100ms`, not `<100ms`. The fix
++  commands above handle most cases.
++- **Never invent IDs.** Wiki entities get `numericId` + `stableId` from
++  `pnpm crux tb ids allocate <slug>`; lightweight records get a `sid_…`
++  stableId via `crux tb ensure-entities` / `generateId()`. Read
++  `docs/agent-rules/id-system.md` first.
++- **Migrations** (`apps/wiki-server/drizzle/*.sql`): never edit one that has
++  merged; enumerate prod values before a CHECK constraint; use `NOT VALID`
++  + `VALIDATE` on large tables. Read `docs/agent-rules/database-migrations.md`
++  before writing any.
++- **FactBase facts** are the only structured-fact source: use `<FBF>` /
++  `<FBFactValue>` / `<Calc>` in MDX, not hard-coded numbers.
++- New wiki-server routes use Hono RPC method-chaining and export
++  `type XRoute = typeof app`.
++- No silent `.catch(() => {})`: log, rethrow, or comment why not.
++- API keys come from the environment (`ANTHROPIC_BILLING_KEY`,
++  `OPENROUTER_API_KEY`), never committed `.env` files.
++- Do not use `isolation: "worktree"` for subagents (a Claude Code bug
++  deletes the parent's working directory).
++- Never kill processes you did not start (`pkill node` / `pkill next` can
++  take down the owner's dev server).
++- Bug fixes: reproduce first (a failing test or check), then fix.
++- New scripts are TypeScript under `crux/`, not bash.
++
++## On-demand docs (read when the task touches the subject)
++
++| Subject | Read |
+ |---|---|
+-| Linear issue lifecycle, branch naming `qua-NNN`, `crux linear` commands | `docs/agent-rules/linear-integration.md` |
+-| Filing a new Linear ticket — picking the right project | `docs/agent-rules/linear-project-ownership.md` |
+-| Filing a Linear ticket — sizing red flags | `docs/agent-rules/ticket-sizing.md` |
+-| Database migrations (any `apps/wiki-server/drizzle/*.sql`) | `docs/agent-rules/database-migrations.md` |
+-| PG audit triggers, `full_audit_log`, `tablebase_audit_log` | `docs/agent-rules/audit-log.md` |
+-| TableBase sync routes (`apps/wiki-server/src/routes/tablebase/`) | `docs/agent-rules/tablebase-sync-factory.md` |
+-| TableBase / FactBase / WikiBase naming, which layer owns what | `docs/agent-rules/three-bases-architecture.md` |
+-| Source-check verdicts, coverage scoring, `/api/sourcing/*`, dot indicators | `docs/agent-rules/source-check-system.md` |
+-| `numericId` vs `stableId` vs `tableId` — allocation, validation | `docs/agent-rules/id-system.md` |
+-| Adding/changing a `crux/validate/` validator or the gate | `docs/agent-rules/validation-gate-system.md` |
+-| Editing improve-entity pipeline files (research/**, claim-sourcing, entity-suite.yaml) — CI gate fires | `docs/agent-rules/improve-pipeline-benchmark-gate.md` |
+-| Entity profile pages (`/organizations/[slug]`, `/people/[slug]`, etc.) | `docs/agent-rules/entity-profile-pages.md` |
+-| Adding a new internal dashboard (`/internal/*`) | `docs/agent-rules/internal-dashboards.md` |
+-| Auto-update system (cron, news pipeline) | `docs/agent-rules/auto-update-system.md` |
+-| LLM prompt construction — escaping user content | `docs/agent-rules/llm-prompt-safety.md` |
+-| Dispatching subagents from a coordinator session | `docs/agent-rules/dispatched-agent-review.md` |
+-| PR patrol — health gate, fleet-level signals | `docs/agent-rules/patrol-health-gate.md` |
+-| Editing the root `package.json` `postinstall` (or any lifecycle script), or adding/changing a sub-app `Dockerfile` | `docs/agent-rules/dockerfile-postinstall-trap.md` |
+-
+-Plus historical: `docs/audits/things-denormalization-audit.md` (denorm columns dropped in QUA-507 / migration 0204; retained for pre-QUA-507 composer logic per thing_type and for the `*_display_name` sibling pattern audit before proposing a new cache column).
+-
+-> **Why this split (QUA-949):** before this restructure, every Tier 2 map auto-loaded on every turn — ~55k tokens of subsystem reference manuals consumed even when the task didn't touch them. Moving them out of `.claude/rules/` cuts cache cost ~60% while keeping the table above as the explicit "go read X" pointer.
++| Editing wiki pages | `/page-authoring`, `content/docs/internal/` style guides |
++| IDs | `docs/agent-rules/id-system.md` |
++| Migrations, audit log | `docs/agent-rules/database-migrations.md`, `audit-log.md` |
++| TableBase / FactBase / WikiBase | `docs/agent-rules/three-bases-architecture.md`, `content/docs/internal/data-architecture.mdx` |
++| TableBase sync routes | `docs/agent-rules/tablebase-sync-factory.md` |
++| Source-checking, verdicts | `docs/agent-rules/source-check-system.md` |
++| Validators and the gate | `docs/agent-rules/validation-gate-system.md` |
++| Entity profile pages, `/internal/*` dashboards | `docs/agent-rules/entity-profile-pages.md`, `internal-dashboards.md` |
++| Improve-entity pipeline | `docs/agent-rules/improve-pipeline-benchmark-gate.md` |
++| LLM prompts with user content | `docs/agent-rules/llm-prompt-safety.md` |
++| `postinstall` / Dockerfiles | `docs/agent-rules/dockerfile-postinstall-trap.md` |
++| Error handling, test depth | `docs/agent-rules/error-handling.md`, `implementation-quality.md` |
++| Linear issues and filing | `docs/agent-rules/github-issue-tracking.md`, `proactive-github-filing.md`, `linear-integration.md` |
++| Multi-week plans | `docs/agent-rules/agent-planning-discipline.md` |
++| Gotchas learned the hard way | `.claude/memory/MEMORY.md` |
++| Running many agents in parallel slots | `docs/agent-rules/fleet-mode.md` |
+diff --git a/apps/groundskeeper/src/scheduler.ts b/apps/groundskeeper/src/scheduler.ts
+index 41a328ae0..339266ece 100644
+--- a/apps/groundskeeper/src/scheduler.ts
++++ b/apps/groundskeeper/src/scheduler.ts
+@@ -255,7 +255,7 @@ export function registerTask(
+ 
+       // Update active agent step + heartbeat
+       if (groundskeeperAgentId) {
+-        // catch-ok: agent step updates are best-effort heartbeat telemetry per .claude/rules/error-handling.md (high-frequency, non-correctness)
++        // catch-ok: agent step updates are best-effort heartbeat telemetry per docs/agent-rules/error-handling.md (high-frequency, non-correctness)
+         updateActiveAgent(config, groundskeeperAgentId, {
+           currentStep: `${name}: ${result.summary ?? event} (${Math.round(durationMs / 1000)}s)`,
+         }).catch((e: unknown) => logger.warn({ error: e instanceof Error ? e.message : String(e), event: "agent_update_failed" }, "Failed to update active agent step")); // catch-ok: heartbeat telemetry
+diff --git a/apps/web/scripts/lib/session-log-parser.mjs b/apps/web/scripts/lib/session-log-parser.mjs
+index fdffcb658..8b0338847 100644
+--- a/apps/web/scripts/lib/session-log-parser.mjs
++++ b/apps/web/scripts/lib/session-log-parser.mjs
+@@ -7,7 +7,7 @@
+  * 3. The consolidated .claude/session-log.md (legacy format)
+  *
+  * IMPORTANT: If you change the session entry format, also update:
+- *   - .claude/rules/session-logging.md (the format spec for contributors)
++ *   - docs/agent-rules/session-logging.md (the format spec for contributors)
+  *   - The tests in app/scripts/lib/__tests__/session-log-parser.test.mjs
+  *
+  * If you change where session files are stored, also update:
+diff --git a/apps/wiki-server/src/__tests__/migration-0221-qua-956-policy-stakeholders-natural-key.test.ts b/apps/wiki-server/src/__tests__/migration-0221-qua-956-policy-stakeholders-natural-key.test.ts
+index bb882f5e6..aeef3694c 100644
+--- a/apps/wiki-server/src/__tests__/migration-0221-qua-956-policy-stakeholders-natural-key.test.ts
++++ b/apps/wiki-server/src/__tests__/migration-0221-qua-956-policy-stakeholders-natural-key.test.ts
+@@ -98,7 +98,7 @@ describe("migration 0221 — QUA-956 policy_stakeholders natural-key + UNIQUE",
+   it("does not skip the audit trigger (this is not a multi-million-row rewrite)", () => {
+     // ~234 dupe deletes + ~136 canonical UPDATEs → ≤370 audit_trigger_fn
+     // rows in full_audit_log. (`things` is not on the audit allow-list — see
+-    // `.claude/rules/audit-log.md` — so the things cleanup doesn't add to
++    // `docs/agent-rules/audit-log.md` — so the things cleanup doesn't add to
+     // the count.) Small enough that the trigger overhead doesn't matter
+     // and the audit trail is useful for forensics. `app.audit_skip` is
+     // only for bulk migrations (millions of rows).
+diff --git a/apps/wiki-server/src/api-types.ts b/apps/wiki-server/src/api-types.ts
+index 217b56b3a..667adc24c 100644
+--- a/apps/wiki-server/src/api-types.ts
++++ b/apps/wiki-server/src/api-types.ts
+@@ -1615,7 +1615,7 @@ export const RecordGroundskeeperRunBatchSchema = z.object({
+ /**
+  * v1 status enum. Mirrors the CHECK constraint on `pipeline_runs.status`.
+  * Widening requires a follow-up migration that enumerates prod row
+- * distribution first — see `.claude/rules/database-migrations.md`.
++ * distribution first — see `docs/agent-rules/database-migrations.md`.
+  */
+ export const VALID_PIPELINE_RUN_STATUSES = [
+   "running",
+diff --git a/apps/wiki-server/src/routes/operational/active-agents.ts b/apps/wiki-server/src/routes/operational/active-agents.ts
+index ccf50cdab..6b2ae8a3f 100644
+--- a/apps/wiki-server/src/routes/operational/active-agents.ts
++++ b/apps/wiki-server/src/routes/operational/active-agents.ts
+@@ -290,7 +290,7 @@ const activeAgentsApp = new Hono()
+           // Non-critical for the heartbeat response, but we want to know if
+           // this starts failing: a silent regression here would break the
+           // PG-first dedup's freshness signal without any symptom until the
+-          // next collision. See .claude/rules/error-handling.md — every
++          // next collision. See docs/agent-rules/error-handling.md — every
+           // catch must log, re-throw, or document why neither.
+           logger.warn(
+             {
+diff --git a/apps/wiki-server/src/routes/operational/pipeline-runs.ts b/apps/wiki-server/src/routes/operational/pipeline-runs.ts
+index 60f181e64..1049d484a 100644
+--- a/apps/wiki-server/src/routes/operational/pipeline-runs.ts
++++ b/apps/wiki-server/src/routes/operational/pipeline-runs.ts
+@@ -186,7 +186,7 @@ const pipelineRunsApp = new Hono()
+   // Multiplied by ~700 entities/night that would be ~42K spurious audit
+   // rows daily. Heartbeats are not durable history — start, end, and
+   // status changes still write to the audit log. See
+-  // `.claude/rules/audit-log.md` § "Bulk backfills — skip the universal
++  // `docs/agent-rules/audit-log.md` § "Bulk backfills — skip the universal
+   // audit trigger" for the same mechanism on bulk migrations.
+   .patch("/:id/heartbeat", async (c) => {
+     const id = c.req.param("id");
+diff --git a/apps/wiki-server/src/schema.ts b/apps/wiki-server/src/schema.ts
+index e2dd00ce4..fc9b29993 100644
+--- a/apps/wiki-server/src/schema.ts
++++ b/apps/wiki-server/src/schema.ts
+@@ -1076,7 +1076,7 @@ export const agentSessions = pgTable(
+     linearId: text("linear_id"),
+     // Agent slot number (a0..a99). Derived from the cwd ancestor walk at init
+     // time; used by the dedup query to distinguish "same slot resumption"
+-    // from "different slot collision". See .claude/rules/github-issue-tracking.md.
++    // from "different slot collision". See docs/agent-rules/github-issue-tracking.md.
+     slotNumber: integer("slot_number"),
+     checklistMd: text("checklist_md").notNull(),
+     worktree: text("worktree"), // working directory path for collision detection
+@@ -1438,7 +1438,7 @@ export const groundskeeperRuns = pgTable(
+  *
+  * `status` is CHECK-constrained to the v1 enum (running / committed /
+  * aborted / oscillation / partial_failure). Widening requires the
+- * enum-enumeration procedure in `.claude/rules/database-migrations.md`.
++ * enum-enumeration procedure in `docs/agent-rules/database-migrations.md`.
+  */
+ export const pipelineRuns = pgTable(
+   "pipeline_runs",
+diff --git a/content/docs/internal/agent-cost-monitoring.mdx b/content/docs/internal/agent-cost-monitoring.mdx
+index 3fe833141..b52c60057 100644
+--- a/content/docs/internal/agent-cost-monitoring.mdx
++++ b/content/docs/internal/agent-cost-monitoring.mdx
+@@ -53,7 +53,7 @@ When you suspect a cost spike (Discord ping, monthly bill review, gut feel):
+ 4. Common causes:
+     - Opus on a refactor that should be Sonnet — kill, swap model, restart.
+     - Re-read/re-summarize loop — kill, file a Linear ticket on the looping pattern.
+-    - A patrol session with a stuck loop — see `.claude/rules/agent-planning-discipline.md`.
++    - A patrol session with a stuck loop — see `docs/agent-rules/agent-planning-discipline.md`.
+ 
+ ## What's deliberately out of scope
+ 
+diff --git a/crux/commands/flagship-curate.ts b/crux/commands/flagship-curate.ts
+index 1030fa848..ddfebff30 100644
+--- a/crux/commands/flagship-curate.ts
++++ b/crux/commands/flagship-curate.ts
+@@ -200,7 +200,7 @@ async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesR
+   // is tolerated (the entity is silently skipped and counted toward a
+   // threshold), but N consecutive failures abort the whole sweep — same
+   // pattern as the groundskeeper health-check tracker
+-  // (`.claude/rules/error-handling.md`). Without this, a down sourcing
++  // (`docs/agent-rules/error-handling.md`). Without this, a down sourcing
+   // endpoint would make every entity report `needsCuration: 0`, producing
+   // an empty "nothing to curate" list that the outer command can't
+   // distinguish from a legitimate "all clean" state.
+diff --git a/crux/lib/sourcing/entity-wikidata-qid.ts b/crux/lib/sourcing/entity-wikidata-qid.ts
+index 5c9febe18..8d703188c 100644
+--- a/crux/lib/sourcing/entity-wikidata-qid.ts
++++ b/crux/lib/sourcing/entity-wikidata-qid.ts
+@@ -56,7 +56,7 @@ function loadCache(): Map<string, string> {
+     // Fail-open per QUA-724: any read/parse failure (missing file, EPERM,
+     // YAML syntax error, ...) means the gate stays disabled rather than
+     // tripping every caller. We log at warn so file-shape regressions are
+-    // still visible; per `.claude/rules/error-handling.md` no catch is
++    // still visible; per `docs/agent-rules/error-handling.md` no catch is
+     // silent.
+     if (process.env.NODE_ENV !== 'test') {
+       const msg = e instanceof Error ? e.message : String(e);
+diff --git a/crux/system-cards/span-verify.ts b/crux/system-cards/span-verify.ts
+index cbd89d6bf..059734512 100644
+--- a/crux/system-cards/span-verify.ts
++++ b/crux/system-cards/span-verify.ts
+@@ -4,7 +4,7 @@
+  * For every non-null field the extractor returned, check that its excerpt
+  * appears in the source text. Fields without a grounded excerpt are
+  * dropped to null and logged — treating them as hallucinations per
+- * `.claude/rules/implementation-quality.md` (adversarial inputs).
++ * `docs/agent-rules/implementation-quality.md` (adversarial inputs).
+  *
+  * Matching tiers (cheap → expensive):
+  *   1. exact substring match (case-insensitive)
+diff --git a/crux/validate/lib/comment-utils.ts b/crux/validate/lib/comment-utils.ts
+index 2b4712fb0..6e921b8f9 100644
+--- a/crux/validate/lib/comment-utils.ts
++++ b/crux/validate/lib/comment-utils.ts
+@@ -7,7 +7,7 @@
+  * - validate-typed-client.ts (direct apiRequest<T> calls — QUA-770)
+  *
+  * Both validators were independently walking string state and extracting
+- * inline comments. Per `.claude/rules/implementation-quality.md` §
++ * inline comments. Per `docs/agent-rules/implementation-quality.md` §
+  * "Pattern fixes must be global", this module hosts the shared
+  * implementation so both validators stay in sync.
+  */
+diff --git a/crux/validate/validate-dangerous-patterns.ts b/crux/validate/validate-dangerous-patterns.ts
+index deda6c026..d0918f2bc 100644
+--- a/crux/validate/validate-dangerous-patterns.ts
++++ b/crux/validate/validate-dangerous-patterns.ts
+@@ -10,7 +10,7 @@
+  * Patterns flagged:
+  *
+  *   1. Silent .catch() — `.catch(() => {})` swallows errors with no diagnostic.
+- *      Banned per `.claude/rules/error-handling.md`.
++ *      Banned per `docs/agent-rules/error-handling.md`.
+  *      Suppression: `// catch-ok: <reason>`
+  *
+  *   2. Warn-only .catch() — `.catch((e) => console.warn(...))` or
+diff --git a/crux/validate/validate-typed-client.ts b/crux/validate/validate-typed-client.ts
+index d709f6817..daa988b24 100644
+--- a/crux/validate/validate-typed-client.ts
++++ b/crux/validate/validate-typed-client.ts
+@@ -11,7 +11,7 @@
+  *  create one using `InferResponseType<>`."
+  *
+  * Part of QUA-770 (Tier 5 of QUA-154 — Eliminate skipEntityValidation and
+- * direct apiRequest bypasses). Also referenced in `.claude/rules/agent-session-workflow.md`
++ * direct apiRequest bypasses). Also referenced in `docs/agent-rules/agent-session-workflow.md`
+  * as "API callers match server response shape (use InferResponseType or typed client)".
+  *
+  * Pattern flagged:
+diff --git a/docs/adrs/0003-validator-economics.md b/docs/adrs/0003-validator-economics.md
+index 8773e83ab..cc7b90277 100644
+--- a/docs/adrs/0003-validator-economics.md
++++ b/docs/adrs/0003-validator-economics.md
+@@ -18,7 +18,7 @@ Evidence from four scout reports: `docs/adrs/research/0003-validator-economics/{
+ 
+ **Failure modes concentrate by class.** Lint-style content invariants produce most false positives (QUA-755 local/CI divergence; QUA-787 CI doesn't run `validate-factbase-record-refs` at all). QUA-86 found a 46% gate-override rate before being Canceled — dated, weakest plank in the evidence chain. The clearest *missing*-validator cost is QUA-302: a CHECK constraint added without row-count enumeration cost 12h prod outage + 7 cascading PRs. Schema-level invariants pay for themselves; lint-level concentrate friction. **Validators also have their own bug surface** — QUA-761 (`entitylink-ids --fix` mis-renamed Kratsios→Trump) and QUA-966 (`validate-entity-schema-drift --update` corrupted its own baseline) are silent-corruption bugs in auto-fix paths.
+ 
+-**Bypass policy conflict.** `.claude/rules/proactive-github-filing.md:77` classifies "silencing a validator" as a symptom-patch red flag. Any deletion or demotion will trip that rule unless explicitly carved out.
++**Bypass policy conflict.** `docs/agent-rules/proactive-github-filing.md:77` classifies "silencing a validator" as a symptom-patch red flag. Any deletion or demotion will trip that rule unless explicitly carved out.
+ 
+ ## Options considered
+ 
+@@ -67,5 +67,5 @@ Evidence from four scout reports: `docs/adrs/research/0003-validator-economics/{
+ - Linear: QUA-1085 (dispatch); QUA-504 (taxonomy); QUA-524/525/528 (shipped); QUA-829, QUA-808, QUA-801–805 (open tail)
+ - Incidents: QUA-302, QUA-755, QUA-86 (Canceled — number is dated), QUA-761, QUA-966, QUA-299
+ - Related ADRs: ADR-0001, ADR-0004
+-- Code: `crux/validate/validate-gate.ts:244` (`PARALLEL_STEPS`), `:226` (`UNIFIED_BLOCKING_RULES`), `.claude/rules/proactive-github-filing.md:77,80`
++- Code: `crux/validate/validate-gate.ts:244` (`PARALLEL_STEPS`), `:226` (`UNIFIED_BLOCKING_RULES`), `docs/agent-rules/proactive-github-filing.md:77,80`
+ - Research: `docs/adrs/research/0003-validator-economics/{codebase,docs,internal-data,linear}.md`
+diff --git a/docs/adrs/research/0003-validator-economics/docs.md b/docs/adrs/research/0003-validator-economics/docs.md
+index d4d52a05b..bca1afa39 100644
+--- a/docs/adrs/research/0003-validator-economics/docs.md
++++ b/docs/adrs/research/0003-validator-economics/docs.md
+@@ -4,17 +4,17 @@
+ 
+ `docs/agent-rules/validation-gate-system.md` is the canonical map. It documents four pipelines (`gate`, `data`, `daily`, `unified`) with a clear rule-of-thumb (`docs/agent-rules/validation-gate-system.md:24`): if a check must run on every PR it goes in `gate`; slow/expensive goes in `daily`. The gate orchestrator (`crux/validate/validate-gate.ts`) runs each check as a **separate subprocess** (`docs/agent-rules/validation-gate-system.md:30-43`) — this is what enables `runParallel()` (line 1055) and the `gate-triage.ts` LLM optimization that predicts which checks can be skipped from the diff.
+ 
+-Default posture for the gate as a whole is **fail-closed** (`.claude/rules/error-handling.md:85`). The four documented fail-open exceptions are enumerated by name (`assign-ids`, `typecheck-crux`, `mdx-compile`, `gate-triage`) at `.claude/rules/error-handling.md:88-92`, and each has a one-line rationale.
++Default posture for the gate as a whole is **fail-closed** (`docs/agent-rules/error-handling.md:85`). The four documented fail-open exceptions are enumerated by name (`assign-ids`, `typecheck-crux`, `mdx-compile`, `gate-triage`) at `docs/agent-rules/error-handling.md:88-92`, and each has a one-line rationale.
+ 
+ ## When to add a validator
+ 
+-`.claude/rules/implementation-quality.md:51` is the binding rule: **structural change across >5 files → write the validator first**. The four complexity tiers (text/structural/cross-file/runtime) are at `.claude/rules/implementation-quality.md:67-74`. Default disposition is **blocking**; advisory requires a documented reason and ideally a promotion path (`docs/agent-rules/validation-gate-system.md:62`, `validate-gate.ts:599-602` for the entity-refs example "as entity coverage improves, this can be promoted to blocking").
++`docs/agent-rules/implementation-quality.md:51` is the binding rule: **structural change across >5 files → write the validator first**. The four complexity tiers (text/structural/cross-file/runtime) are at `docs/agent-rules/implementation-quality.md:67-74`. Default disposition is **blocking**; advisory requires a documented reason and ideally a promotion path (`docs/agent-rules/validation-gate-system.md:62`, `validate-gate.ts:599-602` for the entity-refs example "as entity coverage improves, this can be promoted to blocking").
+ 
+-Display-bug regressions specifically must land at one of three checked layers (`.claude/rules/implementation-quality.md:113-118`): `render-audit.spec.ts`, the component test, or `validate-display-formatting.ts`.
++Display-bug regressions specifically must land at one of three checked layers (`docs/agent-rules/implementation-quality.md:113-118`): `render-audit.spec.ts`, the component test, or `validate-display-formatting.ts`.
+ 
+ ## Deletion / demotion / advisory policy
+ 
+-**There is none.** No doc mentions deleting a validator, demoting blocking → advisory after a frontier is held, or moving from gate to runtime invariant. The Charter (`docs/adrs/0003-validator-economics.md:36-42`) explicitly lists these as questions to be answered. The closest existing rules go the opposite direction: silencing a validator is a **symptom-patch red flag** that requires a Linear ticket (`.claude/rules/proactive-github-filing.md:77`), and ≥2 patches silencing the same validator triggers stop-and-escalate (`.claude/rules/proactive-github-filing.md:80`).
++**There is none.** No doc mentions deleting a validator, demoting blocking → advisory after a frontier is held, or moving from gate to runtime invariant. The Charter (`docs/adrs/0003-validator-economics.md:36-42`) explicitly lists these as questions to be answered. The closest existing rules go the opposite direction: silencing a validator is a **symptom-patch red flag** that requires a Linear ticket (`docs/agent-rules/proactive-github-filing.md:77`), and ≥2 patches silencing the same validator triggers stop-and-escalate (`docs/agent-rules/proactive-github-filing.md:80`).
+ 
+ ## Prior decisions the ADR must respect
+ 
+diff --git a/.claude/rules/agent-planning-discipline.md b/docs/agent-rules/agent-planning-discipline.md
+similarity index 96%
+rename from .claude/rules/agent-planning-discipline.md
+rename to docs/agent-rules/agent-planning-discipline.md
+index 97a4d65a9..59574236c 100644
+--- a/.claude/rules/agent-planning-discipline.md
++++ b/docs/agent-rules/agent-planning-discipline.md
+@@ -120,7 +120,7 @@ Not triggered by:
+ ## Related artifacts
+ 
+ - `/plan-feature` skill — operationalizes these rules in the planning workflow (framing-approval gate, empirical archaeology pass, ≥3 diverse reviewers)
+-- `.claude/rules/proactive-github-filing.md` § "Hypothetical problems you have not observed" — same instinct applied to ticket filing
+-- `.claude/rules/implementation-quality.md` § "Bug fixes — TDD workflow" step 0 — same principle applied to fixes (verify the symptom exists before writing the fix)
++- `docs/agent-rules/proactive-github-filing.md` § "Hypothetical problems you have not observed" — same instinct applied to ticket filing
++- `docs/agent-rules/implementation-quality.md` § "Bug fixes — TDD workflow" step 0 — same principle applied to fixes (verify the symptom exists before writing the fix)
+ - QUA-1045 — the v4/v5 retrospective that produced this file
+ - QUA-943 — the umbrella where the planning failure happened
+diff --git a/.claude/rules/agent-session-workflow.md b/docs/agent-rules/agent-session-workflow.md
+similarity index 91%
+rename from .claude/rules/agent-session-workflow.md
+rename to docs/agent-rules/agent-session-workflow.md
+index cc13904a7..31b34554d 100644
+--- a/.claude/rules/agent-session-workflow.md
++++ b/docs/agent-rules/agent-session-workflow.md
+@@ -1,5 +1,7 @@
+ # Agent Session Workflow — MANDATORY
+ 
++> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
++
+ Every session that involves writing or changing code MUST follow this workflow.
+ 
+ ## Step 0: Create a feature branch
+@@ -109,13 +111,13 @@ Observed this session:
+ - QUA-156 marked Done but migration actually stuck    → filed:QUA-302 (Urgent)
+ ```
+ 
+-You cannot end the session until every observation has a disposition. **"I'll remember for next time" is explicitly forbidden** — the 2026-04-11 incident cascade happened because problems were noticed but never tracked. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags" for which observations *must* be filed (not just deferred).
++You cannot end the session until every observation has a disposition. **"I'll remember for next time" is explicitly forbidden** — the 2026-04-11 incident cascade happened because problems were noticed but never tracked. See `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags" for which observations *must* be filed (not just deferred).
+ 
+ ### Step 2b: Close out
+ 
+ **If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
+ 
+-**Multi-PR sessions — review each PR before the next one, not in a batch at the end.** When a single session ships N independent PRs in sequence (e.g. a coordinator clearing a ticket list), run `/agent-review-pr` *per PR* between ship and moving to the next ticket. Batching reviews to the end of the session means findings can only ship as follow-up PRs once the originals have merged — inverting the "review before ship" intent of `.claude/rules/dispatched-agent-review.md`. The 2026-04-13 tier1/tier2 session generated 3 follow-up PRs this way; one caught a real "fix-instance-not-system" miss (QUA-418 table dead-links) that grep-before-ship would have found in the original PR.
++**Multi-PR sessions — review each PR before the next one, not in a batch at the end.** When a single session ships N independent PRs in sequence (e.g. a coordinator clearing a ticket list), run `/agent-review-pr` *per PR* between ship and moving to the next ticket. Batching reviews to the end of the session means findings can only ship as follow-up PRs once the originals have merged — inverting the "review before ship" intent of `docs/agent-rules/dispatched-agent-review.md`. The 2026-04-13 tier1/tier2 session generated 3 follow-up PRs this way; one caught a real "fix-instance-not-system" miss (QUA-418 table dead-links) that grep-before-ship would have found in the original PR.
+ 
+ **If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.
+ 
+@@ -129,13 +131,13 @@ When you (as a coordinator or individual contributor) rescope a ticket based on
+ 
+ A rescope based on "I read the schema and believe X" is as unreliable as a migration written without `SELECT COUNT(*)`. **The mental model is not enough — you have to count the actual rows.**
+ 
+-This rule is the same lesson encoded in `.claude/rules/database-migrations.md` § "Adding CHECK constraints on enum columns", applied to a different context: that rule binds dispatch briefs and migration authors; this rule binds coordinators rewriting scope.
++This rule is the same lesson encoded in `docs/agent-rules/database-migrations.md` § "Adding CHECK constraints on enum columns", applied to a different context: that rule binds dispatch briefs and migration authors; this rule binds coordinators rewriting scope.
+ 
+ ### Why the rule exists
+ 
+ Two real incidents in a single coordinator session on 2026-04-14 (QUA-408 work in slot a6) shipped because the dispatcher trusted code inspection instead of counting rows:
+ 
+-- **QUA-492 (halt)**: I wrote a dispatch brief saying "Phase 1 is 90% done — add CHECK constraints and delete legacy branches." Slot a15 ran the mandatory enumeration as its first step and discovered `entity_resources.resource_id` was 0% canonical (4,182 legacy rows), `resources.id` was 0% canonical (22,878 legacy rows), and `facts.fact_id` was only 65% canonical (776 legacy rows). The CHECK constraint would have failed `VALIDATE CONSTRAINT` against 35–100% of the target columns. Slot a15 halted cleanly per `.claude/rules/proactive-github-filing.md` § "Misdiagnosis discovered". I (the dispatcher) had never run the enumeration before writing the brief — I pattern-matched from the epic body's claim that "migration is done" and trusted it.
++- **QUA-492 (halt)**: I wrote a dispatch brief saying "Phase 1 is 90% done — add CHECK constraints and delete legacy branches." Slot a15 ran the mandatory enumeration as its first step and discovered `entity_resources.resource_id` was 0% canonical (4,182 legacy rows), `resources.id` was 0% canonical (22,878 legacy rows), and `facts.fact_id` was only 65% canonical (776 legacy rows). The CHECK constraint would have failed `VALIDATE CONSTRAINT` against 35–100% of the target columns. Slot a15 halted cleanly per `docs/agent-rules/proactive-github-filing.md` § "Misdiagnosis discovered". I (the dispatcher) had never run the enumeration before writing the brief — I pattern-matched from the epic body's claim that "migration is done" and trusted it.
+ - **QUA-498 (incomplete rescope)**: After the QUA-492 halt, I rescoped QUA-498 from "design canonical format" to "populate `resources.stable_id` for NULL rows + migrate FKs to sid_". I inspected the schema, confirmed the column existed, and wrote the rescope comment. Shortly after, another session (QUA-503) ran a full enumeration and found 5,002 **bare10 legacy rows** I had missed — they had populated stable_ids in legacy format. My rescope was directionally correct but incomplete; Phase A as written would have shipped a CHECK constraint that rejected those 5,002 rows. Another potential re-halt.
+ 
+ Both incidents have the same shape: **read the code, find what you need, stop before running a data query, ship a brief that's wrong**. See QUA-492 / QUA-498 / QUA-503 comments and QUA-508 for the full discovery trail.
+diff --git a/.claude/rules/environment-setup.md b/docs/agent-rules/environment-setup.md
+similarity index 96%
+rename from .claude/rules/environment-setup.md
+rename to docs/agent-rules/environment-setup.md
+index 021737003..09dbb316c 100644
+--- a/.claude/rules/environment-setup.md
++++ b/docs/agent-rules/environment-setup.md
+@@ -1,5 +1,7 @@
+ # Environment Setup
+ 
++> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
++
+ ## Worktree setup (Claude Code worktrees only)
+ 
+ This applies to **Claude Code git worktrees** (`.claude/worktrees/xyz/`), not `lw/` agent slots. Agent slots (`lw/a1`, `lw/a2`, ...) are full clones managed by `crux agent-workspace` and don't need symlinks.
+diff --git a/.claude/rules/error-handling.md b/docs/agent-rules/error-handling.md
+similarity index 100%
+rename from .claude/rules/error-handling.md
+rename to docs/agent-rules/error-handling.md
+diff --git a/docs/agent-rules/fleet-mode.md b/docs/agent-rules/fleet-mode.md
+new file mode 100644
+index 000000000..f077a9647
+--- /dev/null
++++ b/docs/agent-rules/fleet-mode.md
+@@ -0,0 +1,53 @@
++# Fleet mode (many parallel agent slots)
++
++Read this only when running several agents at once in the `lw/a1`…`lw/a20`
++slot clones. A single session (local or cloud) does not need any of it.
++
++## What is on by default
++
++`.claude/settings.json` (and `.codex/hooks.json`) register only hooks that
++prevent damage in any session:
++
++| Hook | Guards against |
++|---|---|
++| `warn-main-branch.sh` | Edit/Write while on `main` |
++| `block-no-verify.sh` | `git commit/push --no-verify` bypassing the pre-push gate |
++| `recover-cwd.sh` | Parent CWD deleted by the subagent-worktree bug |
++| `approve-claude-configs.sh` | (convenience) auto-approves writes to `.claude/` session paths |
++
++## Turning fleet mode on in a slot
++
++```bash
++cp .claude/settings.fleet.json .claude/settings.local.json   # gitignored, per slot
++```
++
++Claude Code merges hooks from `settings.local.json` with `settings.json`, so
++this adds the fleet hooks on top of the defaults. If the slot already has a
++`settings.local.json`, merge the `hooks` entries by hand. For Codex, merge
++`.codex/hooks.fleet.json` into the slot's `.codex/hooks.json`. To turn it off,
++delete the local file.
++
++The fleet hooks, all still in `.claude/hooks/`:
++
++| Hook | Event | What it does |
++|---|---|---|
++| `session-start.sh` | SessionStart | PID lock, clears stale checklist, wiki-server health, registers the session with prod `/api/active-agents` |
++| `require-checklist.sh` | Edit/Write | Blocks edits until `pnpm crux sys agent-checklist init` has run |
++| `block-git-stash.sh`, `block-branch-switch.sh` | Bash | Stop cross-session branch confusion within one slot |
++| `block-tmux-kill.sh`, `block-other-slots.sh` | Bash | Protect other slots' tmux windows, directories and processes |
++| `block-raw-gh-pr.sh` | Bash | Forces `pnpm crux gh pr create` (injects `Fixes QUA-NNN`) |
++| `block-cat-polling.sh` | Bash | Blocks busy-wait polling of subagent output |
++| `require-stage-approved.sh` | Bash | Blocks `gh pr merge` without the `stage:approved` label (spawns `npx tsx` on every Bash call, ~0.8 s) |
++| `heartbeat.sh` | PostToolUse | Heartbeat to prod wiki-server |
++| `inject-wip-checklist.sh` / `verify-checklist-on-stop.sh` | Prompt / Stop | Surface and enforce the checklist |
++| `cleanup-worktrees.sh`, `session-finalize.sh` | SessionEnd | Remove merged worktrees; write session log to prod |
++
++`require-checklist.sh` needs prod wiki-server credentials for `agent-checklist
++init`, or `--allow-offline`.
++
++## Fleet workflow docs
++
++`agent-session-workflow.md`, `session-logging.md`, `slot-isolation.md`,
++`environment-setup.md` (slot ports, auto-prod wiki-server),
++`wait-on-subagents.md`, `dispatched-agent-review.md`, `patrol-health-gate.md`,
++`linear-integration.md`.
+diff --git a/.claude/rules/github-issue-tracking.md b/docs/agent-rules/github-issue-tracking.md
+similarity index 89%
+rename from .claude/rules/github-issue-tracking.md
+rename to docs/agent-rules/github-issue-tracking.md
+index 0139abc83..612c68239 100644
+--- a/.claude/rules/github-issue-tracking.md
++++ b/docs/agent-rules/github-issue-tracking.md
+@@ -10,7 +10,7 @@ Signaling start and done is **handled automatically** by `pnpm crux sys agent-ch
+ 
+ `crux linear start` and `crux sys agent-checklist init --linear=QUA-NNN` refuse competing claims (exit 2). Three signals are consulted: PG `agent_sessions` (authoritative), Linear start comments, then open PRs. To override a stale claim: `--force` (annotates Linear with a `⚠ Claimed with --force` marker). See `pnpm crux linear --help` for the full source order and rationale, or `docs/agent-rules/linear-integration.md` for QUA-406/QUA-440 history.
+ 
+-**Coordinators dispatching to a slot:** the dedup check fires in the slot, not in the coordinator. The coordinator has separate pre-flight responsibilities — see `.claude/rules/dispatched-agent-review.md` § "Dispatcher pre-flight".
++**Coordinators dispatching to a slot:** the dedup check fires in the slot, not in the coordinator. The coordinator has separate pre-flight responsibilities — see `docs/agent-rules/dispatched-agent-review.md` § "Dispatcher pre-flight".
+ 
+ ## Filing new issues
+ 
+@@ -21,7 +21,7 @@ pnpm crux linear search "your topic here"
+ pnpm crux linear create "Descriptive title" --description="..." --project="<Project Name>"
+ ```
+ 
+-Do NOT use `gh issue create` or `pnpm crux gh issues create` for new issues. See `.claude/rules/proactive-github-filing.md` for what merits a ticket and `.claude/rules/linear-project-ownership.md` to pick the right project.
++Do NOT use `gh issue create` or `pnpm crux gh issues create` for new issues. See `docs/agent-rules/proactive-github-filing.md` for what merits a ticket and `docs/agent-rules/linear-project-ownership.md` to pick the right project.
+ 
+ ## PR management (stays on GitHub)
+ 
+diff --git a/.claude/rules/implementation-quality.md b/docs/agent-rules/implementation-quality.md
+similarity index 100%
+rename from .claude/rules/implementation-quality.md
+rename to docs/agent-rules/implementation-quality.md
+diff --git a/docs/agent-rules/improve-pipeline-benchmark-gate.md b/docs/agent-rules/improve-pipeline-benchmark-gate.md
+index 64b9a179b..b69d1bea8 100644
+--- a/docs/agent-rules/improve-pipeline-benchmark-gate.md
++++ b/docs/agent-rules/improve-pipeline-benchmark-gate.md
+@@ -41,7 +41,7 @@ The marker:
+ - Keyword is case-insensitive (`benchmark-skip`, `BENCHMARK-SKIP`).
+ - Only the first match is honored.
+ 
+-When **not** to use it: a real, unintended regression. Override is for "I know this drops the metric and I have a reason"; it is not "the suite is flaky, override and move on." If you suspect flakiness, file a Linear ticket — multiple back-to-back overrides without ticketed cause is a red flag per `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags".
++When **not** to use it: a real, unintended regression. Override is for "I know this drops the metric and I have a reason"; it is not "the suite is flaky, override and move on." If you suspect flakiness, file a Linear ticket — multiple back-to-back overrides without ticketed cause is a red flag per `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags".
+ 
+ ## Cost & runtime
+ 
+diff --git a/docs/agent-rules/patrol-health-gate.md b/docs/agent-rules/patrol-health-gate.md
+index 0d558fff0..3822db9cb 100644
+--- a/docs/agent-rules/patrol-health-gate.md
++++ b/docs/agent-rules/patrol-health-gate.md
+@@ -122,7 +122,7 @@ jq -c 'select(.type == "health_scan_error")' ~/.cache/pr-patrol/runs.jsonl | tai
+ 
+ ## See also
+ 
+-- `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags"
++- `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags"
+ - QUA-297 — Health-Gate Patrol parent issue + retrospective
+ - `crux/pr-patrol/health-scan.ts` — the scanners
+ - `crux/pr-patrol/health-gate.ts` — the gate wiring
+diff --git a/.claude/rules/proactive-github-filing.md b/docs/agent-rules/proactive-github-filing.md
+similarity index 97%
+rename from .claude/rules/proactive-github-filing.md
+rename to docs/agent-rules/proactive-github-filing.md
+index ac0b2a89c..9c973cbc2 100644
+--- a/.claude/rules/proactive-github-filing.md
++++ b/docs/agent-rules/proactive-github-filing.md
+@@ -55,7 +55,7 @@ pnpm crux linear create "Descriptive title" \
+   --project="<Project Name>"
+ ```
+ 
+-`--project` is **required** (or pass `--parent=QUA-NNN` to inherit). The CLI refuses with exit 2 otherwise — see `.claude/rules/linear-project-ownership.md` for which project to pick. Bypass with `--allow-no-project` only if the issue genuinely has no home yet.
++`--project` is **required** (or pass `--parent=QUA-NNN` to inherit). The CLI refuses with exit 2 otherwise — see `docs/agent-rules/linear-project-ownership.md` for which project to pick. Bypass with `--allow-no-project` only if the issue genuinely has no home yet.
+ 
+ For longer descriptions, use `--description-file=/tmp/description.md`.
+ 
+diff --git a/.claude/rules/session-logging.md b/docs/agent-rules/session-logging.md
+similarity index 87%
+rename from .claude/rules/session-logging.md
+rename to docs/agent-rules/session-logging.md
+index 488f07d7a..2d21ef6f0 100644
+--- a/.claude/rules/session-logging.md
++++ b/docs/agent-rules/session-logging.md
+@@ -1,3 +1,5 @@
++> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
++
+ - **Session logs are stored in PostgreSQL** via the wiki-server API. They are no longer committed to git. The `/agent-ship` skill handles syncing the session log to the DB automatically.
+ - **Always include the `checks:` field** — run `pnpm crux sys agent-checklist snapshot` immediately before creating the session log and paste the output verbatim. This captures the checklist state at ship time as a machine-readable audit trail. The `initiated_at` timestamp reveals whether the checklist was initialized at session start (good) or created at the last minute (red flag). If no checklist was used, the command outputs `checks: {initialized: false}` — include that too, honestly. A missing `checks:` field generates a validation warning.
+ - **Format is machine-parsed**: The `date`, `branch`, `title`, `pages`, `pr`, `model`, `duration`, and `cost` fields are parsed by the wiki-server sessions API to build the `/internal/page-changes` dashboard. Validated by Zod schema in the server's `api-types.ts`.
+diff --git a/.claude/rules/slot-isolation.md b/docs/agent-rules/slot-isolation.md
+similarity index 93%
+rename from .claude/rules/slot-isolation.md
+rename to docs/agent-rules/slot-isolation.md
+index 269e31489..5b2841b18 100644
+--- a/.claude/rules/slot-isolation.md
++++ b/docs/agent-rules/slot-isolation.md
+@@ -1,5 +1,7 @@
+ # Slot Isolation — NEVER Touch Other Agent Slots
+ 
++> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
++
+ ## The Rule
+ 
+ Each agent slot (`lw/a1` through `lw/a20`) is an **independent workspace** with its own Claude Code session. You own exactly ONE slot — the one you're running in. Every other slot is off-limits.
+diff --git a/docs/agent-rules/validation-gate-system.md b/docs/agent-rules/validation-gate-system.md
+index 87d34ce3d..46861d401 100644
+--- a/docs/agent-rules/validation-gate-system.md
++++ b/docs/agent-rules/validation-gate-system.md
+@@ -8,7 +8,7 @@ There are **52 `validate-*.ts` files** in `crux/validate/` (plus ~20 test files
+ - Wire it into the wrong pipeline (daily instead of gate)
+ - Miss the blocking-vs-advisory distinction
+ - Duplicate existing validators (four separate `validate-factbase-*-refs.ts` files exist)
+-- Write a validator without using the validator-first pattern from `.claude/rules/implementation-quality.md`
++- Write a validator without using the validator-first pattern from `docs/agent-rules/implementation-quality.md`
+ 
+ ---
+ 
+@@ -156,7 +156,7 @@ Grouped by what they check. **Before writing a new validator, grep this list.**
+ - **Resources**: `resource-refs`, `resource-quality`, `orphan-entities`
+ - **Data integrity**: `data`, `consistency`, `quality`, `daily`, `unified`
+ 
+-## Validator-first pattern (read `.claude/rules/implementation-quality.md`)
++## Validator-first pattern (read `docs/agent-rules/implementation-quality.md`)
+ 
+ When applying a structural rule across >5 files, **write the validator first**, then fix violations using its output as the work queue. A validator is cheaper than trusting grep to find everything.
+ 
+diff --git a/.claude/rules/wait-on-subagents.md b/docs/agent-rules/wait-on-subagents.md
+similarity index 94%
+rename from .claude/rules/wait-on-subagents.md
+rename to docs/agent-rules/wait-on-subagents.md
+index f4b299546..4bca677a5 100644
+--- a/.claude/rules/wait-on-subagents.md
++++ b/docs/agent-rules/wait-on-subagents.md
+@@ -1,5 +1,7 @@
+ # Waiting on Subagents — Use Monitor, Not `cat`
+ 
++> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
++
+ When you dispatch a subagent (`Agent` / `TaskCreate` / `./ws dispatch`) or
+ launch a background process (`Bash` with `run_in_background`), **wait on
+ it with `Monitor`, not by repeated `cat` of its task-output file**.
+diff --git a/.claude/rules/worktree-isolation-bug.md b/docs/agent-rules/worktree-isolation-bug.md
+similarity index 100%
+rename from .claude/rules/worktree-isolation-bug.md
+rename to docs/agent-rules/worktree-isolation-bug.md
+diff --git a/docs/agent-workflows/agent-review-pr.md b/docs/agent-workflows/agent-review-pr.md
+index 61680917d..a4890bd69 100644
+--- a/docs/agent-workflows/agent-review-pr.md
++++ b/docs/agent-workflows/agent-review-pr.md
+@@ -185,7 +185,7 @@ npx tsx crux/pr-review/detect-narrow-patch.ts
+ 
+ The detector fires at MEDIUM severity when the diff adds a conditional that *both* gates on a literal column name (`columnName === "..."`, `field.name === "..."`, etc.) *and* probes the value's signature (`.startsWith(`, `.test(`, `.match(`, `.includes(`). Pure formatting transforms (`toFixed`, `Intl.NumberFormat`, `formatCurrency`) are not flagged.
+ 
+-**Action on a hit:** before proceeding with the rest of the review, ask explicitly whether the fix could be content-based (match the value's shape regardless of column) instead of column-name-gated. A content-based fix prevents the recurring per-column patch loop. If you confirm the column-gated version is correct (e.g. the column name genuinely carries meaning beyond the value's shape), document the reasoning in the PR body — otherwise rewrite it before shipping. See `.claude/rules/proactive-github-filing.md` § "N+ related symptoms in a narrow window" for the broader rule.
++**Action on a hit:** before proceeding with the rest of the review, ask explicitly whether the fix could be content-based (match the value's shape regardless of column) instead of column-name-gated. A content-based fix prevents the recurring per-column patch loop. If you confirm the column-gated version is correct (e.g. the column name genuinely carries meaning beyond the value's shape), document the reasoning in the PR body — otherwise rewrite it before shipping. See `docs/agent-rules/proactive-github-filing.md` § "N+ related symptoms in a narrow window" for the broader rule.
+ 
+ After running the detector and acting on any hits, record completion:
+ 
+diff --git a/docs/evaluations/dispatch-orchestration-2026.md b/docs/evaluations/dispatch-orchestration-2026.md
+index 0e78711d7..c34facea7 100644
+--- a/docs/evaluations/dispatch-orchestration-2026.md
++++ b/docs/evaluations/dispatch-orchestration-2026.md
+@@ -9,7 +9,7 @@
+ 
+ Reasoning:
+ 1. **Our `./ws` + `crux sys dispatch` + `crux pr-patrol` stack is roughly equivalent in capability** to ComposioHQ AO and Overstory, and is purpose-built for this codebase (slot model, port allocation, `agent_sessions` PG dedup, Linear/GH integration, audit log, `--force` reconciliation). Replacing it would be a multi-week migration to gain… roughly the same thing, with a different bug surface.
+-2. **Mission Control, AO, and Overstory all assume "single repo, agents = worktrees inside it"**. We deliberately rejected worktrees (`.claude/rules/worktree-isolation-bug.md`) in favor of independent-clone slots after a confirmed Claude Code bug (#42282) corrupted parent CWD. Any tool that re-introduces worktrees is a regression for us.
++2. **Mission Control, AO, and Overstory all assume "single repo, agents = worktrees inside it"**. We deliberately rejected worktrees (`docs/agent-rules/worktree-isolation-bug.md`) in favor of independent-clone slots after a confirmed Claude Code bug (#42282) corrupted parent CWD. Any tool that re-introduces worktrees is a regression for us.
+ 3. **Agent Teams (official) is interesting for a different problem** — *intra-session* parallelism inside a single coordinator (research with competing hypotheses, parallel review). It does NOT solve cross-session dispatch. Worth enabling experimentally for high-token review/research tasks, with `teammateMode: in-process` (no tmux split panes — we already manage tmux ourselves).
+ 4. **`bassimeledath/dispatch` is the only tool that solves a problem we don't already solve well**: keeping the *coordinator's* context lean by spawning fire-and-forget workers from inside the coordinator's own session. Our `./ws dispatch` solves dispatch from the shell, not from inside Claude — every coordinator dispatch currently bloats the coordinator's context with the full task description + status polling. Worth a 1-day spike.
+ 
+@@ -228,4 +228,4 @@ If it's a clear win, add a `crux sys dispatch --via=skill` mode that uses the sk
+ - [builderz-labs/mission-control](https://github.com/builderz-labs/mission-control)
+ - [ComposioHQ/agent-orchestrator](https://github.com/ComposioHQ/agent-orchestrator)
+ - [bassimeledath/dispatch](https://github.com/bassimeledath/dispatch) and [10x Your Claude Code Window Size with Dispatch](https://www.bassimeledath.com/blog/dispatch)
+-- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/.claude/rules/worktree-isolation-bug.md`, `lw/a10/docs/agent-rules/dispatched-agent-review.md`
++- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/docs/agent-rules/worktree-isolation-bug.md`, `lw/a10/docs/agent-rules/dispatched-agent-review.md`
+diff --git a/docs/plans/scorecard-upstream-archival.md b/docs/plans/scorecard-upstream-archival.md
+index ed52b211a..e83170978 100644
+--- a/docs/plans/scorecard-upstream-archival.md
++++ b/docs/plans/scorecard-upstream-archival.md
+@@ -576,18 +576,18 @@ So link rot risk is **medium for SaferAI** (continuous update means historical p
+ 
+ ### 12.5 Pass 5 — Scope creep and ticket hygiene
+ 
+-Per `.claude/rules/ticket-sizing.md`:
++Per `docs/agent-rules/ticket-sizing.md`:
+ 
+ - **Phase 1 as one PR**: schema + crux client + 2 ingester families + 1 backfill script. Touches 4-5 surfaces. Borderline; 5/5 of the "split it" red flags are not present (no mixed shapes, no batch processing, no >1K rows, no "phase" wording in body, no "and" connector). Can ship as one PR. If reviewer pushback, split into "schema + crux client (no behavior change)" and "ingester wiring per family".
+ - **Phase 2**: writing evidence at sync time. One handler change + tests. Single shape. Fits one PR.
+ - **Phase 3**: drift detection. Separate ticket; defer.
+ - **Backfill**: should be folded into Phase 2, not its own ticket — it's the "run the new code path against existing data" call.
+ 
+-Per `.claude/rules/linear-project-ownership.md`: source-check work goes in **Source-Check & Verification**. All three phases qualify.
++Per `docs/agent-rules/linear-project-ownership.md`: source-check work goes in **Source-Check & Verification**. All three phases qualify.
+ 
+-Per `.claude/rules/proactive-github-filing.md`: I'm proposing 3 tickets in §11 (revised down from 5). I should **not** file these without explicit ask — the user requested a doc, not implementation. §11 should clarify "to be filed if/when this design is approved, by the user, not by this session."
++Per `docs/agent-rules/proactive-github-filing.md`: I'm proposing 3 tickets in §11 (revised down from 5). I should **not** file these without explicit ask — the user requested a doc, not implementation. §11 should clarify "to be filed if/when this design is approved, by the user, not by this session."
+ 
+-Per `.claude/rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + emit a Linear ticket (auto-filed) so a human can decide.
++Per `docs/agent-rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + emit a Linear ticket (auto-filed) so a human can decide.
+ 
+ ### 12.6 Revised recommendation
+ 
+diff --git a/eslint.config.js b/eslint.config.js
+index f488f44de..08314c97a 100644
+--- a/eslint.config.js
++++ b/eslint.config.js
+@@ -68,7 +68,7 @@ export default tseslint.config(
+       // QUA-388 Phase 2: catches the highest-hit-rate pattern from the
+       // PR-review survey — unhandled promises that silently swallow
+       // errors. Either `await`, `void`, or `.catch(...)` the result.
+-      // See `.claude/rules/error-handling.md` for the in-repo policy on
++      // See `docs/agent-rules/error-handling.md` for the in-repo policy on
+       // when each is appropriate.
+       '@typescript-eslint/no-floating-promises': 'error',
+     },

@@ -1,0 +1,376 @@
+diff --git a/apps/wiki-server/src/__tests__/integrity.test.ts b/apps/wiki-server/src/__tests__/integrity.test.ts
+deleted file mode 100644
+index eb53b4eac..000000000
+--- a/apps/wiki-server/src/__tests__/integrity.test.ts
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/**
+- * QUA-623: the integrity endpoint ran 7 `SELECT DISTINCT ... WHERE NOT EXISTS`
+- * scans without LIMIT. A data-integrity regression could return a huge
+- * `missing_refs` array and OOM the response. We cap each check at
+- * MAX_MISSING_REFS and set a `truncated` flag when the cap is hit.
+- */
+-
+-import { describe, it, expect, vi, beforeEach } from "vitest";
+-import { type SqlDispatcher, mockDbModule } from "./test-utils";
+-
+-/** Rows the mocked `db.execute` should return for each check. */
+-let rowsByTable: Record<string, { ref: string }[]>;
+-
+-function resetRows() {
+-  rowsByTable = {};
+-}
+-
+-const dispatch: SqlDispatcher = (query, _params) => {
+-  // Each checkDangling call composes `<original-query> LIMIT $N`. We route
+-  // the query to the right synthetic result set by looking at the first
+-  // recognizable table name inside it.
+-  if (query.includes("FROM facts")) return rowsByTable.facts ?? [];
+-  if (query.includes("FROM summaries")) return rowsByTable.summaries ?? [];
+-  if (query.includes("FROM citation_quotes") && query.includes("page_id"))
+-    return rowsByTable.citation_quotes_page ?? [];
+-  if (query.includes("FROM citation_quotes") && query.includes("resource_id"))
+-    return rowsByTable.citation_quotes_resource ?? [];
+-  if (query.includes("FROM edit_logs")) return rowsByTable.edit_logs ?? [];
+-  if (query.includes("FROM entities ent")) return rowsByTable.related_entries ?? [];
+-  if (query.includes("FROM resource_citations")) return rowsByTable.resource_citations ?? [];
+-  return [];
+-};
+-
+-vi.mock("../db.js", () => mockDbModule(dispatch));
+-
+-const { integrityRoute } = await import("../routes/operational/integrity.js");
+-
+-describe("Integrity endpoint — QUA-623 unbounded query cap", () => {
+-  beforeEach(() => {
+-    resetRows();
+-  });
+-
+-  it("reports `status: clean` when all tables are consistent", async () => {
+-    // All empty → clean.
+-    const res = await integrityRoute.request("/");
+-    expect(res.status).toBe(200);
+-    const body = (await res.json()) as {
+-      status: string;
+-      issues: unknown[];
+-      summary: { tables_checked: number; issues_found: number };
+-    };
+-    expect(body.status).toBe("clean");
+-    expect(body.issues).toEqual([]);
+-    expect(body.summary.tables_checked).toBe(7);
+-    expect(body.summary.issues_found).toBe(0);
+-  });
+-
+-  it("reports each dangling ref with `truncated: false` when below the cap", async () => {
+-    rowsByTable.facts = [{ ref: "orphan-1" }, { ref: "orphan-2" }];
+-    rowsByTable.summaries = [{ ref: "s-orphan" }];
+-    const res = await integrityRoute.request("/");
+-    expect(res.status).toBe(200);
+-    const body = (await res.json()) as {
+-      status: string;
+-      issues: {
+-        table: string;
+-        missing_refs: string[];
+-        count: number;
+-        truncated: boolean;
+-      }[];
+-    };
+-    expect(body.status).toBe("issues_found");
+-    const facts = body.issues.find((i) => i.table === "facts");
+-    expect(facts).toBeDefined();
+-    expect(facts!.missing_refs).toEqual(["orphan-1", "orphan-2"]);
+-    expect(facts!.count).toBe(2);
+-    expect(facts!.truncated).toBe(false);
+-  });
+-
+-  it("sets `truncated: true` and caps `missing_refs` when an issue exceeds MAX_MISSING_REFS", async () => {
+-    // MAX_MISSING_REFS is 1000. Return 1001 rows so the +1 sentinel fires.
+-    rowsByTable.facts = Array.from({ length: 1001 }, (_, i) => ({
+-      ref: `orphan-${i}`,
+-    }));
+-    const res = await integrityRoute.request("/");
+-    expect(res.status).toBe(200);
+-    const body = (await res.json()) as {
+-      issues: {
+-        table: string;
+-        missing_refs: string[];
+-        count: number;
+-        truncated: boolean;
+-      }[];
+-    };
+-    const facts = body.issues.find((i) => i.table === "facts");
+-    expect(facts).toBeDefined();
+-    expect(facts!.truncated).toBe(true);
+-    // Capped back to MAX_MISSING_REFS (1000); the +1 sentinel row is dropped.
+-    expect(facts!.missing_refs.length).toBe(1000);
+-    expect(facts!.count).toBe(1000);
+-  });
+-});
+diff --git a/apps/wiki-server/src/app.ts b/apps/wiki-server/src/app.ts
+index 2a02db839..6130f186d 100644
+--- a/apps/wiki-server/src/app.ts
++++ b/apps/wiki-server/src/app.ts
+@@ -54,7 +54,6 @@ import { activeAgentsRoute } from "./routes/operational/active-agents.js";
+ import { agentSessionEventsRoute } from "./routes/operational/agent-session-events.js";
+ import { jobsRoute } from "./routes/operational/jobs.js";
+ import { artifactsRoute } from "./routes/operational/artifacts.js";
+-import { integrityRoute } from "./routes/operational/integrity.js";
+ import { autoUpdateRunsRoute } from "./routes/operational/auto-update-runs.js";
+ import { autoUpdateNewsRoute } from "./routes/operational/auto-update-news.js";
+ import { groundskeeperRunsRoute } from "./routes/operational/groundskeeper-runs.js";
+@@ -67,7 +66,6 @@ import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
+ import { qaChecksRoute } from "./routes/operational/qa-checks.js";
+ import { dataQualityRoute } from "./routes/operational/data-quality.js";
+ import { thingsSearchRefreshRoute } from "./routes/operational/things-search-refresh.js";
+-import { operationsLogRoute } from "./routes/operational/operations-log.js";
+ import { auditLogRoute } from "./routes/operational/audit-log.js";
+ import { frameworkReviewRoute } from "./routes/operational/framework-review.js";
+ 
+@@ -221,7 +219,6 @@ export function createApp() {
+   // Citation & sourcing system (operational, not part of a Base)
+   app.route("/api/citations", citationsRoute);
+   app.route("/api/hallucination-risk", hallucinationRiskRoute);
+-  app.route("/api/integrity", integrityRoute);
+ 
+   // Claims-first sourcing (#3253)
+   app.route("/api/claims", claimsRoute);
+@@ -256,7 +253,6 @@ export function createApp() {
+   app.route("/api/qa-checks", qaChecksRoute);
+   app.route("/api/data-quality", dataQualityRoute);
+   app.route("/api/things-search", thingsSearchRefreshRoute);
+-  app.route("/api/operations-log", operationsLogRoute);
+   app.route("/api/audit-log", auditLogRoute);
+   app.route("/api/framework-review", frameworkReviewRoute);
+ 
+diff --git a/apps/wiki-server/src/routes/operational/index.ts b/apps/wiki-server/src/routes/operational/index.ts
+index b0e7bd6dc..e7927ee43 100644
+--- a/apps/wiki-server/src/routes/operational/index.ts
++++ b/apps/wiki-server/src/routes/operational/index.ts
+@@ -2,7 +2,7 @@
+  * Operational routes — sessions, agents, jobs, monitoring, infrastructure.
+  *
+  * Covers: health, sessions, agent sessions, active agents, jobs, artifacts,
+- * integrity, auto-update runs/news, groundskeeper runs, GitHub issues/pulls,
++ * auto-update runs/news, groundskeeper runs, GitHub issues/pulls,
+  * monitoring.
+  */
+ export { healthRoute, type HealthRoute } from "./health.js";
+@@ -12,7 +12,6 @@ export { activeAgentsRoute, type ActiveAgentsRoute } from "./active-agents.js";
+ export { agentSessionEventsRoute, type AgentSessionEventsRoute } from "./agent-session-events.js";
+ export { jobsRoute, type JobsRoute } from "./jobs.js";
+ export { artifactsRoute, type ArtifactsRoute } from "./artifacts.js";
+-export { integrityRoute, type IntegrityRoute } from "./integrity.js";
+ export { autoUpdateRunsRoute, type AutoUpdateRunsRoute } from "./auto-update-runs.js";
+ export { autoUpdateNewsRoute, type AutoUpdateNewsRoute } from "./auto-update-news.js";
+ export { groundskeeperRunsRoute, type GroundskeeperRunsRoute } from "./groundskeeper-runs.js";
+@@ -21,5 +20,4 @@ export { githubPullsRoute, type GithubPullsRoute, type OpenPR, type CheckResult,
+ export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";
+ export { qaChecksRoute, type QaChecksRoute } from "./qa-checks.js";
+ export { dataQualityRoute, type DataQualityRoute } from "./data-quality.js";
+-export { operationsLogRoute, type OperationsLogRoute } from "./operations-log.js";
+ export { frameworkReviewRoute, type FrameworkReviewRoute } from "./framework-review.js";
+diff --git a/apps/wiki-server/src/routes/operational/integrity.ts b/apps/wiki-server/src/routes/operational/integrity.ts
+deleted file mode 100644
+index e937498db..000000000
+--- a/apps/wiki-server/src/routes/operational/integrity.ts
++++ /dev/null
+@@ -1,140 +0,0 @@
+-import { Hono } from "hono";
+-import { sql } from "drizzle-orm";
+-import { getDrizzleDb } from "../../db.js";
+-import { applyTruncation } from "../shared/utils.js";
+-
+-interface IntegrityIssue {
+-  table: string;
+-  column: string;
+-  target_table: string;
+-  missing_refs: string[];
+-  count: number;
+-  truncated: boolean;
+-}
+-
+-// QUA-623: cap each SELECT DISTINCT to prevent a data-integrity regression
+-// from OOMing the response or hitting statement_timeout. If refs exceed the
+-// cap, we return the capped list and set `truncated: true` — the number of
+-// dangling refs is a red flag either way, the exact count can be re-queried.
+-const MAX_MISSING_REFS = 1000;
+-
+-/**
+- * Run a dangling-reference check and return an issue if any are found.
+- * Returns null if the table is clean.
+- *
+- * The caller's SQL should NOT include its own LIMIT — we append one with a
+- * +1 sentinel to detect truncation.
+- */
+-async function checkDangling(
+-  db: ReturnType<typeof getDrizzleDb>,
+-  query: ReturnType<typeof sql>,
+-  table: string,
+-  column: string,
+-  targetTable: string
+-): Promise<IntegrityIssue | null> {
+-  const capped = sql`${query} LIMIT ${MAX_MISSING_REFS + 1}`;
+-  const rows = (await db.execute(capped)) as Array<{ ref: string }>;
+-  if (rows.length === 0) return null;
+-  const { items, truncated } = applyTruncation(rows, MAX_MISSING_REFS);
+-  return {
+-    table,
+-    column,
+-    target_table: targetTable,
+-    missing_refs: items.map((r) => r.ref),
+-    count: items.length,
+-    truncated,
+-  };
+-}
+-
+-// ---- GET / ----
+-
+-const integrityApp = new Hono()
+-  .get("/", async (c) => {
+-    const db = getDrizzleDb();
+-    const issues: IntegrityIssue[] = [];
+-
+-    const checks = [
+-      // 1. facts.entity_id → entities.stable_id
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT f.entity_id AS ref FROM facts f WHERE NOT EXISTS (SELECT 1 FROM entities e WHERE e.stable_id = f.entity_id)`,
+-        "facts",
+-        "entity_id",
+-        "entities"
+-      ),
+-      // 2. summaries.entity_id → entities.stable_id
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT s.entity_id AS ref FROM summaries s WHERE NOT EXISTS (SELECT 1 FROM entities e WHERE e.stable_id = s.entity_id)`,
+-        "summaries",
+-        "entity_id",
+-        "entities"
+-      ),
+-      // 4. citation_quotes.page_id → wiki_pages
+-      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT cq.page_id::text AS ref FROM citation_quotes cq WHERE cq.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = cq.page_id)`,
+-        "citation_quotes",
+-        "page_id",
+-        "wiki_pages"
+-      ),
+-      // 5. citation_quotes.resource_id → resources.stable_id
+-      // QUA-574 Phase B.2b: resource_id now references resources.stable_id (not resources.id).
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT cq.resource_id AS ref FROM citation_quotes cq WHERE cq.resource_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM resources r WHERE r.stable_id = cq.resource_id)`,
+-        "citation_quotes",
+-        "resource_id",
+-        "resources"
+-      ),
+-      // 6. edit_logs.page_id → wiki_pages
+-      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT el.page_id::text AS ref FROM edit_logs el WHERE el.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = el.page_id)`,
+-        "edit_logs",
+-        "page_id",
+-        "wiki_pages"
+-      ),
+-      // 7. entities.relatedEntries JSONB → entities
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT elem->>'id' AS ref FROM entities ent, jsonb_array_elements(ent.related_entries) AS elem WHERE ent.related_entries IS NOT NULL AND NOT EXISTS (SELECT 1 FROM entities e2 WHERE e2.id = elem->>'id')`,
+-        "entities",
+-        "related_entries[].id",
+-        "entities"
+-      ),
+-      // 8. resource_citations.page_id → wiki_pages
+-      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
+-      checkDangling(
+-        db,
+-        sql`SELECT DISTINCT rc.page_id::text AS ref FROM resource_citations rc WHERE rc.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = rc.page_id)`,
+-        "resource_citations",
+-        "page_id",
+-        "wiki_pages"
+-      ),
+-    ];
+-
+-    const results = await Promise.all(checks);
+-    for (const result of results) {
+-      if (result) issues.push(result);
+-    }
+-
+-    const tablesChecked = checks.length;
+-    const totalDangling = issues.reduce((sum, i) => sum + i.count, 0);
+-
+-    return c.json({
+-      status: issues.length === 0 ? "clean" : "issues_found",
+-      checked_at: new Date().toISOString(),
+-      issues,
+-      summary: {
+-        tables_checked: tablesChecked,
+-        issues_found: issues.length,
+-        total_dangling_refs: totalDangling,
+-      },
+-    });
+-  });
+-
+-export const integrityRoute = integrityApp;
+-export type IntegrityRoute = typeof integrityApp;
+diff --git a/apps/wiki-server/src/routes/operational/operations-log.ts b/apps/wiki-server/src/routes/operational/operations-log.ts
+deleted file mode 100644
+index 05d062e78..000000000
+--- a/apps/wiki-server/src/routes/operational/operations-log.ts
++++ /dev/null
+@@ -1,53 +0,0 @@
+-import { Hono } from "hono";
+-import { desc } from "drizzle-orm";
+-import { getDrizzleDb } from "../../db.js";
+-import { operationsLog } from "../../schema.js";
+-import { zv, clampedLimit } from "../shared/utils.js";
+-import { z } from "zod";
+-
+-const CreateOperationSchema = z.object({
+-  description: z.string().trim().min(1),
+-  prNumber: z.number().int().positive().optional(),
+-  agentSessionId: z.number().int().positive().optional(),
+-  operator: z.string().trim().min(1).default("agent"),
+-  metadata: z.record(z.unknown()).optional(),
+-});
+-
+-const ListQuery = z.object({
+-  limit: clampedLimit(200, 50),
+-});
+-
+-const operationsLogApp = new Hono()
+-  .get("/", zv("query", ListQuery), async (c) => {
+-    const db = getDrizzleDb();
+-    const { limit } = c.req.valid("query");
+-
+-    const rows = await db
+-      .select()
+-      .from(operationsLog)
+-      .orderBy(desc(operationsLog.createdAt))
+-      .limit(limit);
+-
+-    return c.json({ operations: rows });
+-  })
+-
+-  .post("/", zv("json", CreateOperationSchema), async (c) => {
+-    const body = c.req.valid("json");
+-    const db = getDrizzleDb();
+-
+-    const [row] = await db
+-      .insert(operationsLog)
+-      .values({
+-        description: body.description,
+-        prNumber: body.prNumber ?? null,
+-        agentSessionId: body.agentSessionId ?? null,
+-        operator: body.operator,
+-        metadata: body.metadata ?? null,
+-      })
+-      .returning();
+-
+-    return c.json({ operation: row }, 201);
+-  });
+-
+-export const operationsLogRoute = operationsLogApp;
+-export type OperationsLogRoute = typeof operationsLogApp;

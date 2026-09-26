@@ -1,0 +1,2391 @@
+diff --git a/content/docs/internal/cli-reference.mdx b/content/docs/internal/cli-reference.mdx
+index 6672be6b4..1aeb59886 100644
+--- a/content/docs/internal/cli-reference.mdx
++++ b/content/docs/internal/cli-reference.mdx
+@@ -45,7 +45,6 @@ Commands:
+   polish         Post-improvement cleanup and polish
+   review         Adversarial review — find gaps in a page (~$0.50/page)
+   suggest-links  Suggest relatedEntries cross-links for entities
+-  strip-scores   Strip scoring fields from MDX frontmatter (assessment migration)
+ 
+ Options:
+   --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
+@@ -385,7 +384,6 @@ Enrich Domain - Standalone enrichment tools for wiki content
+ ```
+ Commands:
+   entity-links   Insert <EntityLink> tags for entity mentions
+-  fact-refs      Wrap canonical numbers with <F> fact-ref tags
+ 
+ Options (entity-links):
+   --apply           Write EntityLink insertions to MDX file
+@@ -393,12 +391,6 @@ Options (entity-links):
+   --limit=N         Limit pages when using --all
+   --json            JSON output (one object per page)
+ 
+-Options (fact-refs):
+-  --apply           Write <F> tag insertions to MDX file
+-  --all             Scan all knowledge-base pages
+-  --limit=N         Limit pages when using --all
+-  --json            JSON output (one object per page)
+-
+ All tools are idempotent — running twice on the same page produces no extra changes.
+ 
+ Examples:
+@@ -407,10 +399,6 @@ Examples:
+   crux w enrich entity-links --all --limit=10       Preview for top 10 pages
+   crux w enrich entity-links --all --apply          Apply EntityLinks across wiki
+ 
+-  crux w enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
+-  crux w enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
+-  crux w enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
+-
+ Note: References are now auto-generated at build time (build-data.mjs → pageResources).
+ The 'crux w enrich references' command has been removed.
+ ```
+@@ -1013,11 +1001,8 @@ Commands:
+   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
+   import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
+   import-990 --discover <query>         Search ProPublica by org name
+-  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
+   sync-sources          Sync KB fact source URLs to wiki-server as Resources
+   sourcing          Check KB facts against source URLs using LLM
+-  migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
+-  migrate-entities-status       Show migration status (files in each format)
+ 
+ Options:
+   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
+@@ -1120,8 +1105,6 @@ Commands:
+   Backfill (consolidated from backfill-* domains):
+   backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+   backfill-program-ids [--dry-run]       Link grants to funding programs
+-  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
+-  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
+ 
+   Import (consolidated from import-* domains):
+   import-grants               Analyze grant import stats (default)
+diff --git a/content/docs/internal/wiki-generation-architecture.mdx b/content/docs/internal/wiki-generation-architecture.mdx
+index a8946f672..100c53d99 100644
+--- a/content/docs/internal/wiki-generation-architecture.mdx
++++ b/content/docs/internal/wiki-generation-architecture.mdx
+@@ -723,7 +723,7 @@ A page with good prose but no diagrams gets diagram tools. A page with bad sourc
+ | Module | Purpose | Standalone CLI | Cost |
+ |--------|---------|----------------|------|
+ | `add-entity-links` | Insert EntityLink components for mentioned entities | `crux enrich entity-links <id>` | \$0.05 (Haiku) |
+-| `add-fact-refs` | Wrap hardcoded numbers in `<FBF>` tags referencing KB facts | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
++| `add-fact-refs` | Wrap hardcoded numbers in `<FBF>` tags referencing KB facts | — (no-op; CLI removed) | — |
+ | `add-diagram` | Generate Mermaid diagram for a section | `crux enrich diagram <id>` | \$0.10-0.20 |
+ | `add-squiggle` | Add uncertainty modeling for a section | `crux enrich squiggle <id>` | \$0.10-0.20 |
+ 
+diff --git a/crux/commands/backfill-stable-ids.ts b/crux/commands/backfill-stable-ids.ts
+deleted file mode 100644
+index 96721e68e..000000000
+--- a/crux/commands/backfill-stable-ids.ts
++++ /dev/null
+@@ -1,136 +0,0 @@
+-/**
+- * Backfill stable IDs for existing entities.
+- *
+- * Reads stableIds from KB YAML files and pushes them to the wiki-server's
+- * entity_ids table. Then generates new stableIds for any entities that
+- * don't have KB entries.
+- *
+- * Usage:
+- *   crux tb backfill-stable-ids run [--dry-run]
+- */
+-
+-import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+-import { loadGraphFull } from '../lib/factbase-loader.ts';
+-import { apiRequest, getServerUrl, isServerAvailable } from '../lib/wiki-server/client.ts';
+-
+-interface BackfillResult {
+-  updated: number;
+-  generated: number;
+-  totalMissing: number;
+-}
+-
+-async function runCommand(
+-  _args: string[],
+-  options: CommandOptions,
+-): Promise<CommandResult> {
+-  const dryRun = options['dry-run'] === true || options['dry-run'] === 'true';
+-
+-  const serverUrl = getServerUrl();
+-  if (!serverUrl) {
+-    return { exitCode: 1, output: 'Error: LONGTERMWIKI_SERVER_URL not configured' };
+-  }
+-
+-  const available = await isServerAvailable();
+-  if (!available) {
+-    return { exitCode: 1, output: 'Error: Wiki server is not reachable' };
+-  }
+-
+-  // Load KB graph to get stableIds from YAML
+-  const kb = await loadGraphFull();
+-  const allEntities = kb.graph.getAllEntities();
+-
+-  const lines: string[] = [];
+-  lines.push(`Loaded ${allEntities.length} KB entities with stableIds`);
+-
+-  // Build slug → stableId map from KB.
+-  // The KB graph keys entities by stableId (entity.id = stableId).
+-  // The filenameMap maps stableId → filename (slug).
+-  const slugToStableId: Array<{ slug: string; stableId: string }> = [];
+-
+-  for (const entity of allEntities) {
+-    const filename = kb.filenameMap.get(entity.id);
+-    if (filename && entity.id.length === 10) {
+-      slugToStableId.push({ slug: filename, stableId: entity.id });
+-    }
+-  }
+-
+-  lines.push(`Found ${slugToStableId.length} slug→stableId mappings from KB`);
+-
+-  if (dryRun) {
+-    lines.push('');
+-    lines.push('Dry run — showing first 20 mappings:');
+-    for (const item of slugToStableId.slice(0, 20)) {
+-      lines.push(`  ${item.slug.padEnd(30)} → ${item.stableId}`);
+-    }
+-    lines.push('');
+-    lines.push('Run without --dry-run to apply.');
+-    return { exitCode: 0, output: lines.join('\n') };
+-  }
+-
+-  // Send to server in batches of 200, finalize on the last batch
+-  let totalUpdated = 0;
+-  let totalGenerated = 0;
+-
+-  const batchSize = 200;
+-  for (let i = 0; i < slugToStableId.length; i += batchSize) {
+-    const batch = slugToStableId.slice(i, i + batchSize);
+-    const isLastBatch = i + batchSize >= slugToStableId.length;
+-    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
+-    const result = await apiRequest<BackfillResult>(
+-      'POST',
+-      '/api/ids/backfill-stable-ids',
+-      { items: batch, finalize: isLastBatch },
+-    );
+-
+-    if (!result.ok) {
+-      lines.push(`Error in batch ${i}-${i + batch.length}: ${result.message}`);
+-      return { exitCode: 1, output: lines.join('\n') };
+-    }
+-
+-    totalUpdated += result.data.updated;
+-    totalGenerated += result.data.generated;
+-  }
+-
+-  // Handle edge case: no KB entities found, but still need to finalize
+-  if (slugToStableId.length === 0) {
+-    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
+-    const result = await apiRequest<BackfillResult>(
+-      'POST',
+-      '/api/ids/backfill-stable-ids',
+-      { items: [], finalize: true },
+-    );
+-
+-    if (!result.ok) {
+-      lines.push(`Error during finalization: ${result.message}`);
+-      return { exitCode: 1, output: lines.join('\n') };
+-    }
+-
+-    totalGenerated += result.data.generated;
+-  }
+-
+-  lines.push(`Updated ${totalUpdated} existing entities with KB stableIds`);
+-  lines.push(`Generated ${totalGenerated} new stableIds for entities without KB entries`);
+-
+-  return { exitCode: 0, output: lines.join('\n') };
+-}
+-
+-export const commands = {
+-  run: runCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Backfill Stable IDs
+-
+-Reads stableIds from KB YAML files (packages/factbase/data/fb-entities/*.yaml) and
+-writes them to the wiki-server entity_ids table. Then generates new stableIds
+-for any entities that don't have KB entries.
+-
+-Usage:
+-  crux tb backfill-stable-ids run              Run the backfill
+-  crux tb backfill-stable-ids run --dry-run    Preview without writing
+-
+-This is a one-time migration command. After running, all entities in the
+-entity_ids table will have a stable_id column populated.
+-`;
+-}
+diff --git a/crux/commands/backfill-yaml-stable-ids.ts b/crux/commands/backfill-yaml-stable-ids.ts
+deleted file mode 100644
+index 8798d1e27..000000000
+--- a/crux/commands/backfill-yaml-stable-ids.ts
++++ /dev/null
+@@ -1,242 +0,0 @@
+-/**
+- * Backfill stableIds into entity YAML files.
+- *
+- * For each entity in data/entities/*.yaml that lacks a stableId:
+- *   1. Checks packages/factbase/data/fb-entities/{slug}.yaml for an existing stableId
+- *   2. If none, generates a new random 10-char alphawiki ID
+- *   3. Inserts the stableId line right after the `id:` line in the YAML
+- *
+- * Uses string manipulation (not parse+stringify) to preserve existing formatting.
+- *
+- * Usage:
+- *   crux tb backfill-yaml-stable-ids run              Run the backfill
+- *   crux tb backfill-yaml-stable-ids run --dry-run     Preview without writing
+- */
+-
+-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
+-import { join } from 'path';
+-import { parse as parseYaml } from 'yaml';
+-import { generateId } from '../../packages/factbase/src/ids.ts';
+-import { PROJECT_ROOT } from '../lib/content-types.ts';
+-import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+-
+-const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
+-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
+-
+-interface KBThing {
+-  thing?: {
+-    id?: string;
+-    stableId?: string;
+-  };
+-}
+-
+-/**
+- * Load stableId from a KB thing file if it exists.
+- */
+-function getKBStableId(slug: string): string | null {
+-  const kbPath = join(KB_THINGS_DIR, `${slug}.yaml`);
+-  if (!existsSync(kbPath)) return null;
+-
+-  try {
+-    const raw = readFileSync(kbPath, 'utf-8');
+-    const parsed = parseYaml(raw) as KBThing;
+-    return parsed?.thing?.stableId ?? null;
+-  } catch {
+-    return null;
+-  }
+-}
+-
+-/**
+- * Collect all existing stableIds from entity YAML files to prevent collisions.
+- */
+-function collectExistingStableIds(): Set<string> {
+-  const ids = new Set<string>();
+-  const files = readdirSync(ENTITIES_DIR).filter((f) => f.endsWith('.yaml'));
+-
+-  for (const file of files) {
+-    const raw = readFileSync(join(ENTITIES_DIR, file), 'utf-8');
+-    const matches = raw.matchAll(/^\s+stableId:\s+(\S+)/gm);
+-    for (const match of matches) {
+-      ids.add(match[1]);
+-    }
+-  }
+-
+-  // Also collect from KB thing files
+-  if (existsSync(KB_THINGS_DIR)) {
+-    const kbFiles = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith('.yaml'));
+-    for (const file of kbFiles) {
+-      try {
+-        const raw = readFileSync(join(KB_THINGS_DIR, file), 'utf-8');
+-        const match = raw.match(/stableId:\s+(\S+)/);
+-        if (match) ids.add(match[1]);
+-      } catch {
+-        // Skip unreadable KB files
+-      }
+-    }
+-  }
+-
+-  return ids;
+-}
+-
+-/**
+- * Generate a unique stableId that doesn't collide with existing ones.
+- */
+-function generateUniqueId(existing: Set<string>): string {
+-  for (let attempt = 0; attempt < 100; attempt++) {
+-    const id = generateId();
+-    if (!existing.has(id)) {
+-      existing.add(id);
+-      return id;
+-    }
+-  }
+-  throw new Error('Failed to generate unique stableId after 100 attempts');
+-}
+-
+-/**
+- * Process a single entity YAML file, adding stableIds where missing.
+- * Returns the modified content and stats.
+- */
+-function processFile(
+-  filePath: string,
+-  existingIds: Set<string>,
+-  dryRun: boolean,
+-): { content: string; added: number; fromKB: number; alreadyHad: number } {
+-  const raw = readFileSync(filePath, 'utf-8');
+-  const lines = raw.split('\n');
+-  const result: string[] = [];
+-  let added = 0;
+-  let fromKB = 0;
+-  let alreadyHad = 0;
+-
+-  let i = 0;
+-  while (i < lines.length) {
+-    const line = lines[i];
+-
+-    // Match entity start: "- id: some-slug"
+-    const idMatch = line.match(/^- id:\s+(.+)$/);
+-    if (idMatch) {
+-      const slug = idMatch[1].trim();
+-      result.push(line);
+-      i++;
+-
+-      // Check if next line already has stableId
+-      if (i < lines.length && lines[i].match(/^\s+stableId:\s+/)) {
+-        // Already has stableId, keep it
+-        alreadyHad++;
+-        result.push(lines[i]);
+-        i++;
+-        continue;
+-      }
+-
+-      // Need to add stableId — check KB first, then generate
+-      let stableId = getKBStableId(slug);
+-      let source: 'kb' | 'generated';
+-
+-      if (stableId) {
+-        source = 'kb';
+-        // Make sure it's not a collision with a different entity
+-        if (existingIds.has(stableId)) {
+-          console.warn(`  WARN: KB stableId ${stableId} for ${slug} already in use — generating new one`);
+-          stableId = generateUniqueId(existingIds);
+-          source = 'generated';
+-        } else {
+-          existingIds.add(stableId);
+-        }
+-        if (source === 'kb') fromKB++;
+-      } else {
+-        stableId = generateUniqueId(existingIds);
+-        source = 'generated';
+-      }
+-
+-      // Insert stableId line with 2-space indent (matching other fields)
+-      result.push(`  stableId: ${stableId}`);
+-      added++;
+-      continue;
+-    }
+-
+-    result.push(line);
+-    i++;
+-  }
+-
+-  const content = result.join('\n');
+-
+-  if (!dryRun && added > 0) {
+-    writeFileSync(filePath, content, 'utf-8');
+-  }
+-
+-  return { content, added, fromKB, alreadyHad };
+-}
+-
+-async function runCommand(
+-  _args: string[],
+-  options: CommandOptions,
+-): Promise<CommandResult> {
+-  const dryRun = options['dry-run'] === true || options['dry-run'] === 'true'
+-    || options['dryRun'] === true || options['dryRun'] === 'true';
+-
+-  const lines: string[] = [];
+-  lines.push(dryRun ? '=== DRY RUN ===' : '=== Backfilling stableIds into entity YAML files ===');
+-  lines.push('');
+-
+-  // Collect all existing stableIds first
+-  const existingIds = collectExistingStableIds();
+-  lines.push(`Found ${existingIds.size} existing stableIds across entity and KB files`);
+-  lines.push('');
+-
+-  const files = readdirSync(ENTITIES_DIR)
+-    .filter((f) => f.endsWith('.yaml'))
+-    .sort();
+-
+-  let totalAdded = 0;
+-  let totalFromKB = 0;
+-  let totalAlreadyHad = 0;
+-
+-  for (const file of files) {
+-    const filePath = join(ENTITIES_DIR, file);
+-    const result = processFile(filePath, existingIds, dryRun);
+-
+-    const status = result.added > 0
+-      ? `+${result.added} added (${result.fromKB} from KB, ${result.added - result.fromKB} generated)`
+-      : 'all present';
+-    lines.push(`${file}: ${result.alreadyHad} already had, ${status}`);
+-
+-    totalAdded += result.added;
+-    totalFromKB += result.fromKB;
+-    totalAlreadyHad += result.alreadyHad;
+-  }
+-
+-  lines.push('');
+-  lines.push(`Total: ${totalAlreadyHad} already had stableIds, ${totalAdded} added`);
+-  lines.push(`  From KB: ${totalFromKB}`);
+-  lines.push(`  Generated: ${totalAdded - totalFromKB}`);
+-  lines.push(`  Unique IDs total: ${existingIds.size}`);
+-
+-  if (dryRun) {
+-    lines.push('');
+-    lines.push('Run without --dry-run to apply.');
+-  }
+-
+-  return { exitCode: 0, output: lines.join('\n') };
+-}
+-
+-export const commands = {
+-  run: runCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Backfill stableIds into Entity YAML Files
+-
+-Reads entity YAML files from data/entities/*.yaml and inserts a stableId
+-field for any entity that doesn't have one. StableIds are sourced from
+-KB thing files (packages/factbase/data/fb-entities/*.yaml) when available, otherwise
+-a new random 10-char alphawiki ID is generated.
+-
+-Usage:
+-  crux tb backfill-yaml-stable-ids run              Run the backfill
+-  crux tb backfill-yaml-stable-ids run --dry-run     Preview without writing
+-
+-The stableId is inserted as the second field after \`id:\`, matching the
+-existing convention in the entity YAML files.
+-`;
+-}
+diff --git a/crux/commands/content.ts b/crux/commands/content.ts
+index a6ee8ada2..713991309 100644
+--- a/crux/commands/content.ts
++++ b/crux/commands/content.ts
+@@ -61,11 +61,6 @@ const SCRIPTS: Record<string, ScriptConfig> = {
+     passthrough: ['type', 'entity', 'minScore', 'limit', 'apply', 'json', 'ci', 'help'],
+     positional: true,
+   },
+-  'strip-scores': {
+-    script: 'commands/strip-scores.ts',
+-    description: 'Strip scoring fields from MDX frontmatter (assessment migration)',
+-    passthrough: ['fields', 'apply', 'dry-run'],
+-  },
+ };
+ 
+ export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = buildCommands(SCRIPTS);
+diff --git a/crux/commands/enrich.ts b/crux/commands/enrich.ts
+index 9787821ae..556d7d074 100644
+--- a/crux/commands/enrich.ts
++++ b/crux/commands/enrich.ts
+@@ -8,10 +8,6 @@
+  *   crux w enrich entity-links <page-id>           Preview EntityLink insertions
+  *   crux w enrich entity-links <page-id> --apply   Write EntityLinks to file
+  *   crux w enrich entity-links --all [--limit=N]   Batch across wiki
+- *
+- *   crux w enrich fact-refs <page-id>              Preview <F> tag insertions
+- *   crux w enrich fact-refs <page-id> --apply      Write <F> tags to file
+- *   crux w enrich fact-refs --all [--limit=N]      Batch across wiki
+  */
+ 
+ import { buildCommands } from '../lib/cli.ts';
+@@ -23,12 +19,8 @@ const SCRIPTS = {
+     passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
+     positional: true,
+   },
+-  'fact-refs': {
+-    script: 'enrich/enrich-fact-refs.ts',
+-    description: 'Wrap canonical numbers with <F> fact-ref tags',
+-    passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
+-    positional: true,
+-  },
++  // Note: 'fact-refs' was removed — enrichFactRefs() is a no-op since the
++  // data/facts/*.yaml pipeline was retired (still called by the improve pipeline).
+   // Note: 'references' was removed — References are now auto-generated at build
+   // time via pageResources in build-data.mjs. The CLI command is no longer needed.
+ };
+@@ -52,12 +44,6 @@ Options (entity-links):
+   --limit=N         Limit pages when using --all
+   --json            JSON output (one object per page)
+ 
+-Options (fact-refs):
+-  --apply           Write <F> tag insertions to MDX file
+-  --all             Scan all knowledge-base pages
+-  --limit=N         Limit pages when using --all
+-  --json            JSON output (one object per page)
+-
+ All tools are idempotent — running twice on the same page produces no extra changes.
+ 
+ Examples:
+@@ -66,10 +52,6 @@ Examples:
+   crux w enrich entity-links --all --limit=10       Preview for top 10 pages
+   crux w enrich entity-links --all --apply          Apply EntityLinks across wiki
+ 
+-  crux w enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
+-  crux w enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
+-  crux w enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
+-
+ Note: References are now auto-generated at build time (build-data.mjs → pageResources).
+ The 'crux w enrich references' command has been removed.
+ `;
+diff --git a/crux/commands/factbase-migrate-entities.test.ts b/crux/commands/factbase-migrate-entities.test.ts
+deleted file mode 100644
+index 39e723d03..000000000
+--- a/crux/commands/factbase-migrate-entities.test.ts
++++ /dev/null
+@@ -1,366 +0,0 @@
+-/**
+- * Tests for FactBase entity migration and loader entity injection.
+- *
+- * Tests cover:
+- * 1. Loader: `entity:` format parsing
+- * 2. Loader: entity injection via options.entities
+- * 3. Migration script: transformFile logic
+- */
+-
+-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs';
+-import { join } from 'node:path';
+-import { tmpdir } from 'node:os';
+-import { loadKB } from '../../packages/factbase/src/loader.ts';
+-import type { Entity } from '../../packages/factbase/src/types.ts';
+-
+-// ── Loader: entity: format parsing ──────────────────────────────────────
+-
+-describe('loadKB with entity: format', () => {
+-  let tmpDir: string;
+-
+-  beforeEach(() => {
+-    tmpDir = mkdtempSync(join(tmpdir(), 'factbase-loader-entity-test-'));
+-    mkdirSync(join(tmpDir, 'fb-entities'), { recursive: true });
+-    mkdirSync(join(tmpDir, 'schemas'), { recursive: true });
+-  });
+-
+-  afterEach(() => {
+-    rmSync(tmpDir, { recursive: true, force: true });
+-  });
+-
+-  it('loads entity: format file with injected entities', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'test-org.yaml'),
+-      `entity: aB3cD4eF5g
+-facts:
+-  - id: f_test001
+-    property: headcount
+-    value: 100
+-`,
+-    );
+-
+-    // Create a properties file so headcount property exists
+-    writeFileSync(
+-      join(tmpDir, 'properties.yaml'),
+-      `properties:
+-  headcount:
+-    name: Headcount
+-    dataType: number
+-    category: people
+-`,
+-    );
+-
+-    const injectedEntities = new Map<string, Entity>([
+-      [
+-        'aB3cD4eF5g',
+-        {
+-          id: 'aB3cD4eF5g',
+-          stableId: 'aB3cD4eF5g',
+-          type: 'organization',
+-          name: 'Test Organization',
+-        },
+-      ],
+-    ]);
+-
+-    const { graph, filenameMap } = await loadKB(tmpDir, { entities: injectedEntities });
+-
+-    // Entity should be the injected one
+-    const entity = graph.getEntity('aB3cD4eF5g');
+-    expect(entity).toBeDefined();
+-    expect(entity!.name).toBe('Test Organization');
+-    expect(entity!.type).toBe('organization');
+-
+-    // Filename map should use the YAML filename
+-    expect(filenameMap.get('aB3cD4eF5g')).toBe('test-org');
+-
+-    // Facts should be loaded
+-    const facts = graph.getFacts('aB3cD4eF5g');
+-    expect(facts).toHaveLength(1);
+-    expect(facts[0].propertyId).toBe('headcount');
+-    expect(facts[0].value).toEqual({ type: 'number', value: 100 });
+-  });
+-
+-  it('creates minimal stub when entity: stableId not in injected map', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'orphan-entity.yaml'),
+-      `entity: xY9zW8vU7t
+-facts:
+-  - id: f_orphan01
+-    property: description
+-    value: "An orphaned entity"
+-`,
+-    );
+-
+-    writeFileSync(
+-      join(tmpDir, 'properties.yaml'),
+-      `properties:
+-  description:
+-    name: Description
+-    dataType: text
+-`,
+-    );
+-
+-    // No injected entities
+-    const { graph, filenameMap } = await loadKB(tmpDir);
+-
+-    const entity = graph.getEntity('xY9zW8vU7t');
+-    expect(entity).toBeDefined();
+-    expect(entity!.name).toBe('orphan-entity'); // fallback to filename
+-    expect(entity!.type).toBe('unknown');
+-
+-    expect(filenameMap.get('xY9zW8vU7t')).toBe('orphan-entity');
+-
+-    const facts = graph.getFacts('xY9zW8vU7t');
+-    expect(facts).toHaveLength(1);
+-  });
+-
+-  it('entity: format works alongside thing: format in same directory', async () => {
+-    // Old-format file
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'old-org.yaml'),
+-      `thing:
+-  id: old-org
+-  stableId: oLdOrG1234
+-  type: organization
+-  name: Old Organization
+-`,
+-    );
+-
+-    // New-format file
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'new-org.yaml'),
+-      `entity: nEwOrG5678
+-facts:
+-  - id: f_new001
+-    property: description
+-    value: "A new org"
+-`,
+-    );
+-
+-    writeFileSync(
+-      join(tmpDir, 'properties.yaml'),
+-      `properties:
+-  description:
+-    name: Description
+-    dataType: text
+-`,
+-    );
+-
+-    const injectedEntities = new Map<string, Entity>([
+-      [
+-        'nEwOrG5678',
+-        {
+-          id: 'nEwOrG5678',
+-          stableId: 'nEwOrG5678',
+-          type: 'organization',
+-          name: 'New Organization',
+-        },
+-      ],
+-    ]);
+-
+-    const { graph, filenameMap } = await loadKB(tmpDir, { entities: injectedEntities });
+-
+-    // Both entities should be present
+-    expect(graph.getEntity('oLdOrG1234')).toBeDefined();
+-    expect(graph.getEntity('oLdOrG1234')!.name).toBe('Old Organization');
+-
+-    expect(graph.getEntity('nEwOrG5678')).toBeDefined();
+-    expect(graph.getEntity('nEwOrG5678')!.name).toBe('New Organization');
+-
+-    expect(filenameMap.get('oLdOrG1234')).toBe('old-org');
+-    expect(filenameMap.get('nEwOrG5678')).toBe('new-org');
+-  });
+-
+-  it('injected entities override thing: block entities', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'test-entity.yaml'),
+-      `thing:
+-  id: test-entity
+-  stableId: tEsT123456
+-  type: organization
+-  name: YAML Name
+-`,
+-    );
+-
+-    const injectedEntities = new Map<string, Entity>([
+-      [
+-        'tEsT123456',
+-        {
+-          id: 'tEsT123456',
+-          stableId: 'tEsT123456',
+-          type: 'organization',
+-          name: 'TableBase Name',
+-          wikiPageId: 'E999',
+-        },
+-      ],
+-    ]);
+-
+-    const { graph } = await loadKB(tmpDir, { entities: injectedEntities });
+-
+-    const entity = graph.getEntity('tEsT123456');
+-    expect(entity).toBeDefined();
+-    // TableBase entity should take precedence
+-    expect(entity!.name).toBe('TableBase Name');
+-    expect(entity!.wikiPageId).toBe('E999');
+-  });
+-
+-  it('entity: format with _sources resolves !src tags', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'src-test.yaml'),
+-      `entity: sRcTeSt123
+-facts:
+-  - id: f_src001
+-    property: revenue
+-    value: 1000000
+-    source: !src my-source
+-_sources:
+-  my-source: https://example.com/article
+-`,
+-    );
+-
+-    writeFileSync(
+-      join(tmpDir, 'properties.yaml'),
+-      `properties:
+-  revenue:
+-    name: Revenue
+-    dataType: number
+-    unit: USD
+-`,
+-    );
+-
+-    const injectedEntities = new Map<string, Entity>([
+-      [
+-        'sRcTeSt123',
+-        {
+-          id: 'sRcTeSt123',
+-          stableId: 'sRcTeSt123',
+-          type: 'organization',
+-          name: 'Source Test Org',
+-        },
+-      ],
+-    ]);
+-
+-    const { graph } = await loadKB(tmpDir, { entities: injectedEntities });
+-
+-    const facts = graph.getFacts('sRcTeSt123');
+-    expect(facts).toHaveLength(1);
+-    expect(facts[0].source).toBe('https://example.com/article');
+-  });
+-
+-  it('handles empty entity: format file (no facts)', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'empty-entity.yaml'),
+-      `entity: eMpTy12345
+-`,
+-    );
+-
+-    const injectedEntities = new Map<string, Entity>([
+-      [
+-        'eMpTy12345',
+-        {
+-          id: 'eMpTy12345',
+-          stableId: 'eMpTy12345',
+-          type: 'concept',
+-          name: 'Empty Entity',
+-        },
+-      ],
+-    ]);
+-
+-    const { graph, filenameMap } = await loadKB(tmpDir, { entities: injectedEntities });
+-
+-    const entity = graph.getEntity('eMpTy12345');
+-    expect(entity).toBeDefined();
+-    expect(entity!.name).toBe('Empty Entity');
+-    expect(filenameMap.get('eMpTy12345')).toBe('empty-entity');
+-
+-    const facts = graph.getFacts('eMpTy12345');
+-    expect(facts).toHaveLength(0);
+-  });
+-
+-  it('rejects entity: files with records: block', async () => {
+-    writeFileSync(
+-      join(tmpDir, 'fb-entities', 'bad-entity.yaml'),
+-      `entity: bAdEnT1234
+-records:
+-  - type: funding-round
+-    value: 1000000
+-facts:
+-  - id: f_bad001
+-    property: description
+-    value: "Should not work"
+-`,
+-    );
+-
+-    await expect(loadKB(tmpDir)).rejects.toThrow('records:');
+-  });
+-});
+-
+-// ── Migration: transformFile logic ──────────────────────────────────────
+-
+-// Import the transformFile function indirectly via the commands
+-// (since it's not exported directly, we test via the full run command with a temp dir)
+-
+-describe('factbase-migrate-entities transformation', () => {
+-  // Test the transformation logic by checking actual YAML content transformation.
+-  // We can't import transformFile directly, so we test the equivalent regex behavior.
+-
+-  function extractStableIdFromThing(content: string): string | null {
+-    const thingMatch = content.match(/^thing:\n((?:[ \t]+.*\n?)*)/m);
+-    if (!thingMatch) return null;
+-    const thingBody = thingMatch[1];
+-
+-    // Try stableId field (old format)
+-    const stableIdMatch = thingBody.match(/^\s+stableId:\s*(\S+)/m);
+-    if (stableIdMatch) return stableIdMatch[1];
+-
+-    // New format: slug field present
+-    const slugMatch = thingBody.match(/^\s+slug:\s*\S+/m);
+-    if (slugMatch) {
+-      const idMatch = thingBody.match(/^\s+id:\s*(\S+)/m);
+-      if (idMatch) return idMatch[1];
+-    }
+-
+-    return null;
+-  }
+-
+-  it('extracts stableId from old-format thing: block', () => {
+-    const content = `thing:
+-  id: anthropic
+-  stableId: mK9pX3rQ7n
+-  type: organization
+-  name: Anthropic
+-  wikiId: "E22"
+-facts:
+-  - id: f_test
+-    property: revenue
+-    value: 1e9
+-`;
+-    expect(extractStableIdFromThing(content)).toBe('mK9pX3rQ7n');
+-  });
+-
+-  it('extracts stableId from new-format thing: block (id=stableId, slug=filename)', () => {
+-    const content = `thing:
+-  id: mK9pX3rQ7n
+-  slug: anthropic
+-  type: organization
+-  name: Anthropic
+-  wikiPageId: "E22"
+-facts:
+-  - id: f_test
+-    property: revenue
+-    value: 1e9
+-`;
+-    expect(extractStableIdFromThing(content)).toBe('mK9pX3rQ7n');
+-  });
+-
+-  it('returns null for entity: format (no thing: block)', () => {
+-    const content = `entity: mK9pX3rQ7n
+-facts:
+-  - id: f_test
+-    property: revenue
+-    value: 1e9
+-`;
+-    expect(extractStableIdFromThing(content)).toBeNull();
+-  });
+-});
+diff --git a/crux/commands/factbase-migrate-entities.ts b/crux/commands/factbase-migrate-entities.ts
+deleted file mode 100644
+index 7053d7c2e..000000000
+--- a/crux/commands/factbase-migrate-entities.ts
++++ /dev/null
+@@ -1,237 +0,0 @@
+-/**
+- * FactBase Entity Migration — Transform YAML files from `thing:` blocks to `entity:` references
+- *
+- * Transforms FactBase YAML files from the full `thing:` block format to the minimal
+- * `entity: <stableId>` format, as part of Entity Unification Phase 4.
+- *
+- * Before:
+- *   thing:
+- *     id: anthropic
+- *     stableId: mK9pX3rQ7n
+- *     type: organization
+- *     name: Anthropic
+- *     wikiId: "E22"
+- *     aliases: [Anthropic PBC]
+- *   facts:
+- *     - ...
+- *
+- * After:
+- *   entity: mK9pX3rQ7n
+- *   facts:
+- *     - ...
+- *
+- * Usage:
+- *   crux fb factbase-migrate-entities run [--dry-run]    Transform all YAML files
+- *   crux fb factbase-migrate-entities status              Show migration status
+- */
+-
+-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+-import { join, extname } from 'node:path';
+-import { PROJECT_ROOT } from '../lib/content-types.ts';
+-import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+-
+-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
+-
+-interface MigrateOptions extends BaseOptions {
+-  dryRun?: boolean;
+-  'dry-run'?: boolean;
+-}
+-
+-/**
+- * Extract the stableId from a thing: block in YAML text.
+- * Handles both old format (stableId field) and new format (id is the stableId).
+- */
+-function extractStableId(thingBlock: string): string | null {
+-  // Try stableId field first (old format)
+-  const stableIdMatch = thingBlock.match(/^\s+stableId:\s*(\S+)/m);
+-  if (stableIdMatch) {
+-    return stableIdMatch[1];
+-  }
+-
+-  // New format: id is the stableId (10-char alphanum), and slug field exists
+-  const slugMatch = thingBlock.match(/^\s+slug:\s*\S+/m);
+-  if (slugMatch) {
+-    const idMatch = thingBlock.match(/^\s+id:\s*(\S+)/m);
+-    if (idMatch) {
+-      return idMatch[1];
+-    }
+-  }
+-
+-  return null;
+-}
+-
+-/**
+- * Transform a single YAML file from thing: block to entity: reference.
+- * Uses text-based replacement to preserve comments and formatting.
+- *
+- * Returns { transformed: true, stableId } on success,
+- *         { transformed: false, reason } on skip.
+- */
+-function transformFile(
+-  content: string,
+-): { transformed: true; stableId: string; result: string } | { transformed: false; reason: string } {
+-  // Already in new format?
+-  if (content.match(/^entity:\s*\S+/m) && !content.match(/^thing:/m)) {
+-    return { transformed: false, reason: 'already migrated' };
+-  }
+-
+-  // Ambiguous: has both thing: and entity: — refuse to migrate
+-  if (content.match(/^entity:\s*\S+/m) && content.match(/^thing:/m)) {
+-    return { transformed: false, reason: 'file has both thing: and entity: blocks — resolve manually' };
+-  }
+-
+-  // Find the thing: block. It starts with "thing:" at the beginning of a line
+-  // and ends at the next top-level key (facts:, _sources:, or end of file).
+-  // The regex also matches blank lines (whitespace-only) within the indented block
+-  // to avoid truncating thing: blocks that contain blank lines in their headers.
+-  const thingMatch = content.match(/^thing:\n((?:(?:[ \t]+.*|[ \t]*)\n)*)/m);
+-  if (!thingMatch) {
+-    return { transformed: false, reason: 'no thing: block found' };
+-  }
+-
+-  const fullThingBlock = thingMatch[0]; // "thing:\n  id: ...\n  stableId: ...\n..."
+-  const thingBody = thingMatch[1]; // The indented content after "thing:"
+-
+-  const stableId = extractStableId(thingBody);
+-  if (!stableId) {
+-    return { transformed: false, reason: 'could not extract stableId from thing: block' };
+-  }
+-
+-  // Replace the thing: block with entity: <stableId>
+-  // The thing: block may or may not have a trailing blank line before the next section
+-  const result = content.replace(fullThingBlock, `entity: ${stableId}\n`);
+-
+-  return { transformed: true, stableId, result };
+-}
+-
+-// ── run command ────────────────────────────────────────────────────────
+-
+-async function runCommand(
+-  args: string[],
+-  options: MigrateOptions,
+-): Promise<CommandResult> {
+-  const dryRun = options.dryRun || options['dry-run'] || false;
+-  const entries = readdirSync(KB_THINGS_DIR);
+-  const yamlFiles = entries.filter(
+-    (e) => extname(e) === '.yaml' || extname(e) === '.yml',
+-  );
+-
+-  const lines: string[] = [];
+-  let transformed = 0;
+-  let skipped = 0;
+-  let errors = 0;
+-
+-  lines.push(`\x1b[1mFactBase Entity Migration${dryRun ? ' (DRY RUN)' : ''}\x1b[0m`);
+-  lines.push(`Scanning ${yamlFiles.length} YAML files in packages/factbase/data/fb-entities/\n`);
+-
+-  for (const filename of yamlFiles.sort()) {
+-    const filePath = join(KB_THINGS_DIR, filename);
+-    try {
+-      const content = readFileSync(filePath, 'utf-8');
+-
+-      const result = transformFile(content);
+-
+-      if (!result.transformed) {
+-        if (result.reason !== 'already migrated') {
+-          lines.push(`  \x1b[33mSKIP\x1b[0m ${filename}: ${result.reason}`);
+-        }
+-        skipped++;
+-        continue;
+-      }
+-
+-      transformed++;
+-      lines.push(`  \x1b[32m OK \x1b[0m ${filename} -> entity: ${result.stableId}`);
+-
+-      if (!dryRun) {
+-        writeFileSync(filePath, result.result, 'utf-8');
+-      }
+-    } catch (err) {
+-      errors++;
+-      const msg = err instanceof Error ? err.message : String(err);
+-      lines.push(`  \x1b[31mERROR\x1b[0m ${filename}: ${msg}`);
+-    }
+-  }
+-
+-  lines.push('');
+-  lines.push(`\x1b[1mResults:\x1b[0m`);
+-  lines.push(`  Transformed: ${transformed}`);
+-  lines.push(`  Skipped: ${skipped}`);
+-  if (errors > 0) {
+-    lines.push(`  \x1b[31mErrors: ${errors}\x1b[0m`);
+-  }
+-  if (dryRun) {
+-    lines.push(`\n  \x1b[33mDry run — no files were modified. Run without --dry-run to apply.\x1b[0m`);
+-  }
+-
+-  return { exitCode: errors > 0 ? 1 : 0, output: lines.join('\n') };
+-}
+-
+-// ── status command ────────────────────────────────────────────────────
+-
+-async function statusCommand(
+-  _args: string[],
+-  _options: MigrateOptions,
+-): Promise<CommandResult> {
+-  const entries = readdirSync(KB_THINGS_DIR);
+-  const yamlFiles = entries.filter(
+-    (e) => extname(e) === '.yaml' || extname(e) === '.yml',
+-  );
+-
+-  let oldFormat = 0;
+-  let newFormat = 0;
+-  let unknown = 0;
+-
+-  for (const filename of yamlFiles) {
+-    const filePath = join(KB_THINGS_DIR, filename);
+-    const content = readFileSync(filePath, 'utf-8');
+-
+-    if (content.match(/^entity:\s*\S+/m) && !content.match(/^thing:/m)) {
+-      newFormat++;
+-    } else if (content.match(/^thing:/m)) {
+-      oldFormat++;
+-    } else {
+-      unknown++;
+-    }
+-  }
+-
+-  const lines: string[] = [];
+-  lines.push(`\x1b[1mFactBase Entity Migration Status\x1b[0m`);
+-  lines.push(`Total files: ${yamlFiles.length}`);
+-  lines.push(`  Old format (thing:): ${oldFormat}`);
+-  lines.push(`  New format (entity:): ${newFormat}`);
+-  if (unknown > 0) {
+-    lines.push(`  \x1b[33mUnknown format: ${unknown}\x1b[0m`);
+-  }
+-
+-  const pct = yamlFiles.length > 0
+-    ? Math.round((newFormat / yamlFiles.length) * 100)
+-    : 0;
+-  lines.push(`\nMigration progress: ${pct}%`);
+-
+-  return { exitCode: 0, output: lines.join('\n') };
+-}
+-
+-// ── Exports ─────────────────────────────────────────────────────────
+-
+-export const commands = {
+-  run: runCommand,
+-  status: statusCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-FactBase Entity Migration — Transform YAML files from thing: blocks to entity: references
+-
+-Commands:
+-  run [--dry-run]     Transform all YAML files from thing: to entity: format
+-  status              Show migration status (how many files in each format)
+-
+-Options:
+-  --dry-run           Preview changes without modifying files
+-
+-Examples:
+-  crux fb factbase-migrate-entities run --dry-run    Preview migration
+-  crux fb factbase-migrate-entities run              Apply migration
+-  crux fb factbase-migrate-entities status           Check progress
+-`;
+-}
+diff --git a/crux/commands/factbase-migrate-records.test.ts b/crux/commands/factbase-migrate-records.test.ts
+deleted file mode 100644
+index 2797bf1e2..000000000
+--- a/crux/commands/factbase-migrate-records.test.ts
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/**
+- * Tests for KB records migration — DEPRECATED.
+- *
+- * The YAML → PG record migration is complete. Record-handling code has been
+- * removed from the FactBase package. These tests are no longer applicable.
+- */
+-
+-import { describe, it, expect } from 'vitest';
+-import { run } from './factbase-migrate-records.ts';
+-
+-describe("factbase-migrate-records (deprecated)", () => {
+-  it("returns deprecation message", async () => {
+-    const result = await run([], {});
+-    expect(result.exitCode).toBe(0);
+-    expect(result.output).toContain("DEPRECATED");
+-  });
+-});
+diff --git a/crux/commands/factbase-migrate-records.ts b/crux/commands/factbase-migrate-records.ts
+deleted file mode 100644
+index b3b9ee124..000000000
+--- a/crux/commands/factbase-migrate-records.ts
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/**
+- * KB Records Migration — YAML → PG (DEPRECATED)
+- *
+- * This command was used to migrate record data from YAML files to PostgreSQL.
+- * The migration is complete — records are now served exclusively from PG.
+- * Record-handling code has been removed from the KB/FactBase package.
+- *
+- * This file is kept as a stub to avoid breaking the command registry.
+- */
+-
+-import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+-
+-interface MigrateOptions extends BaseOptions {
+-  dryRun?: boolean;
+-  'dry-run'?: boolean;
+-}
+-
+-export async function run(
+-  _args: string[],
+-  _options: MigrateOptions,
+-): Promise<CommandResult> {
+-  return {
+-    exitCode: 0,
+-    output: [
+-      'KB Records Migration — DEPRECATED',
+-      '',
+-      'The YAML → PG record migration is complete. All record data (grants,',
+-      'funding rounds, investments, equity positions, personnel, divisions,',
+-      'funding programs) is now served exclusively from PostgreSQL.',
+-      '',
+-      'Record-handling code has been removed from the FactBase package.',
+-      'This command is no longer functional.',
+-    ].join('\n'),
+-  };
+-}
+diff --git a/crux/commands/factbase-migrate.ts b/crux/commands/factbase-migrate.ts
+deleted file mode 100644
+index 5a67e4340..000000000
+--- a/crux/commands/factbase-migrate.ts
++++ /dev/null
+@@ -1,431 +0,0 @@
+-import { join, dirname } from 'path';
+-import { readFileSync, writeFileSync, existsSync, readdirSync, renameSync } from 'fs';
+-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+-import { PROJECT_ROOT } from '../lib/content-types.ts';
+-import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+-import { generateStableId, generateFactId } from '../../packages/factbase/src/ids.ts';
+-
+-// ── Paths ─────────────────────────────────────────────────────────────
+-
+-const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
+-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
+-
+-// ── Types ─────────────────────────────────────────────────────────────
+-
+-interface OldEntity {
+-  id: string;
+-  wikiId?: string;
+-  type: string;
+-  title?: string;
+-  name?: string;
+-  website?: string;
+-  description?: string;
+-  aliases?: string[];
+-  customFields?: Array<{ label: string; value: string }>;
+-  relatedEntries?: Array<{ id: string; type: string; relationship?: string }>;
+-  sources?: Array<{ title: string; url: string; author?: string; date?: string }>;
+-  tags?: string[];
+-  lastUpdated?: string;
+-  orgType?: string;
+-  summaryPage?: string;
+-  severity?: string;
+-  likelihood?: Record<string, unknown>;
+-  timeframe?: Record<string, unknown>;
+-  maturity?: string;
+-  clusters?: string[];
+-  path?: string;
+-  [key: string]: unknown;
+-}
+-
+-interface KBCommandOptions extends BaseOptions {
+-  dryRun?: boolean;
+-  'dry-run'?: boolean;
+-  stubOld?: boolean;
+-  'stub-old'?: boolean;
+-  force?: boolean;
+-}
+-
+-// ── Entity type mapping ───────────────────────────────────────────────
+-
+-/**
+- * Maps old entity types to KB thing types.
+- * Types not listed here pass through unchanged (e.g., organization, person, concept).
+- * See apps/web/src/data/entity-type-names.ts for the full canonical type list.
+- */
+-const TYPE_MAP: Record<string, string> = {
+-  // Organization subtypes (old lab-* types and synonyms → organization)
+-  lab: 'organization',
+-  'lab-frontier': 'organization',
+-  'lab-research': 'organization',
+-  'lab-startup': 'organization',
+-  'lab-academic': 'organization',
+-  nonprofit: 'organization',
+-  government: 'organization',
+-  company: 'organization',
+-  // People subtypes → person
+-  researcher: 'person',
+-  policymaker: 'person',
+-  executive: 'person',
+-  // Renamed types
+-  crux: 'debate',
+-  model: 'analysis',
+-  // Plural aliases
+-  'safety-approaches': 'safety-agenda',
+-  policies: 'policy',
+-  concepts: 'concept',
+-  events: 'event',
+-  models: 'analysis',
+-};
+-
+-/**
+- * KB types that have schemas (things that can actually live in KB).
+- */
+-const VALID_KB_TYPES = new Set([
+-  'ai-model',
+-  'analysis',
+-  'approach',
+-  'argument',
+-  'capability',
+-  'case-study',
+-  'concept',
+-  'debate',
+-  'event',
+-  'funder',
+-  'historical',
+-  'incident',
+-  'organization',
+-  'person',
+-  'policy',
+-  'project',
+-  'risk',
+-  'risk-factor',
+-  'safety-agenda',
+-]);
+-
+-// ── Helpers ───────────────────────────────────────────────────────────
+-
+-/** Validate E-prefix wikiId format (e.g., "E22") */
+-function isValidWikiId(wikiId: string): boolean {
+-  return /^E\d+$/.test(wikiId);
+-}
+-
+-/** Get today's date as YYYY-MM (matches KB convention) */
+-function today(): string {
+-  return new Date().toISOString().slice(0, 7);
+-}
+-
+-/**
+- * Find an entity by slug across all entity YAML files.
+- * Returns the entity and the source file path.
+- */
+-function findEntity(slug: string): { entity: OldEntity; filePath: string; allEntities: OldEntity[] } | null {
+-  const files = readdirSync(ENTITIES_DIR).filter((f) => f.endsWith('.yaml'));
+-
+-  for (const file of files) {
+-    const filePath = join(ENTITIES_DIR, file);
+-    const content = readFileSync(filePath, 'utf-8');
+-    const entities = parseYaml(content) as OldEntity[];
+-    if (!Array.isArray(entities)) continue;
+-
+-    const entity = entities.find((e) => e.id === slug);
+-    if (entity) {
+-      return { entity, filePath, allEntities: entities };
+-    }
+-  }
+-
+-  return null;
+-}
+-
+-/**
+- * Build the KB thing YAML structure from an old entity.
+- */
+-function buildKBThing(entity: OldEntity): { yaml: string; warnings: string[] } {
+-  const warnings: string[] = [];
+-  const todayDate = today();
+-
+-  // Map entity type
+-  const kbType = TYPE_MAP[entity.type] ?? entity.type;
+-  if (!VALID_KB_TYPES.has(kbType)) {
+-    warnings.push(`Type "${entity.type}" maps to "${kbType}" which is not a known KB type. The file will be created but may fail KB validation.`);
+-  }
+-
+-  // Build thing section
+-  const thing: Record<string, unknown> = {
+-    id: entity.id,
+-    stableId: generateStableId(),
+-    type: kbType,
+-    name: entity.title || entity.name || entity.id,
+-  };
+-  if (entity.wikiId && isValidWikiId(entity.wikiId)) {
+-    thing.wikiId = entity.wikiId; // Keep E-prefix format (e.g., "E22")
+-  } else if (entity.wikiId) {
+-    warnings.push(`wikiId "${entity.wikiId}" doesn't match E-prefix format. Skipped.`);
+-  }
+-  if (entity.aliases && entity.aliases.length > 0) {
+-    thing.aliases = entity.aliases;
+-  }
+-
+-  // Build facts array
+-  const facts: Array<Record<string, unknown>> = [];
+-
+-  // description -> facts.description
+-  if (entity.description) {
+-    // Clean up multi-paragraph descriptions (collapse double newlines)
+-    const cleanDesc = entity.description.replace(/\n\n+/g, '\n\n').trim();
+-    facts.push({
+-      id: generateFactId(),
+-      property: 'description',
+-      value: cleanDesc,
+-      asOf: todayDate,
+-      notes: 'Migrated from old entity system',
+-    });
+-  }
+-
+-  // website -> facts.website
+-  if (entity.website) {
+-    facts.push({
+-      id: generateFactId(),
+-      property: 'website',
+-      value: entity.website,
+-    });
+-  }
+-
+-  // Log warnings for unmapped fields
+-  if (entity.customFields && entity.customFields.length > 0) {
+-    const labels = entity.customFields.map((f) => f.label).join(', ');
+-    warnings.push(`Skipped ${entity.customFields.length} customFields: ${labels}. These need manual migration.`);
+-  }
+-
+-  if (entity.relatedEntries && entity.relatedEntries.length > 0) {
+-    warnings.push(`Skipped ${entity.relatedEntries.length} relatedEntries. These remain in the old entity system.`);
+-  }
+-
+-  if (entity.sources && entity.sources.length > 0) {
+-    warnings.push(`Entity has ${entity.sources.length} source(s). These are not migrated to KB facts — consider adding them as source fields on individual facts.`);
+-  }
+-
+-  if (entity.tags && entity.tags.length > 0) {
+-    warnings.push(`Skipped ${entity.tags.length} tags: ${entity.tags.join(', ')}. KB does not have a tags system.`);
+-  }
+-
+-  // Type-specific fields that are skipped
+-  const skippedFields: string[] = [];
+-  if (entity.orgType) skippedFields.push('orgType');
+-  if (entity.summaryPage) skippedFields.push('summaryPage');
+-  if (entity.severity) skippedFields.push('severity');
+-  if (entity.likelihood) skippedFields.push('likelihood');
+-  if (entity.timeframe) skippedFields.push('timeframe');
+-  if (entity.maturity) skippedFields.push('maturity');
+-  if (entity.clusters) skippedFields.push('clusters');
+-  if (entity.path) skippedFields.push('path');
+-  if (skippedFields.length > 0) {
+-    warnings.push(`Skipped type-specific fields: ${skippedFields.join(', ')}. These may need manual migration.`);
+-  }
+-
+-  // Build the YAML document
+-  const doc: Record<string, unknown> = { thing };
+-  if (facts.length > 0) {
+-    doc.facts = facts;
+-  }
+-
+-  // Stringify with options matching existing KB file style.
+-  // Use PLAIN default so simple identifiers (slugs, dates, property names)
+-  // stay unquoted, matching hand-authored KB files.
+-  const yaml = stringifyYaml(doc, {
+-    lineWidth: 120,
+-    defaultKeyType: 'PLAIN',
+-    defaultStringType: 'PLAIN',
+-    singleQuote: false,
+-  });
+-
+-  return { yaml, warnings };
+-}
+-
+-/**
+- * Build a stubbed-out version of the old entity, keeping only essential fields.
+- */
+-function buildStubEntity(entity: OldEntity): OldEntity {
+-  const stub: OldEntity = {
+-    id: entity.id,
+-    ...(entity.wikiId && { wikiId: entity.wikiId }),
+-    type: entity.type,
+-    title: entity.title || entity.name,
+-  } as OldEntity;
+-
+-  // Keep relatedEntries since they're not migrated to KB
+-  if (entity.relatedEntries && entity.relatedEntries.length > 0) {
+-    stub.relatedEntries = entity.relatedEntries;
+-  }
+-
+-  return stub;
+-}
+-
+-// ── Main command ──────────────────────────────────────────────────────
+-
+-async function migrateCommand(
+-  args: string[],
+-  options: KBCommandOptions,
+-): Promise<CommandResult> {
+-  const slug = args.find((a) => !a.startsWith('--'));
+-  const dryRun = options.dryRun || options['dry-run'] || false;
+-  const stubOld = options.stubOld || options['stub-old'] || false;
+-  const force = options.force || false;
+-
+-  if (!slug) {
+-    return {
+-      exitCode: 1,
+-      output: `Usage: crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
+-
+-  Migrate an entity from data/entities/*.yaml to packages/factbase/data/fb-entities/*.yaml.
+-
+-Options:
+-  --dry-run    Print the generated YAML without writing any files
+-  --stub-old   After migration, strip the old entity to a minimal stub
+-  --force      Overwrite existing KB thing file if it already exists
+-
+-Examples:
+-  crux fb migrate deepmind --dry-run
+-  crux fb migrate ajeya-cotra --stub-old
+-  crux fb migrate authentication-collapse`,
+-    };
+-  }
+-
+-  // 1. Check if KB thing already exists
+-  const kbPath = join(KB_THINGS_DIR, `${slug}.yaml`);
+-  if (existsSync(kbPath) && !force) {
+-    return {
+-      exitCode: 1,
+-      output: `KB thing already exists at ${kbPath}\nUse 'crux fb show ${slug}' to inspect it, or pass --force to overwrite.`,
+-    };
+-  }
+-
+-  // 2. Find the entity in old system
+-  const result = findEntity(slug);
+-  if (!result) {
+-    return {
+-      exitCode: 1,
+-      output: `Entity "${slug}" not found in data/entities/*.yaml`,
+-    };
+-  }
+-
+-  const { entity, filePath, allEntities } = result;
+-
+-  // 3. Build KB YAML
+-  const { yaml, warnings } = buildKBThing(entity);
+-
+-  // 4. Output
+-  const lines: string[] = [];
+-
+-  if (dryRun) {
+-    lines.push('\x1b[1m=== DRY RUN — KB Thing YAML ===\x1b[0m');
+-    lines.push(`Source: ${filePath}`);
+-    lines.push(`Target: ${kbPath}`);
+-    lines.push('');
+-    lines.push(yaml);
+-  } else {
+-    // Write KB thing file
+-    writeFileSync(kbPath, yaml, 'utf-8');
+-    lines.push(`\x1b[32mCreated KB thing:\x1b[0m ${kbPath}`);
+-
+-    // Optionally stub the old entity
+-    if (stubOld) {
+-      const stubEntity = buildStubEntity(entity);
+-      const entityIndex = allEntities.findIndex((e) => e.id === slug);
+-      if (entityIndex >= 0) {
+-        allEntities[entityIndex] = stubEntity;
+-        const updatedYaml = stringifyYaml(allEntities, {
+-          lineWidth: 120,
+-        });
+-        // Add comment header and migration note
+-        const headerMatch = readFileSync(filePath, 'utf-8').match(/^#[^\n]*\n(?:#[^\n]*\n)*/);
+-        const header = headerMatch ? headerMatch[0] : '';
+-        // Write to temp file first, then atomic rename to avoid data loss on crash
+-        const tmpPath = join(dirname(filePath), `.${slug}.yaml.tmp`);
+-        writeFileSync(tmpPath, header + updatedYaml, 'utf-8');
+-        renameSync(tmpPath, filePath);
+-        lines.push(`\x1b[33mStubbed old entity in:\x1b[0m ${filePath}`);
+-        lines.push('  Kept: id, wikiId, type, title, relatedEntries');
+-        lines.push('  Removed: description, website, sources, tags, customFields, type-specific fields');
+-      }
+-    }
+-  }
+-
+-  // Show warnings
+-  if (warnings.length > 0) {
+-    lines.push('');
+-    lines.push('\x1b[33mWarnings:\x1b[0m');
+-    for (const w of warnings) {
+-      lines.push(`  - ${w}`);
+-    }
+-  }
+-
+-  // Summary
+-  lines.push('');
+-  lines.push(`Entity: ${entity.title || entity.name} (${entity.id})`);
+-  lines.push(`Type: ${entity.type} -> ${TYPE_MAP[entity.type] ?? entity.type}`);
+-  if (entity.wikiId) {
+-    lines.push(`WikiId: ${entity.wikiId}`);
+-  }
+-
+-  if (!dryRun) {
+-    lines.push('');
+-    lines.push('Next steps:');
+-    lines.push(`  1. Review and enrich: packages/factbase/data/fb-entities/${slug}.yaml`);
+-    lines.push('  2. Add facts (born-year, role, employed-by, etc.) with sources');
+-    lines.push('  3. Validate: pnpm crux fb validate');
+-    lines.push('  4. Check: pnpm crux fb show ' + slug);
+-  }
+-
+-  return { exitCode: 0, output: lines.join('\n') };
+-}
+-
+-// ── Exports ───────────────────────────────────────────────────────────
+-
+-export const commands = {
+-  default: migrateCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-KB Migrate — Migrate entities from old system to KB
+-
+-Usage:
+-  crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
+-
+-  Reads an entity from data/entities/*.yaml and creates a new KB thing file
+-  at packages/factbase/data/fb-entities/<slug>.yaml with the mapped structure.
+-
+-Options:
+-  --dry-run    Print the generated YAML without writing any files
+-  --stub-old   After migration, strip the old entity down to a minimal stub
+-               (keeps id, wikiId, type, title, relatedEntries)
+-  --force      Overwrite existing KB thing file if it already exists
+-
+-Type Mapping:
+-  lab, lab-*, nonprofit, government, company          -> organization
+-  researcher, policymaker, executive                 -> person
+-  crux                                               -> debate
+-  model, models                                      -> analysis
+-  safety-approaches                                  -> safety-agenda
+-  (all others pass through unchanged, including: safety-agenda,
+-   historical, risk-factor, case-study — these have their own KB schemas)
+-
+-What gets migrated:
+-  - id, wikiId, type, name/title, aliases
+-  - description -> facts[].property: description
+-  - website -> facts[].property: website
+-
+-What gets skipped (with warnings):
+-  - customFields (need manual migration)
+-  - relatedEntries (stay in old system)
+-  - sources (not auto-mapped to individual facts)
+-  - tags (KB has no tags system)
+-  - Type-specific fields (severity, likelihood, timeframe, etc.)
+-
+-Examples:
+-  crux fb migrate deepmind --dry-run        Preview migration
+-  crux fb migrate ajeya-cotra               Create KB thing file
+-  crux fb migrate ajeya-cotra --stub-old    Create KB thing + strip old entity
+-  crux fb migrate deepmind --force          Overwrite existing KB thing
+-`;
+-}
+diff --git a/crux/commands/factbase.ts b/crux/commands/factbase.ts
+index 7e3206e7f..4722f5c02 100644
+--- a/crux/commands/factbase.ts
++++ b/crux/commands/factbase.ts
+@@ -16,13 +16,11 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
+ import { validate } from '../../packages/factbase/src/validate.ts';
+ import type { Graph } from '../../packages/factbase/src/graph.ts';
+ import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
+-import { commands as kbMigrateCommands } from './factbase-migrate.ts';
+ import { sourcingCommand } from './factbase-sourcing.ts';
+ import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
+ import { commands as sourceDiscoverCommands } from './factbase-source-discover.ts';
+ import { commands as backfillSourcesCommands } from './factbase-backfill-sources.ts';
+ import { commands as resourceUnverifiablesCommands } from './factbase-resource-unverifiables.ts';
+-import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
+ import { commands as verdictsCommands } from './factbase-verdicts.ts';
+ import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
+ import { hashId, guessResourceType } from '../resource-utils.ts';
+@@ -1178,7 +1176,6 @@ export const commands = {
+   fact: factCommand,
+   stale: staleCommand,
+   'needs-update': needsUpdateCommand,
+-  migrate: kbMigrateCommands.default,
+   'sync-sources': syncSourcesCommand,
+   'sourcing': sourcingCommand,
+   'source-backfill': sourceBackfillCommands.default,
+@@ -1186,9 +1183,6 @@ export const commands = {
+   'backfill-sources': backfillSourcesCommands.default,
+   'resource-unverifiables': resourceUnverifiablesCommands.default,
+   'add-fact': addFactCommand,
+-  // Consolidated from factbase-migrate-entities domain
+-  'migrate-entities': migrateEntitiesCommands.run,
+-  'migrate-entities-status': migrateEntitiesCommands.status,
+   // QUA-930: FactBase-scoped wrapper around POST /api/sourcing/cleanup-orphans
+   'verdicts': verdictsCommands.default,
+ };
+@@ -1211,15 +1205,12 @@ Commands:
+   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
+   import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
+   import-990 --discover <query>         Search ProPublica by org name
+-  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
+   sync-sources          Sync KB fact source URLs to wiki-server as Resources
+   sourcing          Check KB facts against source URLs using LLM
+   source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
+   source-discover       Find canonical source URL(s) for one fact via LLM + web search (QUA-926)
+   backfill-sources      NULL→source backfill loop wrapping source-discover, with verify chain (QUA-933) [--apply] [--batch]
+   resource-unverifiables Replace weak sources for facts with verdict=unverifiable (QUA-934) [--apply] [--batch]
+-  migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
+-  migrate-entities-status       Show migration status (files in each format)
+   verdicts prune-orphans        Delete orphan fact verdicts (QUA-930) [--apply]
+ 
+ Options:
+diff --git a/crux/commands/migrate-citations.ts b/crux/commands/migrate-citations.ts
+deleted file mode 100644
+index 285a04f7f..000000000
+--- a/crux/commands/migrate-citations.ts
++++ /dev/null
+@@ -1,352 +0,0 @@
+-/**
+- * Migrate Citations to Source-Check
+- *
+- * One-time, additive migration that reads citation_quotes with accuracy verdicts
+- * and writes them into the unified source_check_verdicts + source_check_evidence tables.
+- *
+- * The citation_quotes table is NOT modified — this is purely additive.
+- *
+- * Usage:
+- *   crux tb migrate-citations                        Migrate all citations
+- *   crux tb migrate-citations --dry-run              Preview what would be migrated
+- *   crux tb migrate-citations --page=anthropic       Migrate just one page
+- *   crux tb migrate-citations --limit=50             Migrate at most 50 citations
+- */
+-
+-import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+-import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/index.ts';
+-import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
+-import {
+-  getAllQuotes,
+-  getQuotesByPage,
+-  getCitationBrokenQuotes,
+-  type AllQuotesResult,
+-  type QuotesByPageResult,
+-} from '../lib/wiki-server/citations.ts';
+-import { listPages, type PageListResult } from '../lib/wiki-server/pages.ts';
+-import { getVerdictByRecord } from '../lib/wiki-server/sourcing-client.ts';
+-
+-// ── Types ──────────────────────────────────────────────────────────────
+-
+-interface MigrateCitationsOptions extends BaseOptions {
+-  'dry-run'?: boolean;
+-  dryRun?: boolean;
+-  page?: string;
+-  limit?: string;
+-}
+-
+-/** Shape of a citation quote row returned by the wiki-server /quotes/all endpoint */
+-interface CitationQuoteRow {
+-  id: number;
+-  pageId: number;
+-  pageSlug: string | null;
+-  footnote: number;
+-  url: string | null;
+-  resourceId: string | null;
+-  claimText: string;
+-  claimContext: string | null;
+-  sourceQuote: string | null;
+-  sourceLocation: string | null;
+-  quoteVerified: boolean;
+-  verificationMethod: string | null;
+-  verificationScore: number | null;
+-  verifiedAt: string | null;
+-  sourceTitle: string | null;
+-  sourceType: string | null;
+-  extractionModel: string | null;
+-  claimId: number | null;
+-  accuracyVerdict: string | null;
+-  accuracyIssues: string | null;
+-  accuracyScore: number | null;
+-  accuracyCheckedAt: string | null;
+-  accuracySupportingQuotes: string | null;
+-  verificationDifficulty: string | null;
+-  createdAt: string;
+-  updatedAt: string;
+-}
+-
+-/** Shape of a page row from the wiki-server /quotes endpoint (per-page) */
+-interface QuotesByPageResponse {
+-  quotes: CitationQuoteRow[];
+-}
+-
+-/** Shape of the paginated /quotes/all response */
+-interface AllQuotesResponse {
+-  quotes: CitationQuoteRow[];
+-  total: number;
+-  limit: number;
+-  offset: number;
+-}
+-
+-// ── Verdict Mapping ──────────────────────────────────────────────────
+-
+-const VERDICT_MAP: Record<string, SourcingVerdict> = {
+-  accurate: 'confirmed',
+-  inaccurate: 'contradicted',
+-  unsupported: 'unverifiable',
+-  minor_issues: 'partial',
+-  not_verifiable: 'unverifiable',
+-};
+-
+-function mapVerdict(accuracyVerdict: string): SourcingVerdict | null {
+-  return VERDICT_MAP[accuracyVerdict] ?? null;
+-}
+-
+-/**
+- * Build a recordId for a citation in the unified sourcing system.
+- * Format: page:<pageSlug>:fn<footnote>
+- */
+-function buildRecordId(pageSlug: string, footnote: number): string {
+-  return `page:${pageSlug}:fn${footnote}`;
+-}
+-
+-// ── Fetch Helpers ────────────────────────────────────────────────────
+-
+-const PAGE_SIZE = 500;
+-
+-/**
+- * Fetch all citation quotes paginated. Returns the complete list.
+- */
+-async function fetchAllQuotes(): Promise<CitationQuoteRow[]> {
+-  const all: CitationQuoteRow[] = [];
+-  let offset = 0;
+-
+-  // First call to get total
+-  const firstResult = await getAllQuotes(PAGE_SIZE, 0);
+-  if (!firstResult.ok) {
+-    throw new Error(`Failed to fetch citations: ${firstResult.error} - ${firstResult.message}`);
+-  }
+-
+-  all.push(...(firstResult.data.quotes as unknown as CitationQuoteRow[]));
+-  const total = firstResult.data.total;
+-  offset = PAGE_SIZE;
+-
+-  while (offset < total) {
+-    const result = await getAllQuotes(PAGE_SIZE, offset);
+-    if (!result.ok) {
+-      throw new Error(`Failed to fetch citations at offset ${offset}: ${result.error} - ${result.message}`);
+-    }
+-    all.push(...(result.data.quotes as unknown as CitationQuoteRow[]));
+-    offset += PAGE_SIZE;
+-  }
+-
+-  return all;
+-}
+-
+-/**
+- * Fetch page slug mappings. Uses pages-with-quotes to build a reverse map.
+- * Then also fetches all wiki pages for a complete mapping.
+- */
+-async function fetchPageSlugs(): Promise<Map<number, string>> {
+-  // We need to map integer pageId -> slug. The pages-with-quotes endpoint
+-  // only has pages with quotes, so we'll use a different approach:
+-  // fetch wiki pages list to build the mapping.
+-  const result = await listPages({ limit: 5000 });
+-  if (!result.ok) {
+-    throw new Error(`Failed to fetch page list: ${result.error} - ${result.message}`);
+-  }
+-
+-  const map = new Map<number, string>();
+-  for (const page of result.data.pages) {
+-    // The pages endpoint returns `slug` as the `id` field
+-    map.set(page.id as unknown as number, page.id);
+-  }
+-  return map;
+-}
+-
+-/**
+- * Fetch quotes for a single page by slug.
+- */
+-async function fetchQuotesForPage(pageSlug: string): Promise<CitationQuoteRow[]> {
+-  const result = await getQuotesByPage(pageSlug, 500);
+-  if (!result.ok) {
+-    throw new Error(`Failed to fetch citations for page ${pageSlug}: ${result.error} - ${result.message}`);
+-  }
+-  return result.data.quotes as unknown as CitationQuoteRow[];
+-}
+-
+-/**
+- * Check if a sourcing verdict already exists for a given record.
+- */
+-async function hasExistingVerdict(recordId: string): Promise<boolean> {
+-  const result = await getVerdictByRecord('citation', recordId);
+-  // A 404 means no verdict exists
+-  if (!result.ok) return false;
+-  return result.data.verdicts.length > 0;
+-}
+-
+-// ── Main Command ─────────────────────────────────────────────────────
+-
+-const LOG_PREFIX = '[migrate-citations]';
+-
+-async function migrateCommand(
+-  args: string[],
+-  options: MigrateCitationsOptions,
+-): Promise<CommandResult> {
+-  const dryRun = options['dry-run'] || options.dryRun || false;
+-  const pageFilter = options.page;
+-  const limit = options.limit ? parseInt(options.limit, 10) : undefined;
+-
+-  if (limit !== undefined && (isNaN(limit) || limit < 1)) {
+-    return { exitCode: 1, output: '--limit must be a positive integer' };
+-  }
+-
+-  console.log(`${LOG_PREFIX} Starting citation migration${dryRun ? ' (DRY RUN)' : ''}...`);
+-
+-  let quotes: CitationQuoteRow[];
+-  let pageSlugMap: Map<number, string>;
+-
+-  if (pageFilter) {
+-    // Single page mode: fetch quotes for that page directly
+-    console.log(`${LOG_PREFIX} Fetching citations for page: ${pageFilter}`);
+-    quotes = await fetchQuotesForPage(pageFilter);
+-    // For single-page mode, we know the slug already
+-    pageSlugMap = new Map();
+-    for (const q of quotes) {
+-      pageSlugMap.set(q.pageId, pageFilter);
+-    }
+-  } else {
+-    // Full mode: fetch all quotes and page mappings
+-    console.log(`${LOG_PREFIX} Fetching all citation quotes...`);
+-    quotes = await fetchAllQuotes();
+-    console.log(`${LOG_PREFIX} Fetched ${quotes.length} citation quotes total`);
+-
+-    console.log(`${LOG_PREFIX} Fetching page slug mappings...`);
+-    pageSlugMap = await fetchPageSlugs();
+-    console.log(`${LOG_PREFIX} Loaded ${pageSlugMap.size} page slug mappings`);
+-  }
+-
+-  // Filter to only quotes with an accuracy verdict
+-  const withVerdicts = quotes.filter((q) => q.accuracyVerdict != null);
+-  console.log(`${LOG_PREFIX} ${withVerdicts.length} citations have accuracy verdicts`);
+-
+-  // Apply limit
+-  const toProcess = limit ? withVerdicts.slice(0, limit) : withVerdicts;
+-  if (limit && withVerdicts.length > limit) {
+-    console.log(`${LOG_PREFIX} Limiting to ${limit} citations`);
+-  }
+-
+-  let migrated = 0;
+-  let skipped = 0;
+-  let errors = 0;
+-  let unknownPage = 0;
+-
+-  for (const quote of toProcess) {
+-    const pageSlug = pageSlugMap.get(quote.pageId);
+-    if (!pageSlug) {
+-      unknownPage++;
+-      if (unknownPage <= 5) {
+-        console.warn(`${LOG_PREFIX} No slug found for pageId=${quote.pageId}, skipping footnote ${quote.footnote}`);
+-      }
+-      continue;
+-    }
+-
+-    const recordId = buildRecordId(pageSlug, quote.footnote);
+-    const mappedVerdict = mapVerdict(quote.accuracyVerdict!);
+-
+-    if (!mappedVerdict) {
+-      console.warn(`${LOG_PREFIX} Unknown accuracy verdict "${quote.accuracyVerdict}" for ${recordId}, skipping`);
+-      errors++;
+-      continue;
+-    }
+-
+-    if (dryRun) {
+-      console.log(`  [dry-run] Would migrate ${recordId}: ${quote.accuracyVerdict} -> ${mappedVerdict} (confidence: ${quote.accuracyScore ?? 'N/A'})`);
+-      migrated++;
+-      continue;
+-    }
+-
+-    // Check if already migrated (idempotent)
+-    try {
+-      const exists = await hasExistingVerdict(recordId);
+-      if (exists) {
+-        skipped++;
+-        continue;
+-      }
+-    } catch (err) {
+-      // If check fails, proceed with migration attempt anyway
+-      console.warn(`${LOG_PREFIX} Could not check existing verdict for ${recordId}: ${err instanceof Error ? err.message : String(err)}`);
+-    }
+-
+-    try {
+-      // Store evidence
+-      await storeSourcingEvidence({
+-        recordType: 'citation',
+-        recordId,
+-        sourceUrl: quote.url || '',
+-        verdict: mappedVerdict,
+-        confidence: quote.accuracyScore ?? 0.5,
+-        extractedValue: quote.claimText.slice(0, 2000),
+-        reasoning: quote.accuracyIssues || `Migrated from citation_quotes accuracy check. Original verdict: ${quote.accuracyVerdict}`,
+-      }, LOG_PREFIX);
+-
+-      // Store aggregate verdict
+-      await storeAggregateVerdict({
+-        recordType: 'citation',
+-        recordId,
+-        verdict: mappedVerdict,
+-        confidence: quote.accuracyScore ?? 0.5,
+-        reasoning: quote.accuracyIssues || `Migrated from citation_quotes. Original verdict: ${quote.accuracyVerdict}`,
+-        sourcesChecked: 1,
+-      }, LOG_PREFIX);
+-
+-      migrated++;
+-    } catch (err) {
+-      errors++;
+-      console.error(`${LOG_PREFIX} Failed to migrate ${recordId}: ${err instanceof Error ? err.message : String(err)}`);
+-    }
+-  }
+-
+-  if (unknownPage > 5) {
+-    console.warn(`${LOG_PREFIX} ${unknownPage} total citations had unresolvable page IDs`);
+-  }
+-
+-  const summary = [
+-    `${LOG_PREFIX} Migration complete${dryRun ? ' (DRY RUN)' : ''}:`,
+-    `  Migrated: ${migrated}`,
+-    `  Skipped (already exists): ${skipped}`,
+-    `  Errors: ${errors}`,
+-    `  Unknown pages: ${unknownPage}`,
+-    `  Total with verdicts: ${withVerdicts.length}`,
+-  ].join('\n');
+-
+-  console.log(summary);
+-
+-  return {
+-    exitCode: errors > 0 ? 1 : 0,
+-    output: `Migrated ${migrated} citations${dryRun ? ' (dry run)' : ''}, ${skipped} skipped, ${errors} errors`,
+-  };
+-}
+-
+-// ── Exports ──────────────────────────────────────────────────────────
+-
+-export const commands = {
+-  default: migrateCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Migrate Citations — copy citation accuracy verdicts into the unified sourcing system
+-
+-Usage:
+-  crux tb migrate-citations                     Migrate all citation accuracy verdicts
+-  crux tb migrate-citations --dry-run           Preview what would be migrated
+-  crux tb migrate-citations --page=<slug>       Migrate just one page's citations
+-  crux tb migrate-citations --limit=50          Migrate at most 50 citations
+-
+-Options:
+-  --dry-run          Show what would be migrated without writing anything
+-  --page=<slug>      Limit to a single page (by slug)
+-  --limit=N          Maximum number of citations to migrate
+-
+-This is a one-time additive migration. The citation_quotes table is NOT modified.
+-Safe to run multiple times — existing sourcing verdicts are skipped.
+-
+-Verdict mapping:
+-  accurate       -> confirmed
+-  inaccurate     -> contradicted
+-  unsupported    -> unverifiable
+-  minor_issues   -> partial
+-  not_verifiable -> unverifiable
+-`.trim();
+-}
+diff --git a/crux/commands/strip-scores.ts b/crux/commands/strip-scores.ts
+deleted file mode 100644
+index dc0a17c9c..000000000
+--- a/crux/commands/strip-scores.ts
++++ /dev/null
+@@ -1,177 +0,0 @@
+-/**
+- * Strip scoring fields from MDX frontmatter.
+- *
+- * Migration tool for the scoring redesign (epic #2428). Removes scoring
+- * fields that have been migrated to PG assessments.
+- *
+- * Usage:
+- *   pnpm crux w content strip-scores --fields=quality,ratings --dry-run
+- *   pnpm crux w content strip-scores --fields=quality,ratings --apply
+- *   pnpm crux w content strip-scores --fields=readerImportance,researchImportance,tacticalValue --apply
+- *   pnpm crux w content strip-scores --fields=tractability,neglectedness --apply
+- */
+-
+-import { readFileSync, writeFileSync } from 'fs';
+-import { join, relative } from 'path';
+-import { parse as parseYaml } from 'yaml';
+-import { FRONTMATTER_RE } from '../lib/patterns.ts';
+-import { reorderFrontmatterObject } from '../lib/frontmatter-order.ts';
+-import { findMdxFiles } from '../lib/file-utils.ts';
+-import { safeStringifyFm } from '../authoring/grading/apply.ts';
+-
+-const PROJECT_ROOT = join(import.meta.dirname!, '../..');
+-const CONTENT_DIR = join(PROJECT_ROOT, 'content/docs');
+-
+-/** All fields that can be stripped. */
+-const VALID_FIELDS = [
+-  'quality',
+-  'readerImportance',
+-  'researchImportance',
+-  'tacticalValue',
+-  'tractability',
+-  'neglectedness',
+-  'uncertainty',
+-  'ratings',
+-] as const;
+-
+-type StrippableField = typeof VALID_FIELDS[number];
+-
+-interface StripResult {
+-  filePath: string;
+-  pageId: string;
+-  fieldsRemoved: string[];
+-}
+-
+-/**
+- * Parse a file, detect strippable fields, and optionally rewrite it.
+- * Returns null if no fields to strip. When apply=true, writes the file.
+- */
+-function processFile(
+-  filePath: string,
+-  fieldsToStrip: Set<StrippableField>,
+-  apply: boolean,
+-): StripResult | null {
+-  const content = readFileSync(filePath, 'utf-8');
+-  const fmMatch = content.match(FRONTMATTER_RE);
+-  if (!fmMatch) return null;
+-
+-  let fm: Record<string, unknown>;
+-  try {
+-    fm = parseYaml(fmMatch[1]) || {};
+-  } catch {
+-    return null;
+-  }
+-
+-  const removed: string[] = [];
+-  for (const field of fieldsToStrip) {
+-    if (field in fm) {
+-      delete fm[field];
+-      removed.push(field);
+-    }
+-  }
+-
+-  if (removed.length === 0) return null;
+-
+-  const id = relative(CONTENT_DIR, filePath).replace(/\.(mdx|md)$/, '');
+-
+-  if (apply) {
+-    const orderedFm = reorderFrontmatterObject(fm);
+-    let newFm = safeStringifyFm(orderedFm);
+-    if (!newFm.endsWith('\n')) newFm += '\n';
+-
+-    const bodyStart = content.indexOf('---', 4) + 3;
+-    let body = content.slice(bodyStart);
+-    body = '\n' + body.replace(/^\n+/, '');
+-    const newContent = `---\n${newFm}---${body}`;
+-
+-    const fmTest = newContent.match(/^---\n[\s\S]*?\n---\n/);
+-    if (!fmTest) {
+-      console.error(`ERROR: Invalid frontmatter structure after strip in ${filePath}`);
+-      return null;
+-    }
+-
+-    writeFileSync(filePath, newContent);
+-  }
+-
+-  return { filePath, pageId: id, fieldsRemoved: removed };
+-}
+-
+-export async function run(args: string[]) {
+-  const fieldsArg = args.find(a => a.startsWith('--fields='))?.split('=')[1];
+-  const apply = args.includes('--apply');
+-
+-  if (!fieldsArg) {
+-    console.error('Usage: pnpm crux w content strip-scores --fields=quality,ratings [--apply|--dry-run]');
+-    console.error(`\nValid fields: ${VALID_FIELDS.join(', ')}`);
+-    process.exit(1);
+-  }
+-
+-  const requestedFields = fieldsArg.split(',') as StrippableField[];
+-  const invalidFields = requestedFields.filter(f => !VALID_FIELDS.includes(f));
+-  if (invalidFields.length > 0) {
+-    console.error(`Invalid fields: ${invalidFields.join(', ')}`);
+-    console.error(`Valid fields: ${VALID_FIELDS.join(', ')}`);
+-    process.exit(1);
+-  }
+-
+-  const fieldsToStrip = new Set(requestedFields);
+-  console.log(`Fields to strip: ${[...fieldsToStrip].join(', ')}`);
+-  console.log(`Mode: ${apply ? 'APPLY (will modify files)' : 'dry-run (preview only)'}\n`);
+-
+-  const mdxFiles = findMdxFiles(CONTENT_DIR);
+-  console.log(`Found ${mdxFiles.length} MDX files\n`);
+-
+-  const results: StripResult[] = [];
+-  let errors = 0;
+-
+-  for (const filePath of mdxFiles) {
+-    const result = processFile(filePath, fieldsToStrip, apply);
+-    if (result) results.push(result);
+-    else if (apply) {
+-      // processFile returns null both for "no fields to strip" and "write error"
+-      // We only count errors for files we know had fields to strip
+-    }
+-  }
+-
+-  if (results.length === 0) {
+-    console.log('No files have the specified fields — nothing to strip.');
+-    return;
+-  }
+-
+-  // Summary by field
+-  const byCounts: Record<string, number> = {};
+-  for (const r of results) {
+-    for (const f of r.fieldsRemoved) {
+-      byCounts[f] = (byCounts[f] || 0) + 1;
+-    }
+-  }
+-
+-  const verb = apply ? 'Stripped from' : 'Would strip from';
+-  console.log(`${verb} ${results.length} files:`);
+-  for (const [field, count] of Object.entries(byCounts).sort((a, b) => b[1] - a[1])) {
+-    console.log(`  ${field}: ${count} files`);
+-  }
+-
+-  if (!apply) {
+-    console.log('\n[dry-run] Sample files:');
+-    for (const r of results.slice(0, 15)) {
+-      console.log(`  ${r.pageId}: ${r.fieldsRemoved.join(', ')}`);
+-    }
+-    if (results.length > 15) {
+-      console.log(`  ... and ${results.length - 15} more`);
+-    }
+-    console.log('\nRun with --apply to actually strip fields.');
+-    return;
+-  }
+-
+-  console.log(`\nDone: ${results.length} files updated.`);
+-}
+-
+-// Standalone entrypoint
+-import { fileURLToPath } from 'url';
+-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+-  run(process.argv.slice(2)).catch((err) => {
+-    console.error('strip-scores failed:', err);
+-    process.exit(1);
+-  });
+-}
+diff --git a/crux/commands/tablebase.ts b/crux/commands/tablebase.ts
+index 004904aea..93a25ae0f 100644
+--- a/crux/commands/tablebase.ts
++++ b/crux/commands/tablebase.ts
+@@ -23,9 +23,7 @@ import { truncate } from '../lib/text-utils.ts';
+ // Consolidated orphan domain imports
+ import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
+ import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
+-import { commands as backfillStableIdsCommands } from './backfill-stable-ids.ts';
+ import { commands as backfillSourcesCommands } from './backfill-sources.ts';
+-import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stable-ids.ts';
+ import { commands as importGrantsCommands } from './import-grants.ts';
+ import { commands as importDivisionsCommands } from './import-divisions.ts';
+ import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
+@@ -1510,9 +1508,7 @@ export const commands = {
+   // Consolidated from backfill-* orphan domains
+   'backfill-grantee-ids': backfillGranteeIdsCommands.default,
+   'backfill-program-ids': backfillProgramIdsCommands.default,
+-  'backfill-stable-ids': backfillStableIdsCommands.run,
+   'backfill-sources': backfillSourcesCommands.default,
+-  'backfill-yaml-stable-ids': backfillYamlStableIdsCommands.run,
+   // Consolidated from import-* orphan domains
+   'import-grants': importGrantsCommands.default,
+   'import-grants-sync': importGrantsCommands.sync,
+@@ -1596,9 +1592,7 @@ Commands:
+   Backfill (consolidated from backfill-* domains):
+   backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+   backfill-program-ids [--dry-run]       Link grants to funding programs
+-  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
+   backfill-sources [--dry-run|--apply]   Find source URLs for records with no source
+-  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
+ 
+   Import (consolidated from import-* domains):
+   import-grants               Analyze grant import stats (default)
+diff --git a/crux/completions/crux.bash b/crux/completions/crux.bash
+index 25e4ab93d..268a20b34 100644
+--- a/crux/completions/crux.bash
++++ b/crux/completions/crux.bash
+@@ -38,7 +38,7 @@ _crux_complete() {
+   # ---------------------------------------------------------------------------
+   local groups="w wiki fb factbase tb tablebase gh sys system"
+   local toplevel="query context"
+-  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants backfill-grantee-ids backfill-program-ids import-divisions import-funding-programs people orgs research-areas backfill-stable-ids backfill-yaml-stable-ids factbase-migrate-entities verify qa-sweep matrix tablebase pages"
++  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants backfill-grantee-ids backfill-program-ids import-divisions import-funding-programs people orgs research-areas verify qa-sweep matrix tablebase pages"
+ 
+   # ---------------------------------------------------------------------------
+   # Level 2: domains within each group
+@@ -46,15 +46,15 @@ _crux_complete() {
+ 
+   # wiki group (w/wiki): content-focused domains + flattened content commands
+   local wiki_domains="validate fix content citations footnotes generate visual enrich importance updates auto-update analyze pages resources check-links qa-sweep evals research grokipedia"
+-  local wiki_flattened="improve iterate create regrade grade grade-content polish review suggest-links strip-scores"
++  local wiki_flattened="improve iterate create regrade grade grade-content polish review suggest-links"
+ 
+   # factbase group (fb/factbase): factbase domains + flattened factbase commands
+   local fb_domains="factbase"
+-  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
++  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update sync-sources verify add-fact"
+ 
+   # tablebase group (tb/tablebase): tablebase-related domains + flattened commands
+   local tb_domains="tablebase matrix entity ids people orgs research-areas verify"
+-  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
++  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers backfill-grantee-ids backfill-program-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+ 
+   # github group (gh): GitHub-related domains + flattened issues commands
+   local gh_domains="issues pr ci epic release review pr-patrol"
+@@ -68,12 +68,12 @@ _crux_complete() {
+   # ---------------------------------------------------------------------------
+   local cmds_validate="all unified compile links entity-links cross-links mermaid style consistency data refs sidebar orphans quality schema edit-logs session-logs financials numeric-consistency drizzle-journal gate id-server-sync hallucination-risk entity-refs directory-pages cross-entity cross-check to-rdjsonl"
+   local cmds_fix="all entity-links cross-links broken-links markdown escaping dollars comparisons frontmatter imports orphaned-footnotes related-pages frontmatter-order"
+-  local cmds_content="improve iterate create regrade grade grade-content polish review suggest-links strip-scores"
++  local cmds_content="improve iterate create regrade grade grade-content polish review suggest-links"
+   local cmds_issues="list next search create comment update-body update-title lint start done cleanup close"
+   local cmds_pr="create ready detect check overlaps fix-body rebase-all validate-test-plan resolve-conflicts"
+   local cmds_agent_checklist="init check verify status complete snapshot pre-push-check"
+-  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
+-  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
++  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update sync-sources verify add-fact"
++  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers backfill-grantee-ids backfill-program-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+   local cmds_query="search entity facts related backlinks page recent-changes recent-edits citations risk stats blocks"
+   local cmds_context="for-issue for-page for-entity for-topic"
+   local cmds_ci="status pause-actions resume-actions main-status"
+diff --git a/crux/crux.mjs b/crux/crux.mjs
+index f1277a474..02a01e28c 100644
+--- a/crux/crux.mjs
++++ b/crux/crux.mjs
+@@ -94,10 +94,7 @@ import * as peopleCommands from './commands/people.ts';
+ import * as orgsCommands from './commands/orgs.ts';
+ import * as researchAreasCommands from './commands/research-areas.ts';
+ import * as autoVerifyStakeholdersCommands from './commands/legislation/auto-verify-stakeholders.ts';
+-import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
+-import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
+ import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
+-import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
+ import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
+ import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
+ import * as sourcingRetroScanSubjectsCommands from './commands/sourcing-retro-scan-subjects.ts';
+@@ -108,7 +105,6 @@ import * as sourcingSuggestUrlsCommands from './commands/sourcing-suggest-urls.t
+ import * as sourcingApplySuggestionsCommands from './commands/sourcing-apply-suggestions.ts';
+ import * as sourcingCleanupOrphansCommands from './commands/sourcing-cleanup-orphans.ts';
+ import * as sourcingResolveContradictedCommands from './commands/sourcing-resolve-contradicted.ts';
+-import * as migrateCitationsCommands from './commands/migrate-citations.ts';
+ import * as verifyEntityCommands from './commands/verify-entity.ts';
+ import * as sourcingWikiPagesCommands from './commands/sourcing-wiki-pages.ts';
+ import * as qaSweepCommands from './commands/qa-sweep.ts';
+@@ -192,7 +188,6 @@ const domains = {
+   'pr-patrol': prPatrolCommands,
+   'health-monitor': healthMonitorCommands,
+   factbase: factbaseCommands,
+-  kb: factbaseCommands, // deprecated alias
+   'import-990': factbaseImport990Commands,
+   footnotes: footnotesCommands,
+   'agent-workspace': agentWorkspaceCommands,
+@@ -207,10 +202,7 @@ const domains = {
+   orgs: orgsCommands,
+   'research-areas': researchAreasCommands,
+   'auto-verify-stakeholders': autoVerifyStakeholdersCommands,
+-  'backfill-stable-ids': backfillStableIdsCommand,
+-  'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
+   'backfill-pr-outcomes': backfillPrOutcomesCommands,
+-  'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
+   verify: verifyEntityCommands,
+   'verify-orchestrate': verifyOrchestrateCommands,
+   'sourcing-recheck': sourcingRecheckCommands,
+@@ -222,7 +214,6 @@ const domains = {
+   'sourcing-apply-suggestions': sourcingApplySuggestionsCommands,
+   'sourcing-cleanup-orphans': sourcingCleanupOrphansCommands,
+   'sourcing-resolve-contradicted': sourcingResolveContradictedCommands,
+-  'migrate-citations': migrateCitationsCommands,
+   'sourcing-wiki-pages': sourcingWikiPagesCommands,
+   'qa-sweep': qaSweepCommands,
+   'qa-checks': qaChecksCommands,
+diff --git a/crux/lib/groups.ts b/crux/lib/groups.ts
+index 3b4f4eec8..43c8605a1 100644
+--- a/crux/lib/groups.ts
++++ b/crux/lib/groups.ts
+@@ -84,7 +84,6 @@ export const GROUPS: Record<string, GroupDef> = {
+       'sourcing-recheck',
+       'sourcing-retro-scan-subjects',
+       'sourcing-cleanup-orphans',
+-      'migrate-citations',
+       'legislation',
+       'bluesky',
+       'races',

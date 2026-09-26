@@ -1,0 +1,3163 @@
+diff --git a/.gitignore b/.gitignore
+index 5b0dd8284..796358d97 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -140,10 +140,6 @@ crux/scripts/career-data.json
+ data/archived/
+ data/archive/
+ 
+-# Calibration raw data — regenerable via crux/calibration/run-calibration.ts
+-# Only metrics.json + audit doc are committed; corpus + per-item results rebuild on demand
+-crux/calibration/data/corpus.json
+-crux/calibration/data/results-*.json
+ .claude/scratch/
+ .claude/research-cache/
+ 
+diff --git a/apps/wiki-server/src/routes/tablebase/grants.ts b/apps/wiki-server/src/routes/tablebase/grants.ts
+index d437807ee..f368d6ae0 100644
+--- a/apps/wiki-server/src/routes/tablebase/grants.ts
++++ b/apps/wiki-server/src/routes/tablebase/grants.ts
+@@ -527,8 +527,8 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
+ 
+   // ---- GET /all-program-ids ----
+   // Returns all grant IDs with their current programId, organizationId,
+-  // source, name, and notes. Used by backfill-program-ids to match grants
+-  // to funding programs.
++  // source, name, and notes. Was used by the one-shot `crux tb
++  // backfill-program-ids` command (since removed); no remaining crux caller.
+   .get("/all-program-ids", async (c) => {
+     const HARD_LIMIT = 10000;
+     const db = getDrizzleDb();
+@@ -561,7 +561,8 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
+ 
+   // ---- PATCH /batch-update-program ----
+   // Updates programId for multiple grants using bulk SQL.
+-  // Used by the backfill-program-ids command.
++  // Was used by the one-shot `crux tb backfill-program-ids` command (since
++  // removed); no remaining crux caller.
+   .patch("/batch-update-program", async (c) => {
+     const body = await parseJsonBody(c);
+     if (!body) return invalidJsonError(c);
+diff --git a/content/docs/internal/cli-reference.mdx b/content/docs/internal/cli-reference.mdx
+index 1aeb59886..2b885d259 100644
+--- a/content/docs/internal/cli-reference.mdx
++++ b/content/docs/internal/cli-reference.mdx
+@@ -1103,8 +1103,6 @@ Commands:
+   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
+ 
+   Backfill (consolidated from backfill-* domains):
+-  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+-  backfill-program-ids [--dry-run]       Link grants to funding programs
+ 
+   Import (consolidated from import-* domains):
+   import-grants               Analyze grant import stats (default)
+diff --git a/crux/calibration/README.md b/crux/calibration/README.md
+deleted file mode 100644
+index b068614b9..000000000
+--- a/crux/calibration/README.md
++++ /dev/null
+@@ -1,34 +0,0 @@
+-# Verdict LLM Calibration (QUA-635)
+-
+-De-risking tool for the defensive enrichment burst (QUA-637). Measures the precision/recall/false-confirm rate of the verdict LLM against a corpus of known-true and known-false (claim, source) pairs.
+-
+-## Files
+-
+-| File | Purpose |
+-|---|---|
+-| `build-corpus.ts` | Sample confirmed verdicts from prod + construct mismatched mutations. Emits `data/corpus.json` (100 items: 50 true + 50 false). |
+-| `run-calibration.ts` | Replay the corpus through the production `buildRecordSourcingPrompt` using a specified model. Emits `data/results-{haiku,sonnet}.json`. |
+-| `analyze-results.ts` | Compute precision/recall/false-confirm/quote-fidelity/cost/latency metrics for both runs. Emits `data/metrics.json`. |
+-| `data/` | All artifacts (committed so re-runs are reproducible). |
+-
+-## Usage
+-
+-```bash
+-# From an agent slot (WIKI_SERVER_ENV=prod auto-detected):
+-node --import tsx/esm crux/calibration/build-corpus.ts         # ~2 min, reads prod
+-node --import tsx/esm crux/calibration/run-calibration.ts --model=haiku   # ~6 min, ~$0.45
+-node --import tsx/esm crux/calibration/run-calibration.ts --model=sonnet  # ~9 min, ~$1.37
+-node --import tsx/esm crux/calibration/analyze-results.ts      # instant
+-```
+-
+-`--limit=N` on the runner restricts to the first N items (smoke test).
+-
+-## When to re-run
+-
+-- After any change to `crux/lib/sourcing/item-verifier.ts` or `crux/lib/sourcing/prompt-guidelines.ts` (prompt hygiene).
+-- After a model version change (the current checker model is `claude-haiku-4-5-20251001`).
+-- Mid-burst (end of Week 1, Week 2) as a drift guard on organic data.
+-
+-## Results + recommendation
+-
+-See `docs/audits/2026-04-19-verdict-llm-calibration.md`.
+diff --git a/crux/calibration/analyze-results.ts b/crux/calibration/analyze-results.ts
+deleted file mode 100644
+index 5a7529841..000000000
+--- a/crux/calibration/analyze-results.ts
++++ /dev/null
+@@ -1,330 +0,0 @@
+-/**
+- * Calibration Analyzer (QUA-635)
+- *
+- * Loads results-{haiku,sonnet}.json and computes:
+- *  - Precision, recall, F1 on the known-true / known-false split
+- *  - False-confirm rate (critical metric for the defensive invariant)
+- *  - Per-category breakdown (personnel, publication, funding-round)
+- *  - Quoted-text fidelity (% of extracted_value substrings that appear in source)
+- *  - Inter-model agreement
+- *  - Cost + latency per item
+- *
+- * Emits: crux/calibration/data/metrics.json + console table
+- */
+-
+-import { readFileSync, writeFileSync } from 'node:fs';
+-
+-interface RunResult {
+-  itemId: string;
+-  label: 'true' | 'false';
+-  recordType: string;
+-  description: string;
+-  sourceUrl: string;
+-  verdict: string | null;
+-  confidence: number | null;
+-  extractedValue: string;
+-  reasoning: string;
+-  quoteFidelityHit: boolean | null;
+-  quoteFidelityExample: string | null;
+-  latencyMs: number;
+-  inputTokens: number;
+-  outputTokens: number;
+-  costUsd: number;
+-  error?: string;
+-}
+-
+-interface RunFile {
+-  runAt: string;
+-  model: string;
+-  modelId: string;
+-  itemsProcessed: number;
+-  totalInputTokens: number;
+-  totalOutputTokens: number;
+-  totalCostUsd: number;
+-  results: RunResult[];
+-}
+-
+-function loadRun(model: 'haiku' | 'sonnet'): RunFile {
+-  const path = new URL(`./data/results-${model}.json`, import.meta.url).pathname;
+-  return JSON.parse(readFileSync(path, 'utf8'));
+-}
+-
+-// ── Metric computation ────────────────────────────────────────────
+-
+-/** Treat confirmed/partial as "positive (claim supported)". contradicted/outdated/unverifiable as "negative". */
+-function classifyOutcome(verdict: string | null): 'positive' | 'negative' | 'error' {
+-  if (!verdict) return 'error';
+-  if (verdict === 'confirmed' || verdict === 'partial') return 'positive';
+-  return 'negative';
+-}
+-
+-interface TypedMetrics {
+-  n: number;
+-  confirmed: number;
+-  contradicted: number;
+-  unverifiable: number;
+-  partial: number;
+-  outdated: number;
+-  error: number;
+-  /** % of items the model classified as 'confirmed' (strict — excludes partial). */
+-  strictConfirmRate: number;
+-  /** % classified as confirmed OR partial (loose — counts as positive). */
+-  looseConfirmRate: number;
+-  quoteFidelityHit: number;
+-  quoteFidelityN: number;
+-  costUsd: number;
+-  avgLatencyMs: number;
+-}
+-
+-function tally(results: RunResult[]): TypedMetrics {
+-  const m: TypedMetrics = {
+-    n: results.length,
+-    confirmed: 0, contradicted: 0, unverifiable: 0, partial: 0, outdated: 0, error: 0,
+-    strictConfirmRate: 0, looseConfirmRate: 0,
+-    quoteFidelityHit: 0, quoteFidelityN: 0,
+-    costUsd: 0, avgLatencyMs: 0,
+-  };
+-  let latencySum = 0;
+-  for (const r of results) {
+-    if (r.error) { m.error++; continue; }
+-    if (r.verdict === 'confirmed') m.confirmed++;
+-    else if (r.verdict === 'contradicted') m.contradicted++;
+-    else if (r.verdict === 'unverifiable') m.unverifiable++;
+-    else if (r.verdict === 'partial') m.partial++;
+-    else if (r.verdict === 'outdated') m.outdated++;
+-    else m.error++;
+-
+-    if (r.quoteFidelityHit != null) {
+-      m.quoteFidelityN++;
+-      if (r.quoteFidelityHit) m.quoteFidelityHit++;
+-    }
+-    m.costUsd += r.costUsd;
+-    latencySum += r.latencyMs;
+-  }
+-  m.strictConfirmRate = m.n ? m.confirmed / m.n : 0;
+-  m.looseConfirmRate = m.n ? (m.confirmed + m.partial) / m.n : 0;
+-  m.avgLatencyMs = m.n ? latencySum / m.n : 0;
+-  return m;
+-}
+-
+-function fmt(n: number, decimals = 1): string {
+-  return (n * 100).toFixed(decimals) + '%';
+-}
+-
+-function analyzeModel(model: 'haiku' | 'sonnet', file: RunFile) {
+-  const all = file.results;
+-  const trueItems = all.filter(r => r.label === 'true');
+-  const falseItems = all.filter(r => r.label === 'false');
+-
+-  const trueM = tally(trueItems);
+-  const falseM = tally(falseItems);
+-
+-  // Critical metrics
+-  // Recall = % of known-true that got confirmed/partial
+-  const recallStrict = trueItems.filter(r => r.verdict === 'confirmed').length / trueItems.length;
+-  const recallLoose = trueItems.filter(r => r.verdict === 'confirmed' || r.verdict === 'partial').length / trueItems.length;
+-  // False-confirm rate = % of known-false that got confirmed (the defensive-invariant killer)
+-  const falseConfirmStrict = falseItems.filter(r => r.verdict === 'confirmed').length / falseItems.length;
+-  const falseConfirmLoose = falseItems.filter(r => r.verdict === 'confirmed' || r.verdict === 'partial').length / falseItems.length;
+-  // Precision = when model says confirmed, how often is it actually a true item
+-  const confirmedPositives = all.filter(r => r.verdict === 'confirmed').length;
+-  const precisionStrict = confirmedPositives
+-    ? all.filter(r => r.verdict === 'confirmed' && r.label === 'true').length / confirmedPositives
+-    : 0;
+-
+-  const perType: Record<string, { true: TypedMetrics; false: TypedMetrics }> = {};
+-  for (const t of ['personnel', 'publication', 'funding-round']) {
+-    perType[t] = {
+-      true: tally(trueItems.filter(r => r.recordType === t)),
+-      false: tally(falseItems.filter(r => r.recordType === t)),
+-    };
+-  }
+-
+-  return {
+-    model,
+-    modelId: file.modelId,
+-    itemsProcessed: all.length,
+-    totalCostUsd: file.totalCostUsd,
+-    costPerItemUsd: file.totalCostUsd / all.length,
+-    avgLatencyMs: all.reduce((s, r) => s + r.latencyMs, 0) / all.length,
+-
+-    // Headline metrics
+-    recallStrict,       // of 50 known-true, fraction marked `confirmed`
+-    recallLoose,        // ... marked `confirmed` or `partial`
+-    falseConfirmStrict, // CRITICAL: of 50 known-false, fraction marked `confirmed`
+-    falseConfirmLoose,  // ... marked `confirmed` or `partial`
+-    precisionStrict,    // when model says `confirmed`, P(item was actually true)
+-
+-    // Verdict distributions
+-    knownTrueVerdicts: trueM,
+-    knownFalseVerdicts: falseM,
+-
+-    // Per-category
+-    perType,
+-
+-    // Quote fidelity (both splits)
+-    quoteFidelityRateTrue: trueM.quoteFidelityN ? trueM.quoteFidelityHit / trueM.quoteFidelityN : 0,
+-    quoteFidelityRateFalse: falseM.quoteFidelityN ? falseM.quoteFidelityHit / falseM.quoteFidelityN : 0,
+-  };
+-}
+-
+-// ── Failure-mode analysis ────────────────────────────────────────
+-
+-function findFailures(haikuFile: RunFile, sonnetFile: RunFile) {
+-  const haiku = new Map(haikuFile.results.map(r => [r.itemId, r]));
+-  const sonnet = new Map(sonnetFile.results.map(r => [r.itemId, r]));
+-  const failures: Array<{
+-    kind: string;
+-    itemId: string;
+-    label: string;
+-    description: string;
+-    haikuVerdict: string | null;
+-    sonnetVerdict: string | null;
+-    haikuReasoning: string;
+-    sonnetReasoning: string;
+-    sourceUrl: string;
+-  }> = [];
+-
+-  for (const [id, h] of haiku) {
+-    const s = sonnet.get(id);
+-    if (!s) continue;
+-    if (h.error || s.error) continue;
+-
+-    // Haiku false-confirm (CRITICAL)
+-    if (h.label === 'false' && h.verdict === 'confirmed') {
+-      failures.push({
+-        kind: 'haiku-false-confirm',
+-        itemId: id, label: h.label, description: h.description,
+-        haikuVerdict: h.verdict, sonnetVerdict: s.verdict,
+-        haikuReasoning: h.reasoning, sonnetReasoning: s.reasoning,
+-        sourceUrl: h.sourceUrl,
+-      });
+-    }
+-    // Sonnet false-confirm
+-    if (s.label === 'false' && s.verdict === 'confirmed') {
+-      failures.push({
+-        kind: 'sonnet-false-confirm',
+-        itemId: id, label: s.label, description: s.description,
+-        haikuVerdict: h.verdict, sonnetVerdict: s.verdict,
+-        haikuReasoning: h.reasoning, sonnetReasoning: s.reasoning,
+-        sourceUrl: h.sourceUrl,
+-      });
+-    }
+-    // Haiku missed confirm (false-negative)
+-    if (h.label === 'true' && h.verdict !== 'confirmed' && h.verdict !== 'partial') {
+-      failures.push({
+-        kind: 'haiku-missed-confirm',
+-        itemId: id, label: h.label, description: h.description,
+-        haikuVerdict: h.verdict, sonnetVerdict: s.verdict,
+-        haikuReasoning: h.reasoning, sonnetReasoning: s.reasoning,
+-        sourceUrl: h.sourceUrl,
+-      });
+-    }
+-    // Models disagree
+-    if (h.verdict !== s.verdict && !['haiku-false-confirm','sonnet-false-confirm','haiku-missed-confirm'].some(k => failures.some(f => f.itemId === id && f.kind === k))) {
+-      failures.push({
+-        kind: 'disagreement',
+-        itemId: id, label: h.label, description: h.description,
+-        haikuVerdict: h.verdict, sonnetVerdict: s.verdict,
+-        haikuReasoning: h.reasoning, sonnetReasoning: s.reasoning,
+-        sourceUrl: h.sourceUrl,
+-      });
+-    }
+-  }
+-  return failures;
+-}
+-
+-// ── Inter-model agreement ────────────────────────────────────────
+-
+-function agreement(haikuFile: RunFile, sonnetFile: RunFile) {
+-  const haiku = new Map(haikuFile.results.map(r => [r.itemId, r.verdict]));
+-  const sonnet = new Map(sonnetFile.results.map(r => [r.itemId, r.verdict]));
+-  let total = 0, agree = 0;
+-  for (const [id, hv] of haiku) {
+-    const sv = sonnet.get(id);
+-    if (hv == null || sv == null) continue;
+-    total++;
+-    if (hv === sv) agree++;
+-  }
+-  return total ? agree / total : 0;
+-}
+-
+-// ── Main ────────────────────────────────────────────────────────
+-
+-function main() {
+-  const haikuFile = loadRun('haiku');
+-  const sonnetFile = loadRun('sonnet');
+-
+-  const haiku = analyzeModel('haiku', haikuFile);
+-  const sonnet = analyzeModel('sonnet', sonnetFile);
+-  const agreementRate = agreement(haikuFile, sonnetFile);
+-  const failures = findFailures(haikuFile, sonnetFile);
+-
+-  const metrics = {
+-    runAt: new Date().toISOString(),
+-    corpus: {
+-      total: haikuFile.itemsProcessed,
+-      knownTrue: haikuFile.results.filter(r => r.label === 'true').length,
+-      knownFalse: haikuFile.results.filter(r => r.label === 'false').length,
+-    },
+-    models: { haiku, sonnet },
+-    interModelAgreementRate: agreementRate,
+-    failures,
+-    failureSummary: {
+-      haikuFalseConfirms: failures.filter(f => f.kind === 'haiku-false-confirm').length,
+-      sonnetFalseConfirms: failures.filter(f => f.kind === 'sonnet-false-confirm').length,
+-      haikuMissedConfirms: failures.filter(f => f.kind === 'haiku-missed-confirm').length,
+-      disagreements: failures.filter(f => f.kind === 'disagreement').length,
+-    },
+-  };
+-
+-  const outputPath = new URL('./data/metrics.json', import.meta.url).pathname;
+-  writeFileSync(outputPath, JSON.stringify(metrics, null, 2));
+-
+-  // ── Console report ──
+-  console.log('\n=== Calibration Results (QUA-635) ===\n');
+-  console.log(`Corpus: ${metrics.corpus.total} items (${metrics.corpus.knownTrue} known-true + ${metrics.corpus.knownFalse} known-false)`);
+-  console.log();
+-
+-  const row = (name: string, h: number | string, s: number | string) =>
+-    `  ${name.padEnd(34)}  ${String(h).padStart(10)}  ${String(s).padStart(10)}`;
+-
+-  console.log('  ' + 'METRIC'.padEnd(34) + '  ' + 'HAIKU'.padStart(10) + '  ' + 'SONNET'.padStart(10));
+-  console.log('  ' + '─'.repeat(60));
+-  console.log(row('Recall (confirmed only)', fmt(haiku.recallStrict), fmt(sonnet.recallStrict)));
+-  console.log(row('Recall (confirmed+partial)', fmt(haiku.recallLoose), fmt(sonnet.recallLoose)));
+-  console.log(row('False-confirm (strict)', fmt(haiku.falseConfirmStrict), fmt(sonnet.falseConfirmStrict)));
+-  console.log(row('False-confirm (loose: confirm+partial)', fmt(haiku.falseConfirmLoose), fmt(sonnet.falseConfirmLoose)));
+-  console.log(row('Precision @ confirmed', fmt(haiku.precisionStrict), fmt(sonnet.precisionStrict)));
+-  console.log(row('Quote fidelity (true items)', fmt(haiku.quoteFidelityRateTrue), fmt(sonnet.quoteFidelityRateTrue)));
+-  console.log(row('Quote fidelity (false items)', fmt(haiku.quoteFidelityRateFalse), fmt(sonnet.quoteFidelityRateFalse)));
+-  console.log(row('Cost / item', '$' + haiku.costPerItemUsd.toFixed(4), '$' + sonnet.costPerItemUsd.toFixed(4)));
+-  console.log(row('Total cost (100 items)', '$' + haiku.totalCostUsd.toFixed(2), '$' + sonnet.totalCostUsd.toFixed(2)));
+-  console.log(row('Avg latency / item', Math.round(haiku.avgLatencyMs) + 'ms', Math.round(sonnet.avgLatencyMs) + 'ms'));
+-
+-  console.log(`\n  Inter-model verdict agreement: ${fmt(agreementRate)} (${Math.round(agreementRate * metrics.corpus.total)}/${metrics.corpus.total})`);
+-
+-  console.log('\n  Per-type (known-true confirmation rate):');
+-  for (const t of ['personnel', 'publication', 'funding-round']) {
+-    const h = haiku.perType[t].true;
+-    const s = sonnet.perType[t].true;
+-    console.log(`    ${t.padEnd(18)} haiku: ${h.confirmed}/${h.n} (${fmt(h.strictConfirmRate)})  sonnet: ${s.confirmed}/${s.n} (${fmt(s.strictConfirmRate)})`);
+-  }
+-
+-  console.log('\n  Per-type (known-false false-confirm rate — lower is better):');
+-  for (const t of ['personnel', 'publication', 'funding-round']) {
+-    const h = haiku.perType[t].false;
+-    const s = sonnet.perType[t].false;
+-    console.log(`    ${t.padEnd(18)} haiku: ${h.confirmed}/${h.n} (${fmt(h.strictConfirmRate)})  sonnet: ${s.confirmed}/${s.n} (${fmt(s.strictConfirmRate)})`);
+-  }
+-
+-  console.log(`\n  Failure summary:`);
+-  console.log(`    Haiku false-confirms:  ${metrics.failureSummary.haikuFalseConfirms}`);
+-  console.log(`    Sonnet false-confirms: ${metrics.failureSummary.sonnetFalseConfirms}`);
+-  console.log(`    Haiku missed-confirms: ${metrics.failureSummary.haikuMissedConfirms}`);
+-  console.log(`    Disagreements (other): ${metrics.failureSummary.disagreements}`);
+-
+-  console.log(`\n✓ Wrote full metrics to ${outputPath}`);
+-}
+-
+-main();
+diff --git a/crux/calibration/build-corpus.ts b/crux/calibration/build-corpus.ts
+deleted file mode 100644
+index 3744bece6..000000000
+--- a/crux/calibration/build-corpus.ts
++++ /dev/null
+@@ -1,412 +0,0 @@
+-/**
+- * Calibration Corpus Builder (QUA-635)
+- *
+- * Samples confirmed sourcing verdicts from prod, pulls the matching
+- * records + evidence + cached source content, and emits a calibration
+- * corpus JSON file that the calibration runner can replay against
+- * different LLM models.
+- *
+- * Known-true: real (record, sourceUrl) pairs whose verdict is `confirmed`.
+- * Known-false: constructed by mutating a field of a known-true item so the
+- * claim no longer matches the source (e.g. swap role, flip amount).
+- *
+- * Run: WIKI_SERVER_ENV=prod pnpm tsx crux/calibration/build-corpus.ts
+- * Emits: crux/calibration/data/corpus.json
+- */
+-
+-import { writeFileSync } from 'node:fs';
+-import { apiRequest } from '../lib/wiki-server/client.ts';
+-import { getEvidenceByRecord } from '../lib/wiki-server/sourcing-client.ts';
+-import { fetchSourceContent } from '../lib/sourcing/source-fetcher.ts';
+-import { hostMatches } from '@longterm-wiki/url-utils';
+-
+-// ── Types ───────────────────────────────────────────────────────────
+-
+-type RecordType = 'personnel' | 'publication' | 'funding-round';
+-
+-interface CorpusItem {
+-  id: string;                             // unique within corpus
+-  label: 'true' | 'false';                // ground truth
+-  expectedVerdict: 'confirmed' | 'contradicted' | 'unverifiable';
+-  recordType: RecordType;
+-  recordId: string;                       // real PG id (even for mutated false items — ok, we don't write back)
+-  entityDisplayName: string;              // e.g. "Anthropic"
+-  description: string;                    // human-readable claim description
+-  fields: Record<string, string | number | null>;  // the fields that go into the prompt
+-  sourceUrl: string;
+-  /** If label=false, what mutation was applied (for auditing). */
+-  mutation?: {
+-    kind: 'field-swap' | 'value-change' | 'name-swap';
+-    field: string;
+-    originalValue: string | number | null;
+-    mutatedValue: string | number | null;
+-    note: string;
+-  };
+-  /** For true items: the prior verdict evidence (for context, not fed into prompt). */
+-  provenance?: {
+-    priorVerdict: string;
+-    priorConfidence: number;
+-    priorReasoning: string;
+-    priorCheckerModel?: string;
+-  };
+-}
+-
+-// ── Per-type fetchers ───────────────────────────────────────────────
+-
+-async function fetchConfirmedVerdicts(recordType: RecordType, limit: number) {
+-  // The /verdicts endpoint returns aggregate verdicts, pageable with limit up to 500.
+-  // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
+-  const r = await apiRequest<{
+-    verdicts: Array<{
+-      recordType: string; recordId: string; entityId: string | null;
+-      displayName: string | null; entityDisplayName: string | null;
+-      verdict: string; confidence: number; reasoning: string;
+-    }>;
+-    total: number;
+-  }>(
+-    'GET',
+-    `/api/sourcing/verdicts?verdict=confirmed&record_type=${recordType}&limit=${limit}`,
+-  );
+-  if (!r.ok) throw new Error(`verdicts fetch failed: ${r.message}`);
+-  return r.data.verdicts;
+-}
+-
+-async function fetchPersonnelRecord(id: string) {
+-  // There's no point-lookup endpoint for personnel — fetch by organizationId via verdict's entityId.
+-  // Simpler: just scan /api/personnel/all with offset, but that's expensive. Use the by-entity
+-  // endpoint via the verdict's entityId. The verdict has entityId = organizationId.
+-  return null; // we'll resolve fields from the verdict itself + evidence
+-}
+-
+-/** Cache all publications once, keyed by id — point-lookup endpoint doesn't exist. */
+-let publicationCache: Map<string, Record<string, unknown>> | null = null;
+-async function fetchPublication(id: string) {
+-  if (!publicationCache) {
+-    publicationCache = new Map();
+-    let offset = 0;
+-    while (true) {
+-      // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
+-      const r = await apiRequest<{ publications: Array<Record<string, unknown>>; total: number }>(
+-        'GET', `/api/publications/all?limit=200&offset=${offset}`,
+-      );
+-      if (!r.ok) break;
+-      for (const row of r.data.publications) publicationCache.set(row.id as string, row);
+-      offset += r.data.publications.length;
+-      if (offset >= r.data.total || r.data.publications.length === 0) break;
+-    }
+-    console.log(`[cache] loaded ${publicationCache.size} publications`);
+-  }
+-  return publicationCache.get(id) ?? null;
+-}
+-
+-let fundingRoundCache: Map<string, Record<string, unknown>> | null = null;
+-async function fetchFundingRound(id: string) {
+-  if (!fundingRoundCache) {
+-    fundingRoundCache = new Map();
+-    let offset = 0;
+-    while (true) {
+-      // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
+-      const r = await apiRequest<{ fundingRounds: Array<Record<string, unknown>>; total: number }>(
+-        'GET', `/api/funding-rounds/all?limit=200&offset=${offset}`,
+-      );
+-      if (!r.ok) break;
+-      for (const row of r.data.fundingRounds) fundingRoundCache.set(row.id as string, row);
+-      offset += r.data.fundingRounds.length;
+-      if (offset >= r.data.total || r.data.fundingRounds.length === 0) break;
+-    }
+-    console.log(`[cache] loaded ${fundingRoundCache.size} funding-rounds`);
+-  }
+-  return fundingRoundCache.get(id) ?? null;
+-}
+-
+-/** Fetch a personnel row by scanning by-entity for the parent org. */
+-async function fetchPersonnelByEntity(orgId: string, recordId: string): Promise<Record<string, unknown> | null> {
+-  // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
+-  const r = await apiRequest<{
+-    personnel: Array<Record<string, unknown>>;
+-  }>('GET', `/api/personnel/by-entity/${encodeURIComponent(orgId)}?limit=500`);
+-  if (!r.ok) return null;
+-  return r.data.personnel.find(p => p.id === recordId) ?? null;
+-}
+-
+-// ── Field extraction → fields used in prompt ────────────────────────
+-
+-function personnelFields(row: Record<string, unknown>): {
+-  description: string;
+-  entityName: string;
+-  fields: Record<string, string | number | null>;
+-} {
+-  const person = row.person as { name?: string } | undefined;
+-  const org = row.organization as { name?: string } | undefined;
+-  const personName = person?.name ?? (row.personResolvedName as string) ?? String(row.personId ?? '');
+-  const orgName = org?.name ?? (row.orgResolvedName as string) ?? String(row.organizationId ?? '');
+-  const role = row.role as string | null;
+-  const description = `${personName} — ${role ?? 'unknown role'} at ${orgName}`;
+-  return {
+-    description,
+-    entityName: orgName,
+-    fields: {
+-      person: personName,
+-      organization: orgName,
+-      role: role,
+-      roleType: (row.roleType as string | null) ?? null,
+-      startDate: (row.startDate as string | null) ?? null,
+-      endDate: (row.endDate as string | null) ?? null,
+-      isFounder: row.isFounder ? 'true' : null,
+-    },
+-  };
+-}
+-
+-function publicationFields(row: Record<string, unknown>): {
+-  description: string;
+-  entityName: string;
+-  fields: Record<string, string | number | null>;
+-} {
+-  const entityName = (row.entityDisplayName as string) ?? '(unknown org)';
+-  const title = (row.title as string) ?? '';
+-  const authors = (row.authors as string) ?? '';
+-  const venue = (row.venue as string | null) ?? null;
+-  const year = (row.publishedDate as string | null) ?? null;
+-  return {
+-    description: `"${title}" by ${authors}${year ? ` (${year})` : ''}${venue ? ` — ${venue}` : ''}`,
+-    entityName,
+-    fields: {
+-      title,
+-      authors,
+-      venue,
+-      publishedDate: year,
+-      publicationType: (row.publicationType as string | null) ?? null,
+-    },
+-  };
+-}
+-
+-function fundingRoundFields(row: Record<string, unknown>): {
+-  description: string;
+-  entityName: string;
+-  fields: Record<string, string | number | null>;
+-} {
+-  const companyRef = row.companyRef as { name?: string } | undefined;
+-  const entityName = companyRef?.name ?? (row.companyResolvedName as string) ?? String(row.companyId ?? '');
+-  const name = (row.name as string) ?? '(unnamed round)';
+-  const date = (row.date as string | null) ?? null;
+-  const raised = (row.raised as number | null) ?? null;
+-  const lead = (row.leadInvestor as string | null) ?? null;
+-  const instrument = (row.instrument as string | null) ?? null;
+-  return {
+-    description: `${entityName} — ${name}${date ? ` (${date})` : ''}${raised ? `, raised $${raised.toLocaleString()}` : ''}`,
+-    entityName,
+-    fields: {
+-      company: entityName,
+-      roundName: name,
+-      date,
+-      raised,
+-      leadInvestor: lead,
+-      instrument,
+-    },
+-  };
+-}
+-
+-// ── Known-false mutations ───────────────────────────────────────────
+-
+-function mutatePersonnel(fields: Record<string, string | number | null>, description: string) {
+-  // Swap role to something clearly wrong.
+-  const original = fields.role as string | null;
+-  const swap = /ceo|chief executive/i.test(original ?? '') ? 'Intern'
+-    : /intern/i.test(original ?? '') ? 'CEO'
+-    : /board|director|trustee|advisor/i.test(original ?? '') ? 'Software Engineering Intern'
+-    : /founder|ceo/i.test(original ?? '') ? 'Janitor'
+-    : 'Chief Executive Officer';
+-  return {
+-    fields: { ...fields, role: swap, roleType: 'career' as string | null },
+-    description: description.replace(original ?? '', swap),
+-    mutation: {
+-      kind: 'value-change' as const,
+-      field: 'role',
+-      originalValue: original,
+-      mutatedValue: swap,
+-      note: 'Swapped role to clearly different title unsupported by source.',
+-    },
+-  };
+-}
+-
+-function mutatePublication(fields: Record<string, string | number | null>, description: string) {
+-  // Change authors to a well-known AI-safety researcher not on the paper.
+-  const original = fields.authors as string | null;
+-  const swap = 'Geoffrey Hinton, Yoshua Bengio';
+-  return {
+-    fields: { ...fields, authors: swap },
+-    description: description.replace(original ?? '', swap),
+-    mutation: {
+-      kind: 'value-change' as const,
+-      field: 'authors',
+-      originalValue: original,
+-      mutatedValue: swap,
+-      note: 'Replaced authors with unrelated well-known researchers.',
+-    },
+-  };
+-}
+-
+-function mutateFundingRound(fields: Record<string, string | number | null>, description: string) {
+-  // 10x the raised amount.
+-  const original = fields.raised as number | null;
+-  const swap = original == null ? 999_999_999 : original * 10;
+-  return {
+-    fields: { ...fields, raised: swap },
+-    description: description.replace(
+-      `$${(original ?? 0).toLocaleString()}`,
+-      `$${swap.toLocaleString()}`,
+-    ),
+-    mutation: {
+-      kind: 'value-change' as const,
+-      field: 'raised',
+-      originalValue: original,
+-      mutatedValue: swap,
+-      note: 'Inflated raised amount by 10x.',
+-    },
+-  };
+-}
+-
+-// ── Main ───────────────────────────────────────────────────────────
+-
+-const TARGETS: Record<RecordType, number> = {
+-  personnel: 20,
+-  publication: 15,
+-  'funding-round': 15,
+-};
+-
+-async function buildForType(recordType: RecordType): Promise<CorpusItem[]> {
+-  const target = TARGETS[recordType];
+-  console.log(`\n[${recordType}] target: ${target} true + ${target} false`);
+-
+-  // Pull more verdicts than needed — we'll filter.
+-  const verdicts = await fetchConfirmedVerdicts(recordType, Math.max(200, target * 6));
+-  console.log(`[${recordType}] fetched ${verdicts.length} confirmed verdicts`);
+-
+-  const trueItems: CorpusItem[] = [];
+-  const falseItems: CorpusItem[] = [];
+-
+-  for (const v of verdicts) {
+-    if (trueItems.length >= target && falseItems.length >= target) break;
+-
+-    // 1. Fetch evidence to get sourceUrl and checker model.
+-    const evidenceResult = await getEvidenceByRecord(v.recordType, v.recordId, { limit: 5 });
+-    if (!evidenceResult.ok) continue;
+-    const evidence = evidenceResult.data.evidence;
+-    // Prefer LLM-checked evidence (Haiku) over inline-submission — those actually went through the verdict prompt.
+-    const llmEvidence = evidence.find(
+-      (e: any) => e.checkerModel && /haiku|sonnet|opus|claude/.test(e.checkerModel)
+-    );
+-    const anyEvidence = llmEvidence ?? evidence[0];
+-    if (!anyEvidence) continue;
+-    const sourceUrl = (anyEvidence as any).sourceUrl;
+-    if (!sourceUrl) continue;
+-
+-    // 2. Skip archive/wayback URLs and dead-known domains.
+-    if (hostMatches(sourceUrl, 'web.archive.org') || sourceUrl.startsWith('mailto:')) continue;
+-
+-    // 3. Fetch the full record (fields) from the typed endpoint.
+-    let row: Record<string, unknown> | null = null;
+-    if (recordType === 'personnel') {
+-      if (!v.entityId) continue;
+-      row = await fetchPersonnelByEntity(v.entityId, v.recordId);
+-    } else if (recordType === 'publication') {
+-      row = await fetchPublication(v.recordId);
+-    } else if (recordType === 'funding-round') {
+-      row = await fetchFundingRound(v.recordId);
+-    }
+-    if (!row) continue;
+-
+-    // 4. Build description + fields.
+-    let extracted: { description: string; entityName: string; fields: Record<string, string | number | null> };
+-    if (recordType === 'personnel') extracted = personnelFields(row);
+-    else if (recordType === 'publication') extracted = publicationFields(row);
+-    else extracted = fundingRoundFields(row);
+-
+-    // 5. Confirm source content is cached and non-empty (skip if not).
+-    const fetch = await fetchSourceContent(sourceUrl, undefined, '[corpus-build]');
+-    if (!fetch.content || fetch.content.length < 400) {
+-      // Skip silently — not enough text to verify against.
+-      continue;
+-    }
+-
+-    // 6. Build true item.
+-    if (trueItems.length < target) {
+-      trueItems.push({
+-        id: `T-${recordType}-${v.recordId}`,
+-        label: 'true',
+-        expectedVerdict: 'confirmed',
+-        recordType,
+-        recordId: v.recordId,
+-        entityDisplayName: extracted.entityName,
+-        description: extracted.description,
+-        fields: extracted.fields,
+-        sourceUrl,
+-        provenance: {
+-          priorVerdict: v.verdict,
+-          priorConfidence: v.confidence,
+-          priorReasoning: v.reasoning?.slice(0, 300) ?? '',
+-          priorCheckerModel: (anyEvidence as any).checkerModel,
+-        },
+-      });
+-    }
+-
+-    // 7. Build mutated false item from the same record.
+-    if (falseItems.length < target) {
+-      let mutated: { fields: Record<string, string | number | null>; description: string; mutation: CorpusItem['mutation'] };
+-      if (recordType === 'personnel') mutated = mutatePersonnel(extracted.fields, extracted.description);
+-      else if (recordType === 'publication') mutated = mutatePublication(extracted.fields, extracted.description);
+-      else mutated = mutateFundingRound(extracted.fields, extracted.description);
+-
+-      // Sanity: skip mutations that didn't actually change the value.
+-      if (mutated.mutation!.originalValue === mutated.mutation!.mutatedValue) continue;
+-
+-      falseItems.push({
+-        id: `F-${recordType}-${v.recordId}`,
+-        label: 'false',
+-        expectedVerdict: 'contradicted',
+-        recordType,
+-        recordId: v.recordId,
+-        entityDisplayName: extracted.entityName,
+-        description: mutated.description,
+-        fields: mutated.fields,
+-        sourceUrl,
+-        mutation: mutated.mutation,
+-      });
+-    }
+-  }
+-
+-  console.log(`[${recordType}] built ${trueItems.length} true + ${falseItems.length} false`);
+-  return [...trueItems, ...falseItems];
+-}
+-
+-async function main() {
+-  const allItems: CorpusItem[] = [];
+-  for (const t of ['personnel', 'publication', 'funding-round'] as RecordType[]) {
+-    const items = await buildForType(t);
+-    allItems.push(...items);
+-  }
+-
+-  const outputPath = new URL('./data/corpus.json', import.meta.url).pathname;
+-  writeFileSync(outputPath, JSON.stringify({
+-    builtAt: new Date().toISOString(),
+-    totalItems: allItems.length,
+-    trueCount: allItems.filter(i => i.label === 'true').length,
+-    falseCount: allItems.filter(i => i.label === 'false').length,
+-    byType: Object.fromEntries(
+-      (['personnel', 'publication', 'funding-round'] as RecordType[]).map(t => [
+-        t,
+-        {
+-          true: allItems.filter(i => i.recordType === t && i.label === 'true').length,
+-          false: allItems.filter(i => i.recordType === t && i.label === 'false').length,
+-        },
+-      ]),
+-    ),
+-    items: allItems,
+-  }, null, 2));
+-  console.log(`\n✓ Wrote ${allItems.length} items to ${outputPath}`);
+-}
+-
+-main().catch((e) => {
+-  console.error('FAILED:', e);
+-  process.exit(1);
+-});
+diff --git a/crux/calibration/data/metrics.json b/crux/calibration/data/metrics.json
+deleted file mode 100644
+index ab2ef13e1..000000000
+--- a/crux/calibration/data/metrics.json
++++ /dev/null
+@@ -1,492 +0,0 @@
+-{
+-  "runAt": "2026-04-20T04:01:09.185Z",
+-  "corpus": {
+-    "total": 100,
+-    "knownTrue": 50,
+-    "knownFalse": 50
+-  },
+-  "models": {
+-    "haiku": {
+-      "model": "haiku",
+-      "modelId": "claude-haiku-4-5-20251001",
+-      "itemsProcessed": 100,
+-      "totalCostUsd": 0.44669100000000006,
+-      "costPerItemUsd": 0.004466910000000001,
+-      "avgLatencyMs": 3127.13,
+-      "recallStrict": 0.92,
+-      "recallLoose": 0.98,
+-      "falseConfirmStrict": 0,
+-      "falseConfirmLoose": 0.04,
+-      "precisionStrict": 1,
+-      "knownTrueVerdicts": {
+-        "n": 50,
+-        "confirmed": 46,
+-        "contradicted": 0,
+-        "unverifiable": 0,
+-        "partial": 3,
+-        "outdated": 0,
+-        "error": 1,
+-        "strictConfirmRate": 0.92,
+-        "looseConfirmRate": 0.98,
+-        "quoteFidelityHit": 37,
+-        "quoteFidelityN": 49,
+-        "costUsd": 0.22312799999999997,
+-        "avgLatencyMs": 3294.18
+-      },
+-      "knownFalseVerdicts": {
+-        "n": 50,
+-        "confirmed": 0,
+-        "contradicted": 48,
+-        "unverifiable": 0,
+-        "partial": 2,
+-        "outdated": 0,
+-        "error": 0,
+-        "strictConfirmRate": 0,
+-        "looseConfirmRate": 0.04,
+-        "quoteFidelityHit": 30,
+-        "quoteFidelityN": 50,
+-        "costUsd": 0.22356299999999993,
+-        "avgLatencyMs": 2847.7
+-      },
+-      "perType": {
+-        "personnel": {
+-          "true": {
+-            "n": 20,
+-            "confirmed": 18,
+-            "contradicted": 0,
+-            "unverifiable": 0,
+-            "partial": 2,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0.9,
+-            "looseConfirmRate": 1,
+-            "quoteFidelityHit": 11,
+-            "quoteFidelityN": 20,
+-            "costUsd": 0.072774,
+-            "avgLatencyMs": 2803.8
+-          },
+-          "false": {
+-            "n": 20,
+-            "confirmed": 0,
+-            "contradicted": 20,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0,
+-            "quoteFidelityHit": 12,
+-            "quoteFidelityN": 20,
+-            "costUsd": 0.072218,
+-            "avgLatencyMs": 2680.95
+-          }
+-        },
+-        "publication": {
+-          "true": {
+-            "n": 15,
+-            "confirmed": 14,
+-            "contradicted": 0,
+-            "unverifiable": 0,
+-            "partial": 1,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0.9333333333333333,
+-            "looseConfirmRate": 1,
+-            "quoteFidelityHit": 13,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.077593,
+-            "avgLatencyMs": 3847.6666666666665
+-          },
+-          "false": {
+-            "n": 15,
+-            "confirmed": 0,
+-            "contradicted": 13,
+-            "unverifiable": 0,
+-            "partial": 2,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0.13333333333333333,
+-            "quoteFidelityHit": 8,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.07622,
+-            "avgLatencyMs": 2982.4
+-          }
+-        },
+-        "funding-round": {
+-          "true": {
+-            "n": 15,
+-            "confirmed": 14,
+-            "contradicted": 0,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 1,
+-            "strictConfirmRate": 0.9333333333333333,
+-            "looseConfirmRate": 0.9333333333333333,
+-            "quoteFidelityHit": 13,
+-            "quoteFidelityN": 14,
+-            "costUsd": 0.072761,
+-            "avgLatencyMs": 3394.5333333333333
+-          },
+-          "false": {
+-            "n": 15,
+-            "confirmed": 0,
+-            "contradicted": 15,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0,
+-            "quoteFidelityHit": 10,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.07512499999999998,
+-            "avgLatencyMs": 2935.3333333333335
+-          }
+-        }
+-      },
+-      "quoteFidelityRateTrue": 0.7551020408163265,
+-      "quoteFidelityRateFalse": 0.6
+-    },
+-    "sonnet": {
+-      "model": "sonnet",
+-      "modelId": "claude-sonnet-4-6",
+-      "itemsProcessed": 100,
+-      "totalCostUsd": 1.3680719999999997,
+-      "costPerItemUsd": 0.013680719999999997,
+-      "avgLatencyMs": 5533.24,
+-      "recallStrict": 0.64,
+-      "recallLoose": 0.94,
+-      "falseConfirmStrict": 0,
+-      "falseConfirmLoose": 0,
+-      "precisionStrict": 1,
+-      "knownTrueVerdicts": {
+-        "n": 50,
+-        "confirmed": 32,
+-        "contradicted": 3,
+-        "unverifiable": 0,
+-        "partial": 15,
+-        "outdated": 0,
+-        "error": 0,
+-        "strictConfirmRate": 0.64,
+-        "looseConfirmRate": 0.94,
+-        "quoteFidelityHit": 39,
+-        "quoteFidelityN": 50,
+-        "costUsd": 0.693123,
+-        "avgLatencyMs": 6003.6
+-      },
+-      "knownFalseVerdicts": {
+-        "n": 50,
+-        "confirmed": 0,
+-        "contradicted": 50,
+-        "unverifiable": 0,
+-        "partial": 0,
+-        "outdated": 0,
+-        "error": 0,
+-        "strictConfirmRate": 0,
+-        "looseConfirmRate": 0,
+-        "quoteFidelityHit": 34,
+-        "quoteFidelityN": 50,
+-        "costUsd": 0.674949,
+-        "avgLatencyMs": 5062.88
+-      },
+-      "perType": {
+-        "personnel": {
+-          "true": {
+-            "n": 20,
+-            "confirmed": 13,
+-            "contradicted": 1,
+-            "unverifiable": 0,
+-            "partial": 6,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0.65,
+-            "looseConfirmRate": 0.95,
+-            "quoteFidelityHit": 10,
+-            "quoteFidelityN": 20,
+-            "costUsd": 0.21799199999999994,
+-            "avgLatencyMs": 5158.2
+-          },
+-          "false": {
+-            "n": 20,
+-            "confirmed": 0,
+-            "contradicted": 20,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0,
+-            "quoteFidelityHit": 11,
+-            "quoteFidelityN": 20,
+-            "costUsd": 0.21240900000000001,
+-            "avgLatencyMs": 4255.6
+-          }
+-        },
+-        "publication": {
+-          "true": {
+-            "n": 15,
+-            "confirmed": 7,
+-            "contradicted": 1,
+-            "unverifiable": 0,
+-            "partial": 7,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0.4666666666666667,
+-            "looseConfirmRate": 0.9333333333333333,
+-            "quoteFidelityHit": 14,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.24206400000000003,
+-            "avgLatencyMs": 7204.866666666667
+-          },
+-          "false": {
+-            "n": 15,
+-            "confirmed": 0,
+-            "contradicted": 15,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0,
+-            "quoteFidelityHit": 8,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.233775,
+-            "avgLatencyMs": 5924.666666666667
+-          }
+-        },
+-        "funding-round": {
+-          "true": {
+-            "n": 15,
+-            "confirmed": 12,
+-            "contradicted": 1,
+-            "unverifiable": 0,
+-            "partial": 2,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0.8,
+-            "looseConfirmRate": 0.9333333333333333,
+-            "quoteFidelityHit": 15,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.23306700000000002,
+-            "avgLatencyMs": 5929.533333333334
+-          },
+-          "false": {
+-            "n": 15,
+-            "confirmed": 0,
+-            "contradicted": 15,
+-            "unverifiable": 0,
+-            "partial": 0,
+-            "outdated": 0,
+-            "error": 0,
+-            "strictConfirmRate": 0,
+-            "looseConfirmRate": 0,
+-            "quoteFidelityHit": 15,
+-            "quoteFidelityN": 15,
+-            "costUsd": 0.228765,
+-            "avgLatencyMs": 5277.466666666666
+-          }
+-        }
+-      },
+-      "quoteFidelityRateTrue": 0.78,
+-      "quoteFidelityRateFalse": 0.68
+-    }
+-  },
+-  "interModelAgreementRate": 0.8282828282828283,
+-  "failures": [
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-m5VWwvls1v",
+-      "label": "true",
+-      "description": "Noah Tan — James C. Gaither Junior Fellow at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly confirms all key fields of the record. Noah Tan is listed in the Program Staff section with the exact title 'James C. Gaither Junior Fellow, Technology and International Affairs Program' at the Carnegie Endowment for International Peace. The organization is confirmed as 'Carnegie Endowment for International Peace' (with the specific program being Technology and International Affairs, which is part of the AI Program mentioned in the record). The role 'James C. Gaither Junior Fellow' is explicitly stated. The roleType 'career' is a reasonable classification for this fellowship position and is not contradicted by the source.",
+-      "sonnetReasoning": "The source confirms that Noah Tan holds the role of James C. Gaither Junior Fellow at Carnegie Endowment for International Peace, and that this role is within the Technology and International Affairs Program. However, the record claims the organization is specifically the 'AI Program,' while the source clearly states it is the 'Technology and International Affairs Program' — a broader program that covers AI, cybersecurity, biotechnology, and the information environment. The role and person are confirmed, but the specific sub-program label 'AI Program' is not supported by the source text.",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-n52KZ9ERBI",
+-      "label": "true",
+-      "description": "Arthur Nelson — Co-Director at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text explicitly lists 'Arthur Nelson' under 'Co-Director, Technology and International Affairs Program' with the description 'Arthur Nelson is co-director of Carnegie's Technology and International Affairs Program.' This directly confirms all key fields in the record: person (Arthur Nelson), organization (Carnegie Endowment for International Peace, specifically the Technology and International Affairs Program), role (Co-Director), and roleType (key-person). The only minor discrepancy is that the record specifies 'Carnegie Endowment for International Peace AI Program' while the source refers to the 'Technology and International Affairs Program' which covers AI as one of four focus areas. However, this is a reasonable organizational naming variation and does not contradict the core claim.",
+-      "sonnetReasoning": "The source confirms that Arthur Nelson is Co-Director of the Technology and International Affairs Program at Carnegie Endowment for International Peace. However, the record claims his role is specifically 'Co-Director at Carnegie Endowment for International Peace AI Program,' which is inaccurate in its naming — the program is called the 'Technology and International Affairs Program,' not the 'AI Program.' The program does focus on AI among other areas (cybersecurity, biotechnology, information environment), but calling it the 'AI Program' is a mischaracterization of the program's name. The person, organization, and role type are otherwise confirmed, but the organization/program name in the record is imprecise.",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-xy9kTV5rtL",
+-      "label": "true",
+-      "description": "Alejandro N. Mayorkas — Visiting Scholar at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "partial",
+-      "sonnetVerdict": "contradicted",
+-      "haikuReasoning": "The source confirms that Alejandro N. Mayorkas is a Visiting Scholar at Carnegie Endowment for International Peace. However, the source lists him simply as 'Visiting Scholar' under the Technology and International Affairs Program staff section, without explicitly stating he is a 'Visiting Scholar at Carnegie Endowment for International Peace AI Program.' The source text shows he is affiliated with the Technology and International Affairs Program (which covers AI among other areas), not specifically an 'AI Program.' The record's specification of 'AI Program' is more narrow than what the source indicates. The role and person are confirmed, but the organizational unit specification in the record is not fully supported by the source text.",
+-      "sonnetReasoning": "The source confirms that Mayorkas is a Visiting Scholar at the Carnegie Endowment for International Peace, but he is listed under the 'Technology and International Affairs Program' staff section — not specifically the 'AI Program'. His bio does not specify any sub-program affiliation, and unlike other staff members (e.g., Anton Leicht who is explicitly described as researching AI), Mayorkas's description makes no mention of AI. The record claims his organization is 'Carnegie Endowment for International Peace AI Program', but the source does not support this specific sub-program designation. The program is called 'Technology and International Affairs Program', not 'AI Program'. This is a meaningful inaccuracy in the organization field, making the record contradicted on that specific claim.",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-7AAnTrXfNN",
+-      "label": "true",
+-      "description": "Thom Crockett — Program Manager at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly lists 'Thom Crockett' with the title 'Program Manager, Technology and International Affairs Program' under the Program Staff section. The record claims he is a 'Program Manager at Carnegie Endowment for International Peace AI Program'. The source confirms the person name, organization (Carnegie Endowment for International Peace), and role (Program Manager). The only minor discrepancy is that the source refers to the 'Technology and International Affairs Program' rather than 'AI Program' specifically, but the Technology and International Affairs Program explicitly covers AI as one of its four focus areas, so this is not a contradiction—it's a more specific vs. general naming convention. The roleType 'career' is reasonable for a Program Manager position and is not contradicted by the source.",
+-      "sonnetReasoning": "The source confirms that Thom Crockett holds the role of 'Program Manager' at Carnegie Endowment for International Peace, but the program is listed as 'Technology and International Affairs Program' — not specifically the 'AI Program' as claimed in the record. The Technology and International Affairs Program covers four areas (AI, information environment, cybersecurity, and biotechnology), so calling it the 'AI Program' is an inaccurate narrowing of the actual program name. The person, organization, and role type (career) are consistent with the source, but the specific program name in the record is incorrect/imprecise.",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-YsXk2ZVDUf",
+-      "label": "true",
+-      "description": "Isabella Wright — Program Coordinator at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text explicitly lists 'Isabella Wright' with the title 'Program Coordinator, Technology and International Affairs' at the Carnegie Endowment for International Peace. The record claims she is a 'Program Coordinator at Carnegie Endowment for International Peace AI Program'. The source confirms her name, role title, and organization. The record specifies 'AI Program' as a sub-program, while the source lists her under 'Technology and International Affairs Program' which encompasses AI as one of four focus areas. This is a minor organizational specificity difference but does not contradict the core facts—she is indeed a Program Coordinator at Carnegie Endowment for International Peace working in a program that covers AI.",
+-      "sonnetReasoning": "The source confirms that Isabella Wright holds the role of Program Coordinator at the Carnegie Endowment for International Peace's Technology and International Affairs Program. However, the record specifies 'AI Program' as the organization, which is inaccurate — the correct program name is 'Technology and International Affairs Program,' which covers AI, cybersecurity, information environment, and biotechnology. The role title 'Program Coordinator' is confirmed, and the person's name is confirmed. The roleType of 'career' is not addressed by the source but is a reasonable inference. The main discrepancy is the narrowing of the program to 'AI Program' when it is actually the broader 'Technology and International Affairs Program.'",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-personnel-4QpUpeeRvv",
+-      "label": "true",
+-      "description": "Alicia Wanless — Senior Fellow and Director, Information Environment Project at Carnegie Endowment for International Peace AI Program",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly lists Alicia Wanless with the title 'Senior Fellow, Technology and International Affairs, Director, Information Environment Project' at Carnegie Endowment for International Peace. The record claims she is a 'Senior Fellow and Director, Information Environment Project at Carnegie Endowment for International Peace AI Program.' The source confirms her role as Senior Fellow and Director of the Information Environment Project at Carnegie. The only minor discrepancy is that the source lists her under 'Technology and International Affairs Program' rather than 'AI Program,' but the source text explicitly states that AI is one of four focus areas within the Technology and International Affairs Program, making this a matter of organizational hierarchy rather than a contradiction. All key facts are confirmed.",
+-      "sonnetReasoning": "The source confirms Alicia Wanless's person, organization (Carnegie Endowment for International Peace), role as Senior Fellow and Director of the Information Environment Project, and roleType as key-person. However, the record claims her organization unit is the 'AI Program,' while the source places her in the 'Technology and International Affairs Program' — a broader program that covers AI, the information environment, cybersecurity, and biotechnology. The record's attribution to specifically the 'AI Program' is inaccurate; she belongs to the Technology and International Affairs Program. This is a partial match: the person, role title, and organization are confirmed, but the specific program/unit name is incorrect.",
+-      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-nAmNFgpTRD",
+-      "label": "true",
+-      "description": "\"Military Applications of AI: Ethical Concerns in an Uncertain World\" by Forrest E. Morgan, Benjamin Boudreaux, Andrew J. Lohn, Mark Ashby, Christian Curriden, Kelly Klima, Derek Grossman (2020)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "contradicted",
+-      "haikuReasoning": "All key fields in the record are directly confirmed by the source text. The title matches exactly (with minor capitalization variation in 'Artificial Intelligence' vs 'AI' in the record, which is acceptable). All seven authors are listed in the correct order. The publication date of 2020 is confirmed (published Apr 28, 2020). The publication type is confirmed as a research report from RAND Corporation. No contradictions or discrepancies were found.",
+-      "sonnetReasoning": "The record's title field states 'Military Applications of AI: Ethical Concerns in an Uncertain World', omitting the word 'Artificial Intelligence' and abbreviating it as 'AI'. The source text consistently uses the full title 'Military Applications of Artificial Intelligence: Ethical Concerns in an Uncertain World' throughout (in the page heading, the citation, and the document details). While this is a minor difference, the title as claimed does not match the actual title. All other fields (authors, publishedDate: 2020, publicationType: report) are confirmed by the source.",
+-      "sourceUrl": "https://www.rand.org/pubs/research_reports/RR3139-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-GWzE7Is0Cp",
+-      "label": "true",
+-      "description": "\"AI and the Future of Work\" by Tobias Sytsma, Melanie Zaber, Rachel Slama (2024)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly. All three authors are listed in the correct order (Tobias Sytsma, Melanie A. Zaber, Rachel Slama). The publication date is confirmed as 2024 (specifically Dec 18, 2024). The publication type is confirmed as a presentation/report—the source explicitly states 'This publication is part of the RAND presentation series' and categorizes it under 'Presentations.' All structured data fields are accurate and verifiable from the source.",
+-      "sonnetReasoning": "The source confirms the title ('AI and the Future of Work'), authors (Tobias Sytsma, Melanie A. Zaber, Rachel Slama — note middle initial 'A.' for Zaber, which is a minor difference), and published date (2024, specifically Dec 18, 2024). However, the publicationType field is listed as 'report' in the record, while the source clearly identifies it as a 'presentation' (document number PT-A2655-1, part of the RAND presentation series, and labeled as a 'Video'). This is a meaningful discrepancy — the source says 'presentation', not 'report' — making the record partially correct but wrong on publicationType.",
+-      "sourceUrl": "https://www.rand.org/pubs/presentations/PTA2655-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-amBuPandy0",
+-      "label": "true",
+-      "description": "\"Generative AI Threats to Information Integrity\" by Todd C. Helmus, Bilva Chandra (2024-04)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly (with the record using a shortened version that is accurate). Both authors are confirmed. The publication date is April 2024 (2024-04), matching the source's 'Published Apr 16, 2024'. The publication type is confirmed as a report—specifically a RAND Expert Insights perspective, which is a type of report publication. All verifiable claims in the record are supported by the source.",
+-      "sonnetReasoning": "The source confirms the authors (Todd C. Helmus, Bilva Chandra), the published date (April 2024), and the general subject matter. However, the title in the record is slightly truncated — the record says 'Generative AI Threats to Information Integrity' while the source gives the full title as 'Generative Artificial Intelligence Threats to Information Integrity and Potential Policy Responses'. Additionally, the publication type in the record is listed as 'report', but the source identifies it as part of the 'Expert Insights' series (document number PE-A3089-1), which is a perspectives/expert insights publication rather than a formal report. These discrepancies make the verdict 'partial' rather than fully confirmed.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3089-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-sCuNiiPdvG",
+-      "label": "true",
+-      "description": "\"AI Legislation Scorecard\" by Kara Williams, EPIC (2024-06)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text confirms all key fields in the record. The title 'AI Legislation Scorecard' is explicitly stated. Kara Williams is identified as an 'EPIC Fellow' who moderated the launch webinar on June 25, 2024, confirming her authorship and EPIC affiliation. The publication date of 2024-06 (June 2024) is confirmed by the webinar date of June 25, 2024. The publication type as 'report' is appropriate given the source describes it as 'a tool' and 'a rubric' for evaluating AI bills, which aligns with report classification. All claimed fields are directly supported by the source text.",
+-      "sonnetReasoning": "The title ('AI Legislation Scorecard'), publisher (EPIC), date (June 2024, confirmed by the June 25, 2024 webinar), and publication type (scorecard/report) are all confirmed. However, the author attribution is partially off: Kara Williams is identified in the source as an 'EPIC Fellow' who moderated the launch webinar, not explicitly as the author of the scorecard. The scorecard is attributed to EPIC as an organization ('EPIC set out to create a tool...'), with Kara Williams playing a prominent role. Listing 'Kara Williams, EPIC' as authors is plausible but not directly confirmed — the source doesn't explicitly credit her as the author of the document itself.",
+-      "sourceUrl": "https://epic.org/aiscorecard/"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-pN8DT6RpEJ",
+-      "label": "true",
+-      "description": "\"Bridging the AI Governance Gap: US and China's Divergent Approaches\" by Oliver Guest, Kevin Wei (2024-12)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text confirms all key fields in the record. The title matches (with minor wording variation: 'Artificial Intelligence' vs 'AI', and 'Governing' vs 'Approaches to Governing', but these are substantively equivalent). Authors Oliver Guest and Kevin Wei are confirmed. The publication date is confirmed as December 2024 (2024-12). The publication type is confirmed as a report/expert insight from RAND Corporation. All core metadata aligns with the source document.",
+-      "sonnetReasoning": "The source confirms the authors (Oliver Guest, Kevin Wei), the publication date (December 2024), and the general subject matter. However, there are two discrepancies worth noting: (1) The title in the record is shortened/paraphrased as 'Bridging the AI Governance Gap: US and China's Divergent Approaches' while the actual title is 'Bridging the Artificial Intelligence Governance Gap: The United States' and China's Divergent Approaches to Governing General-Purpose Artificial Intelligence' — this is an abbreviated version, not a contradiction per se, but not exact. (2) The publication type is listed as 'report' in the record, but the source identifies it as an 'Expert Insights' publication (part of the RAND expert insights series), which is a distinct RAND publication type from a full report. These differences make this a partial confirmation rather than full confirmation.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3703-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-5WkxjXc1DJ",
+-      "label": "true",
+-      "description": "\"Building a US National Strategy for the AI Era\" by Michael J. Mazarr, Anca Agachi (2025-11)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly (with the full subtitle present in source). Both authors are correctly listed. The publication date is confirmed as November 2025 (source states 'Published Nov 17, 2025'; record shows '2025-11' which is the same month-year). The publication type is confirmed as a report—the source identifies it as part of 'RAND expert insights series' which presents perspectives on policy issues, consistent with the 'report' classification. All verifiable fields match the source material.",
+-      "sonnetReasoning": "The source confirms the authors (Michael J. Mazarr and Anca Agachi), the published date (November 2025, specifically Nov 17, 2025), and the general publication type as a RAND research document. However, there are two minor discrepancies: (1) The title in the record is shortened ('Building a US National Strategy for the AI Era') compared to the full title in the source ('Building a U.S. National Strategy for the Artificial Intelligence Era: Drawing Lessons from Six Archetypal Strategies') — this is an abbreviation, not a contradiction, but it is incomplete. (2) The publication type is listed as 'report' in the record, but the source identifies it as an 'Expert Insights' publication in the RAND Perspectives (PE) series, which is a distinct RAND publication type from a full report. This makes the publicationType field a partial mismatch — not entirely wrong (it is a research publication) but not precisely accurate.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4297-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-publication-E4ByIZbQGh",
+-      "label": "true",
+-      "description": "\"Understanding the AI Diffusion Framework\" by Lennart Heim (2025-01)",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly: 'Understanding the Artificial Intelligence Diffusion Framework'. The author is confirmed as 'Lennart Heim'. The publication date is confirmed as January 2025 (source states 'Published Jan 14, 2025', which matches the claimed '2025-01'). The publication type is confirmed as a report—specifically labeled as 'Expert Insights' and 'Perspectives' (PE-A3776-1) by RAND, which is a research report format. All four key fields are directly supported by the source.",
+-      "sonnetReasoning": "The author (Lennart Heim), publication date (January 2025), and general subject matter are confirmed. However, the record's title field ('Understanding the AI Diffusion Framework') is a shortened version of the full title ('Understanding the Artificial Intelligence Diffusion Framework: Can Export Controls Create a U.S.-Led Global Artificial Intelligence Ecosystem?'). More importantly, the publication type is listed as 'report' in the record, but the source text clearly labels it as 'Expert Insights' (a RAND-specific publication category, not a report). This is a meaningful discrepancy in publication type, making the record only partially confirmed.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3776-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "F-publication-KPYiPyEzG0",
+-      "label": "false",
+-      "description": "\"The Artificial General Intelligence Race and International Security\" by Geoffrey Hinton, Yoshua Bengio (2025-09) — RAND",
+-      "haikuVerdict": "partial",
+-      "sonnetVerdict": "contradicted",
+-      "haikuReasoning": "The record claims Geoffrey Hinton and Yoshua Bengio as authors, but the source identifies the publication as 'Edited by' Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with Contributors listed as Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Hinton and Bengio are not mentioned anywhere in the source text. The title, venue (RAND), and publication date (2025-09, confirmed as September 24, 2025) are correct. The publication type is confirmed as a report/expert insights. However, the authorship claim is fundamentally incorrect—the record lists the wrong authors entirely.",
+-      "sonnetReasoning": "The record claims the authors are Geoffrey Hinton and Yoshua Bengio, but the source text clearly shows the publication was edited by Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with contributors Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Geoffrey Hinton and Yoshua Bengio are not mentioned anywhere in the source. The title (confirmed), venue/publisher RAND (confirmed), date September 2025 (confirmed), and publication type as a report/perspectives document (confirmed) are all accurate, but the authors field is directly contradicted by the source.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4155-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "F-publication-DQX7mNWbYx",
+-      "label": "false",
+-      "description": "\"The Artificial General Intelligence Race and International Security\" by Geoffrey Hinton, Yoshua Bengio (2025-09)",
+-      "haikuVerdict": "partial",
+-      "sonnetVerdict": "contradicted",
+-      "haikuReasoning": "The title and publication date (2025-09) are confirmed. However, the authors field is incomplete and inaccurate. The source lists this as an edited collection with editors (Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, Joel B. Predd) and contributors (Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, Tristan A. Volpe), not authored by Geoffrey Hinton and Yoshua Bengio. Neither Hinton nor Bengio appear anywhere in the source document. The publication type is listed as 'Expert Insights' (a RAND series), not generically as 'report,' though 'report' is a reasonable categorization. The record's author attribution is fundamentally incorrect.",
+-      "sonnetReasoning": "The record claims the authors are Geoffrey Hinton and Yoshua Bengio, but the source text clearly shows the publication was edited by Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with contributors Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Geoffrey Hinton and Yoshua Bengio are not mentioned anywhere in the source. The title ('The Artificial General Intelligence Race and International Security'), publication date (September 2025), and publication type (report/perspectives) are confirmed, but the authors field is directly contradicted. The publication type 'report' is close enough to RAND's 'Expert Insights' / 'Perspectives' series to be considered partial, but the author attribution is clearly and directly wrong.",
+-      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4155-1.html"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-funding-round-L9bLeqvxdU",
+-      "label": "true",
+-      "description": "Algorithmic Justice League — Rockefeller Foundation Grant - Algorithmic Vulnerability Bounty (2020-07), raised $150,000",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source directly confirms all key fields: company (Algorithmic Justice League), amount ($150,000), date (07.01.2020, which matches 2020-07), lead investor (Rockefeller Foundation), instrument (grant), and round name (Algorithmic Vulnerability Bounty). The description matches the stated purpose. All data points align precisely with the record.",
+-      "sonnetReasoning": "The source confirms the amount ($150,000), the date (July 2020 start), the lead investor (Rockefeller Foundation), the instrument (grant), and the connection to the Algorithmic Justice League's Algorithmic Vulnerability Bounty. However, the grant is technically made to the 'New Venture Fund' (a fiscal sponsor), not directly to the Algorithmic Justice League. The record lists the company as 'Algorithmic Justice League,' which is accurate in spirit but the legal grantee is New Venture Fund. The round name and description are well-supported. This is a partial confirmation because the direct recipient organization differs slightly from what the record states.",
+-      "sourceUrl": "https://www.rockefellerfoundation.org/grant/grant-new-venture-fund-2020-8/"
+-    },
+-    {
+-      "kind": "disagreement",
+-      "itemId": "T-funding-round-m5vzQLVwAu",
+-      "label": "true",
+-      "description": "American Civil Liberties Union (ACLU) — Ford Foundation - Social Bond Grant (2020-10), raised $8,000,000",
+-      "haikuVerdict": "confirmed",
+-      "sonnetVerdict": "partial",
+-      "haikuReasoning": "The source confirms all key fields: (1) the recipient is the ACLU Foundation (ACLUF), which is the ACLU's grantee entity; (2) the amount is $8,000,000, matching exactly; (3) the date is October 2020, matching the claimed 2020-10; (4) the lead investor/funder is the Ford Foundation (evident from the source being Ford Foundation's grants database); (5) the instrument is 'Social Bond' as stated in the source. The only minor naming variation is 'American Civil Liberties Union Foundation (ACLUF)' vs 'American Civil Liberties Union (ACLU)' in the record, but this is a standard legal entity naming convention and does not contradict the claim. All material facts are confirmed.",
+-      "sonnetReasoning": "The source confirms the grantee (ACLUF, which is the foundation arm of the ACLU), the amount ($8,000,000), the date (October 2020), and the grant type (Social Bond). However, the record names the company as 'American Civil Liberties Union (ACLU)' while the source specifies 'American Civil Liberties Union Foundation (ACLUF)' — these are related but legally distinct entities. The round name 'Ford Foundation - Social Bond Grant' is a reasonable characterization combining the funder (Ford Foundation, implied by the source being Ford Foundation's grants database) and grant type (Social Bond), though the source doesn't use that exact combined label. The instrument as 'grant' aligns with the Social Bond grant type. The lead investor as Ford Foundation is consistent with the source context (Ford Foundation's own grants database). Overall, the core financial details are confirmed, but the entity name distinction (ACLU vs. ACLUF) introduces a minor discrepancy warranting a 'partial' verdict.",
+-      "sourceUrl": "https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/american-civil-liberties-union-foundation-acluf-138950/"
+-    }
+-  ],
+-  "failureSummary": {
+-    "haikuFalseConfirms": 0,
+-    "sonnetFalseConfirms": 0,
+-    "haikuMissedConfirms": 0,
+-    "disagreements": 17
+-  }
+-}
+\ No newline at end of file
+diff --git a/crux/calibration/run-calibration.ts b/crux/calibration/run-calibration.ts
+deleted file mode 100644
+index a3adb913e..000000000
+--- a/crux/calibration/run-calibration.ts
++++ /dev/null
+@@ -1,280 +0,0 @@
+-/**
+- * Calibration Runner (QUA-635)
+- *
+- * Replays the calibration corpus through the production record-sourcing
+- * prompt against a specified model (haiku or sonnet) and writes results
+- * to a JSON file. Each item's result includes the LLM verdict, confidence,
+- * extracted_value, reasoning, latency, and token usage.
+- *
+- * Usage:
+- *   WIKI_SERVER_ENV=prod pnpm tsx crux/calibration/run-calibration.ts --model=haiku
+- *   WIKI_SERVER_ENV=prod pnpm tsx crux/calibration/run-calibration.ts --model=sonnet
+- */
+-
+-import { readFileSync, writeFileSync } from 'node:fs';
+-import { createLlmClient, callLlm } from '../lib/llm.ts';
+-import { MODELS } from '../lib/anthropic.ts';
+-import { parseJsonResponse } from '../lib/anthropic.ts';
+-import { buildRecordSourcingPrompt } from '../lib/sourcing/item-verifier.ts';
+-import { fetchSourceContent } from '../lib/sourcing/source-fetcher.ts';
+-import type { RecordItemData } from '../lib/sourcing/orchestrator-types.ts';
+-import type { RecordType } from '../../apps/wiki-server/src/api-types.ts';
+-
+-// ── CLI ──────────────────────────────────────────────────────────────
+-
+-function parseArgs(): { model: 'haiku' | 'sonnet'; limit?: number } {
+-  const args = process.argv.slice(2);
+-  let model: 'haiku' | 'sonnet' = 'haiku';
+-  let limit: number | undefined;
+-  for (const a of args) {
+-    if (a.startsWith('--model=')) {
+-      const v = a.slice('--model='.length);
+-      if (v !== 'haiku' && v !== 'sonnet') {
+-        throw new Error(`Unknown model: ${v}. Use --model=haiku or --model=sonnet`);
+-      }
+-      model = v;
+-    } else if (a.startsWith('--limit=')) {
+-      limit = Number(a.slice('--limit='.length));
+-    }
+-  }
+-  return { model, limit };
+-}
+-
+-// ── Pricing (USD per 1M tokens; approximate) ────────────────────────
+-
+-const PRICING: Record<'haiku' | 'sonnet', { inputPerMTok: number; outputPerMTok: number }> = {
+-  // Claude Haiku 4.5: $1 / $5 per 1M tokens (Anthropic public pricing)
+-  haiku: { inputPerMTok: 1.0, outputPerMTok: 5.0 },
+-  // Claude Sonnet 4.6: $3 / $15 per 1M tokens (Anthropic public pricing)
+-  sonnet: { inputPerMTok: 3.0, outputPerMTok: 15.0 },
+-};
+-
+-// ── Corpus types (keep in sync with build-corpus.ts) ───────────────
+-
+-interface CorpusItem {
+-  id: string;
+-  label: 'true' | 'false';
+-  expectedVerdict: 'confirmed' | 'contradicted' | 'unverifiable';
+-  recordType: 'personnel' | 'publication' | 'funding-round';
+-  recordId: string;
+-  entityDisplayName: string;
+-  description: string;
+-  fields: Record<string, string | number | null>;
+-  sourceUrl: string;
+-  mutation?: {
+-    kind: string; field: string;
+-    originalValue: string | number | null;
+-    mutatedValue: string | number | null;
+-    note: string;
+-  };
+-}
+-
+-interface RunResult {
+-  itemId: string;
+-  label: 'true' | 'false';
+-  recordType: string;
+-  description: string;
+-  sourceUrl: string;
+-  verdict: string | null;            // parsed from LLM
+-  confidence: number | null;
+-  extractedValue: string;
+-  reasoning: string;
+-  rawResponse?: string;
+-  /** Whether extractedValue contains a substring (>= 40 chars) that appears in source_content */
+-  quoteFidelityHit: boolean | null;
+-  /** Longest substring of extracted_value (length >= 40) that appears verbatim in source text. */
+-  quoteFidelityExample: string | null;
+-  latencyMs: number;
+-  inputTokens: number;
+-  outputTokens: number;
+-  costUsd: number;
+-  error?: string;
+-}
+-
+-// ── Quote fidelity scorer ──────────────────────────────────────────
+-
+-function normalize(s: string): string {
+-  return s.toLowerCase().replace(/\s+/g, ' ').trim();
+-}
+-
+-/**
+- * Find the longest substring of `extracted` (length ≥ 40) that appears in
+- * `sourceText`. Uses a simple sliding-window approach — adequate for a 100-item
+- * corpus. Returns null if no substring ≥ 40 chars matches.
+- */
+-function longestSharedSubstring(extracted: string, sourceText: string, minLen = 40): string | null {
+-  const e = normalize(extracted);
+-  const s = normalize(sourceText);
+-  if (e.length < minLen || s.length < minLen) return null;
+-  // Try to find any contiguous window of length >= minLen from e that appears in s.
+-  // Start with the longest-possible and shrink.
+-  for (let len = Math.min(e.length, 200); len >= minLen; len -= 10) {
+-    for (let i = 0; i + len <= e.length; i += 5) {
+-      const window = e.slice(i, i + len);
+-      if (s.includes(window)) return window;
+-    }
+-  }
+-  return null;
+-}
+-
+-// ── Build a VerifyItem-shaped input for the prompt ────────────────
+-
+-function buildRecordItemData(item: CorpusItem): RecordItemData {
+-  return {
+-    kind: 'record',
+-    recordType: item.recordType as RecordType,
+-    recordId: item.recordId,
+-    fields: item.fields,
+-    entityId: null,
+-    displayName: item.description,
+-    entityDisplayName: item.entityDisplayName,
+-  };
+-}
+-
+-// ── Main ──────────────────────────────────────────────────────────
+-
+-async function main() {
+-  const { model, limit } = parseArgs();
+-  const corpusPath = new URL('./data/corpus.json', import.meta.url).pathname;
+-  const corpus = JSON.parse(readFileSync(corpusPath, 'utf8')) as {
+-    items: CorpusItem[];
+-  };
+-  const items = limit ? corpus.items.slice(0, limit) : corpus.items;
+-  console.log(`Loaded ${items.length} items. Model: ${model} → ${MODELS[model]}`);
+-
+-  const client = createLlmClient();
+-  const results: RunResult[] = [];
+-  const modelPricing = PRICING[model];
+-
+-  // Track total cost
+-  let totalInputTokens = 0;
+-  let totalOutputTokens = 0;
+-  let totalCost = 0;
+-  let processed = 0;
+-
+-  for (const item of items) {
+-    processed++;
+-    const start = Date.now();
+-    try {
+-      // Fetch source content (uses citation_content cache — same path production uses).
+-      const fetchResult = await fetchSourceContent(item.sourceUrl, undefined, '[calib]');
+-      if (!fetchResult.content) {
+-        results.push({
+-          itemId: item.id,
+-          label: item.label,
+-          recordType: item.recordType,
+-          description: item.description,
+-          sourceUrl: item.sourceUrl,
+-          verdict: null,
+-          confidence: null,
+-          extractedValue: '',
+-          reasoning: '',
+-          quoteFidelityHit: null,
+-          quoteFidelityExample: null,
+-          latencyMs: Date.now() - start,
+-          inputTokens: 0,
+-          outputTokens: 0,
+-          costUsd: 0,
+-          error: `fetchSourceContent: ${fetchResult.errorType ?? 'no_content'}`,
+-        });
+-        continue;
+-      }
+-
+-      // Build the prompt using the exact production builder.
+-      const prompt = buildRecordSourcingPrompt(
+-        buildRecordItemData(item),
+-        item.description,
+-        fetchResult.content,
+-      );
+-
+-      // Call the model.
+-      const llmResult = await callLlm(client, prompt, {
+-        model: MODELS[model],
+-        maxTokens: 500,
+-        temperature: 0,
+-        retryLabel: `calib-${item.id}`,
+-      });
+-
+-      const raw = parseJsonResponse(llmResult.text);
+-      const verdict = (raw as { verdict?: string }).verdict ?? null;
+-      const confidence = (raw as { confidence?: number }).confidence ?? null;
+-      const extractedValue = (raw as { extracted_value?: string }).extracted_value ?? '';
+-      const reasoning = (raw as { reasoning?: string }).reasoning ?? '';
+-
+-      // Quote-fidelity check.
+-      const quoteMatch = longestSharedSubstring(extractedValue, fetchResult.content);
+-
+-      const inputTok = llmResult.usage?.input_tokens ?? 0;
+-      const outputTok = llmResult.usage?.output_tokens ?? 0;
+-      const cost = (inputTok / 1e6) * modelPricing.inputPerMTok
+-        + (outputTok / 1e6) * modelPricing.outputPerMTok;
+-
+-      totalInputTokens += inputTok;
+-      totalOutputTokens += outputTok;
+-      totalCost += cost;
+-
+-      results.push({
+-        itemId: item.id,
+-        label: item.label,
+-        recordType: item.recordType,
+-        description: item.description,
+-        sourceUrl: item.sourceUrl,
+-        verdict,
+-        confidence,
+-        extractedValue,
+-        reasoning,
+-        rawResponse: llmResult.text.slice(0, 2000),
+-        quoteFidelityHit: quoteMatch != null,
+-        quoteFidelityExample: quoteMatch,
+-        latencyMs: Date.now() - start,
+-        inputTokens: inputTok,
+-        outputTokens: outputTok,
+-        costUsd: cost,
+-      });
+-
+-      if (processed % 10 === 0) {
+-        console.log(`  [${processed}/${items.length}] last: ${item.label}→${verdict} (conf=${confidence}) cost=$${cost.toFixed(4)}`);
+-      }
+-    } catch (e) {
+-      results.push({
+-        itemId: item.id,
+-        label: item.label,
+-        recordType: item.recordType,
+-        description: item.description,
+-        sourceUrl: item.sourceUrl,
+-        verdict: null,
+-        confidence: null,
+-        extractedValue: '',
+-        reasoning: '',
+-        quoteFidelityHit: null,
+-        quoteFidelityExample: null,
+-        latencyMs: Date.now() - start,
+-        inputTokens: 0,
+-        outputTokens: 0,
+-        costUsd: 0,
+-        error: e instanceof Error ? e.message : String(e),
+-      });
+-      console.error(`  [${processed}/${items.length}] ERROR on ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+-    }
+-  }
+-
+-  const outputPath = new URL(`./data/results-${model}.json`, import.meta.url).pathname;
+-  writeFileSync(outputPath, JSON.stringify({
+-    runAt: new Date().toISOString(),
+-    model,
+-    modelId: MODELS[model],
+-    itemsProcessed: results.length,
+-    totalInputTokens,
+-    totalOutputTokens,
+-    totalCostUsd: totalCost,
+-    results,
+-  }, null, 2));
+-
+-  console.log(`\n✓ Wrote ${results.length} results to ${outputPath}`);
+-  console.log(`Total cost: $${totalCost.toFixed(4)}  (input: ${totalInputTokens} tok, output: ${totalOutputTokens} tok)`);
+-}
+-
+-main().catch((e) => {
+-  console.error('FAILED:', e);
+-  process.exit(1);
+-});
+diff --git a/crux/commands/backfill-grantee-ids.ts b/crux/commands/backfill-grantee-ids.ts
+deleted file mode 100644
+index 4e6e2eca3..000000000
+--- a/crux/commands/backfill-grantee-ids.ts
++++ /dev/null
+@@ -1,263 +0,0 @@
+-/**
+- * Backfill granteeId in the grants table with matched entity stableIds.
+- *
+- * Existing grants may have display names (e.g. "OpenAI") in granteeId instead
+- * of entity stableIds (e.g. "OwXl35e7bg"). This command uses the entity matcher
+- * to retroactively link grantees to their entity pages.
+- *
+- * Usage:
+- *   pnpm crux tb backfill-grantee-ids run                # Apply updates
+- *   pnpm crux tb backfill-grantee-ids run --dry-run      # Preview without writing
+- */
+-
+-import {
+-  buildEntityMatcher,
+-  matchGrantee,
+-} from "../lib/grant-import/entity-matcher.ts";
+-import { isNumericGranteeId } from "../lib/grant-import/sync.ts";
+-import {
+-  batchedRequest,
+-  getServerUrl,
+-} from "../lib/wiki-server/client.ts";
+-
+-// ---------------------------------------------------------------------------
+-// Types
+-// ---------------------------------------------------------------------------
+-
+-interface GrantIdRow {
+-  id: string;
+-  granteeId: string | null;
+-  name: string;
+-}
+-
+-interface AllGranteeIdsResponse {
+-  grants: GrantIdRow[];
+-  total: number;
+-}
+-
+-interface BatchUpdateResult {
+-  updated: number;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Helpers
+-// ---------------------------------------------------------------------------
+-
+-/**
+- * A 10-char alphanumeric stableId looks like "aB3cD4eF5g".
+- * Display names are typically longer or contain spaces/punctuation.
+- */
+-function looksLikeStableId(value: string): boolean {
+-  return /^[A-Za-z0-9]{10}$/.test(value);
+-}
+-
+-const BATCH_SIZE = 200;
+-
+-// ---------------------------------------------------------------------------
+-// Core logic
+-// ---------------------------------------------------------------------------
+-
+-async function runBackfill(dryRun: boolean): Promise<void> {
+-  const serverUrl = getServerUrl();
+-  if (!serverUrl) {
+-    throw new Error(
+-      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+-    );
+-  }
+-
+-  // 1. Build entity matcher
+-  console.log("Building entity matcher...");
+-  const matcher = buildEntityMatcher();
+-  console.log(`  Entity matcher loaded (${matcher.allNames.size} known names)\n`);
+-
+-  // 2. Fetch all grant IDs and granteeIds
+-  console.log(`Fetching grants from ${serverUrl}...`);
+-  const result = await batchedRequest<AllGranteeIdsResponse>(
+-    "GET",
+-    "/api/grants/all-grantee-ids"
+-  );
+-
+-  if (!result.ok) {
+-    throw new Error(`Failed to fetch grants: ${result.message}`);
+-  }
+-
+-  const allGrants = result.data.grants;
+-  console.log(`  Total grants: ${allGrants.length}\n`);
+-
+-  // 3. Categorize grants
+-  const alreadyLinked: GrantIdRow[] = [];
+-  const noGranteeId: GrantIdRow[] = [];
+-  const wikiIds: GrantIdRow[] = [];
+-  const needsMatching: GrantIdRow[] = [];
+-
+-  for (const grant of allGrants) {
+-    if (!grant.granteeId) {
+-      noGranteeId.push(grant);
+-    } else if (looksLikeStableId(grant.granteeId)) {
+-      alreadyLinked.push(grant);
+-    } else if (isNumericGranteeId(grant.granteeId)) {
+-      wikiIds.push(grant);
+-    } else {
+-      needsMatching.push(grant);
+-    }
+-  }
+-
+-  console.log("=== Grant Categorization ===");
+-  console.log(`  Already linked (stableId):  ${alreadyLinked.length}`);
+-  console.log(`  No granteeId (null):        ${noGranteeId.length}`);
+-  console.log(`  Wiki IDs (to clear):     ${wikiIds.length}`);
+-  console.log(`  Display names (to match):   ${needsMatching.length}\n`);
+-
+-  // Show wiki IDs that will be cleared
+-  if (wikiIds.length > 0) {
+-    const uniqueIds = new Map<string, number>();
+-    for (const g of wikiIds) {
+-      uniqueIds.set(g.granteeId!, (uniqueIds.get(g.granteeId!) || 0) + 1);
+-    }
+-    console.log(`Numeric grantee IDs (${uniqueIds.size} unique, will be set to null):`);
+-    for (const [id, count] of [...uniqueIds.entries()].sort((a, b) => b[1] - a[1])) {
+-      console.log(`  ${count.toString().padStart(4)}x  "${id}"`);
+-    }
+-    console.log("");
+-  }
+-
+-  // 4. Match display names to entity stableIds
+-  const matched: Array<{ id: string; granteeId: string; oldValue: string }> = [];
+-  const unmatched: Map<string, number> = new Map(); // name -> count
+-
+-  for (const grant of needsMatching) {
+-    const displayName = grant.granteeId!;
+-    const stableId = matchGrantee(displayName, matcher);
+-
+-    if (stableId) {
+-      matched.push({ id: grant.id, granteeId: stableId, oldValue: displayName });
+-    } else {
+-      const count = unmatched.get(displayName) || 0;
+-      unmatched.set(displayName, count + 1);
+-    }
+-  }
+-
+-  console.log("=== Matching Results ===");
+-  console.log(`  Newly matched:   ${matched.length}`);
+-  console.log(`  Still unmatched:  ${needsMatching.length - matched.length}\n`);
+-
+-  // 5. Show sample matches
+-  if (matched.length > 0) {
+-    console.log("Sample matches (first 20):");
+-    for (const m of matched.slice(0, 20)) {
+-      console.log(`  "${m.oldValue}" -> ${m.granteeId}`);
+-    }
+-    if (matched.length > 20) {
+-      console.log(`  ... and ${matched.length - 20} more\n`);
+-    } else {
+-      console.log("");
+-    }
+-  }
+-
+-  // 6. Show unmatched names (sorted by frequency)
+-  if (unmatched.size > 0) {
+-    const sorted = [...unmatched.entries()].sort((a, b) => b[1] - a[1]);
+-    console.log(`Unmatched names (${sorted.length} unique, top 30 by frequency):`);
+-    for (const [name, count] of sorted.slice(0, 30)) {
+-      console.log(`  ${count.toString().padStart(4)}x  "${name}"`);
+-    }
+-    if (sorted.length > 30) {
+-      console.log(`  ... and ${sorted.length - 30} more unique names\n`);
+-    } else {
+-      console.log("");
+-    }
+-  }
+-
+-  // 7. Build combined update list: matched display names + wiki IDs to clear
+-  const toClear: Array<{ id: string; granteeId: string | null; oldValue: string }> =
+-    wikiIds.map((g) => ({ id: g.id, granteeId: null, oldValue: g.granteeId! }));
+-  const allUpdates = [...matched, ...toClear];
+-
+-  if (allUpdates.length === 0) {
+-    console.log("No grants to update.");
+-    return;
+-  }
+-
+-  if (toClear.length > 0) {
+-    console.log(`Will clear ${toClear.length} numeric grantee IDs (set to null)`);
+-  }
+-
+-  if (dryRun) {
+-    console.log(`Dry run — would update ${allUpdates.length} grants (${matched.length} matched + ${toClear.length} cleared). Use without --dry-run to apply.`);
+-    return;
+-  }
+-
+-  console.log(`Updating ${allUpdates.length} grants...`);
+-
+-  let totalUpdated = 0;
+-  let failedBatches = 0;
+-
+-  for (let i = 0; i < allUpdates.length; i += BATCH_SIZE) {
+-    const batch = allUpdates.slice(i, i + BATCH_SIZE);
+-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+-    const totalBatches = Math.ceil(allUpdates.length / BATCH_SIZE);
+-
+-    console.log(`  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`);
+-
+-    const updateResult = await batchedRequest<BatchUpdateResult>(
+-      "PATCH",
+-      "/api/grants/batch-update-grantee",
+-      {
+-        items: batch.map((m) => ({ id: m.id, granteeId: m.granteeId })),
+-      }
+-    );
+-
+-    if (updateResult.ok) {
+-      totalUpdated += updateResult.data.updated;
+-      console.log(`    -> ${updateResult.data.updated} updated`);
+-    } else {
+-      failedBatches++;
+-      console.error(`    x Batch ${batchNum} failed: ${updateResult.message}`);
+-    }
+-  }
+-
+-  console.log(`\nTotal updated: ${totalUpdated}`);
+-  if (failedBatches > 0) {
+-    throw new Error(`${failedBatches} batch(es) failed`);
+-  }
+-
+-  console.log("Done.");
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Crux command exports
+-// ---------------------------------------------------------------------------
+-
+-type CommandResult = { exitCode?: number; output?: string };
+-
+-async function runCommand(
+-  _args: string[],
+-  options: Record<string, unknown>
+-): Promise<CommandResult> {
+-  const dryRun = !!options.dryRun || !!options["dry-run"];
+-  await runBackfill(dryRun);
+-  return { exitCode: 0 };
+-}
+-
+-export const commands = {
+-  run: runCommand,
+-  default: runCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Backfill Grantee IDs — Link existing grants to entity stableIds
+-
+-Commands:
+-  run                  Run the backfill (default)
+-  run --dry-run        Preview matches without writing
+-
+-This command:
+-  1. Fetches all grants from the wiki-server
+-  2. Identifies grants where granteeId is a display name (not a 10-char stableId)
+-  3. Clears purely numeric grantee IDs (internal IDs from external systems)
+-  4. Runs the entity matcher (manual overrides + name normalization)
+-  5. Updates matched grants with the entity stableId
+-  6. Reports unmatched names (can be added as manual overrides)
+-`;
+-}
+diff --git a/crux/commands/backfill-pr-outcomes.ts b/crux/commands/backfill-pr-outcomes.ts
+deleted file mode 100644
+index 9bcd26e57..000000000
+--- a/crux/commands/backfill-pr-outcomes.ts
++++ /dev/null
+@@ -1,194 +0,0 @@
+-/**
+- * Backfill PR Outcomes — scan agent sessions and set prOutcome based on GitHub PR state.
+- *
+- * For each completed agent session with a PR URL but no outcome:
+- * 1. Fetch the PR from GitHub API
+- * 2. Determine outcome: merged, closed_without_merge
+- * 3. Check if any subsequent PRs reference it in a fix context (merged_with_revisions)
+- * 4. Update the agent session record via wiki-server
+- *
+- * Usage:
+- *   crux backfill-pr-outcomes           # Dry run (show what would change)
+- *   crux backfill-pr-outcomes --apply   # Actually update records
+- *   crux backfill-pr-outcomes --all     # Include sessions that already have outcomes
+- */
+-
+-import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+-import { createLogger } from '../lib/output.ts';
+-import { githubApi, REPO } from '../lib/github.ts';
+-import { apiRequest } from '../lib/wiki-server/client.ts';
+-import { updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
+-import type { PrOutcome } from '../../apps/wiki-server/src/api-types.ts';
+-
+-// ---------------------------------------------------------------------------
+-// GitHub types
+-// ---------------------------------------------------------------------------
+-
+-interface GitHubPR {
+-  number: number;
+-  state: string; // 'open' | 'closed'
+-  merged_at: string | null;
+-  html_url: string;
+-  title: string;
+-}
+-
+-interface AgentSessionRow {
+-  id: number;
+-  branch: string;
+-  task: string;
+-  prUrl: string | null;
+-  prOutcome: string | null;
+-  status: string;
+-}
+-
+-interface AgentSessionListResponse {
+-  sessions: AgentSessionRow[];
+-}
+-
+-// ---------------------------------------------------------------------------
+-// run — default command
+-// ---------------------------------------------------------------------------
+-
+-async function runCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+-  const log = createLogger(options.ci as boolean);
+-  const c = log.colors;
+-  const apply = !!options.apply;
+-  const includeAll = !!options.all;
+-
+-  // Fetch agent sessions from wiki-server
+-  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
+-  const sessionsResult = await apiRequest<AgentSessionListResponse>(
+-    'GET',
+-    '/api/agent-sessions?limit=200',
+-  );
+-
+-  if (!sessionsResult.ok) {
+-    return {
+-      output: `${c.red}Error: Could not fetch agent sessions from wiki-server: ${sessionsResult.error}${c.reset}`,
+-      exitCode: 1,
+-    };
+-  }
+-
+-  const sessions = sessionsResult.data.sessions;
+-
+-  // 'stale' sessions may have prUrl written by /agent-ship before sweep fired.
+-  const candidates = sessions.filter(s => {
+-    if (!s.prUrl) return false;
+-    if (!includeAll && s.prOutcome) return false;
+-    return s.status === 'completed' || s.status === 'stale';
+-  });
+-
+-  if (candidates.length === 0) {
+-    return {
+-      output: `${c.green}No sessions need outcome backfill.${c.reset}\n` +
+-        `${c.dim}Total sessions: ${sessions.length}, with PR: ${sessions.filter(s => s.prUrl).length}, ` +
+-        `with outcome: ${sessions.filter(s => s.prOutcome).length}${c.reset}\n`,
+-      exitCode: 0,
+-    };
+-  }
+-
+-  let output = `\n${c.bold}PR Outcome Backfill${c.reset}\n`;
+-  output += `${c.dim}${candidates.length} sessions to process${apply ? ' (APPLYING)' : ' (DRY RUN)'}${c.reset}\n\n`;
+-
+-  let updated = 0;
+-  let skipped = 0;
+-  let errors = 0;
+-
+-  for (const session of candidates) {
+-    const prNum = session.prUrl!.match(/\/pull\/(\d+)/)?.[1];
+-    if (!prNum) {
+-      output += `  ${c.dim}[skip] Session ${session.id}: invalid PR URL ${session.prUrl}${c.reset}\n`;
+-      skipped++;
+-      continue;
+-    }
+-
+-    let pr: GitHubPR;
+-    try {
+-      pr = await githubApi<GitHubPR>(`/repos/${REPO}/pulls/${prNum}`);
+-    } catch (err) {
+-      const msg = err instanceof Error ? err.message : String(err);
+-      output += `  ${c.red}[error] Session ${session.id} (PR #${prNum}): ${msg}${c.reset}\n`;
+-      errors++;
+-      continue;
+-    }
+-
+-    let outcome: PrOutcome;
+-    if (pr.merged_at) {
+-      outcome = 'merged';
+-    } else if (pr.state === 'closed') {
+-      outcome = 'closed_without_merge';
+-    } else {
+-      // PR is still open — skip
+-      output += `  ${c.dim}[skip] Session ${session.id} (PR #${prNum}): still open${c.reset}\n`;
+-      skipped++;
+-      continue;
+-    }
+-
+-    const currentOutcome = session.prOutcome;
+-    if (currentOutcome === outcome) {
+-      output += `  ${c.dim}[unchanged] Session ${session.id} (PR #${prNum}): already ${outcome}${c.reset}\n`;
+-      skipped++;
+-      continue;
+-    }
+-
+-    const outcomeLabel = outcome === 'merged' ? c.green + outcome + c.reset :
+-      outcome === 'closed_without_merge' ? c.red + 'closed' + c.reset :
+-      outcome;
+-
+-    output += `  [${apply ? 'update' : 'would update'}] Session ${session.id} (PR #${prNum}): `;
+-    output += currentOutcome ? `${currentOutcome} → ${outcomeLabel}` : outcomeLabel;
+-    output += ` — ${session.task.slice(0, 60)}\n`;
+-
+-    if (apply) {
+-      try {
+-        await updateAgentSession(session.id, { prOutcome: outcome });
+-        updated++;
+-      } catch (err) {
+-        const msg = err instanceof Error ? err.message : String(err);
+-        output += `    ${c.red}Failed to update: ${msg}${c.reset}\n`;
+-        errors++;
+-      }
+-    } else {
+-      updated++;
+-    }
+-  }
+-
+-  output += `\n${c.bold}Summary:${c.reset}\n`;
+-  output += `  ${apply ? 'Updated' : 'Would update'}: ${updated}\n`;
+-  output += `  Skipped: ${skipped}\n`;
+-  if (errors > 0) output += `  ${c.red}Errors: ${errors}${c.reset}\n`;
+-  if (!apply && updated > 0) {
+-    output += `\n${c.dim}Run with --apply to update records.${c.reset}\n`;
+-  }
+-
+-  return { output, exitCode: errors > 0 ? 1 : 0 };
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Exports
+-// ---------------------------------------------------------------------------
+-
+-export const commands = {
+-  default: runCommand,
+-  run: runCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Backfill PR Outcomes — set prOutcome on agent sessions based on GitHub PR state
+-
+-Usage:
+-  crux backfill-pr-outcomes             Dry run (preview changes)
+-  crux backfill-pr-outcomes --apply     Apply changes to wiki-server
+-  crux backfill-pr-outcomes --all       Re-check sessions that already have outcomes
+-
+-Scans completed agent sessions with PR URLs. For each, fetches the PR from
+-GitHub and sets the outcome field:
+-  merged                 — PR was merged
+-  closed_without_merge   — PR was closed without merging
+-
+-Note: "merged_with_revisions" and "reverted" must be set manually via
+-  pnpm crux gh issues done <N> --outcome=merged_with_revisions
+-since they require human judgment about whether revisions were needed.
+-`;
+-}
+diff --git a/crux/commands/backfill-program-ids.ts b/crux/commands/backfill-program-ids.ts
+deleted file mode 100644
+index 992ec84e2..000000000
+--- a/crux/commands/backfill-program-ids.ts
++++ /dev/null
+@@ -1,290 +0,0 @@
+-/**
+- * Backfill programId in the grants table by matching grants to funding programs.
+- *
+- * Uses the program matcher (source + funder + focusArea patterns) to link
+- * existing grants to their funding programs. This is the retroactive version
+- * of what the import pipeline does for new grants.
+- *
+- * Usage:
+- *   pnpm crux tb backfill-program-ids run                # Apply updates
+- *   pnpm crux tb backfill-program-ids run --dry-run      # Preview without writing
+- */
+-
+-import {
+-  matchProgram,
+-  PROGRAM_IDS,
+-} from "../lib/grant-import/program-matcher.ts";
+-import {
+-  batchedRequest,
+-  getServerUrl,
+-} from "../lib/wiki-server/client.ts";
+-import { hostMatches } from "@longterm-wiki/url-utils";
+-
+-// ---------------------------------------------------------------------------
+-// Types
+-// ---------------------------------------------------------------------------
+-
+-interface GrantRow {
+-  id: string;
+-  programId: string | null;
+-  organizationId: string;
+-  source: string | null;
+-  name: string;
+-  notes: string | null;
+-}
+-
+-interface AllProgramIdsResponse {
+-  grants: GrantRow[];
+-  total: number;
+-}
+-
+-interface BatchUpdateResult {
+-  updated: number;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Source detection from grant URL
+-// ---------------------------------------------------------------------------
+-
+-/**
+- * Detect the grant source ID from its source URL.
+- * Grants in the DB store the source URL, not the source ID used during import.
+- */
+-function detectSource(sourceUrl: string | null): string | null {
+-  if (!sourceUrl) return null;
+-  const url = sourceUrl.toLowerCase();
+-
+-  if (hostMatches(url, "coefficientgiving.org") || hostMatches(url, "openphilanthropy.org"))
+-    return "coefficient-giving";
+-  if ((hostMatches(url, "effectivealtruism.org") && url.includes("/grants")) || hostMatches(url, "funds.effectivealtruism.org"))
+-    return "ea-funds";
+-  if (url.includes("survivalandflourishing"))
+-    return "sff";
+-  if (url.includes("ftxfuturefund") || (hostMatches(url, "web.archive.org") && url.includes("ftx")))
+-    return "ftx-future-fund";
+-  if (hostMatches(url, "manifund.org"))
+-    return "manifund";
+-  if (hostMatches(url, "givewell.org"))
+-    return "givewell";
+-  if (url.includes("astralcodexten"))
+-    return "acx-grants";
+-
+-  return null;
+-}
+-
+-/**
+- * Extract focusArea-like information from grant notes.
+- * EA Funds grants have the fund name in notes (e.g. "[Long-Term Future Fund] ...")
+- * Coefficient Giving grants have the focus area in notes (e.g. "[Potential Risks from Advanced AI] ...")
+- * FTX grants may have "regrant" in their focusArea stored in notes.
+- */
+-function extractFocusArea(notes: string | null): string | null {
+-  if (!notes) return null;
+-
+-  // Try to extract bracketed prefix: "[Focus Area] description"
+-  const bracketMatch = notes.match(/^\[([^\]]+)\]/);
+-  if (bracketMatch) return bracketMatch[1];
+-
+-  return null;
+-}
+-
+-const BATCH_SIZE = 200;
+-
+-// ---------------------------------------------------------------------------
+-// Core logic
+-// ---------------------------------------------------------------------------
+-
+-async function runBackfill(dryRun: boolean): Promise<void> {
+-  const serverUrl = getServerUrl();
+-  if (!serverUrl) {
+-    throw new Error(
+-      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+-    );
+-  }
+-
+-  // 1. Fetch all grants with program-related fields
+-  console.log(`Fetching grants from ${serverUrl}...`);
+-  const result = await batchedRequest<AllProgramIdsResponse>(
+-    "GET",
+-    "/api/grants/all-program-ids"
+-  );
+-
+-  if (!result.ok) {
+-    throw new Error(`Failed to fetch grants: ${result.message}`);
+-  }
+-
+-  const allGrants = result.data.grants;
+-  console.log(`  Total grants: ${allGrants.length}\n`);
+-
+-  // 2. Categorize grants
+-  const alreadyLinked: GrantRow[] = [];
+-  const noProgram: GrantRow[] = [];
+-
+-  for (const grant of allGrants) {
+-    if (grant.programId) {
+-      alreadyLinked.push(grant);
+-    } else {
+-      noProgram.push(grant);
+-    }
+-  }
+-
+-  console.log("=== Grant Categorization ===");
+-  console.log(`  Already linked (programId set):  ${alreadyLinked.length}`);
+-  console.log(`  No programId (to match):         ${noProgram.length}\n`);
+-
+-  // 3. Match grants to programs
+-  const matched: Array<{ id: string; programId: string; source: string }> = [];
+-  const unmatchedBySource = new Map<string, number>();
+-  const matchedByProgram = new Map<string, number>();
+-
+-  for (const grant of noProgram) {
+-    const source = detectSource(grant.source);
+-    const focusArea = extractFocusArea(grant.notes);
+-
+-    const programId = matchProgram({
+-      source: source || "",
+-      funderId: grant.organizationId,
+-      focusArea,
+-      name: grant.name,
+-      description: grant.notes,
+-    });
+-
+-    if (programId) {
+-      matched.push({ id: grant.id, programId, source: source || "unknown" });
+-      matchedByProgram.set(
+-        programId,
+-        (matchedByProgram.get(programId) || 0) + 1
+-      );
+-    } else {
+-      const src = source || "unknown";
+-      unmatchedBySource.set(src, (unmatchedBySource.get(src) || 0) + 1);
+-    }
+-  }
+-
+-  console.log("=== Matching Results ===");
+-  console.log(`  Newly matched:    ${matched.length}`);
+-  console.log(`  Still unmatched:  ${noProgram.length - matched.length}\n`);
+-
+-  // 4. Show matches by program
+-  if (matchedByProgram.size > 0) {
+-    // Reverse lookup program names from PROGRAM_IDS
+-    const idToLabel = new Map<string, string>();
+-    for (const [key, val] of Object.entries(PROGRAM_IDS)) {
+-      idToLabel.set(val, key);
+-    }
+-
+-    console.log("Matches by program:");
+-    const sortedPrograms = [...matchedByProgram.entries()].sort(
+-      (a, b) => b[1] - a[1]
+-    );
+-    for (const [progId, count] of sortedPrograms) {
+-      const label = idToLabel.get(progId) || progId;
+-      console.log(`  ${count.toString().padStart(5)}x  ${label} (${progId})`);
+-    }
+-    console.log("");
+-  }
+-
+-  // 5. Show unmatched by source
+-  if (unmatchedBySource.size > 0) {
+-    console.log("Unmatched by source:");
+-    const sorted = [...unmatchedBySource.entries()].sort(
+-      (a, b) => b[1] - a[1]
+-    );
+-    for (const [src, count] of sorted) {
+-      console.log(`  ${count.toString().padStart(5)}x  ${src}`);
+-    }
+-    console.log("");
+-  }
+-
+-  // 6. Apply updates
+-  if (matched.length === 0) {
+-    console.log("No grants to update.");
+-    return;
+-  }
+-
+-  if (dryRun) {
+-    console.log(
+-      `Dry run — would update ${matched.length} grants. Use without --dry-run to apply.`
+-    );
+-    return;
+-  }
+-
+-  console.log(`Updating ${matched.length} grants...`);
+-
+-  let totalUpdated = 0;
+-  let failedBatches = 0;
+-
+-  for (let i = 0; i < matched.length; i += BATCH_SIZE) {
+-    const batch = matched.slice(i, i + BATCH_SIZE);
+-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+-    const totalBatches = Math.ceil(matched.length / BATCH_SIZE);
+-
+-    console.log(
+-      `  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`
+-    );
+-
+-    const updateResult = await batchedRequest<BatchUpdateResult>(
+-      "PATCH",
+-      "/api/grants/batch-update-program",
+-      {
+-        items: batch.map((m) => ({ id: m.id, programId: m.programId })),
+-      }
+-    );
+-
+-    if (updateResult.ok) {
+-      totalUpdated += updateResult.data.updated;
+-      console.log(`    -> ${updateResult.data.updated} updated`);
+-    } else {
+-      failedBatches++;
+-      console.error(`    x Batch ${batchNum} failed: ${updateResult.message}`);
+-    }
+-  }
+-
+-  console.log(`\nTotal updated: ${totalUpdated}`);
+-  if (failedBatches > 0) {
+-    throw new Error(`${failedBatches} batch(es) failed`);
+-  }
+-
+-  console.log("Done.");
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Crux command exports
+-// ---------------------------------------------------------------------------
+-
+-type CommandResult = { exitCode?: number; output?: string };
+-
+-async function runCommand(
+-  _args: string[],
+-  options: Record<string, unknown>
+-): Promise<CommandResult> {
+-  const dryRun = !!options.dryRun || !!options["dry-run"];
+-  await runBackfill(dryRun);
+-  return { exitCode: 0 };
+-}
+-
+-export const commands = {
+-  run: runCommand,
+-  default: runCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Backfill Program IDs — Link existing grants to funding programs
+-
+-Commands:
+-  run                  Run the backfill (default)
+-  run --dry-run        Preview matches without writing
+-
+-This command:
+-  1. Fetches all grants from the wiki-server
+-  2. Identifies grants where programId is null
+-  3. Detects the grant source from the source URL
+-  4. Runs the program matcher (source + funder + focusArea rules)
+-  5. Updates matched grants with the funding program ID
+-  6. Reports unmatched grants by source
+-
+-The matching uses the same rules as the import pipeline, ensuring
+-consistency between new imports and backfilled grants.
+-`;
+-}
+diff --git a/crux/commands/import-quri-personnel.ts b/crux/commands/import-quri-personnel.ts
+deleted file mode 100644
+index 83606c91c..000000000
+--- a/crux/commands/import-quri-personnel.ts
++++ /dev/null
+@@ -1,199 +0,0 @@
+-/**
+- * Import QURI personnel records into wiki-server Postgres.
+- *
+- * Syncs a curated list of QURI staff, contractors, and board members
+- * to the personnel table via POST /api/personnel/sync.
+- *
+- * Usage:
+- *   pnpm crux tb import-quri-personnel sync              # Sync to wiki-server
+- *   pnpm crux tb import-quri-personnel sync --dry-run    # Preview without writing
+- */
+-
+-import type { CommandResult } from '../lib/command-types.ts';
+-import { getServerUrl } from '../lib/wiki-server/client.ts';
+-import { syncPersonnel } from '../lib/wiki-server/personnel.ts';
+-
+-// ---------------------------------------------------------------------------
+-// Personnel type (matches wiki-server SyncPersonnelItemSchema)
+-// ---------------------------------------------------------------------------
+-
+-interface PersonnelRecord {
+-  id: string;
+-  personId: string;
+-  organizationId: string;
+-  role: string;
+-  roleType: 'key-person' | 'board' | 'career';
+-  startDate?: string;
+-  endDate?: string | null;
+-  isFounder?: boolean;
+-  source?: string;
+-  notes?: string;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Curated QURI personnel data
+-// ---------------------------------------------------------------------------
+-
+-const QURI_PERSONNEL: PersonnelRecord[] = [
+-  {
+-    id: 'QRprs00001',
+-    personId: 'ozzie-gooen',
+-    organizationId: 'quri',
+-    role: 'Executive Director',
+-    roleType: 'key-person',
+-    startDate: '2019',
+-    endDate: null,
+-    isFounder: true,
+-    notes: 'Founder and Executive Director since 2019',
+-  },
+-  {
+-    id: 'QRprs00002',
+-    personId: 'slava-matyukhin',
+-    organizationId: 'quri',
+-    role: 'Lead Developer',
+-    roleType: 'key-person',
+-    startDate: '2022',
+-    endDate: '2025',
+-    isFounder: false,
+-    notes: 'Lead developer of Squiggle v0.8-0.10 and Squiggle Hub',
+-  },
+-  {
+-    id: 'QRprs00003',
+-    personId: 'nuno-sempere',
+-    organizationId: 'quri',
+-    role: 'Research Fellow',
+-    roleType: 'key-person',
+-    startDate: '2020',
+-    endDate: '2023',
+-    isFounder: false,
+-    notes: 'Built Metaforecast; extensive forecasting research',
+-  },
+-  {
+-    id: 'QRprs00004',
+-    personId: 'sam-nolan',
+-    organizationId: 'quri',
+-    role: 'Software Developer',
+-    roleType: 'key-person',
+-    startDate: '2021',
+-    endDate: '2023',
+-    isFounder: false,
+-    notes: 'Squiggle developer; led GiveWell CEA quantification project',
+-  },
+-  {
+-    id: 'QRprs00005',
+-    personId: 'elizabeth-van-nostrand',
+-    organizationId: 'quri',
+-    role: 'Consultant',
+-    roleType: 'key-person',
+-    startDate: '2019',
+-    endDate: '2020',
+-    isFounder: false,
+-    notes: 'Evaluation work and Amplifying Generalist Research experiment',
+-  },
+-  {
+-    id: 'QRprs00006',
+-    personId: 'quinn-dougherty',
+-    organizationId: 'quri',
+-    role: 'Software Engineer',
+-    roleType: 'key-person',
+-    startDate: '2021',
+-    endDate: '2022',
+-    isFounder: false,
+-    notes: 'Focused on epistemic public goods',
+-  },
+-  {
+-    id: 'QRprs00007',
+-    personId: 'ben-goldhaber',
+-    organizationId: 'quri',
+-    role: 'Board Member',
+-    roleType: 'board',
+-    isFounder: false,
+-  },
+-  {
+-    id: 'QRprs00008',
+-    personId: 'jacob-lagerros',
+-    organizationId: 'quri',
+-    role: 'Board Member',
+-    roleType: 'board',
+-    isFounder: false,
+-  },
+-  {
+-    id: 'QRprs00009',
+-    personId: 'andrew-critch',
+-    organizationId: 'quri',
+-    role: 'Board Member',
+-    roleType: 'board',
+-    isFounder: false,
+-  },
+-];
+-
+-// ---------------------------------------------------------------------------
+-// Command handler
+-// ---------------------------------------------------------------------------
+-
+-async function syncCommand(
+-  _args: string[],
+-  options: Record<string, unknown>,
+-): Promise<CommandResult> {
+-  const dryRun = !!options['dry-run'];
+-  const lines: string[] = [];
+-
+-  if (!getServerUrl()) {
+-    return {
+-      exitCode: 1,
+-      output:
+-        'wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod.',
+-    };
+-  }
+-
+-  lines.push('\n  QURI Personnel Import');
+-  lines.push(`  ${'='.repeat(40)}`);
+-  lines.push(`  ${QURI_PERSONNEL.length} personnel records to sync`);
+-
+-  if (dryRun) {
+-    for (const p of QURI_PERSONNEL) {
+-      lines.push(
+-        `    - ${p.personId}: ${p.role} (${p.roleType})${p.isFounder ? ' [founder]' : ''}`,
+-      );
+-    }
+-    lines.push('\n  DRY RUN: no changes made');
+-    return { exitCode: 0, output: lines.join('\n') };
+-  }
+-
+-  const result = await syncPersonnel(QURI_PERSONNEL, {
+-    forceSkipSourcing: true,
+-    forceSkipSourcingReason: 'bulk-import: curated QURI personnel data',
+-  });
+-
+-  if (!result.ok) {
+-    lines.push(`\n  Sync failed: ${result.message}`);
+-    return { exitCode: 1, output: lines.join('\n') };
+-  }
+-
+-  lines.push(`\n  Sync complete`);
+-  return { exitCode: 0, output: lines.join('\n') };
+-}
+-
+-// ---------------------------------------------------------------------------
+-// CLI interface
+-// ---------------------------------------------------------------------------
+-
+-export const commands: Record<
+-  string,
+-  (args: string[], options: Record<string, unknown>) => Promise<CommandResult>
+-> = {
+-  sync: syncCommand,
+-  default: syncCommand,
+-};
+-
+-export function getHelp(): string {
+-  return `
+-Import QURI Personnel — Sync QURI staff, contractors, and board members to PG
+-
+-Commands:
+-  sync          Sync personnel records to wiki-server (default)
+-
+-Options:
+-  --dry-run     Preview records without writing
+-`;
+-}
+diff --git a/crux/commands/tablebase.ts b/crux/commands/tablebase.ts
+index 93a25ae0f..f3e9d1f79 100644
+--- a/crux/commands/tablebase.ts
++++ b/crux/commands/tablebase.ts
+@@ -21,8 +21,6 @@ import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
+ import { truncate } from '../lib/text-utils.ts';
+ 
+ // Consolidated orphan domain imports
+-import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
+-import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
+ import { commands as backfillSourcesCommands } from './backfill-sources.ts';
+ import { commands as importGrantsCommands } from './import-grants.ts';
+ import { commands as importDivisionsCommands } from './import-divisions.ts';
+@@ -1506,8 +1504,6 @@ export const commands = {
+   'sync-careers': syncCareersCommand,
+   default: scanCommand,
+   // Consolidated from backfill-* orphan domains
+-  'backfill-grantee-ids': backfillGranteeIdsCommands.default,
+-  'backfill-program-ids': backfillProgramIdsCommands.default,
+   'backfill-sources': backfillSourcesCommands.default,
+   // Consolidated from import-* orphan domains
+   'import-grants': importGrantsCommands.default,
+@@ -1590,8 +1586,6 @@ Commands:
+   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
+ 
+   Backfill (consolidated from backfill-* domains):
+-  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+-  backfill-program-ids [--dry-run]       Link grants to funding programs
+   backfill-sources [--dry-run|--apply]   Find source URLs for records with no source
+ 
+   Import (consolidated from import-* domains):
+diff --git a/crux/completions/crux.bash b/crux/completions/crux.bash
+index 268a20b34..4e31e1975 100644
+--- a/crux/completions/crux.bash
++++ b/crux/completions/crux.bash
+@@ -38,7 +38,7 @@ _crux_complete() {
+   # ---------------------------------------------------------------------------
+   local groups="w wiki fb factbase tb tablebase gh sys system"
+   local toplevel="query context"
+-  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants backfill-grantee-ids backfill-program-ids import-divisions import-funding-programs people orgs research-areas verify qa-sweep matrix tablebase pages"
++  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants import-divisions import-funding-programs people orgs research-areas verify qa-sweep matrix tablebase pages"
+ 
+   # ---------------------------------------------------------------------------
+   # Level 2: domains within each group
+@@ -54,7 +54,7 @@ _crux_complete() {
+ 
+   # tablebase group (tb/tablebase): tablebase-related domains + flattened commands
+   local tb_domains="tablebase matrix entity ids people orgs research-areas verify"
+-  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers backfill-grantee-ids backfill-program-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
++  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+ 
+   # github group (gh): GitHub-related domains + flattened issues commands
+   local gh_domains="issues pr ci epic release review pr-patrol"
+@@ -73,7 +73,7 @@ _crux_complete() {
+   local cmds_pr="create ready detect check overlaps fix-body rebase-all validate-test-plan resolve-conflicts"
+   local cmds_agent_checklist="init check verify status complete snapshot pre-push-check"
+   local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update sync-sources verify add-fact"
+-  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers backfill-grantee-ids backfill-program-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
++  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+   local cmds_query="search entity facts related backlinks page recent-changes recent-edits citations risk stats blocks"
+   local cmds_context="for-issue for-page for-entity for-topic"
+   local cmds_ci="status pause-actions resume-actions main-status"
+diff --git a/crux/crux.mjs b/crux/crux.mjs
+index 02a01e28c..bff21af61 100644
+--- a/crux/crux.mjs
++++ b/crux/crux.mjs
+@@ -85,16 +85,12 @@ import * as footnotesCommands from './commands/footnotes.ts';
+ import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
+ import * as importGrantsCommands from './commands/import-grants.ts';
+ import * as importScorecardsCommands from './commands/import-scorecards.ts';
+-import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
+-import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
+ import * as importDivisionsCommands from './commands/import-divisions.ts';
+ import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
+-import * as importQuriPersonnelCommands from './commands/import-quri-personnel.ts';
+ import * as peopleCommands from './commands/people.ts';
+ import * as orgsCommands from './commands/orgs.ts';
+ import * as researchAreasCommands from './commands/research-areas.ts';
+ import * as autoVerifyStakeholdersCommands from './commands/legislation/auto-verify-stakeholders.ts';
+-import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
+ import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
+ import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
+ import * as sourcingRetroScanSubjectsCommands from './commands/sourcing-retro-scan-subjects.ts';
+@@ -193,16 +189,12 @@ const domains = {
+   'agent-workspace': agentWorkspaceCommands,
+   'import-grants': importGrantsCommands,
+   'import-scorecards': importScorecardsCommands,
+-  'backfill-grantee-ids': backfillGranteeIdsCommands,
+-  'backfill-program-ids': backfillProgramIdsCommands,
+   'import-divisions': importDivisionsCommands,
+   'import-funding-programs': importFundingProgramsCommands,
+-  'import-quri-personnel': importQuriPersonnelCommands,
+   people: peopleCommands,
+   orgs: orgsCommands,
+   'research-areas': researchAreasCommands,
+   'auto-verify-stakeholders': autoVerifyStakeholdersCommands,
+-  'backfill-pr-outcomes': backfillPrOutcomesCommands,
+   verify: verifyEntityCommands,
+   'verify-orchestrate': verifyOrchestrateCommands,
+   'sourcing-recheck': sourcingRecheckCommands,
+diff --git a/crux/lib/wiki-server/benchmark-results-pending.ts b/crux/lib/wiki-server/benchmark-results-pending.ts
+deleted file mode 100644
+index 84dd90469..000000000
+--- a/crux/lib/wiki-server/benchmark-results-pending.ts
++++ /dev/null
+@@ -1,71 +0,0 @@
+-/**
+- * BenchmarkResultsPending API — wiki-server client module.
+- *
+- * Phase 2 ingesters write rows here when a raw model name fails alias
+- * resolution. The /internal/benchmark-quarantine dashboard (follow-up PR)
+- * promotes them via syncModelAliases() + syncBenchmarkResults().
+- */
+-
+-import { apiRequest, type ApiResult } from './client.ts';
+-import type { hc, InferResponseType } from 'hono/client';
+-import type { BenchmarkResultsPendingRoute } from '../../../apps/wiki-server/src/routes/tablebase/benchmark-results-pending.ts';
+-import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+-
+-type RpcClient = ReturnType<typeof hc<BenchmarkResultsPendingRoute>>;
+-
+-export type BenchmarkResultsPendingAllResult = InferResponseType<
+-  RpcClient['all']['$get'],
+-  200
+->;
+-export type BenchmarkResultsPendingStatsResult = InferResponseType<
+-  RpcClient['stats']['$get'],
+-  200
+->;
+-export type BenchmarkResultsPendingSyncResult = SyncResponse;
+-
+-/** Fetch quarantine rows with pagination + filters. */
+-export async function getAllBenchmarkResultsPending(
+-  options?: {
+-    limit?: number;
+-    offset?: number;
+-    status?: 'pending' | 'resolved' | 'rejected';
+-    ingesterSource?: string;
+-    benchmarkId?: string;
+-    q?: string;
+-  },
+-): Promise<ApiResult<BenchmarkResultsPendingAllResult>> {
+-  const params = new URLSearchParams();
+-  if (options?.limit != null) params.set('limit', String(options.limit));
+-  if (options?.offset != null) params.set('offset', String(options.offset));
+-  if (options?.status) params.set('status', options.status);
+-  if (options?.ingesterSource)
+-    params.set('ingesterSource', options.ingesterSource);
+-  if (options?.benchmarkId) params.set('benchmarkId', options.benchmarkId);
+-  if (options?.q) params.set('q', options.q);
+-  const qs = params.toString();
+-  return apiRequest<BenchmarkResultsPendingAllResult>(
+-    'GET',
+-    `/api/benchmark-results-pending/all${qs ? `?${qs}` : ''}`,
+-  );
+-}
+-
+-/** Quarantine queue depth + breakdown. */
+-export async function getBenchmarkResultsPendingStats(): Promise<
+-  ApiResult<BenchmarkResultsPendingStatsResult>
+-> {
+-  return apiRequest<BenchmarkResultsPendingStatsResult>(
+-    'GET',
+-    '/api/benchmark-results-pending/stats',
+-  );
+-}
+-
+-/** Sync benchmark_results_pending (upsert). */
+-export async function syncBenchmarkResultsPending(
+-  items: Array<Record<string, unknown>>,
+-): Promise<ApiResult<BenchmarkResultsPendingSyncResult>> {
+-  return apiRequest<BenchmarkResultsPendingSyncResult>(
+-    'POST',
+-    '/api/benchmark-results-pending/sync',
+-    { items },
+-  );
+-}
+diff --git a/crux/lib/wiki-server/model-aliases.ts b/crux/lib/wiki-server/model-aliases.ts
+deleted file mode 100644
+index 913ad0ae9..000000000
+--- a/crux/lib/wiki-server/model-aliases.ts
++++ /dev/null
+@@ -1,77 +0,0 @@
+-/**
+- * ModelAliases API — wiki-server client module.
+- *
+- * Phase 2 ingesters call resolveModelAlias() per row to map a leaderboard's
+- * raw model name to entities.stable_id. Misses are written to
+- * benchmark_results_pending (see benchmark-results-pending.ts).
+- */
+-
+-import { apiRequest, type ApiResult } from './client.ts';
+-import type { hc, InferResponseType } from 'hono/client';
+-import type { ModelAliasesRoute } from '../../../apps/wiki-server/src/routes/tablebase/model-aliases.ts';
+-import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+-
+-type RpcClient = ReturnType<typeof hc<ModelAliasesRoute>>;
+-
+-export type ModelAliasesAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
+-export type ModelAliasesStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+-export type ModelAliasesResolveOk = InferResponseType<RpcClient['resolve']['$get'], 200>;
+-export type ModelAliasesResolveMiss = InferResponseType<RpcClient['resolve']['$get'], 404>;
+-export type ModelAliasesSyncResult = SyncResponse;
+-
+-/** Fetch all model_aliases rows with pagination + filters. */
+-export async function getAllModelAliases(
+-  options?: {
+-    limit?: number;
+-    offset?: number;
+-    modelStableId?: string;
+-    source?: string;
+-    confidence?: 'exact' | 'fuzzy' | 'manual';
+-    q?: string;
+-  },
+-): Promise<ApiResult<ModelAliasesAllResult>> {
+-  const params = new URLSearchParams();
+-  if (options?.limit != null) params.set('limit', String(options.limit));
+-  if (options?.offset != null) params.set('offset', String(options.offset));
+-  if (options?.modelStableId) params.set('modelStableId', options.modelStableId);
+-  if (options?.source) params.set('source', options.source);
+-  if (options?.confidence) params.set('confidence', options.confidence);
+-  if (options?.q) params.set('q', options.q);
+-  const qs = params.toString();
+-  return apiRequest<ModelAliasesAllResult>(
+-    'GET',
+-    `/api/model-aliases/all${qs ? `?${qs}` : ''}`,
+-  );
+-}
+-
+-/** Distribution of aliases by source + confidence. */
+-export async function getModelAliasesStats(): Promise<
+-  ApiResult<ModelAliasesStatsResult>
+-> {
+-  return apiRequest<ModelAliasesStatsResult>('GET', '/api/model-aliases/stats');
+-}
+-
+-/**
+- * Resolve a single alias to its canonical model stable_id. Returns null on
+- * miss (HTTP 404 from the server). Ingesters use this in the hot loop, so
+- * callers should batch-cache the table client-side via getAllModelAliases
+- * when processing more than ~50 rows.
+- */
+-export async function resolveModelAlias(
+-  alias: string,
+-): Promise<ApiResult<ModelAliasesResolveOk | ModelAliasesResolveMiss>> {
+-  const params = new URLSearchParams({ alias });
+-  return apiRequest<ModelAliasesResolveOk | ModelAliasesResolveMiss>(
+-    'GET',
+-    `/api/model-aliases/resolve?${params.toString()}`,
+-  );
+-}
+-
+-/** Sync model_aliases (upsert). */
+-export async function syncModelAliases(
+-  items: Array<Record<string, unknown>>,
+-): Promise<ApiResult<ModelAliasesSyncResult>> {
+-  return apiRequest<ModelAliasesSyncResult>('POST', '/api/model-aliases/sync', {
+-    items,
+-  });
+-}
+diff --git a/crux/scripts/cleanup-personnel.ts b/crux/scripts/cleanup-personnel.ts
+deleted file mode 100644
+index 4afe24f64..000000000
+--- a/crux/scripts/cleanup-personnel.ts
++++ /dev/null
+@@ -1,176 +0,0 @@
+-/**
+- * Clean up garbage personnel records from the PG personnel table.
+- *
+- * Identifies and deletes:
+- * 1. Records with unresolved stableId as personId (no entity match, no displayable name)
+- * 2. Records with "new:" prefix that were never resolved
+- * 3. Duplicate records (same person at same org)
+- *
+- * Usage:
+- *   pnpm tsx crux/scripts/cleanup-personnel.ts --dry-run   # preview what would be deleted
+- *   pnpm tsx crux/scripts/cleanup-personnel.ts              # actually delete
+- */
+-
+-import { apiRequest } from '../lib/wiki-server/client.ts';
+-import { getAllPersonnel, deletePersonnel } from '../lib/wiki-server/personnel.ts';
+-import { isSid } from '../../packages/id-utils/src/index.ts';
+-
+-function isMachineId(s: string): boolean {
+-  return isSid(s);
+-}
+-
+-interface PersonnelRecord {
+-  id: string;
+-  personId: string;
+-  organizationId: string;
+-  role: string;
+-  roleType: string;
+-  startDate: string | null;
+-  endDate: string | null;
+-  isFounder: boolean;
+-  source: string | null;
+-  person: { entityId: string | null; slug: string | null; name: string | null };
+-  organization: { entityId: string | null; slug: string | null; name: string | null };
+-  personEntityId: string | null;
+-  personDisplayName: string | null;
+-  personResolvedName: string | null;
+-  syncedAt: string;
+-}
+-
+-async function fetchAllPersonnel(): Promise<PersonnelRecord[]> {
+-  const all: PersonnelRecord[] = [];
+-  let offset = 0;
+-  while (true) {
+-    const r = await getAllPersonnel({ limit: 200, offset });
+-    if (!r.ok) {
+-      console.error('Failed to fetch personnel:', r.error);
+-      break;
+-    }
+-    all.push(...r.data.personnel);
+-    if (all.length >= r.data.total) break;
+-    offset += 200;
+-  }
+-  return all;
+-}
+-
+-function getDisplayName(r: PersonnelRecord): string | null {
+-  return r.person?.name ?? r.personResolvedName ?? r.personDisplayName;
+-}
+-
+-function hasDisplayableName(r: PersonnelRecord): boolean {
+-  const name = getDisplayName(r);
+-  if (!name) return false;
+-  if (isMachineId(name)) return false;
+-  // Names with digits mixed in but no spaces are likely IDs
+-  if (name.length <= 15 && !name.includes(' ') && /\d/.test(name) && /[A-Z]/.test(name)) return false;
+-  return true;
+-}
+-
+-async function main() {
+-  const dryRun = process.argv.includes('--dry-run');
+-
+-  console.log(`Personnel cleanup ${dryRun ? '(DRY RUN)' : '(LIVE)'}`);
+-  console.log('Fetching all personnel records...');
+-
+-  const all = await fetchAllPersonnel();
+-  console.log(`Total records: ${all.length}`);
+-
+-  // ── Category 1a: Fabricated stableId — personId looks like a stableId but doesn't
+-  //    match any entity AND has no human-readable name from any source.
+-  //    The !hasDisplayableName guard prevents deleting records that are merely
+-  //    waiting for entity resolution (e.g., synced before their person entity).
+-  const fabricatedId = all.filter(
+-    (r) => isMachineId(r.personId) && !r.personEntityId && !hasDisplayableName(r),
+-  );
+-  console.log(`\nRecords with fabricated personId (stableId, no entity, no name): ${fabricatedId.length}`);
+-
+-  // ── Category 1b: No displayable name (catches remaining junk) ──
+-  const fabricatedIdSet = new Set(fabricatedId.map((r) => r.id));
+-  const noName = all.filter((r) => !hasDisplayableName(r) && !fabricatedIdSet.has(r.id));
+-  console.log(`Records with no displayable name (additional): ${noName.length}`);
+-
+-  // ── Category 2: Duplicates (same person + same org) ──
+-  const seen = new Map<string, PersonnelRecord>();
+-  const duplicates: PersonnelRecord[] = [];
+-  for (const r of all) {
+-    // Skip records we're already deleting for no name
+-    if (!hasDisplayableName(r)) continue;
+-
+-    const name = getDisplayName(r)!.toLowerCase();
+-    const orgId = r.organization?.entityId ?? r.organizationId;
+-    const key = `${name}::${orgId}`;
+-
+-    if (seen.has(key)) {
+-      // Keep the one with more data (prefer entity-resolved, then newer sync)
+-      const existing = seen.get(key)!;
+-      const existingScore = (existing.personEntityId ? 10 : 0) + (existing.startDate ? 1 : 0) + (existing.endDate ? 1 : 0);
+-      const newScore = (r.personEntityId ? 10 : 0) + (r.startDate ? 1 : 0) + (r.endDate ? 1 : 0);
+-
+-      if (newScore > existingScore) {
+-        // New one is better, mark old one as duplicate
+-        duplicates.push(existing);
+-        seen.set(key, r);
+-      } else {
+-        duplicates.push(r);
+-      }
+-    } else {
+-      seen.set(key, r);
+-    }
+-  }
+-  console.log(`Duplicate records: ${duplicates.length}`);
+-
+-  // ── Summary ──
+-  const toDelete = [...fabricatedId, ...noName, ...duplicates];
+-  const toDeleteIds = [...new Set(toDelete.map((r) => r.id))];
+-  console.log(`\nTotal to delete: ${toDeleteIds.length}`);
+-  console.log(`  - Fabricated stableIds: ${fabricatedId.length}`);
+-  console.log(`  - No displayable name: ${noName.length}`);
+-  console.log(`  - Duplicates: ${duplicates.length}`);
+-  console.log(`Will remain: ${all.length - toDeleteIds.length}`);
+-
+-  // Show samples
+-  console.log('\n── Sample deletions (fabricated stableId) ──');
+-  for (const r of fabricatedId.slice(0, 10)) {
+-    const org = r.organization?.name ?? r.organizationId;
+-    console.log(`  ${r.id} | personId=${r.personId} | ${r.role} at ${org}`);
+-  }
+-
+-  console.log('\n── Sample deletions (no name) ──');
+-  for (const r of noName.slice(0, 10)) {
+-    const org = r.organization?.name ?? r.organizationId;
+-    console.log(`  ${r.id} | personId=${r.personId} | ${r.role} at ${org}`);
+-  }
+-
+-  console.log('\n── Sample deletions (duplicates) ──');
+-  for (const r of duplicates.slice(0, 10)) {
+-    const name = getDisplayName(r);
+-    const org = r.organization?.name ?? r.organizationId;
+-    console.log(`  ${r.id} | ${name} | ${r.role} (${r.roleType}) at ${org}`);
+-  }
+-
+-  if (dryRun) {
+-    console.log('\nDry run complete. Run without --dry-run to delete.');
+-    return;
+-  }
+-
+-  // ── Delete in batches ──
+-  const BATCH_SIZE = 100;
+-  let totalDeleted = 0;
+-  for (let i = 0; i < toDeleteIds.length; i += BATCH_SIZE) {
+-    const batch = toDeleteIds.slice(i, i + BATCH_SIZE);
+-    const result = await deletePersonnel(batch);
+-    if (result.ok) {
+-      totalDeleted += result.data.deleted;
+-      console.log(`  Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.data.deleted} records`);
+-    } else {
+-      console.error(`  Batch ${Math.floor(i / BATCH_SIZE) + 1} failed:`, result.error);
+-    }
+-  }
+-
+-  console.log(`\nDone. Deleted ${totalDeleted} records.`);
+-}
+-
+-main().catch((e) => {
+-  console.error(e);
+-  process.exit(1);
+-});
+diff --git a/crux/scripts/verify-grokipedia-links.mjs b/crux/scripts/verify-grokipedia-links.mjs
+deleted file mode 100644
+index 950d8674d..000000000
+--- a/crux/scripts/verify-grokipedia-links.mjs
++++ /dev/null
+@@ -1,100 +0,0 @@
+-/**
+- * Verify Grokipedia links in external-links.yaml via curl HEAD requests.
+- * Removes broken (404) links and reports results.
+- *
+- * Usage:
+- *   node --import tsx/esm crux/scripts/verify-grokipedia-links.mjs           # dry run
+- *   node --import tsx/esm crux/scripts/verify-grokipedia-links.mjs --apply   # remove broken links
+- */
+-
+-import { readFileSync, writeFileSync } from "fs";
+-import { join } from "path";
+-import { parse, stringify } from "yaml";
+-import { execFileSync } from "child_process";
+-
+-const PROJECT_ROOT = join(import.meta.dirname, "../..");
+-const EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "data/external-links.yaml");
+-const APP_EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "apps/web/src/data/external-links.yaml");
+-
+-const apply = process.argv.includes("--apply");
+-
+-/**
+- * Check URL via curl HEAD request. Returns HTTP status code.
+- */
+-function checkUrl(url) {
+-  try {
+-    const status = execFileSync(
+-      "curl",
+-      ["-sI", "-o", "/dev/null", "-w", "%{http_code}", "--max-time", "8", url],
+-      { encoding: "utf-8", timeout: 12000 }
+-    ).trim();
+-    return parseInt(status, 10) || 0;
+-  } catch {
+-    return 0;
+-  }
+-}
+-
+-// Load data
+-const entries = parse(readFileSync(EXTERNAL_LINKS_YAML, "utf-8")) || [];
+-const grokEntries = entries.filter(e => e.links?.grokipedia);
+-console.log(`Found ${grokEntries.length} entries with Grokipedia links\n`);
+-
+-// Check all URLs sequentially (curl doesn't parallelize well via execSync)
+-const valid = [];
+-const broken = [];
+-const errors = [];
+-
+-for (let i = 0; i < grokEntries.length; i++) {
+-  const entry = grokEntries[i];
+-  const url = entry.links.grokipedia;
+-  const status = checkUrl(url);
+-
+-  if (i % 10 === 0 && i > 0) {
+-    process.stdout.write(`\r  Checked ${i}/${grokEntries.length} (${valid.length} valid, ${broken.length} broken)...`);
+-  }
+-
+-  if (status >= 200 && status < 400) {
+-    valid.push({ pageId: entry.pageId, url, status });
+-  } else if (status === 404) {
+-    broken.push({ pageId: entry.pageId, url });
+-  } else {
+-    errors.push({ pageId: entry.pageId, url, status });
+-  }
+-}
+-process.stdout.write(`\r  Checked ${grokEntries.length}/${grokEntries.length}                                    \n\n`);
+-
+-console.log(`VALID (${valid.length}):`);
+-valid.forEach(r => console.log(`  ${r.pageId} → ${r.url}`));
+-
+-console.log(`\nBROKEN / 404 (${broken.length}):`);
+-broken.forEach(r => console.log(`  ${r.pageId} → ${r.url}`));
+-
+-if (errors.length > 0) {
+-  console.log(`\nERRORS / TIMEOUT (${errors.length}):`);
+-  errors.forEach(r => console.log(`  ${r.pageId} → ${r.url} [${r.status}]`));
+-}
+-
+-console.log(`\nSummary: ${valid.length} valid, ${broken.length} broken, ${errors.length} errors`);
+-
+-if (apply && broken.length > 0) {
+-  console.log(`\nRemoving ${broken.length} broken Grokipedia links...`);
+-  const brokenIds = new Set(broken.map(r => r.pageId));
+-
+-  for (const entry of entries) {
+-    if (brokenIds.has(entry.pageId) && entry.links.grokipedia) {
+-      delete entry.links.grokipedia;
+-    }
+-  }
+-
+-  // Remove entries that now have empty links
+-  const cleaned = entries.filter(e => Object.keys(e.links).length > 0);
+-  cleaned.sort((a, b) => a.pageId.localeCompare(b.pageId));
+-
+-  const yamlStr = stringify(cleaned, { lineWidth: 0, defaultKeyType: "PLAIN", defaultStringType: "PLAIN" });
+-  writeFileSync(EXTERNAL_LINKS_YAML, yamlStr);
+-  writeFileSync(APP_EXTERNAL_LINKS_YAML, yamlStr);
+-  console.log(`Removed ${broken.length} broken links. ${entries.length - cleaned.length} empty entries removed.`);
+-  console.log(`Written to both YAML files.`);
+-} else if (!apply && broken.length > 0) {
+-  console.log(`\nDry run — use --apply to remove broken links.`);
+-}
+diff --git a/docs/audits/2026-04-19-verdict-llm-calibration.md b/docs/audits/2026-04-19-verdict-llm-calibration.md
+index ccf973530..b2cf6a5f1 100644
+--- a/docs/audits/2026-04-19-verdict-llm-calibration.md
++++ b/docs/audits/2026-04-19-verdict-llm-calibration.md
+@@ -2,7 +2,7 @@
+ 
+ **Linear:** [QUA-635](https://linear.app/quantifieduncertainty/issue/QUA-635) (parent [QUA-637](https://linear.app/quantifieduncertainty/issue/QUA-637) — coverage expansion burst)
+ **Date:** 2026-04-19
+-**Scripts:** `crux/calibration/{build-corpus.ts, run-calibration.ts, analyze-results.ts}`
++**Scripts:** `crux/calibration/{build-corpus.ts, run-calibration.ts, analyze-results.ts}` (removed from the tree after this audit concluded; recover with `git show e35e704fa:crux/calibration/<file>`)
+ **Raw data:** `crux/calibration/data/{corpus.json, results-haiku.json, results-sonnet.json, metrics.json}`
+ 
+ ## TL;DR

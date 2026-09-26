@@ -1,0 +1,230 @@
+diff --git a/apps/web/scripts/build-data.mjs b/apps/web/scripts/build-data.mjs
+index 767107cbc..9a06d2aac 100644
+--- a/apps/web/scripts/build-data.mjs
++++ b/apps/web/scripts/build-data.mjs
+@@ -99,7 +99,7 @@ import {
+   generateLinkHealth,
+   generateEntityMatrix,
+ } from './lib/output-writer.mjs';
+-import { getServerUrl } from './lib/wiki-server-env.mjs';
++import { getServerUrl, shouldWriteToServer } from './lib/wiki-server-env.mjs';
+ 
+ // ---------------------------------------------------------------------------
+ // Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
+@@ -108,6 +108,14 @@ const hasQuickFlag = process.argv.includes('--quick');
+ const SCOPE = hasQuickFlag ? 'content' : (process.argv.find(a => a.startsWith('--scope='))?.split('=')[1] || 'full');
+ const CONTENT_ONLY = SCOPE === 'content';
+ 
++// Writes to the wiki-server happen only for merged code (main/production CI,
++// the Vercel production build) — never for PR builds. Reads are unaffected.
++// See shouldWriteToServer() for the full policy.
++const SERVER_WRITES = shouldWriteToServer();
++if (!CONTENT_ONLY && getServerUrl()) {
++  console.log(`Wiki-server writes: ${SERVER_WRITES.write ? 'enabled' : 'disabled'} (${SERVER_WRITES.reason})\n`);
++}
++
+ if (CONTENT_ONLY) {
+   console.log('⚡ Running in content-only scope (skipping git dates, block IR, redundancy, server sync, LLM files)\n');
+ } else {
+@@ -921,7 +929,11 @@ async function main() {
+   database.riskStats = riskStats;
+ 
+   // Record risk snapshots to wiki server (optional)
+-  await syncRiskSnapshots(pages, CONTENT_ONLY);
++  if (CONTENT_ONLY || SERVER_WRITES.write) {
++    await syncRiskSnapshots(pages, CONTENT_ONLY);
++  } else {
++    console.log('  riskSnapshots: not written (server writes disabled for this build)');
++  }
+ 
+   // =========================================================================
+   // PAGE RESOURCES — compute page → resourceId mappings at build time.
+@@ -1052,6 +1064,8 @@ async function main() {
+   // Sync page links to wiki-server (optional — skips if server unavailable)
+   if (CONTENT_ONLY) {
+     console.log('  linkSync: skipped (content-only scope)');
++  } else if (getServerUrl() && !SERVER_WRITES.write) {
++    console.log('  linkSync: not written (server writes disabled for this build)');
+   } else if (getServerUrl()) {
+     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId);
+     await syncLinksAndRefreshGraph(linkSignals);
+@@ -1199,6 +1213,8 @@ async function main() {
+   // =========================================================================
+   if (CONTENT_ONLY) {
+     console.log('  buildMetricsSync: skipped (content-only scope)');
++  } else if (getServerUrl() && !SERVER_WRITES.write) {
++    console.log('  buildMetricsSync: not written (server writes disabled for this build)');
+   } else if (getServerUrl()) {
+     await syncBuildMetrics({ pages, updateScheduleItems });
+   }
+@@ -1238,7 +1254,11 @@ async function main() {
+ 
+   // Sync policy stakeholders to wiki-server PG table (populates things table too)
+   if (!CONTENT_ONLY) {
+-    await syncPolicyStakeholders(typedEntities);
++    if (SERVER_WRITES.write) {
++      await syncPolicyStakeholders(typedEntities);
++    } else {
++      console.log('  policy-stakeholder-sync: not written (server writes disabled for this build)');
++    }
+     // Now fetch the stakeholder IDs (which were 0 if this is the first sync)
+     database.policyStakeholderIds = await fetchPolicyStakeholderIds();
+   }
+diff --git a/apps/web/scripts/lib/__tests__/should-write-to-server.test.mjs b/apps/web/scripts/lib/__tests__/should-write-to-server.test.mjs
+new file mode 100644
+index 000000000..86877cde3
+--- /dev/null
++++ b/apps/web/scripts/lib/__tests__/should-write-to-server.test.mjs
+@@ -0,0 +1,78 @@
++import { describe, it, expect } from 'vitest';
++import { shouldWriteToServer } from '../wiki-server-env.mjs';
++
++const PROD = 'https://wiki-server.k8s.quantifieduncertainty.org';
++const gha = (event, ref) => ({ GITHUB_ACTIONS: 'true', CI: 'true', GITHUB_EVENT_NAME: event, GITHUB_REF: ref });
++
++describe('shouldWriteToServer', () => {
++  describe('GitHub Actions', () => {
++    it('refuses writes from pull_request builds (the bug: PR CI wrote to prod)', () => {
++      expect(shouldWriteToServer(gha('pull_request', 'refs/pull/123/merge'), PROD).write).toBe(false);
++      expect(shouldWriteToServer(gha('pull_request_target', 'refs/heads/main'), PROD).write).toBe(false);
++      expect(shouldWriteToServer(gha('merge_group', 'refs/heads/main'), PROD).write).toBe(false);
++    });
++
++    it('keeps writing on push to main and production (unchanged prod behaviour)', () => {
++      expect(shouldWriteToServer(gha('push', 'refs/heads/main'), PROD).write).toBe(true);
++      expect(shouldWriteToServer(gha('push', 'refs/heads/production'), PROD).write).toBe(true);
++    });
++
++    it('keeps writing for scheduled / manual runs on main', () => {
++      expect(shouldWriteToServer(gha('schedule', 'refs/heads/main'), PROD).write).toBe(true);
++      expect(shouldWriteToServer(gha('workflow_dispatch', 'refs/heads/main'), PROD).write).toBe(true);
++    });
++
++    it('refuses manual runs on a feature branch', () => {
++      expect(shouldWriteToServer(gha('workflow_dispatch', 'refs/heads/claude/foo'), PROD).write).toBe(false);
++      expect(shouldWriteToServer(gha('push', ''), PROD).write).toBe(false);
++    });
++  });
++
++  describe('Vercel', () => {
++    it('writes from production deployments', () => {
++      expect(shouldWriteToServer({ VERCEL: '1', VERCEL_ENV: 'production', VERCEL_GIT_COMMIT_REF: 'production' }, PROD).write).toBe(true);
++    });
++
++    it('writes from main/production-branch builds whatever VERCEL_ENV says', () => {
++      expect(shouldWriteToServer({ VERCEL: '1', VERCEL_ENV: 'preview', VERCEL_GIT_COMMIT_REF: 'production' }, PROD).write).toBe(true);
++      expect(shouldWriteToServer({ VERCEL: '1', VERCEL_ENV: 'preview', VERCEL_GIT_COMMIT_REF: 'main' }, PROD).write).toBe(true);
++    });
++
++    it('refuses preview builds of other branches', () => {
++      expect(shouldWriteToServer({ VERCEL: '1', VERCEL_ENV: 'preview', VERCEL_GIT_COMMIT_REF: 'claude/foo' }, PROD).write).toBe(false);
++      expect(shouldWriteToServer({ VERCEL: '1' }, PROD).write).toBe(false);
++    });
++  });
++
++  describe('dev machine / agent slot', () => {
++    it('writes to a local wiki-server', () => {
++      expect(shouldWriteToServer({}, 'http://localhost:3113').write).toBe(true);
++      expect(shouldWriteToServer({}, 'http://127.0.0.1:3100').write).toBe(true);
++      expect(shouldWriteToServer({}, 'http://[::1]:3100').write).toBe(true);
++    });
++
++    it('does not write to a remote server without opt-in', () => {
++      expect(shouldWriteToServer({}, PROD).write).toBe(false);
++      expect(shouldWriteToServer({}, 'http://localhost.evil.example').write).toBe(false);
++      expect(shouldWriteToServer({}, 'not a url').write).toBe(false);
++      expect(shouldWriteToServer({}, '').write).toBe(false);
++    });
++  });
++
++  describe('BUILD_DATA_SERVER_WRITES override', () => {
++    it('=1 forces writes anywhere', () => {
++      expect(shouldWriteToServer({ BUILD_DATA_SERVER_WRITES: '1' }, PROD).write).toBe(true);
++      expect(shouldWriteToServer({ ...gha('pull_request', 'refs/pull/1/merge'), BUILD_DATA_SERVER_WRITES: '1' }, PROD).write).toBe(true);
++    });
++
++    it('=0 disables writes even on main', () => {
++      expect(shouldWriteToServer({ ...gha('push', 'refs/heads/main'), BUILD_DATA_SERVER_WRITES: '0' }, PROD).write).toBe(false);
++      expect(shouldWriteToServer({ BUILD_DATA_SERVER_WRITES: '0' }, 'http://localhost:3113').write).toBe(false);
++    });
++  });
++
++  it('always returns a human-readable reason', () => {
++    const r = shouldWriteToServer(gha('pull_request', 'refs/pull/9/merge'), PROD);
++    expect(r.reason).toBe('GitHub Actions pull_request event');
++  });
++});
+diff --git a/apps/web/scripts/lib/wiki-server-env.mjs b/apps/web/scripts/lib/wiki-server-env.mjs
+index 837208625..f42488a71 100644
+--- a/apps/web/scripts/lib/wiki-server-env.mjs
++++ b/apps/web/scripts/lib/wiki-server-env.mjs
+@@ -63,3 +63,69 @@ export function getServerUrl() {
+ export function getApiKey() {
+   return getEnv('LONGTERMWIKI_SERVER_API_KEY');
+ }
++
++/**
++ * Should this build-data run WRITE its derived data (risk snapshots, link
++ * graph, build metrics, policy stakeholders) to the wiki-server?
++ *
++ * Reads are unaffected — only unmerged code must not write, because the
++ * wiki-server is shared production state and the last writer wins: a PR's
++ * build would otherwise overwrite prod rows with that PR's view of the data.
++ *
++ *   BUILD_DATA_SERVER_WRITES=1|0   explicit override, always wins
++ *   Vercel (VERCEL=1)              production deployments only (VERCEL_ENV=production,
++ *                                  or a build of the main/production branch)
++ *   GitHub Actions                 not on pull_request* / merge_group events; only
++ *                                  refs/heads/main or refs/heads/production
++ *                                  (push, schedule and workflow_dispatch on those
++ *                                  branches keep writing exactly as before)
++ *   anywhere else (dev box, slot)  only to a loopback server (a local wiki-server);
++ *                                  a remote server needs BUILD_DATA_SERVER_WRITES=1
++ *
++ * @param {NodeJS.ProcessEnv} [env]
++ * @param {string} [serverUrl] - the resolved server URL (default: getServerUrl())
++ * @returns {{ write: boolean, reason: string }}
++ */
++export function shouldWriteToServer(env = process.env, serverUrl = getServerUrl()) {
++  const override = env.BUILD_DATA_SERVER_WRITES;
++  if (override === '1' || override === 'true') return { write: true, reason: 'BUILD_DATA_SERVER_WRITES=1' };
++  if (override === '0' || override === 'false') return { write: false, reason: 'BUILD_DATA_SERVER_WRITES=0' };
++
++  if (env.VERCEL === '1') {
++    const ref = env.VERCEL_GIT_COMMIT_REF || '';
++    if (env.VERCEL_ENV === 'production' || ref === 'main' || ref === 'production') {
++      return { write: true, reason: `Vercel ${env.VERCEL_ENV || 'unknown'} build of ${ref || 'unknown ref'}` };
++    }
++    return { write: false, reason: `Vercel ${env.VERCEL_ENV || 'unknown'} build of ${ref || 'unknown ref'}` };
++  }
++
++  if (env.GITHUB_ACTIONS === 'true') {
++    const event = env.GITHUB_EVENT_NAME || '';
++    const ref = env.GITHUB_REF || '';
++    if (event.startsWith('pull_request') || event === 'merge_group') {
++      return { write: false, reason: `GitHub Actions ${event} event` };
++    }
++    if (ref === 'refs/heads/main' || ref === 'refs/heads/production') {
++      return { write: true, reason: `GitHub Actions ${event} on ${ref}` };
++    }
++    return { write: false, reason: `GitHub Actions ${event} on ${ref || 'unknown ref'}` };
++  }
++
++  if (isLoopbackUrl(serverUrl)) {
++    return { write: true, reason: 'local wiki-server' };
++  }
++  return {
++    write: false,
++    reason: 'remote wiki-server from a dev machine (set BUILD_DATA_SERVER_WRITES=1 to write)',
++  };
++}
++
++function isLoopbackUrl(url) {
++  if (!url) return false;
++  try {
++    const host = new URL(url).hostname;
++    return host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1';
++  } catch {
++    return false;
++  }
++}

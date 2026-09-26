@@ -1,0 +1,1459 @@
+diff --git a/apps/web/.claude/review-done b/apps/web/.claude/review-done
+deleted file mode 100644
+index f16d3f0a9..000000000
+--- a/apps/web/.claude/review-done
++++ /dev/null
+@@ -1 +0,0 @@
+-reviewed 524eb033d877d2cee4be25dfa0550b96ab060e12 2026-04-05T19:11:50Z 260f621b3cc5
+diff --git a/apps/web/scripts/audit-factbase-pg.mjs b/apps/web/scripts/audit-factbase-pg.mjs
+deleted file mode 100644
+index 5862a0e7a..000000000
+--- a/apps/web/scripts/audit-factbase-pg.mjs
++++ /dev/null
+@@ -1,317 +0,0 @@
+-/**
+- * Factbase Equivalence Audit — Phase 3a (QUA-510)
+- *
+- * Companion to `build-data-from-pg.mjs`. Loads all FactBase YAML (via the
+- * canonical `loadKB` + `serialize` pipeline) and compares every fact to
+- * the PG mirror (`/api/facts/export`), classifying each diff per the
+- * QUA-510 taxonomy (Type A/B/C/D).
+- *
+- * Why separate from build-data-from-pg.mjs: the YAML side here runs through
+- * the FactBase loader (not entity YAML), and the PG side uses a different
+- * endpoint. Sharing the diff helper isn't worth cross-file plumbing.
+- *
+- * Usage:
+- *   WIKI_SERVER_ENV=prod node --import tsx/esm apps/web/scripts/audit-factbase-pg.mjs
+- *
+- * Outputs:
+- *   - docs/audits/phase-3-equivalence-audit-factbase.diff.json  — committed
+- *   - apps/web/src/data/factbase-audit-diff.md                    — gitignored
+- *
+- * NOT wired into the default build.
+- */
+-
+-import { writeFileSync, existsSync, mkdirSync } from "fs";
+-import { join, dirname } from "path";
+-import { fileURLToPath } from "url";
+-
+-import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
+-import { getServerUrl, getApiKey, getEnvPrefix } from "./lib/wiki-server-env.mjs";
+-
+-const __dirname = dirname(fileURLToPath(import.meta.url));
+-const REPO_ROOT = join(__dirname, "..", "..", "..");
+-const AUDIT_DIR = join(REPO_ROOT, "docs", "audits");
+-const FACTBASE_DATA_DIR = join(REPO_ROOT, "packages", "factbase", "data");
+-const OUT_MD_DIR = join(REPO_ROOT, "apps", "web", "src", "data");
+-
+-const SERVER_URL = getServerUrl();
+-const API_KEY = getApiKey();
+-
+-if (!SERVER_URL) {
+-  console.error(
+-    `error: ${getEnvPrefix()}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
+-  );
+-  process.exit(1);
+-}
+-const AUTH_HEADERS = API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {};
+-
+-// ---------------------------------------------------------------------------
+-// Load YAML side via canonical factbase loader
+-// ---------------------------------------------------------------------------
+-
+-/**
+- * Return a map of entityId → Fact[] sourced from YAML. Skips derived/inverse
+- * facts to match what /api/facts/export (PG) stores. Uses the same
+- * filename→id mapping the loader produces so output is comparable.
+- */
+-async function loadYamlFacts() {
+-  const { loadKB } = await import("../../../packages/factbase/src/index.ts");
+-  const { graph } = await loadKB(FACTBASE_DATA_DIR);
+-  const entities = graph.getAllEntities();
+-  const byEntity = {};
+-  let total = 0;
+-  let droppedDerived = 0;
+-  for (const entity of entities) {
+-    const facts = graph.getFacts(entity.id);
+-    const kept = [];
+-    for (const fact of facts) {
+-      if (fact.derivedFrom) {
+-        droppedDerived++;
+-        continue;
+-      }
+-      kept.push(fact);
+-      total++;
+-    }
+-    if (kept.length > 0) byEntity[entity.id] = kept;
+-  }
+-  return { byEntity, entities, total, droppedDerived };
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Load PG side
+-// ---------------------------------------------------------------------------
+-
+-async function fetchPgFacts() {
+-  // /api/facts/export paginates via limit+offset. NOTE: the response's
+-  // `returned` field counts rows AFTER skipping malformed ones on the server,
+-  // so it is NOT a reliable "end of pagination" signal — a page with N DB
+-  // rows and one malformed row will report `returned = N-1 < pageSize` while
+-  // later offsets still have rows. We drive the loop off `total` + `offset`
+-  // only. (CodeRabbit catch on PR #4384.)
+-  const all = {};
+-  let offset = 0;
+-  const pageSize = 5000;
+-  let total = 0;
+-  while (true) {
+-    const result = await fetchJsonWithRetry(
+-      `${SERVER_URL}/api/facts/export?limit=${pageSize}&offset=${offset}`,
+-      { headers: AUTH_HEADERS }
+-    );
+-    if (!result.ok) {
+-      throw new Error(`GET /api/facts/export → ${result.reason}`);
+-    }
+-    const facts = result.data.facts || {};
+-    for (const [entityId, list] of Object.entries(facts)) {
+-      if (!all[entityId]) all[entityId] = [];
+-      all[entityId].push(...list);
+-    }
+-    total = result.data.total ?? total;
+-    offset += pageSize;
+-    if (offset >= total) break;
+-  }
+-  return all;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Diff — fact by (entityId, factId)
+-// ---------------------------------------------------------------------------
+-
+-/** Canonicalize a fact to a shape we can compare across the YAML/PG boundary. */
+-function canonicalizeFact(f) {
+-  return {
+-    id: f.id,
+-    subjectId: f.subjectId,
+-    propertyId: f.propertyId ?? "",
+-    asOf: f.asOf ?? null,
+-    validEnd: f.validEnd ?? null,
+-    source: f.source ?? null,
+-    sourceQuote: f.sourceQuote ?? null,
+-    notes: f.notes ?? null,
+-    currency: f.currency ?? null,
+-    usdEquivalent: f.usdEquivalent ?? null,
+-    exchangeRate: f.exchangeRate ?? null,
+-    exchangeRateDate: f.exchangeRateDate ?? null,
+-    dollarYear: f.dollarYear ?? null,
+-    value: canonicalizeValue(f.value),
+-  };
+-}
+-
+-function canonicalizeValue(v) {
+-  if (v == null || typeof v !== "object") return v;
+-  // FactValue is a discriminated union. Collapse to a stable string shape.
+-  switch (v.type) {
+-    case "number":
+-      return `number:${v.value}`;
+-    case "text":
+-    case "date":
+-      return `${v.type}:${v.value}`;
+-    case "boolean":
+-      return `boolean:${v.value}`;
+-    case "ref":
+-      return `ref:${v.value}`;
+-    case "refs":
+-      return `refs:${(v.value || []).join(",")}`;
+-    case "range":
+-      return `range:${v.low}-${v.high}`;
+-    case "min":
+-      return `min:${v.value}`;
+-    case "json":
+-      try { return `json:${JSON.stringify(v.value)}`; } catch { return "json:?"; }
+-    default:
+-      return JSON.stringify(v);
+-  }
+-}
+-
+-function diffFacts(yamlByEntity, pgByEntity) {
+-  // Build per-fact index: key = "entityId:factId"
+-  const yamlIndex = new Map();
+-  for (const [entityId, list] of Object.entries(yamlByEntity)) {
+-    for (const f of list) yamlIndex.set(`${entityId}:${f.id}`, canonicalizeFact(f));
+-  }
+-  const pgIndex = new Map();
+-  for (const [entityId, list] of Object.entries(pgByEntity)) {
+-    for (const f of list) pgIndex.set(`${entityId}:${f.id}`, canonicalizeFact(f));
+-  }
+-
+-  const yamlOnly = []; // Type D — fact in YAML missing from PG
+-  const pgOnly = []; // Type D — fact in PG missing from YAML
+-  const fieldDiffs = []; // Type A/B/C
+-
+-  for (const [key, yf] of yamlIndex) {
+-    const pf = pgIndex.get(key);
+-    if (!pf) {
+-      yamlOnly.push(key);
+-      continue;
+-    }
+-    for (const fieldKey of new Set([...Object.keys(yf), ...Object.keys(pf)])) {
+-      const yv = yf[fieldKey];
+-      const pv = pf[fieldKey];
+-      if (yv === pv) continue;
+-      if (yv == null && pv == null) continue;
+-      const yPresent = yv != null;
+-      const pPresent = pv != null;
+-      let type;
+-      if (yPresent && !pPresent) type = "A";
+-      else if (!yPresent && pPresent) type = "B";
+-      else type = "C";
+-      fieldDiffs.push({
+-        id: key,
+-        key: fieldKey,
+-        type,
+-        yaml: shortVal(yv),
+-        pg: shortVal(pv),
+-      });
+-    }
+-  }
+-  for (const key of pgIndex.keys()) {
+-    if (!yamlIndex.has(key)) pgOnly.push(key);
+-  }
+-
+-  return { yamlOnly, pgOnly, fieldDiffs };
+-}
+-
+-function shortVal(v) {
+-  if (v == null) return v;
+-  const s = typeof v === "string" ? v : JSON.stringify(v);
+-  return s.length > 150 ? s.slice(0, 150) + "…" : v;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Main
+-// ---------------------------------------------------------------------------
+-
+-async function main() {
+-  console.log(`Auditing FactBase YAML vs PG (${SERVER_URL})...\n`);
+-
+-  console.log("1. Loading YAML facts via loadKB...");
+-  const yaml = await loadYamlFacts();
+-  console.log(
+-    `   ${yaml.total} source facts across ${Object.keys(yaml.byEntity).length} entities (${yaml.droppedDerived} derived facts skipped)`
+-  );
+-
+-  console.log("\n2. Fetching PG facts via /api/facts/export...");
+-  const pgFacts = await fetchPgFacts();
+-  const pgTotal = Object.values(pgFacts).reduce((s, arr) => s + arr.length, 0);
+-  console.log(`   ${pgTotal} facts across ${Object.keys(pgFacts).length} entities`);
+-
+-  console.log("\n3. Diffing per-fact...");
+-  const diff = diffFacts(yaml.byEntity, pgFacts);
+-
+-  // Counts
+-  const byType = { A: 0, B: 0, C: 0 };
+-  const byField = new Map();
+-  for (const d of diff.fieldDiffs) {
+-    byType[d.type]++;
+-    const k = `${d.type}:${d.key}`;
+-    byField.set(k, (byField.get(k) || 0) + 1);
+-  }
+-  const topFields = [...byField.entries()].sort((a, b) => b[1] - a[1]).slice(0, 25);
+-
+-  console.log(
+-    `\nDiff summary: ${diff.fieldDiffs.length} field diffs, ${diff.yamlOnly.length} yaml-only facts, ${diff.pgOnly.length} pg-only facts`
+-  );
+-  console.log(`  Type A (yaml-only field): ${byType.A}`);
+-  console.log(`  Type B (pg-only field):   ${byType.B}`);
+-  console.log(`  Type C (value mismatch):  ${byType.C}`);
+-  console.log(`  Type D (missing fact):    ${diff.yamlOnly.length + diff.pgOnly.length}`);
+-  console.log(`\nTop field diffs:`);
+-  for (const [k, v] of topFields) console.log(`  ${k}: ${v}`);
+-
+-  // --- Write artifacts ---
+-  if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
+-  if (!existsSync(OUT_MD_DIR)) mkdirSync(OUT_MD_DIR, { recursive: true });
+-
+-  // Committed artifact — no timestamp/run metadata (see build-data-from-pg.mjs
+-  // for rationale: byte-identical regeneration enables drift detection).
+-  const diffOut = join(AUDIT_DIR, "phase-3-equivalence-audit-factbase.diff.json");
+-  writeFileSync(
+-    diffOut,
+-    JSON.stringify(
+-      {
+-        counts: {
+-          yamlTotalFacts: yaml.total,
+-          yamlDroppedDerived: yaml.droppedDerived,
+-          yamlEntities: Object.keys(yaml.byEntity).length,
+-          pgTotalFacts: pgTotal,
+-          pgEntities: Object.keys(pgFacts).length,
+-          A: byType.A, B: byType.B, C: byType.C,
+-          D: diff.yamlOnly.length + diff.pgOnly.length,
+-          fieldDiffs: diff.fieldDiffs.length,
+-          yamlOnly: diff.yamlOnly.length,
+-          pgOnly: diff.pgOnly.length,
+-        },
+-        yamlOnly: [...diff.yamlOnly].sort(),
+-        pgOnly: [...diff.pgOnly].sort(),
+-        fieldDiffs: [...diff.fieldDiffs].sort(
+-          (a, b) => a.id.localeCompare(b.id) || a.key.localeCompare(b.key)
+-        ),
+-      },
+-      null,
+-      2
+-    )
+-  );
+-  console.log(`\n✓ Wrote ${diffOut} (committed artifact)`);
+-
+-  const mdOut = join(OUT_MD_DIR, "factbase-audit-diff.md");
+-  const md = [
+-    "# FactBase Audit Diff — per-fact\n",
+-    `Generated: ${new Date().toISOString()}\n`,
+-    "## Counts\n",
+-    `- YAML source facts: **${yaml.total}** (${Object.keys(yaml.byEntity).length} entities, ${yaml.droppedDerived} derived skipped)`,
+-    `- PG source facts: **${pgTotal}** (${Object.keys(pgFacts).length} entities)`,
+-    `- Type A (field in YAML, missing in PG): **${byType.A}**`,
+-    `- Type B (field in PG, missing in YAML): **${byType.B}**`,
+-    `- Type C (same field, different value): **${byType.C}**`,
+-    `- Type D (missing fact): **${diff.yamlOnly.length + diff.pgOnly.length}** (yamlOnly=${diff.yamlOnly.length}, pgOnly=${diff.pgOnly.length})`,
+-    "\n## Top field diffs\n",
+-    "| Type:field | Count |",
+-    "|---|---|",
+-    ...topFields.map(([k, v]) => `| \`${k}\` | ${v} |`),
+-  ].join("\n");
+-  writeFileSync(mdOut, md);
+-  console.log(`✓ Wrote ${mdOut} (gitignored)`);
+-}
+-
+-main().catch((err) => {
+-  console.error(err);
+-  process.exit(1);
+-});
+diff --git a/apps/web/scripts/build-data-from-pg.mjs b/apps/web/scripts/build-data-from-pg.mjs
+deleted file mode 100644
+index 78decf612..000000000
+--- a/apps/web/scripts/build-data-from-pg.mjs
++++ /dev/null
+@@ -1,494 +0,0 @@
+-/**
+- * Build Data From PG — Phase 3a Equivalence Audit Prototype (QUA-510)
+- *
+- * NOT a replacement for build-data.mjs. This is a side-by-side prototype used
+- * to answer the Phase 3 unblocking question: can `build-data.mjs` read
+- * entities / facts from PG instead of YAML and produce an equivalent output?
+- *
+- * Scope:
+- *   - Re-implements the entity-loading phase of build-data.mjs against the
+- *     wiki-server PG mirror (`/api/entities/:id`) instead of YAML.
+- *   - Imports `transformEntities()` from the existing build-data pipeline —
+- *     the transform code is shared, NOT reimplemented, so any diff we see
+- *     is a pure SOURCE diff, not a transformation diff.
+- *   - Loads MDX pages through the normal `buildPagesRegistry` path (pages
+- *     come from MDX content, which is unaffected by Phase 3).
+- *   - Emits `typedEntities-from-pg.json` and `pg-audit-diff.json` beside
+- *     `database.json`. The app does NOT read either.
+- *
+- * Usage:
+- *   WIKI_SERVER_ENV=prod node apps/web/scripts/build-data-from-pg.mjs [--sample=N]
+- *
+- * Options:
+- *   --sample=N   Only fetch N entities (for quick testing). Default: all.
+- *
+- * Output artifacts:
+- *   - docs/audits/phase-3-equivalence-audit.diff.json
+- *       Committed. Full per-row A/C/D classification (QUA-510 acceptance criterion).
+- *   - apps/web/src/data/typedEntities-from-pg.json
+- *       Gitignored. The PG-sourced typedEntities array — input to the diff.
+- *   - apps/web/src/data/pg-audit-diff.md
+- *       Gitignored. Human-readable top-25 summary regeneratable from the JSON.
+- *
+- * Known limitations of this prototype (documented in the audit report):
+- *   1. No bulk entity export endpoint exists. We paginate via /api/entities/
+- *      and then fetch /api/entities/:stableId for each row to get the full
+- *      shape (metadata, relatedEntries, customFields). ~2800 requests,
+- *      runs in a few minutes with concurrency.
+- *   2. This prototype only diffs `typedEntities`. Other database.json fields
+- *      (kb, resources, records collections) are already PG-sourced or
+- *      PG-overriding today — they are already equivalent by construction
+- *      and out of scope for this audit phase.
+- */
+-
+-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+-import { join, dirname } from "path";
+-import { fileURLToPath } from "url";
+-
+-import { transformEntities } from "./lib/entity-transform.mjs";
+-import { OUTPUT_DIR } from "./lib/content-types.mjs";
+-import { buildPagesRegistry } from "./lib/pages-builder.mjs";
+-import { buildUrlToResourceMap } from "./lib/unconverted-links.mjs";
+-import { buildIdRegistry } from "./lib/id-registry.mjs";
+-import { collectPageWikiIds } from "./lib/frontmatter-scanner.mjs";
+-import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
+-import { getServerUrl, getApiKey, getEnvPrefix } from "./lib/wiki-server-env.mjs";
+-import { fetchPersistentIdRegistry } from "./lib/id-client.mjs";
+-
+-const __dirname = dirname(fileURLToPath(import.meta.url));
+-const REPO_ROOT = join(__dirname, "..", "..", "..");
+-const AUDIT_DIR = join(REPO_ROOT, "docs", "audits");
+-
+-// ---------------------------------------------------------------------------
+-// Config
+-// ---------------------------------------------------------------------------
+-
+-const SAMPLE_ARG = process.argv.find((a) => a.startsWith("--sample="));
+-const SAMPLE = SAMPLE_ARG ? Number(SAMPLE_ARG.split("=")[1]) : Infinity;
+-
+-const SERVER_URL = getServerUrl();
+-const API_KEY = getApiKey();
+-
+-if (!SERVER_URL) {
+-  console.error(
+-    `error: ${getEnvPrefix()}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
+-  );
+-  process.exit(1);
+-}
+-
+-const AUTH_HEADERS = API_KEY
+-  ? { Authorization: `Bearer ${API_KEY}` }
+-  : {};
+-
+-// ---------------------------------------------------------------------------
+-// PG fetchers
+-// ---------------------------------------------------------------------------
+-
+-// Thin wrapper: 3-attempt exponential backoff on 5xx/429/timeouts via the
+-// shared helper in wiki-server-data.mjs. Throws on terminal failure so the
+-// per-item try/catch in pMap can turn it into a skip.
+-async function fetchJson(path) {
+-  const result = await fetchJsonWithRetry(`${SERVER_URL}${path}`, {
+-    headers: AUTH_HEADERS,
+-  });
+-  if (!result.ok) {
+-    throw new Error(`GET ${path} → ${result.reason}`);
+-  }
+-  return result.data;
+-}
+-
+-/** List all entity slugs + stableIds (one paginated call). */
+-async function listAllEntities() {
+-  const pageSize = 500;
+-  let offset = 0;
+-  const all = [];
+-  while (true) {
+-    const data = await fetchJson(
+-      `/api/entities?limit=${pageSize}&offset=${offset}`
+-    );
+-    all.push(...(data.entities || []));
+-    if ((data.entities || []).length < pageSize) break;
+-    offset += pageSize;
+-  }
+-  return all;
+-}
+-
+-/** Fetch full entity shape (with metadata, relatedEntries, customFields). */
+-async function fetchEntityFull(slug) {
+-  return fetchJson(`/api/entities/${encodeURIComponent(slug)}`);
+-}
+-
+-/**
+- * Concurrent map with a bounded worker pool. Returns results in input order.
+- * Fails fast on first rejection.
+- */
+-async function pMap(items, worker, concurrency = 20) {
+-  const out = new Array(items.length);
+-  let idx = 0;
+-  async function runner() {
+-    while (idx < items.length) {
+-      const i = idx++;
+-      out[i] = await worker(items[i], i);
+-    }
+-  }
+-  const runners = Array.from({ length: Math.min(concurrency, items.length) }, runner);
+-  await Promise.all(runners);
+-  return out;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Transformation: PG entity row → raw entity shape expected by transformEntities
+-// ---------------------------------------------------------------------------
+-
+-/**
+- * PG stores type-specific fields inside `metadata` JSONB (via
+- * sync-entities.ts::extractMetadata). `transformEntities()` expects them
+- * at top-level on the raw entity object. Un-nest them so the transform
+- * function sees the same shape it would from YAML.
+- */
+-function pgRowToRawEntity(row) {
+-  const meta = row.metadata || {};
+-  // Base fields live at top-level on the PG row.
+-  // Type-specific fields live in metadata and are hoisted here.
+-  const raw = {
+-    id: row.id,
+-    stableId: row.stableId ?? undefined,
+-    wikiId: row.wikiId ?? undefined,
+-    type: row.entityType,
+-    title: row.title,
+-    description: row.description ?? undefined,
+-    website: row.website ?? undefined,
+-    tags: row.tags ?? undefined,
+-    clusters: row.clusters ?? undefined,
+-    status: row.status ?? undefined,
+-    lastUpdated: row.lastUpdated ?? undefined,
+-    customFields: row.customFields ?? undefined,
+-    relatedEntries: row.relatedEntries ?? undefined,
+-    ...meta, // un-nest type-specific fields
+-  };
+-  return raw;
+-}
+-
+-/**
+- * Extract a synthetic `experts` array from PG entity metadata. Mirrors the
+- * YAML experts.yaml schema so `transformEntities()` can consume it unchanged.
+- *
+- * Every entity with metadata.expertPositions or metadata.expertRole or
+- * metadata.knownFor or metadata.affiliation was an entry in experts.yaml
+- * at sync time — sync-entities.ts::mergeExpertData hoists those fields
+- * into metadata.
+- */
+-function synthesizeExpertsFromPg(pgRows) {
+-  const experts = [];
+-  for (const row of pgRows) {
+-    const m = row.metadata || {};
+-    const hasExpertData =
+-      m.expertPositions || m.expertRole || m.knownFor || m.affiliation;
+-    if (!hasExpertData) continue;
+-    experts.push({
+-      id: row.id,
+-      name: row.title,
+-      website: row.website ?? undefined,
+-      affiliation: m.affiliation ?? undefined,
+-      role: m.expertRole ?? undefined,
+-      knownFor: m.knownFor ?? undefined,
+-      positions: m.expertPositions ?? undefined,
+-    });
+-  }
+-  return experts;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Diff
+-// ---------------------------------------------------------------------------
+-
+-/**
+- * Compare two typedEntities arrays, reporting per-field diffs.
+- *
+- * Diff types (matching QUA-510 taxonomy, minus E):
+- *   A — field present in YAML side, absent/null in PG side
+- *   B — field present in PG side, absent/null in YAML side
+- *   C — same field, different value (includes different array ordering)
+- *   D — row in YAML not in PG (or vice versa)
+- *
+- * Note: The original QUA-510 taxonomy also defined Type E (order-only
+- * diffs on arrays of equal membership). We do NOT detect E separately —
+- * order-only drift gets folded into Type C. Implementing E detection
+- * would require per-field knowledge of which arrays are order-sensitive
+- * vs set-like, which the transform doesn't surface. If a future audit
+- * finds that array ordering drift is a meaningful signal, add a dedicated
+- * `isOrderOnlyDiff` check here. For this audit's purposes, C is a
+- * strict superset of what E would report, so no data is lost — just
+- * grouped more conservatively.
+- */
+-function diffTypedEntities(yamlArr, pgArr) {
+-  const yamlById = new Map(yamlArr.map((e) => [e.id, e]));
+-  const pgById = new Map(pgArr.map((e) => [e.id, e]));
+-
+-  const yamlOnly = []; // Type D
+-  const pgOnly = []; // Type D
+-  const fieldDiffs = []; // Type A/B/C
+-
+-  for (const [id, yamlE] of yamlById) {
+-    const pgE = pgById.get(id);
+-    if (!pgE) {
+-      yamlOnly.push(id);
+-      continue;
+-    }
+-    const allKeys = new Set([...Object.keys(yamlE), ...Object.keys(pgE)]);
+-    for (const key of allKeys) {
+-      const yv = yamlE[key];
+-      const pv = pgE[key];
+-      if (isEqual(yv, pv)) continue;
+-      const yPresent = isPresent(yv);
+-      const pPresent = isPresent(pv);
+-      let type;
+-      if (yPresent && !pPresent) type = "A";
+-      else if (!yPresent && pPresent) type = "B";
+-      else type = "C";
+-      fieldDiffs.push({ id, entityType: yamlE.entityType, key, type, yaml: truncate(yv), pg: truncate(pv) });
+-    }
+-  }
+-
+-  for (const id of pgById.keys()) {
+-    if (!yamlById.has(id)) pgOnly.push(id);
+-  }
+-
+-  return { yamlOnly, pgOnly, fieldDiffs };
+-}
+-
+-/** A value is "present" if it's not null/undefined and not an empty array. */
+-function isPresent(v) {
+-  if (v == null) return false;
+-  if (Array.isArray(v) && v.length === 0) return false;
+-  return true;
+-}
+-
+-function isEqual(a, b) {
+-  if (a === b) return true;
+-  if (a == null && b == null) return true;
+-  if (Array.isArray(a) && Array.isArray(b)) {
+-    if (a.length !== b.length) return false;
+-    for (let i = 0; i < a.length; i++) {
+-      if (!isEqual(a[i], b[i])) return false;
+-    }
+-    return true;
+-  }
+-  if (typeof a === "object" && typeof b === "object" && a != null && b != null) {
+-    const aKeys = Object.keys(a).sort();
+-    const bKeys = Object.keys(b).sort();
+-    if (aKeys.length !== bKeys.length) return false;
+-    for (let i = 0; i < aKeys.length; i++) {
+-      if (aKeys[i] !== bKeys[i]) return false;
+-      if (!isEqual(a[aKeys[i]], b[bKeys[i]])) return false;
+-    }
+-    return true;
+-  }
+-  return false;
+-}
+-
+-function truncate(v) {
+-  if (v == null) return v;
+-  const s = JSON.stringify(v);
+-  return s && s.length > 120 ? s.slice(0, 120) + "…" : v;
+-}
+-
+-// ---------------------------------------------------------------------------
+-// Main
+-// ---------------------------------------------------------------------------
+-
+-async function main() {
+-  console.log(`Building typedEntities from PG (${SERVER_URL})...\n`);
+-
+-  // --- Step 1: enumerate all entities ---
+-  console.log("1. Listing entity slugs from PG...");
+-  const stubs = await listAllEntities();
+-  const slugs = stubs.map((s) => s.id).slice(0, SAMPLE);
+-  console.log(
+-    `   ${slugs.length} entities${Number.isFinite(SAMPLE) && slugs.length < stubs.length ? ` (sampled from ${stubs.length})` : ""}`
+-  );
+-
+-  // --- Step 2: fetch full shape for each ---
+-  console.log("2. Fetching full entity shapes (metadata + relatedEntries + customFields)...");
+-  let skipped = 0;
+-  const fullRows = await pMap(
+-    slugs,
+-    async (slug) => {
+-      try {
+-        return await fetchEntityFull(slug);
+-      } catch (err) {
+-        skipped++;
+-        console.warn(`   skip ${slug}: ${err.message}`);
+-        return null;
+-      }
+-    },
+-    20
+-  );
+-  const pgRows = fullRows.filter((r) => r != null);
+-  console.log(`   ${pgRows.length} entities fetched${skipped > 0 ? ` (${skipped} skipped)` : ""}`);
+-  if (skipped > 0 && skipped / slugs.length > 0.01) {
+-    console.error(`   ERROR: skip rate ${(skipped / slugs.length * 100).toFixed(1)}% exceeds 1% — diff would have spurious Type-D entries. Aborting.`);
+-    process.exit(1);
+-  }
+-
+-  // --- Step 3: convert to raw entity shape for transform ---
+-  const rawEntities = pgRows.map(pgRowToRawEntity);
+-  const synthExperts = synthesizeExpertsFromPg(pgRows);
+-  console.log(
+-    `3. Synthesized: ${synthExperts.length} experts from PG metadata`
+-  );
+-
+-  // --- Step 4: load pages (same source as build-data.mjs) ---
+-  // transformEntities uses pages for path-based type overrides and for
+-  // filling in missing descriptions from page.description. Both pipelines
+-  // must see the same pages list for the diff to be apples-to-apples, so
+-  // we pay the MDX-scan cost even though it's expensive.
+-  console.log("4. Loading pages from MDX frontmatter...");
+-  const urlToResource = buildUrlToResourceMap([]);
+-  const pages = buildPagesRegistry(urlToResource, new Map(), { gitCreatedMap: new Map(), gitModifiedMap: new Map() }, new Map(), new Map());
+-  console.log(`   ${pages.length} pages loaded`);
+-
+-  // --- Step 4b: assign wikiIds via the same buildIdRegistry path that
+-  // build-data.mjs uses. Entities whose wikiId was never denormalized onto
+-  // the entities table (but exists in the persistent entity_ids registry)
+-  // are recovered via fetchServerEntityIdMap — that's QUA-521. Without the
+-  // pre-seed, step 3's in-memory fallback allocator would produce different
+-  // E-numbers every run and dominate the Phase 3 diff. Any slug still
+-  // unresolved after the pre-seed falls through to slug-sorted fallback
+-  // allocation inside buildIdRegistry.
+-  const CONTENT_DIR = join(REPO_ROOT, "content/docs");
+-  const reservedPageWikiIds = collectPageWikiIds(CONTENT_DIR);
+-  console.log("4b. Fetching persistent entity_ids registry from server...");
+-  const persistedSlugToWikiId = await fetchPersistentIdRegistry();
+-  if (persistedSlugToWikiId === null) {
+-    console.error(
+-      "    ERROR: persistent id_registry fetch failed (server unavailable or returned non-2xx).\n" +
+-      "    Refusing to proceed — without the registry pre-seed, the PG diff would\n" +
+-      "    mix persisted and fallback IDs, defeating the purpose of this audit.\n" +
+-      "    Check WIKI_SERVER_ENV / LONGTERMWIKI_SERVER_URL / API key and retry."
+-    );
+-    process.exit(1);
+-  }
+-  console.log(`    ${persistedSlugToWikiId.size} slug→wikiId mappings loaded`);
+-  buildIdRegistry(rawEntities, reservedPageWikiIds, { persistedSlugToWikiId });
+-
+-  // --- Step 5: run the shared transform ---
+-  console.log("5. Running transformEntities()...");
+-  const typedEntitiesFromPg = transformEntities(
+-    rawEntities,
+-    pages,
+-    synthExperts
+-  );
+-  console.log(`   ${typedEntitiesFromPg.length} typedEntities produced from PG`);
+-
+-  // --- Step 6: load the existing YAML-sourced typedEntities as baseline ---
+-  console.log("6. Loading YAML-sourced typedEntities from database.json...");
+-  const dbPath = join(OUTPUT_DIR, "database.json");
+-  if (!existsSync(dbPath)) {
+-    console.error(`   ERROR: ${dbPath} not found — run 'node apps/web/scripts/build-data.mjs' first`);
+-    process.exit(1);
+-  }
+-  const db = JSON.parse(readFileSync(dbPath, "utf-8"));
+-  const typedEntitiesFromYaml = db.typedEntities || [];
+-  console.log(`   ${typedEntitiesFromYaml.length} typedEntities from YAML baseline`);
+-
+-  // --- Step 7: write PG output + diff ---
+-  if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
+-  if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
+-
+-  const pgOut = join(OUTPUT_DIR, "typedEntities-from-pg.json");
+-  writeFileSync(pgOut, JSON.stringify(typedEntitiesFromPg, null, 2));
+-  console.log(`\n✓ Wrote ${pgOut} (gitignored — regeneratable)`);
+-
+-  console.log("\n7. Diffing YAML-sourced vs PG-sourced typedEntities...");
+-  const diff = diffTypedEntities(typedEntitiesFromYaml, typedEntitiesFromPg);
+-
+-  const summary = summarizeDiff(diff);
+-  console.log(summary.human);
+-
+-  // The full per-row dump goes into docs/audits/ and is committed —
+-  // this is the QUA-510 acceptance criterion "enumerate every A/C/D diff
+-  // with per-row classification." Stable ordering (alphabetical) so the
+-  // diff is byte-identical across runs against the same PG state.
+-  // Do NOT include timestamps/run metadata in the committed file — it
+-  // would change on every rerun and break drift-detection use cases.
+-  const diffOut = join(AUDIT_DIR, "phase-3-equivalence-audit.diff.json");
+-  writeFileSync(
+-    diffOut,
+-    JSON.stringify(
+-      {
+-        counts: summary.counts,
+-        yamlOnly: [...diff.yamlOnly].sort(),
+-        pgOnly: [...diff.pgOnly].sort(),
+-        fieldDiffs: [...diff.fieldDiffs].sort(
+-          (a, b) => a.id.localeCompare(b.id) || a.key.localeCompare(b.key)
+-        ),
+-      },
+-      null,
+-      2
+-    )
+-  );
+-  console.log(`✓ Wrote ${diffOut} (committed artifact)`);
+-
+-  const mdOut = join(OUTPUT_DIR, "pg-audit-diff.md");
+-  writeFileSync(mdOut, summary.markdown);
+-  console.log(`✓ Wrote ${mdOut} (gitignored)`);
+-}
+-
+-function summarizeDiff(diff) {
+-  const byType = { A: 0, B: 0, C: 0 };
+-  const byField = new Map();
+-  for (const d of diff.fieldDiffs) {
+-    byType[d.type]++;
+-    const fieldKey = `${d.type}:${d.key}`;
+-    byField.set(fieldKey, (byField.get(fieldKey) || 0) + 1);
+-  }
+-  byType.D = diff.yamlOnly.length + diff.pgOnly.length;
+-
+-  const topFields = [...byField.entries()]
+-    .sort((a, b) => b[1] - a[1])
+-    .slice(0, 25);
+-
+-  const lines = [];
+-  lines.push(`Diff summary: ${diff.fieldDiffs.length} field diffs, ${diff.yamlOnly.length} yaml-only rows, ${diff.pgOnly.length} pg-only rows`);
+-  lines.push(`  Type A (yaml-only field): ${byType.A}`);
+-  lines.push(`  Type B (pg-only field):   ${byType.B}`);
+-  lines.push(`  Type C (value mismatch):  ${byType.C}`);
+-  lines.push(`  Type D (missing row):     ${byType.D}`);
+-  lines.push("");
+-  lines.push("Top 25 field diffs (type:field — count):");
+-  for (const [k, v] of topFields) {
+-    lines.push(`  ${k}: ${v}`);
+-  }
+-
+-  const human = lines.join("\n");
+-
+-  const md = [];
+-  md.push("# PG Audit Diff — typedEntities\n");
+-  md.push(`Generated: ${new Date().toISOString()}\n`);
+-  md.push("## Counts\n");
+-  md.push(`- Type A (field in YAML, missing in PG): **${byType.A}**`);
+-  md.push(`- Type B (field in PG, missing in YAML): **${byType.B}**`);
+-  md.push(`- Type C (same field, different value): **${byType.C}**`);
+-  md.push(`- Type D (missing row): **${byType.D}** (yamlOnly=${diff.yamlOnly.length}, pgOnly=${diff.pgOnly.length})`);
+-  md.push("\n## Top 25 field diffs\n");
+-  md.push("| Type:field | Count |");
+-  md.push("|---|---|");
+-  for (const [k, v] of topFields) md.push(`| \`${k}\` | ${v} |`);
+-  md.push("\n## Yaml-only row samples\n");
+-  md.push(diff.yamlOnly.slice(0, 20).map((id) => `- ${id}`).join("\n") || "_none_");
+-  md.push("\n## PG-only row samples\n");
+-  md.push(diff.pgOnly.slice(0, 20).map((id) => `- ${id}`).join("\n") || "_none_");
+-  const markdown = md.join("\n");
+-
+-  return {
+-    counts: { ...byType, fieldDiffs: diff.fieldDiffs.length, yamlOnly: diff.yamlOnly.length, pgOnly: diff.pgOnly.length },
+-    human,
+-    markdown,
+-  };
+-}
+-
+-main().catch((err) => {
+-  console.error(err);
+-  process.exit(1);
+-});
+diff --git a/apps/web/src/components/wiki/factbase/FBCellValue.tsx b/apps/web/src/components/wiki/factbase/FBCellValue.tsx
+index c2ef0fa53..7287fe3f7 100644
+--- a/apps/web/src/components/wiki/factbase/FBCellValue.tsx
++++ b/apps/web/src/components/wiki/factbase/FBCellValue.tsx
+@@ -31,7 +31,7 @@ const CURRENCY_FIELD_NAMES = new Set([
+   "totalBudget", "totalRaised", "selfFunding", "pacAmount",
+   // FactBase kebab-case properties
+   "revenue", "internal-revenue", "secondary-valuation",
+-  // FactBase snake_case properties (from claims-properties.yaml)
++  // FactBase snake_case properties
+   "funding_round_amount", "funding_total",
+ ]);
+ 
+diff --git a/apps/wiki-server/src/routes/tablebase/entities.ts b/apps/wiki-server/src/routes/tablebase/entities.ts
+index 2e6b88789..0a9bcf74a 100644
+--- a/apps/wiki-server/src/routes/tablebase/entities.ts
++++ b/apps/wiki-server/src/routes/tablebase/entities.ts
+@@ -855,9 +855,8 @@ const entitiesApp = new Hono()
+ 
+   // ---- GET /export ----
+   // Returns the full entity shape (including metadata, relatedEntries,
+-  // customFields) for all entities in one response. Used by the PG-backed
+-  // build pipeline (apps/web/scripts/build-data-from-pg.mjs) to replace the
+-  // ~2,800 per-entity fetches it used to do via GET /:id.
++  // customFields) for all entities in one response. Used by the sourcing
++  // item collector (crux/lib/sourcing/item-collectors.ts, entityType=ai-model).
+   //
+   // Mirrors the GET /api/facts/export pattern.
+   //
+diff --git a/data/claims-properties.yaml b/data/claims-properties.yaml
+deleted file mode 100644
+index 5f03a0e0c..000000000
+--- a/data/claims-properties.yaml
++++ /dev/null
+@@ -1,531 +0,0 @@
+-# Controlled vocabulary for structured claim properties.
+-#
+-# Each property defines a named attribute that can be extracted from claims.
+-# The extraction prompt uses this list to normalize claim properties.
+-# Grow organically — add properties as extraction encounters common patterns.
+-#
+-# See: https://github.com/quantified-uncertainty/longterm-wiki/issues/1164
+-
+-properties:
+-  # ── Financial ──────────────────────────────────────────────────────────
+-  - id: funding_round_amount
+-    label: "Funding Round Amount"
+-    description: "Amount raised in a single funding round"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  - id: funding_total
+-    label: "Total Funding Raised"
+-    description: "Cumulative funding raised across all rounds"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  - id: valuation
+-    label: "Company Valuation"
+-    description: "Pre-money or post-money valuation"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  - id: revenue
+-    label: "Revenue"
+-    description: "Annual or quarterly revenue"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  - id: market_volume
+-    label: "Market/Transaction Volume"
+-    description: "Trading or transaction volume over a period"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  # ── Organizational ─────────────────────────────────────────────────────
+-  - id: employee_count
+-    label: "Employee Count"
+-    description: "Number of employees or headcount"
+-    value_type: number
+-    value_unit: count
+-    category: organizational
+-
+-  - id: market_share
+-    label: "Market Share"
+-    description: "Percentage of market captured"
+-    value_type: number
+-    value_unit: percent
+-    category: organizational
+-
+-  - id: headquarters
+-    label: "Headquarters"
+-    description: "Location of headquarters"
+-    value_type: string
+-    category: organizational
+-
+-  - id: legal_structure
+-    label: "Legal Structure"
+-    description: "Corporate structure (PBC, C-corp, nonprofit, etc.)"
+-    value_type: string
+-    category: organizational
+-
+-  # ── Dates / Milestones ─────────────────────────────────────────────────
+-  - id: founded_date
+-    label: "Founded Date"
+-    description: "Date the entity was founded"
+-    value_type: date
+-    category: milestone
+-
+-  - id: launched_date
+-    label: "Launched Date"
+-    description: "Date a product or initiative was launched"
+-    value_type: date
+-    category: milestone
+-
+-  - id: announced_date
+-    label: "Announced Date"
+-    description: "Date an announcement was made"
+-    value_type: date
+-    category: milestone
+-
+-  - id: shutdown_date
+-    label: "Shutdown Date"
+-    description: "Date an entity or product was shut down"
+-    value_type: date
+-    category: milestone
+-
+-  # ── Entity Relations ───────────────────────────────────────────────────
+-  - id: founder
+-    label: "Founder"
+-    description: "Person who founded the entity"
+-    value_type: entity
+-    category: relation
+-
+-  - id: ceo
+-    label: "CEO"
+-    description: "Current chief executive officer"
+-    value_type: entity
+-    category: relation
+-
+-  - id: parent_org
+-    label: "Parent Organization"
+-    description: "Parent or owning organization"
+-    value_type: entity
+-    category: relation
+-
+-  - id: acquired_by
+-    label: "Acquired By"
+-    description: "Entity that acquired this one"
+-    value_type: entity
+-    category: relation
+-
+-  # ── Technical / AI-specific ────────────────────────────────────────────
+-  - id: parameter_count
+-    label: "Parameter Count"
+-    description: "Number of model parameters"
+-    value_type: number
+-    value_unit: count
+-    category: technical
+-
+-  - id: benchmark_score
+-    label: "Benchmark Score"
+-    description: "Score on a named benchmark"
+-    value_type: number
+-    category: technical
+-
+-  - id: context_window
+-    label: "Context Window"
+-    description: "Maximum context window size in tokens"
+-    value_type: number
+-    value_unit: tokens
+-    category: technical
+-
+-  # ── Research / Impact ──────────────────────────────────────────────────
+-  - id: citation_count
+-    label: "Citation Count"
+-    description: "Number of academic or scholarly citations"
+-    value_type: number
+-    value_unit: count
+-    category: research
+-
+-  - id: citations
+-    label: "Citations"
+-    description: "Number of academic or scholarly citations (alias for citation_count)"
+-    value_type: number
+-    value_unit: count
+-    category: research
+-
+-  - id: github_stars
+-    label: "GitHub Stars"
+-    description: "Number of GitHub stars on a repository or project"
+-    value_type: number
+-    value_unit: count
+-    category: research
+-
+-  # ── Risk / Safety Estimates ────────────────────────────────────────────
+-  - id: doom_probability
+-    label: "Doom Probability"
+-    description: "Estimated probability of existential catastrophe from AI"
+-    value_type: number
+-    value_unit: percent
+-    category: safety
+-
+-  - id: risk_probability
+-    label: "Risk Probability"
+-    description: "Estimated probability of a specific risk scenario materializing"
+-    value_type: number
+-    value_unit: percent
+-    category: safety
+-
+-  - id: risk_assessment
+-    label: "Risk Assessment"
+-    description: "Qualitative assessment of risk level"
+-    value_type: string
+-    category: safety
+-
+-  - id: alignment_faking_rate
+-    label: "Alignment Faking Rate"
+-    description: "Observed or estimated rate of alignment faking behavior in AI systems"
+-    value_type: number
+-    value_unit: percent
+-    category: safety
+-
+-  # ── Person-specific ──────────────────────────────────────────────────
+-  - id: position
+-    label: "Position / Role"
+-    description: "Job title or role held by a person at an organization"
+-    value_type: string
+-    category: organizational
+-
+-  - id: employer
+-    label: "Employer"
+-    description: "Organization where a person is employed"
+-    value_type: entity
+-    category: relation
+-
+-  - id: publication_count
+-    label: "Publications Count"
+-    description: "Number of academic or technical publications authored"
+-    value_type: number
+-    value_unit: count
+-    category: research
+-
+-  - id: h_index
+-    label: "h-index"
+-    description: "h-index measuring research impact"
+-    value_type: number
+-    category: research
+-
+-  # ── Additional Safety ───────────────────────────────────────────────
+-  - id: safety_team_size
+-    label: "Safety Team Size"
+-    description: "Number of people on the safety/alignment team"
+-    value_type: number
+-    value_unit: count
+-    category: safety
+-    staleness_cadence: annually
+-
+-  - id: policy_commitment
+-    label: "Policy Commitment"
+-    description: "Public policy commitment or voluntary agreement related to AI safety"
+-    value_type: string
+-    category: safety
+-
+-  # ── Additional Organizational ───────────────────────────────────────
+-  - id: board_composition
+-    label: "Board Composition"
+-    description: "Description of board structure and key members"
+-    value_type: string
+-    category: organizational
+-
+-  # ── Additional Financial ────────────────────────────────────────────
+-  - id: compute_budget
+-    label: "Compute Budget"
+-    description: "Estimated or reported compute expenditure"
+-    value_type: number
+-    value_unit: USD
+-    category: financial
+-
+-  # ── Additional Technical ────────────────────────────────────────────
+-  - id: product_name
+-    label: "Product Name"
+-    description: "Name of a product or service offered by the entity"
+-    value_type: string
+-    category: technical
+-
+-  # ── Additional Milestones ───────────────────────────────────────────
+-  - id: release_date
+-    label: "Release Date"
+-    description: "Date a product, model, or version was released"
+-    value_type: date
+-    category: milestone
+-
+-  # ── People & Leadership ────────────────────────────────────────────────
+-  - id: team_size
+-    label: "Team Size"
+-    description: "Size of a specific team or division within an organization"
+-    value_type: number
+-    value_unit: count
+-    category: people
+-    entity_types: [organization]
+-
+-  - id: chief_scientist
+-    label: "Chief Scientist"
+-    description: "Chief scientist or head of research at an organization"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  - id: education
+-    label: "Education"
+-    description: "Educational background, degrees, or institutional affiliations"
+-    value_type: string
+-    category: people
+-    entity_types: [person]
+-
+-  - id: research_group_lead
+-    label: "Research Group Lead"
+-    description: "Leader of a specific research group or team"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  # ── Products ─────────────────────────────────────────────────────────
+-  - id: product_release
+-    label: "Product Release"
+-    description: "Product or model release event"
+-    value_type: string
+-    category: products
+-    entity_types: [organization]
+-
+-  - id: model_capability
+-    label: "Model Capability"
+-    description: "Qualitative capability description of a model or product"
+-    value_type: string
+-    category: products
+-    entity_types: [organization]
+-
+-  - id: safety_level
+-    label: "Safety Level"
+-    description: "AI Safety Level (ASL) or safety classification tier"
+-    value_type: string
+-    category: products
+-    entity_types: [organization]
+-
+-  - id: pricing
+-    label: "Pricing"
+-    description: "Pricing model, tier structure, or specific price point"
+-    value_type: string
+-    category: products
+-    entity_types: [organization]
+-
+-  - id: user_count
+-    label: "User Count"
+-    description: "Number of users of a product or platform"
+-    value_type: number
+-    value_unit: count
+-    category: products
+-    entity_types: [organization]
+-
+-  - id: api_volume
+-    label: "API Volume"
+-    description: "Number of API calls, requests, or tokens processed"
+-    value_type: number
+-    value_unit: count
+-    category: products
+-    entity_types: [organization]
+-
+-  # ── Safety & Research (expanded) ──────────────────────────────────────
+-  - id: research_finding
+-    label: "Research Finding"
+-    description: "Empirical research result or discovery"
+-    value_type: string
+-    category: research
+-    entity_types: [organization, person]
+-
+-  - id: research_methodology
+-    label: "Research Methodology"
+-    description: "Research method, approach, or experimental technique"
+-    value_type: string
+-    category: research
+-    entity_types: [organization]
+-
+-  - id: publication
+-    label: "Publication"
+-    description: "Published paper, report, or technical document"
+-    value_type: string
+-    category: research
+-    entity_types: [organization, person]
+-
+-  - id: interpretability_finding
+-    label: "Interpretability Finding"
+-    description: "Specific finding from interpretability or mechanistic interpretability research"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: safety_incident
+-    label: "Safety Incident"
+-    description: "AI safety incident, failure, or concerning behavior observed in deployment"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: red_team_result
+-    label: "Red Team Result"
+-    description: "Finding from red-teaming or adversarial testing of AI systems"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: alignment_technique
+-    label: "Alignment Technique"
+-    description: "AI alignment method, approach, or training technique"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: safety_evaluation
+-    label: "Safety Evaluation"
+-    description: "Formal safety evaluation result or assessment"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: responsible_scaling_level
+-    label: "Responsible Scaling Level"
+-    description: "ASL or RSP tier classification for AI system capabilities"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  - id: biosecurity_finding
+-    label: "Biosecurity Finding"
+-    description: "Finding related to biosecurity risks from AI systems"
+-    value_type: string
+-    category: safety
+-    entity_types: [organization]
+-
+-  # ── Governance & Policy (expanded) ────────────────────────────────────
+-  - id: governance_structure
+-    label: "Governance Structure"
+-    description: "Governance mechanism or board structure"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: policy_position
+-    label: "Policy Position"
+-    description: "Stated stance or position on a policy issue"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization, person]
+-
+-  - id: regulatory_event
+-    label: "Regulatory Event"
+-    description: "Regulatory action, investigation, or compliance event"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: lobbying_action
+-    label: "Lobbying Action"
+-    description: "Lobbying effort, advocacy action, or political engagement"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: compliance_standard
+-    label: "Compliance Standard"
+-    description: "Regulatory or industry compliance standard adopted"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: transparency_report
+-    label: "Transparency Report"
+-    description: "Published transparency report or disclosure document"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: voluntary_commitment
+-    label: "Voluntary Commitment"
+-    description: "Voluntary commitment or pledge related to AI safety or ethics"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  - id: international_agreement
+-    label: "International Agreement"
+-    description: "International agreement, treaty, or multi-party commitment"
+-    value_type: string
+-    category: governance
+-    entity_types: [organization]
+-
+-  # ── Attribution ────────────────────────────────────────────────────────
+-  - id: prediction
+-    label: "Prediction"
+-    description: "Forward-looking prediction or forecast attributed to a person"
+-    value_type: string
+-    category: attribution
+-    entity_types: [person, organization]
+-
+-  - id: public_statement
+-    label: "Public Statement"
+-    description: "Notable public statement, quote, or position expressed publicly"
+-    value_type: string
+-    category: attribution
+-    entity_types: [person, organization]
+-
+-  - id: interview_quote
+-    label: "Interview Quote"
+-    description: "Notable quote from an interview, podcast, or testimony"
+-    value_type: string
+-    category: attribution
+-    entity_types: [person]
+-
+-  # ── Competitive & Market ───────────────────────────────────────────────
+-  - id: competitor
+-    label: "Competitor"
+-    description: "Organization with a competitive relationship"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  - id: partner
+-    label: "Partner"
+-    description: "Organization in a partnership or collaboration"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  - id: investor
+-    label: "Investor"
+-    description: "Investor in the organization"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  - id: subsidiary
+-    label: "Subsidiary"
+-    description: "Child or subsidiary organization"
+-    value_type: entity
+-    category: relation
+-    entity_types: [organization]
+-
+-  # ── Generic Fallback ───────────────────────────────────────────────────
+-  - id: count
+-    label: "Count"
+-    description: "Generic count measure (fallback for unclassified numeric counts)"
+-    value_type: number
+-    value_unit: count
+-    category: organizational
+-
+-  - id: percent
+-    label: "Percentage"
+-    description: "Generic percentage measure (fallback for unclassified percentages)"
+-    value_type: number
+-    value_unit: percent
+-    category: organizational
+diff --git a/data/page-forecasts.yaml b/data/page-forecasts.yaml
+deleted file mode 100644
+index bb4433c9a..000000000
+--- a/data/page-forecasts.yaml
++++ /dev/null
+@@ -1,25 +0,0 @@
+-# Page-Forecast Mappings
+-# Generated by discover-page-forecasts.mjs
+-# Last updated: 2025-01-29
+-
+-knowledge-base/risks/misuse/bioweapons:
+-  title: "Bioweapons"
+-  lastUpdated: "2025-01-29"
+-  forecasts:
+-    # Note: These are example forecasts added manually
+-    # Run npm run forecasts:discover when Metaforecast search API is working
+-    # to populate with real data
+-
+-    # Example structure (uncomment and replace with real IDs when available):
+-    # - id: "metaculus-12345"
+-    #   title: "Will there be a bioweapon attack causing >10k casualties by 2030?"
+-    #   url: "https://metaculus.com/questions/12345"
+-    #   platform: "Metaculus"
+-    #   stars: 4
+-    #   relevance: 0.92
+-    #   discoveredVia: "title"
+-    #   probabilities:
+-    #     - name: "Yes"
+-    #       probability: 0.15
+-    #     - name: "No"
+-    #       probability: 0.85
+diff --git a/apps/web/.claude/plans/MASTER_DATA_REFACTOR.md b/docs/archive/plans/MASTER_DATA_REFACTOR.md
+similarity index 100%
+rename from apps/web/.claude/plans/MASTER_DATA_REFACTOR.md
+rename to docs/archive/plans/MASTER_DATA_REFACTOR.md
+diff --git a/.claude/plans/PLAN_FOR_MIGRATION_GAPS.md b/docs/archive/plans/PLAN_FOR_MIGRATION_GAPS.md
+similarity index 100%
+rename from .claude/plans/PLAN_FOR_MIGRATION_GAPS.md
+rename to docs/archive/plans/PLAN_FOR_MIGRATION_GAPS.md
+diff --git a/.claude/plans/STUB_AUDIT_AND_UI_PRIMITIVES.md b/docs/archive/plans/STUB_AUDIT_AND_UI_PRIMITIVES.md
+similarity index 100%
+rename from .claude/plans/STUB_AUDIT_AND_UI_PRIMITIVES.md
+rename to docs/archive/plans/STUB_AUDIT_AND_UI_PRIMITIVES.md
+diff --git a/.claude/plans/epic-coordination-research.md b/docs/archive/plans/epic-coordination-research.md
+similarity index 100%
+rename from .claude/plans/epic-coordination-research.md
+rename to docs/archive/plans/epic-coordination-research.md
+diff --git a/.claude/plans/scaled-hallucination-hunting.md b/docs/archive/plans/scaled-hallucination-hunting.md
+similarity index 100%
+rename from .claude/plans/scaled-hallucination-hunting.md
+rename to docs/archive/plans/scaled-hallucination-hunting.md
+diff --git a/.claude/plans/unified-timeline.md b/docs/archive/plans/unified-timeline.md
+similarity index 100%
+rename from .claude/plans/unified-timeline.md
+rename to docs/archive/plans/unified-timeline.md
+diff --git a/todo/006-validation-engine-improvements.md b/docs/archive/todo/006-validation-engine-improvements.md
+similarity index 100%
+rename from todo/006-validation-engine-improvements.md
+rename to docs/archive/todo/006-validation-engine-improvements.md
+diff --git a/todo/README.md b/docs/archive/todo/README.md
+similarity index 100%
+rename from todo/README.md
+rename to docs/archive/todo/README.md

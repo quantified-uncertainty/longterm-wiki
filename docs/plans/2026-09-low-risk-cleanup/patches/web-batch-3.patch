@@ -1,0 +1,76 @@
+diff --git a/apps/web/next.config.ts b/apps/web/next.config.ts
+index ed2322f92..7a1398bb1 100644
+--- a/apps/web/next.config.ts
++++ b/apps/web/next.config.ts
+@@ -45,6 +45,20 @@ const nextConfig: NextConfig = {
+ 
+   async redirects() {
+     return [
++      // Legacy detail URLs (previously App Router pages that only redirected).
++      // Status codes match the old pages: permanentRedirect() → 308,
++      // redirect() → 307.
++      { source: "/source/:id", destination: "/resources/:id", permanent: true },
++      {
++        source: "/sources/publications/:id",
++        destination: "/publications/:id",
++        permanent: true,
++      },
++      {
++        source: "/factbase/publications/:id",
++        destination: "/publications/:id",
++        permanent: false,
++      },
+       // Vanity URL: /about → wiki page E755
+       {
+         source: "/about",
+diff --git a/apps/web/src/app/factbase/publications/[id]/page.tsx b/apps/web/src/app/factbase/publications/[id]/page.tsx
+deleted file mode 100644
+index d690e979b..000000000
+--- a/apps/web/src/app/factbase/publications/[id]/page.tsx
++++ /dev/null
+@@ -1,13 +0,0 @@
+-import { redirect } from "next/navigation";
+-import { getAllPublications } from "@/data";
+-
+-interface PageProps {
+-  params: Promise<{ id: string }>;
+-}
+-
+-// Render on-demand — this is just a redirect page.
+-
+-export default async function LegacyPublicationPage({ params }: PageProps) {
+-  const { id } = await params;
+-  redirect(`/publications/${id}`);
+-}
+diff --git a/apps/web/src/app/source/[id]/page.tsx b/apps/web/src/app/source/[id]/page.tsx
+deleted file mode 100644
+index 959e0a464..000000000
+--- a/apps/web/src/app/source/[id]/page.tsx
++++ /dev/null
+@@ -1,10 +0,0 @@
+-import { permanentRedirect } from "next/navigation";
+-
+-interface PageProps {
+-  params: Promise<{ id: string }>;
+-}
+-
+-export default async function LegacySourcePage({ params }: PageProps) {
+-  const { id } = await params;
+-  permanentRedirect(`/resources/${id}`);
+-}
+diff --git a/apps/web/src/app/sources/publications/[id]/page.tsx b/apps/web/src/app/sources/publications/[id]/page.tsx
+deleted file mode 100644
+index 240054800..000000000
+--- a/apps/web/src/app/sources/publications/[id]/page.tsx
++++ /dev/null
+@@ -1,10 +0,0 @@
+-import { permanentRedirect } from "next/navigation";
+-
+-interface PageProps {
+-  params: Promise<{ id: string }>;
+-}
+-
+-export default async function LegacySourcesPublicationPage({ params }: PageProps) {
+-  const { id } = await params;
+-  permanentRedirect(`/publications/${id}`);
+-}

@@ -1,0 +1,2242 @@
+diff --git a/apps/web/src/app/data-sources/data-sources-tab-content.tsx b/apps/web/src/app/data-sources/data-sources-tab-content.tsx
+deleted file mode 100644
+index b2b32e115..000000000
+--- a/apps/web/src/app/data-sources/data-sources-tab-content.tsx
++++ /dev/null
+@@ -1,94 +0,0 @@
+-/**
+- * Data Sources tab content for the /sources page.
+- * Fetches data sources from the wiki-server API and renders
+- * stat cards + sortable table within a tab panel.
+- */
+-import {
+-  fetchDetailed,
+-  type RpcDataSourceListResult,
+-} from "@/lib/wiki-server";
+-import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
+-import { DataSourcesTable } from "@/app/data-sources/data-sources-table";
+-import { enrichDataSources, StatCard } from "@/app/data-sources/data-sources-shared";
+-
+-export async function DataSourcesTabContent() {
+-  const result = await fetchDetailed<RpcDataSourceListResult>(
+-    "/api/data-sources",
+-    { revalidate: 60 },
+-  );
+-
+-  if (!result.ok) {
+-    return (
+-      <div className="py-4">
+-        <DataSourceBanner source="api" apiError={result.error} />
+-        <p className="text-destructive text-sm mt-2">
+-          Failed to load data sources.{" "}
+-          {result.error.type === "not-configured"
+-            ? "Wiki server not configured."
+-            : result.error.type === "connection-error"
+-              ? result.error.message
+-              : `Server error: ${result.error.status}`}
+-        </p>
+-      </div>
+-    );
+-  }
+-
+-  const raw = result.data.dataSources;
+-
+-  if (raw.length === 0) {
+-    return (
+-      <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground my-6">
+-        <p className="text-lg font-medium mb-2">No data sources registered</p>
+-        <p className="text-sm">
+-          Run{" "}
+-          <code className="bg-muted px-1.5 py-0.5 rounded text-xs">
+-            pnpm crux tb data-sources snapshot --all
+-          </code>{" "}
+-          to sync source metadata from manifests.
+-        </p>
+-      </div>
+-    );
+-  }
+-
+-  const rows = enrichDataSources(raw);
+-  const staleSources = rows.filter((r) => r.freshness === "overdue").length;
+-  const activeSources = rows.filter((r) => r.sourceStatus === "active").length;
+-  const totalRecords = rows.reduce(
+-    (sum, r) => sum + (r.snapshotRecordCount ?? 0),
+-    0,
+-  );
+-
+-  return (
+-    <div>
+-      <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+-        Structured data feeds (CSV, JSON, HTML) for grants, personnel, and
+-        investments — tracked with versioned snapshots.
+-      </p>
+-
+-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+-        <StatCard
+-          label="Active Sources"
+-          value={activeSources}
+-          sub={`${rows.length} total`}
+-        />
+-        <StatCard
+-          label="Stale Sources"
+-          value={staleSources}
+-          color={staleSources > 0 ? "text-red-600" : "text-emerald-600"}
+-          sub={staleSources > 0 ? "overdue for refresh" : "all on schedule"}
+-        />
+-        <StatCard
+-          label="Records Tracked"
+-          value={totalRecords.toLocaleString()}
+-        />
+-        <StatCard
+-          label="Static Sources"
+-          value={rows.filter((r) => r.freshness === "static").length}
+-          sub="historical, not refreshed"
+-        />
+-      </div>
+-
+-      <DataSourcesTable rows={rows} />
+-    </div>
+-  );
+-}
+diff --git a/apps/web/src/app/divisions/[slug]/division-shared.tsx b/apps/web/src/app/divisions/[slug]/division-shared.tsx
+deleted file mode 100644
+index 2ed641825..000000000
+--- a/apps/web/src/app/divisions/[slug]/division-shared.tsx
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * Shared UI components for division detail pages.
+- * Extracted from page.tsx as a pure refactor — no visual changes.
+- */
+-import type React from "react";
+-import Link from "next/link";
+-
+-// ── Subcomponents ──────────────────────────────────────────────────────
+-
+-export function DetailSection({
+-  title,
+-  children,
+-}: {
+-  title: string;
+-  children: React.ReactNode;
+-}) {
+-  return (
+-    <div>
+-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
+-        {title}
+-      </div>
+-      <div className="flex items-center gap-1 flex-wrap">{children}</div>
+-    </div>
+-  );
+-}
+-
+-export function EntityLinkDisplay({
+-  name,
+-  href,
+-}: {
+-  name: string;
+-  href: string | null;
+-}) {
+-  if (href) {
+-    return (
+-      <Link
+-        href={href}
+-        className="text-sm font-medium text-primary hover:underline"
+-      >
+-        {name}
+-      </Link>
+-    );
+-  }
+-  return <span className="text-sm font-medium text-foreground">{name}</span>;
+-}
+diff --git a/apps/web/src/app/legislation/[slug]/resource-timeline.tsx b/apps/web/src/app/legislation/[slug]/resource-timeline.tsx
+deleted file mode 100644
+index 75d6790bf..000000000
+--- a/apps/web/src/app/legislation/[slug]/resource-timeline.tsx
++++ /dev/null
+@@ -1,377 +0,0 @@
+-"use client";
+-
+-import { safeHref } from "@/lib/format-compact";
+-
+-// ── Types ───────────────────────────────────────────────────────────────
+-
+-export interface TimelineEvent {
+-  label: string;
+-  date: string; // display string like "May 21, 2024" or "2024-05"
+-  sortDate: string; // ISO-ish for sorting, e.g., "2024-05-21"
+-  type: "event";
+-}
+-
+-export interface TimelineResource {
+-  id: string;
+-  title: string;
+-  url: string;
+-  domain: string | null;
+-  publishedDate: string; // ISO date
+-  type: "resource";
+-  resourceType: string; // "web", "paper", "government", etc.
+-  category: "official" | "analysis" | "press";
+-}
+-
+-export type TimelineItem = TimelineEvent | TimelineResource;
+-
+-interface ResourceTimelineProps {
+-  events: TimelineEvent[];
+-  resources: TimelineResource[];
+-}
+-
+-// ── Date helpers ────────────────────────────────────────────────────────
+-
+-const MONTH_NAMES: Record<string, string> = {
+-  "01": "Jan",
+-  "02": "Feb",
+-  "03": "Mar",
+-  "04": "Apr",
+-  "05": "May",
+-  "06": "Jun",
+-  "07": "Jul",
+-  "08": "Aug",
+-  "09": "Sep",
+-  "10": "Oct",
+-  "11": "Nov",
+-  "12": "Dec",
+-};
+-
+-/** Format an ISO date string (YYYY-MM-DD or YYYY-MM) to a short display string. */
+-function formatShortDate(iso: string): string {
+-  const parts = iso.split("-");
+-  if (parts.length >= 3) {
+-    const month = MONTH_NAMES[parts[1]] ?? parts[1];
+-    const day = parseInt(parts[2], 10);
+-    return `${month} ${day}`;
+-  }
+-  if (parts.length === 2) {
+-    const month = MONTH_NAMES[parts[1]] ?? parts[1];
+-    return `${month} ${parts[0]}`;
+-  }
+-  return iso;
+-}
+-
+-// Re-export for backward compatibility with any existing imports
+-export { parseDisplayDateToISO } from "./date-utils";
+-
+-// ── Event dot color ─────────────────────────────────────────────────────
+-
+-function getEventDotColor(label: string): string {
+-  if (label === "Introduced") return "bg-blue-500";
+-  if (label === "Signed" || label === "Enacted" || label === "Effective" || label === "In Force")
+-    return "bg-green-500";
+-  if (label === "Vetoed") return "bg-red-500";
+-  return "bg-violet-500";
+-}
+-
+-function getEventTextColor(label: string): string {
+-  if (label === "Introduced") return "text-blue-700 dark:text-blue-400";
+-  if (label === "Signed" || label === "Enacted" || label === "Effective" || label === "In Force")
+-    return "text-green-700 dark:text-green-400";
+-  if (label === "Vetoed") return "text-red-700 dark:text-red-400";
+-  return "text-violet-700 dark:text-violet-400";
+-}
+-
+-// ── Category badge colors ───────────────────────────────────────────────
+-
+-function getCategoryBadge(category: "official" | "analysis" | "press"): {
+-  label: string;
+-  className: string;
+-} {
+-  switch (category) {
+-    case "official":
+-      return {
+-        label: "Official",
+-        className:
+-          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+-      };
+-    case "analysis":
+-      return {
+-        label: "Analysis",
+-        className:
+-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+-      };
+-    case "press":
+-      return {
+-        label: "Press",
+-        className:
+-          "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+-      };
+-  }
+-}
+-
+-// ── Grouping logic ──────────────────────────────────────────────────────
+-
+-interface EventGroup {
+-  event: TimelineEvent;
+-  resources: TimelineResource[];
+-}
+-
+-interface OrphanGroup {
+-  resources: TimelineResource[];
+-}
+-
+-interface UndatedGroup {
+-  resources: TimelineResource[];
+-}
+-
+-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+-
+-function buildGroups(
+-  events: TimelineEvent[],
+-  resources: TimelineResource[]
+-): { eventGroups: EventGroup[]; orphans: OrphanGroup; undated: UndatedGroup } {
+-  // Sort events newest-first
+-  const sortedEvents = [...events].sort(
+-    (a, b) => b.sortDate.localeCompare(a.sortDate)
+-  );
+-
+-  // Separate dated and undated resources
+-  const datedResources = resources
+-    .filter((r) => r.publishedDate)
+-    .sort((a, b) => b.publishedDate.localeCompare(a.publishedDate));
+-  const undatedResources = resources.filter((r) => !r.publishedDate);
+-
+-  // Assign each dated resource to the nearest preceding event (within 30 days after)
+-  const claimed = new Set<string>();
+-  const eventGroups: EventGroup[] = sortedEvents.map((event) => {
+-    const eventTime = new Date(event.sortDate).getTime();
+-    const attached = datedResources.filter((r) => {
+-      if (claimed.has(r.id)) return false;
+-      const rTime = new Date(r.publishedDate).getTime();
+-      const diff = rTime - eventTime;
+-      // Resource published 0-30 days after event
+-      return diff >= 0 && diff <= THIRTY_DAYS_MS;
+-    });
+-    for (const r of attached) claimed.add(r.id);
+-    return { event, resources: attached };
+-  });
+-
+-  // Remaining dated resources not attached to any event
+-  const orphanResources = datedResources.filter((r) => !claimed.has(r.id));
+-
+-  return {
+-    eventGroups,
+-    orphans: { resources: orphanResources },
+-    undated: { resources: undatedResources },
+-  };
+-}
+-
+-// ── Subcomponents ───────────────────────────────────────────────────────
+-
+-function ResourceRow({ resource }: { resource: TimelineResource }) {
+-  const badge = getCategoryBadge(resource.category);
+-  const shortDate = formatShortDate(resource.publishedDate);
+-
+-  return (
+-    <div className="flex items-start gap-2 py-1 group">
+-      <div className="relative flex items-center justify-center mt-1.5 shrink-0 w-4">
+-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-muted-foreground/50 transition-colors" />
+-      </div>
+-      <div className="flex-1 min-w-0">
+-        <div className="flex items-baseline gap-2 flex-wrap">
+-          <a
+-            href={safeHref(resource.url)}
+-            target="_blank"
+-            rel="noopener noreferrer"
+-            className="text-sm text-primary hover:underline truncate max-w-[24rem]"
+-            title={resource.title}
+-          >
+-            {resource.title}
+-          </a>
+-          <span
+-            className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
+-          >
+-            {badge.label}
+-          </span>
+-        </div>
+-        <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
+-          {resource.domain && <span>{resource.domain}</span>}
+-          <span>{shortDate}</span>
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-function EventEntry({
+-  group,
+-}: {
+-  group: EventGroup;
+-}) {
+-  const { event, resources } = group;
+-  const dotColor = getEventDotColor(event.label);
+-  const textColor = getEventTextColor(event.label);
+-
+-  return (
+-    <div className="relative">
+-      {/* Event dot on the timeline line */}
+-      <div
+-        className={`absolute -left-[13px] top-1.5 w-2 h-2 rounded-full border border-background ${dotColor}`}
+-      />
+-      <div className="flex items-baseline justify-between gap-3">
+-        <span className={`font-bold text-sm ${textColor}`}>
+-          {event.label}
+-        </span>
+-        <span className="text-sm text-muted-foreground whitespace-nowrap">
+-          {event.date}
+-        </span>
+-      </div>
+-      {resources.length > 0 && (
+-        <div className="mt-1 ml-1 border-l border-border/40 pl-2 space-y-0.5">
+-          {resources.map((r) => (
+-            <ResourceRow key={r.id} resource={r} />
+-          ))}
+-        </div>
+-      )}
+-    </div>
+-  );
+-}
+-
+-function OrphanResourceEntry({ resource }: { resource: TimelineResource }) {
+-  const badge = getCategoryBadge(resource.category);
+-  const shortDate = formatShortDate(resource.publishedDate);
+-
+-  return (
+-    <div className="ml-1 border-l border-border/40 pl-2">
+-      <div className="flex items-start gap-2 py-1 group">
+-        <div className="relative flex items-center justify-center mt-1.5 shrink-0 w-4">
+-          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-muted-foreground/50 transition-colors" />
+-        </div>
+-        <div className="flex-1 min-w-0">
+-          <div className="flex items-baseline gap-2 flex-wrap">
+-            <a
+-              href={safeHref(resource.url)}
+-              target="_blank"
+-              rel="noopener noreferrer"
+-              className="text-sm text-primary hover:underline truncate max-w-[24rem]"
+-              title={resource.title}
+-            >
+-              {resource.title}
+-            </a>
+-            <span
+-              className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
+-            >
+-              {badge.label}
+-            </span>
+-          </div>
+-          <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
+-            {resource.domain && <span>{resource.domain}</span>}
+-            <span>{shortDate}</span>
+-          </div>
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-// ── Main component ──────────────────────────────────────────────────────
+-
+-export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
+-  if (events.length === 0 && resources.length === 0) return null;
+-
+-  const { eventGroups, orphans, undated } = buildGroups(events, resources);
+-
+-  // Interleave event groups and orphan resources by date for a unified timeline
+-  type Section =
+-    | { kind: "event-group"; group: EventGroup; sortDate: string }
+-    | { kind: "orphan"; resource: TimelineResource; sortDate: string };
+-
+-  const sections: Section[] = [];
+-  for (const group of eventGroups) {
+-    sections.push({
+-      kind: "event-group",
+-      group,
+-      sortDate: group.event.sortDate,
+-    });
+-  }
+-  for (const r of orphans.resources) {
+-    sections.push({ kind: "orphan", resource: r, sortDate: r.publishedDate });
+-  }
+-  sections.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+-
+-  const datedCount = resources.filter((r) => r.publishedDate).length;
+-  const totalCount = resources.length;
+-
+-  return (
+-    <div>
+-      <div className="flex items-center justify-between mb-4">
+-        <h2 className="text-lg font-bold">Coverage Timeline</h2>
+-        <span className="text-xs text-muted-foreground">
+-          {totalCount} resource{totalCount !== 1 ? "s" : ""}
+-          {datedCount < totalCount && ` (${totalCount - datedCount} undated)`}
+-        </span>
+-      </div>
+-
+-      <div className="relative pl-4 border-l border-border/60 space-y-2">
+-        {sections.map((section, i) => {
+-          if (section.kind === "event-group") {
+-            return (
+-              <EventEntry
+-                key={`event-${section.group.event.label}-${i}`}
+-                group={section.group}
+-              />
+-            );
+-          }
+-          return (
+-            <OrphanResourceEntry
+-              key={`orphan-${section.resource.id}`}
+-              resource={section.resource}
+-            />
+-          );
+-        })}
+-      </div>
+-
+-      {/* Undated resources */}
+-      {undated.resources.length > 0 && (
+-        <div className="mt-6">
+-          <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
+-            Undated
+-          </h3>
+-          <div className="space-y-1.5 pl-2">
+-            {undated.resources.map((r) => {
+-              const badge = getCategoryBadge(r.category);
+-              return (
+-                <div
+-                  key={r.id}
+-                  className="flex items-baseline gap-2 py-0.5 group"
+-                >
+-                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20 shrink-0 mt-1.5" />
+-                  <a
+-                    href={safeHref(r.url)}
+-                    target="_blank"
+-                    rel="noopener noreferrer"
+-                    className="text-sm text-primary hover:underline truncate max-w-[24rem]"
+-                    title={r.title}
+-                  >
+-                    {r.title}
+-                  </a>
+-                  <span
+-                    className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
+-                  >
+-                    {badge.label}
+-                  </span>
+-                  {r.domain && (
+-                    <span className="text-xs text-muted-foreground/70">
+-                      {r.domain}
+-                    </span>
+-                  )}
+-                </div>
+-              );
+-            })}
+-          </div>
+-        </div>
+-      )}
+-    </div>
+-  );
+-}
+diff --git a/apps/web/src/app/legislation/[slug]/stakeholder-detail.tsx b/apps/web/src/app/legislation/[slug]/stakeholder-detail.tsx
+deleted file mode 100644
+index c40c7e60d..000000000
+--- a/apps/web/src/app/legislation/[slug]/stakeholder-detail.tsx
++++ /dev/null
+@@ -1,104 +0,0 @@
+-"use client";
+-
+-import * as Popover from "@radix-ui/react-popover";
+-
+-interface StakeholderDetailProps {
+-  reason: string | undefined;
+-  context: string[] | undefined;
+-  source: string | undefined;
+-}
+-
+-export function StakeholderReasonCell({
+-  reason,
+-  context,
+-  source,
+-}: StakeholderDetailProps) {
+-  const hasContext = context && context.length > 0;
+-  const hasMore = hasContext || (reason && reason.length > 100);
+-
+-  if (!reason && !hasContext) {
+-    return <span className="text-muted-foreground/40">&mdash;</span>;
+-  }
+-
+-  return (
+-    <div className="flex items-start gap-1">
+-      <div className="min-w-0 flex-1">
+-        <span className="line-clamp-2">{reason ?? "\u2014"}</span>
+-        {source && (
+-          <a
+-            href={source}
+-            target="_blank"
+-            rel="noopener noreferrer"
+-            className="ml-1 text-primary hover:underline text-xs"
+-          >
+-            [source]
+-          </a>
+-        )}
+-      </div>
+-      {hasMore && (
+-        <Popover.Root>
+-          <Popover.Trigger asChild>
+-            <button
+-              className="shrink-0 mt-0.5 w-5 h-5 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted/60 transition-colors"
+-              aria-label="Show full details"
+-            >
+-              <svg
+-                width="14"
+-                height="14"
+-                viewBox="0 0 16 16"
+-                fill="none"
+-                stroke="currentColor"
+-                strokeWidth="1.5"
+-              >
+-                <circle cx="8" cy="8" r="6.5" />
+-                <path d="M8 7v4M8 5.5v0" strokeLinecap="round" />
+-              </svg>
+-            </button>
+-          </Popover.Trigger>
+-          <Popover.Portal>
+-            <Popover.Content
+-              side="bottom"
+-              align="end"
+-              sideOffset={4}
+-              className="z-50 w-80 rounded-lg border border-border bg-card shadow-lg p-4 text-sm animate-in fade-in-0 zoom-in-95"
+-            >
+-              {reason && (
+-                <p className="text-foreground leading-relaxed">{reason}</p>
+-              )}
+-              {source && (
+-                <a
+-                  href={source}
+-                  target="_blank"
+-                  rel="noopener noreferrer"
+-                  className="inline-block mt-2 text-primary hover:underline text-xs"
+-                >
+-                  View source &rarr;
+-                </a>
+-              )}
+-              {hasContext && (
+-                <>
+-                  <div className="mt-3 pt-3 border-t border-border/50">
+-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+-                      Context &amp; Connections
+-                    </span>
+-                  </div>
+-                  <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground list-none pl-0">
+-                    {context!.map((note, j) => (
+-                      <li key={j} className="leading-relaxed">
+-                        <span className="text-muted-foreground/40 mr-1">
+-                          &rarr;
+-                        </span>
+-                        {note}
+-                      </li>
+-                    ))}
+-                  </ul>
+-                </>
+-              )}
+-              <Popover.Arrow className="fill-border" />
+-            </Popover.Content>
+-          </Popover.Portal>
+-        </Popover.Root>
+-      )}
+-    </div>
+-  );
+-}
+diff --git a/apps/web/src/app/organizations/[slug]/related-orgs-section.tsx b/apps/web/src/app/organizations/[slug]/related-orgs-section.tsx
+deleted file mode 100644
+index 3671b25b6..000000000
+--- a/apps/web/src/app/organizations/[slug]/related-orgs-section.tsx
++++ /dev/null
+@@ -1,86 +0,0 @@
+-/**
+- * Related Organizations section for organization profile pages.
+- * Extracted from page.tsx as a pure refactor — no visual changes.
+- */
+-import Link from "next/link";
+-import { formatKBDate } from "@/components/wiki/factbase/format";
+-import { SectionHeader } from "./org-shared";
+-import type { RelatedOrg } from "./org-data";
+-
+-
+-import { SourcingDot } from "@/components/sourcing/SourcingDot";
+-import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+-
+-const MAX_RELATED = 15;
+-
+-export function RelatedOrganizationsSection({
+-  orgs,
+-  parentOrgId,
+-}: {
+-  orgs: RelatedOrg[];
+-  parentOrgId: string;
+-}) {
+-  if (orgs.length === 0) return null;
+-
+-  const displayed = orgs.slice(0, MAX_RELATED);
+-  const overflow = orgs.length - displayed.length;
+-
+-  return (
+-    <section>
+-      <SectionHeader title="Related Organizations" count={orgs.length} />
+-      <div className="border border-border rounded-xl overflow-x-auto">
+-        <table className="w-full text-sm">
+-          <thead>
+-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+-              <th scope="col" className="py-2 px-3 text-left font-medium">Organization</th>
+-              <th scope="col" className="py-2 px-3 text-left font-medium">Relationship</th>
+-              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+-              <th scope="col" className="py-2 px-1 w-8" />
+-            </tr>
+-          </thead>
+-          <tbody className="divide-y divide-border/50">
+-            {displayed.map((org, idx) => {
+-              // entity-relationship has no sourcing verdicts yet (QUA-211)
+-              const verdict = null as string | null;
+-              return (
+-                <tr key={`${org.id}-${idx}`} className="hover:bg-muted/20 transition-colors">
+-                  <td className="py-1.5 px-3">
+-                    {org.slug ? (
+-                      <Link
+-                        href={`/organizations/${org.slug}`}
+-                        className="font-medium text-foreground hover:text-primary transition-colors"
+-                      >
+-                        {org.name}
+-                      </Link>
+-                    ) : (
+-                      <span className="font-medium">{org.name}</span>
+-                    )}
+-                  </td>
+-                  <td className="py-1.5 px-3 text-muted-foreground">{org.relationship}</td>
+-                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">
+-                    {org.date ? formatKBDate(org.date) : ""}
+-                  </td>
+-                  <td className="py-1.5 px-1">
+-                    <SourcingDot
+-                      status={recordVerdictToStatus(verdict)}
+-                      originalVerdict={verdict}
+-                      size="md"
+-                      href={undefined}
+-                    />
+-                  </td>
+-                </tr>
+-              );
+-            })}
+-            {overflow > 0 && (
+-              <tr>
+-                <td colSpan={4} className="py-2 px-3 text-center text-xs text-muted-foreground">
+-                  +{overflow} more
+-                </td>
+-              </tr>
+-            )}
+-          </tbody>
+-        </table>
+-      </div>
+-    </section>
+-  );
+-}
+diff --git a/apps/web/src/app/people/[slug]/social-links.tsx b/apps/web/src/app/people/[slug]/social-links.tsx
+deleted file mode 100644
+index 245e9a567..000000000
+--- a/apps/web/src/app/people/[slug]/social-links.tsx
++++ /dev/null
+@@ -1,113 +0,0 @@
+-import type { Fact } from "@longterm-wiki/factbase";
+-import { safeHref } from "@/lib/directory-utils";
+-
+-/**
+- * Social link definition — maps a KB property to display config.
+- */
+-interface SocialLinkDef {
+-  /** KB property ID */
+-  property: string;
+-  /** Display label */
+-  label: string;
+-  /** SVG icon path data (rendered inside a 24x24 viewBox) */
+-  iconPath: string;
+-  /** Given the fact text value, return the full URL */
+-  toUrl: (value: string) => string;
+-}
+-
+-const SOCIAL_LINKS: SocialLinkDef[] = [
+-  {
+-    property: "website",
+-    label: "Website",
+-    // Globe icon
+-    iconPath:
+-      "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
+-    toUrl: (v) => v,
+-  },
+-  {
+-    property: "social-media",
+-    label: "X / Twitter",
+-    // X (Twitter) icon
+-    iconPath:
+-      "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
+-    toUrl: (v) => {
+-      const handle = v.replace(/^@/, "");
+-      return `https://x.com/${handle}`;
+-    },
+-  },
+-  {
+-    property: "github-profile",
+-    label: "GitHub",
+-    // GitHub icon
+-    iconPath:
+-      "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z",
+-    toUrl: (v) => v,
+-  },
+-  {
+-    property: "google-scholar",
+-    label: "Google Scholar",
+-    // Graduation cap / scholar icon
+-    iconPath:
+-      "M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z",
+-    toUrl: (v) => v,
+-  },
+-  {
+-    property: "wikipedia-url",
+-    label: "Wikipedia",
+-    // W icon (simplified Wikipedia)
+-    iconPath:
+-      "M12.09 13.119c-.14 1.064-.44 2.098-.876 3.076l-1.264 2.828-.252.504L6.476 12.2 4.75 17.092 3.5 21.5l-1-.34L5.7 12.03l.252-.672L3.356 4.5h1.36l2.1 5.88L8.424 4.5h1.26l-2.34 6.552c.816-.048 1.464.24 1.944.864.48.624.84 1.44 1.08 2.448l.252-.504 1.764-3.552L13.536 4.5h1.248L12.54 9.96l1.596 3.528L17.592 4.5h1.26l-4.2 9.372-2.16 4.632-.252.504c-.456-.96-.78-1.98-.936-3.06L12.09 13.12z",
+-    toUrl: (v) => v,
+-  },
+-];
+-
+-interface SocialLinksProps {
+-  /** All facts for this entity, keyed by property ID */
+-  facts: Record<string, Fact | undefined>;
+-}
+-
+-/**
+- * Renders a row of small social link icons for a person profile page.
+- * Reads from KB facts: website, social-media, github-profile, google-scholar, wikipedia-url.
+- */
+-export function SocialLinks({ facts }: SocialLinksProps) {
+-  const links: Array<{ label: string; url: string; iconPath: string }> = [];
+-
+-  for (const def of SOCIAL_LINKS) {
+-    const fact = facts[def.property];
+-    if (!fact || fact.value.type !== "text") continue;
+-    const url = def.toUrl(fact.value.value);
+-    if (!url) continue;
+-    links.push({ label: def.label, url, iconPath: def.iconPath });
+-  }
+-
+-  if (links.length === 0) return null;
+-
+-  return (
+-    <section>
+-      <h2 className="text-lg font-bold tracking-tight mb-3">Links</h2>
+-      <div className="flex flex-wrap gap-2">
+-        {links.map((link) => (
+-          <a
+-            key={link.label}
+-            href={safeHref(link.url)}
+-            target="_blank"
+-            rel="noopener noreferrer"
+-            title={link.label}
+-            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-border/60 bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+-          >
+-            <svg
+-              viewBox="0 0 24 24"
+-              fill="currentColor"
+-              className="w-4.5 h-4.5"
+-              aria-hidden="true"
+-            >
+-              <path d={link.iconPath} />
+-            </svg>
+-            <span className="sr-only">{link.label}</span>
+-          </a>
+-        ))}
+-      </div>
+-    </section>
+-  );
+-}
+diff --git a/apps/web/src/components/internal/FactDashboard.tsx b/apps/web/src/components/internal/FactDashboard.tsx
+deleted file mode 100644
+index a1da35174..000000000
+--- a/apps/web/src/components/internal/FactDashboard.tsx
++++ /dev/null
+@@ -1,954 +0,0 @@
+-"use client";
+-
+-import { useState, useMemo } from "react";
+-import Link from "next/link";
+-
+-interface FactMeasureDef {
+-  id: string;
+-  label: string;
+-  unit: string;
+-  category: string;
+-  direction?: "higher" | "lower";
+-  description?: string;
+-  display?: {
+-    divisor?: number;
+-    prefix?: string;
+-    suffix?: string;
+-  };
+-  relatedMeasures?: string[];
+-  applicableTo?: string[];
+-}
+-
+-interface FactUsagePage {
+-  id: string;
+-  title: string;
+-  path: string;
+-}
+-
+-interface FactEntry {
+-  key: string;
+-  entity: string;
+-  factId: string;
+-  value?: string;
+-  numeric?: number;
+-  low?: number;
+-  high?: number;
+-  asOf?: string;
+-  source?: string;
+-  sourceTitle?: string;
+-  sourcePublication?: string;
+-  sourceCredibility?: number;
+-  note?: string;
+-  computed?: boolean;
+-  compute?: string;
+-  measure?: string;
+-  subject?: string;
+-}
+-
+-type ViewMode = "entity" | "measure" | "timeseries";
+-
+-export function FactDashboard({
+-  facts,
+-  entityHrefs,
+-  factMeasures,
+-  factUsage = {},
+-}: {
+-  facts: FactEntry[];
+-  entityHrefs: Record<string, string>;
+-  factMeasures: Record<string, FactMeasureDef>;
+-  factUsage?: Record<string, FactUsagePage[]>;
+-}) {
+-  const [filter, setFilter] = useState("");
+-  const [showComputed, setShowComputed] = useState(true);
+-  const [sourceFilter, setSourceFilter] = useState<"all" | "sourced" | "unsourced">("all");
+-  const [viewMode, setViewMode] = useState<ViewMode>("entity");
+-
+-  const filtered = useMemo(() => facts.filter((f) => {
+-    if (!showComputed && f.computed) return false;
+-    if (sourceFilter === "sourced" && !f.source) return false;
+-    if (sourceFilter === "unsourced" && f.source) return false;
+-    if (!filter) return true;
+-    const q = filter.toLowerCase();
+-    return (
+-      f.entity.toLowerCase().includes(q) ||
+-      f.factId.toLowerCase().includes(q) ||
+-      (f.value || "").toLowerCase().includes(q) ||
+-      (f.measure || "").toLowerCase().includes(q) ||
+-      (f.sourcePublication || "").toLowerCase().includes(q) ||
+-      (f.sourceTitle || "").toLowerCase().includes(q)
+-    );
+-  }), [facts, filter, showComputed, sourceFilter]);
+-
+-  // Stats
+-  const measureCount = useMemo(() => {
+-    const measures = new Set(filtered.filter(f => f.measure).map(f => f.measure));
+-    return measures.size;
+-  }, [filtered]);
+-
+-  const entityCount = useMemo(() => {
+-    return new Set(filtered.map(f => f.entity)).size;
+-  }, [filtered]);
+-
+-  // Source coverage stats (computed from all facts, not filtered)
+-  const sourceStats = useMemo(() => {
+-    const total = facts.length;
+-    const withSource = facts.filter(f => f.source).length;
+-    const unsourced = total - withSource;
+-    const pct = total > 0 ? Math.round((withSource / total) * 100) : 0;
+-    // Credibility breakdown
+-    const credCounts = { high: 0, medium: 0, low: 0 };
+-    for (const f of facts) {
+-      if (f.sourceCredibility != null) {
+-        if (f.sourceCredibility >= 4) credCounts.high++;
+-        else if (f.sourceCredibility >= 3) credCounts.medium++;
+-        else credCounts.low++;
+-      }
+-    }
+-    return { total, withSource, unsourced, pct, credCounts };
+-  }, [facts]);
+-
+-  return (
+-    <div>
+-      {/* ID naming convention note */}
+-      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+-        <strong>ID convention:</strong> A bare measure name (e.g.{" "}
+-        <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation</code>) always refers to the{" "}
+-        <em>latest/canonical</em> observation. When a newer value arrives, rename the old fact to a dated ID
+-        (e.g. <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation-nov-2025</code>) and create
+-        a fresh <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation</code>. This lets pages
+-        using <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;F e="x" f="valuation" /&gt;</code> always
+-        show the current value without code changes.
+-      </div>
+-
+-      {/* Source coverage summary */}
+-      <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg flex-wrap">
+-        <div className="flex items-center gap-2">
+-          <span className="text-sm font-medium">Source Coverage:</span>
+-          <span className={`text-sm font-semibold ${sourceStats.pct >= 50 ? "text-green-600 dark:text-green-400" : sourceStats.pct >= 25 ? "text-yellow-600 dark:text-yellow-400" : "text-red-600 dark:text-red-400"}`}>
+-            {sourceStats.pct}%
+-          </span>
+-        </div>
+-        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden min-w-[100px] max-w-[200px]">
+-          <div className="h-full bg-green-500/60 rounded-full" style={{ width: `${sourceStats.pct}%` }} />
+-        </div>
+-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+-          <span className="flex items-center gap-1">
+-            <span className="w-2 h-2 rounded-full bg-green-500/60 inline-block" />
+-            {sourceStats.withSource} sourced
+-          </span>
+-          <span className="flex items-center gap-1">
+-            <span className="w-2 h-2 rounded-full bg-red-500/40 inline-block" />
+-            {sourceStats.unsourced} unsourced
+-          </span>
+-        </div>
+-        {(sourceStats.credCounts.high > 0 || sourceStats.credCounts.medium > 0) && (
+-          <div className="flex items-center gap-2 text-xs border-l border-border pl-3 ml-1">
+-            <span className="text-muted-foreground">Credibility:</span>
+-            {sourceStats.credCounts.high > 0 && (
+-              <span className="px-1.5 py-0.5 bg-green-500/15 text-green-600 dark:text-green-400 rounded font-medium">
+-                {sourceStats.credCounts.high} high
+-              </span>
+-            )}
+-            {sourceStats.credCounts.medium > 0 && (
+-              <span className="px-1.5 py-0.5 bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 rounded font-medium">
+-                {sourceStats.credCounts.medium} med
+-              </span>
+-            )}
+-            {sourceStats.credCounts.low > 0 && (
+-              <span className="px-1.5 py-0.5 bg-red-500/15 text-red-600 dark:text-red-400 rounded font-medium">
+-                {sourceStats.credCounts.low} low
+-              </span>
+-            )}
+-          </div>
+-        )}
+-      </div>
+-
+-      <div className="flex items-center gap-4 mb-4 flex-wrap">
+-        <input
+-          type="text"
+-          placeholder="Filter by entity, fact ID, measure, or source..."
+-          value={filter}
+-          onChange={(e) => setFilter(e.target.value)}
+-          className="flex-1 min-w-[200px] px-3 py-2 text-sm border border-border rounded-md bg-background"
+-        />
+-        <div className="flex rounded-md border border-border overflow-hidden">
+-          {(["all", "sourced", "unsourced"] as const).map((mode) => (
+-            <button
+-              key={mode}
+-              onClick={() => setSourceFilter(mode)}
+-              className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
+-                sourceFilter === mode
+-                  ? "bg-primary text-primary-foreground"
+-                  : "bg-background text-muted-foreground hover:bg-muted"
+-              }`}
+-            >
+-              {mode === "all" ? "All" : mode === "sourced" ? "Sourced" : "Unsourced"}
+-            </button>
+-          ))}
+-        </div>
+-        <label className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
+-          <input
+-            type="checkbox"
+-            checked={showComputed}
+-            onChange={(e) => setShowComputed(e.target.checked)}
+-            className="rounded"
+-          />
+-          Show computed
+-        </label>
+-      </div>
+-
+-      <div className="flex items-center gap-3 mb-6">
+-        <div className="flex rounded-md border border-border overflow-hidden">
+-          {(["entity", "measure", "timeseries"] as ViewMode[]).map((mode) => (
+-            <button
+-              key={mode}
+-              onClick={() => setViewMode(mode)}
+-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+-                viewMode === mode
+-                  ? "bg-primary text-primary-foreground"
+-                  : "bg-background text-muted-foreground hover:bg-muted"
+-              }`}
+-            >
+-              {mode === "entity" ? "By Entity" : mode === "measure" ? "By Measure" : "Timeseries"}
+-            </button>
+-          ))}
+-        </div>
+-        <span className="text-sm text-muted-foreground">
+-          {filtered.length} facts | {entityCount} entities | {measureCount} measures
+-        </span>
+-      </div>
+-
+-      {viewMode === "entity" && (
+-        <EntityView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
+-      )}
+-      {viewMode === "measure" && (
+-        <MeasureView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
+-      )}
+-      {viewMode === "timeseries" && (
+-        <TimeseriesView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
+-      )}
+-    </div>
+-  );
+-}
+-
+-// === Entity View (original, enhanced with measure badges) ===
+-
+-function EntityView({
+-  facts,
+-  entityHrefs,
+-  factMeasures,
+-  factUsage,
+-}: {
+-  facts: FactEntry[];
+-  entityHrefs: Record<string, string>;
+-  factMeasures: Record<string, FactMeasureDef>;
+-  factUsage: Record<string, FactUsagePage[]>;
+-}) {
+-  const grouped = useMemo(() => {
+-    const map = new Map<string, FactEntry[]>();
+-    for (const fact of facts) {
+-      const group = map.get(fact.entity) || [];
+-      group.push(fact);
+-      map.set(fact.entity, group);
+-    }
+-    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+-  }, [facts]);
+-
+-  return (
+-    <div className="space-y-6">
+-      {grouped.map(([entity, entityFacts]) => (
+-        <div key={entity}>
+-          <h3 className="text-base font-semibold mb-2 text-foreground">
+-            <Link href={entityHrefs[entity] || `/wiki/${entity}`} className="hover:underline">
+-              {entity}
+-            </Link>
+-          </h3>
+-          <table className="w-full text-sm border-collapse">
+-            <thead>
+-              <tr className="text-left text-muted-foreground">
+-                <th className="pb-1 pr-4 font-medium">Fact ID</th>
+-                <th className="pb-1 pr-4 font-medium">Measure</th>
+-                <th className="pb-1 pr-4 font-medium">Value</th>
+-                <th className="pb-1 pr-4 font-medium">As Of</th>
+-                <th className="pb-1 pr-4 font-medium">Source</th>
+-                <th className="pb-1 pr-4 font-medium">Type</th>
+-                <th className="pb-1 font-medium">Used in</th>
+-              </tr>
+-            </thead>
+-            <tbody>
+-              {entityFacts.map((fact) => {
+-                const pages = factUsage[fact.key] || [];
+-                return (
+-                  <tr key={fact.key} className="border-t border-border">
+-                    <td className="py-1.5 pr-4">
+-                      <span className="font-mono text-xs">{fact.factId}</span>
+-                      {fact.subject && (
+-                        <span className="ml-1.5 text-[10px] px-1 py-px bg-orange-100 text-orange-700 rounded dark:bg-orange-900 dark:text-orange-300">
+-                          subject: {fact.subject}
+-                        </span>
+-                      )}
+-                    </td>
+-                    <td className="py-1.5 pr-4">
+-                      <MeasureBadge measureId={fact.measure} factMeasures={factMeasures} />
+-                    </td>
+-                    <td className="py-1.5 pr-4">
+-                      <ValueDisplay fact={fact} />
+-                    </td>
+-                    <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+-                    <td className="py-1.5 pr-4">
+-                      <SourceBadge fact={fact} />
+-                    </td>
+-                    <td className="py-1.5 pr-4">
+-                      {fact.computed ? (
+-                        <span className="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded dark:bg-blue-900 dark:text-blue-300">
+-                          computed
+-                        </span>
+-                      ) : (
+-                        <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded dark:bg-green-900 dark:text-green-300">
+-                          manual
+-                        </span>
+-                      )}
+-                    </td>
+-                    <td className="py-1.5">
+-                      <UsedInBadge pages={pages} />
+-                    </td>
+-                  </tr>
+-                );
+-              })}
+-            </tbody>
+-          </table>
+-        </div>
+-      ))}
+-    </div>
+-  );
+-}
+-
+-// === Measure View (grouped by measure) ===
+-
+-function MeasureView({
+-  facts,
+-  entityHrefs,
+-  factMeasures,
+-  factUsage,
+-}: {
+-  facts: FactEntry[];
+-  entityHrefs: Record<string, string>;
+-  factMeasures: Record<string, FactMeasureDef>;
+-  factUsage: Record<string, FactUsagePage[]>;
+-}) {
+-  const { measureGroups, untagged } = useMemo(() => {
+-    const byMeasure = new Map<string, FactEntry[]>();
+-    const noMeasure: FactEntry[] = [];
+-    for (const fact of facts) {
+-      if (fact.measure) {
+-        const group = byMeasure.get(fact.measure) || [];
+-        group.push(fact);
+-        byMeasure.set(fact.measure, group);
+-      } else {
+-        noMeasure.push(fact);
+-      }
+-    }
+-    // Sort within each measure by entity then asOf
+-    for (const group of byMeasure.values()) {
+-      group.sort((a, b) => a.entity.localeCompare(b.entity) || (a.asOf || "").localeCompare(b.asOf || ""));
+-    }
+-    // Sort measures by category then label
+-    const sorted = [...byMeasure.entries()].sort((a, b) => {
+-      const catA = factMeasures[a[0]]?.category || "zzz";
+-      const catB = factMeasures[b[0]]?.category || "zzz";
+-      if (catA !== catB) return catA.localeCompare(catB);
+-      return a[0].localeCompare(b[0]);
+-    });
+-    return { measureGroups: sorted, untagged: noMeasure };
+-  }, [facts, factMeasures]);
+-
+-  // Group by category
+-  const byCategory = useMemo(() => {
+-    const cats = new Map<string, [string, FactEntry[]][]>();
+-    for (const [measureId, entries] of measureGroups) {
+-      const cat = factMeasures[measureId]?.category || "uncategorized";
+-      const group = cats.get(cat) || [];
+-      group.push([measureId, entries]);
+-      cats.set(cat, group);
+-    }
+-    return [...cats.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+-  }, [measureGroups, factMeasures]);
+-
+-  return (
+-    <div className="space-y-8">
+-      {byCategory.map(([category, measures]) => (
+-        <div key={category}>
+-          <h2 className="text-lg font-bold mb-4 capitalize text-foreground border-b border-border pb-1">
+-            {category}
+-          </h2>
+-          <div className="space-y-6">
+-            {measures.map(([measureId, entries]) => {
+-              const def = factMeasures[measureId];
+-              const entities = [...new Set(entries.map(e => e.entity))];
+-              return (
+-                <div key={measureId} className="pl-2 border-l-2 border-primary/20">
+-                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+-                    <h3 className="text-base font-semibold text-foreground">
+-                      {def?.label || measureId}
+-                    </h3>
+-                    <span className="text-xs text-muted-foreground font-mono">{measureId}</span>
+-                    {def?.unit && (
+-                      <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+-                        {def.unit}
+-                      </span>
+-                    )}
+-                    {def?.direction && (
+-                      <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+-                        {def.direction === "higher" ? "\u2191 higher is better" : "\u2193 lower is better"}
+-                      </span>
+-                    )}
+-                    <span className="text-xs text-muted-foreground">
+-                      {entries.length} observations across {entities.length} {entities.length === 1 ? "entity" : "entities"}
+-                    </span>
+-                    {def?.applicableTo && def.applicableTo.length > 0 && (
+-                      <span className="text-xs text-muted-foreground">
+-                        · applies to: {def.applicableTo.join(", ")}
+-                      </span>
+-                    )}
+-                  </div>
+-                  {def?.description && (
+-                    <p className="text-xs text-muted-foreground mb-1">{def.description}</p>
+-                  )}
+-                  {def?.relatedMeasures && def.relatedMeasures.length > 0 && (
+-                    <p className="text-xs text-muted-foreground mb-2">
+-                      Related: {def.relatedMeasures.map((rm, i) => (
+-                        <span key={rm}>
+-                          {i > 0 && ", "}
+-                          <span className="font-mono">{rm}</span>
+-                          {factMeasures[rm] ? ` (${factMeasures[rm].label})` : ""}
+-                        </span>
+-                      ))}
+-                    </p>
+-                  )}
+-                  <table className="w-full text-sm border-collapse">
+-                    <thead>
+-                      <tr className="text-left text-muted-foreground">
+-                        <th className="pb-1 pr-4 font-medium">Entity</th>
+-                        <th className="pb-1 pr-4 font-medium">Fact ID</th>
+-                        <th className="pb-1 pr-4 font-medium">Value</th>
+-                        <th className="pb-1 pr-4 font-medium">As Of</th>
+-                        <th className="pb-1 pr-4 font-medium">Source</th>
+-                        <th className="pb-1 pr-4 font-medium">Note</th>
+-                        <th className="pb-1 font-medium">Used in</th>
+-                      </tr>
+-                    </thead>
+-                    <tbody>
+-                      {entries.map((fact) => {
+-                        const pages = factUsage[fact.key] || [];
+-                        return (
+-                          <tr key={fact.key} className="border-t border-border">
+-                            <td className="py-1.5 pr-4">
+-                              <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
+-                                {fact.entity}
+-                              </Link>
+-                              {fact.subject && (
+-                                <span className="ml-1.5 text-[10px] px-1 py-px bg-orange-100 text-orange-700 rounded dark:bg-orange-900 dark:text-orange-300">
+-                                  subj: {fact.subject}
+-                                </span>
+-                              )}
+-                            </td>
+-                            <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
+-                            <td className="py-1.5 pr-4">
+-                              <ValueDisplay fact={fact} />
+-                            </td>
+-                            <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+-                            <td className="py-1.5 pr-4">
+-                              <SourceBadge fact={fact} />
+-                            </td>
+-                            <td className="py-1.5 pr-4 text-muted-foreground text-xs max-w-[200px] truncate">
+-                              {fact.note || "\u2014"}
+-                            </td>
+-                            <td className="py-1.5">
+-                              <UsedInBadge pages={pages} />
+-                            </td>
+-                          </tr>
+-                        );
+-                      })}
+-                    </tbody>
+-                  </table>
+-                </div>
+-              );
+-            })}
+-          </div>
+-        </div>
+-      ))}
+-
+-      {untagged.length > 0 && (
+-        <div>
+-          <h2 className="text-lg font-bold mb-4 text-muted-foreground border-b border-border pb-1">
+-            Untagged (no measure)
+-          </h2>
+-          <table className="w-full text-sm border-collapse">
+-            <thead>
+-              <tr className="text-left text-muted-foreground">
+-                <th className="pb-1 pr-4 font-medium">Entity</th>
+-                <th className="pb-1 pr-4 font-medium">Fact ID</th>
+-                <th className="pb-1 pr-4 font-medium">Value</th>
+-                <th className="pb-1 pr-4 font-medium">As Of</th>
+-                <th className="pb-1 pr-4 font-medium">Note</th>
+-                <th className="pb-1 font-medium">Used in</th>
+-              </tr>
+-            </thead>
+-            <tbody>
+-              {untagged.map((fact) => {
+-                const pages = factUsage[fact.key] || [];
+-                return (
+-                  <tr key={fact.key} className="border-t border-border">
+-                    <td className="py-1.5 pr-4">
+-                      <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
+-                        {fact.entity}
+-                      </Link>
+-                    </td>
+-                    <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
+-                    <td className="py-1.5 pr-4">{fact.value || "\u2014"}</td>
+-                    <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+-                    <td className="py-1.5 pr-4 text-muted-foreground text-xs">{fact.note || "\u2014"}</td>
+-                    <td className="py-1.5">
+-                      <UsedInBadge pages={pages} />
+-                    </td>
+-                  </tr>
+-                );
+-              })}
+-            </tbody>
+-          </table>
+-        </div>
+-      )}
+-    </div>
+-  );
+-}
+-
+-// === Timeseries View (visual timeline per measure+entity) ===
+-
+-function TimeseriesView({
+-  facts,
+-  entityHrefs,
+-  factMeasures,
+-  factUsage,
+-}: {
+-  facts: FactEntry[];
+-  entityHrefs: Record<string, string>;
+-  factMeasures: Record<string, FactMeasureDef>;
+-  factUsage: Record<string, FactUsagePage[]>;
+-}) {
+-  // Build timeseries: group by measure+entity, sort by date
+-  const series = useMemo(() => {
+-    const map = new Map<string, FactEntry[]>();
+-    for (const fact of facts) {
+-      if (!fact.measure || !fact.asOf) continue;
+-      const seriesKey = `${fact.measure}:${fact.entity}`;
+-      const group = map.get(seriesKey) || [];
+-      group.push(fact);
+-      map.set(seriesKey, group);
+-    }
+-    // Sort chronologically within each series
+-    for (const group of map.values()) {
+-      group.sort((a, b) => (a.asOf || "").localeCompare(b.asOf || ""));
+-    }
+-    // Only show series with 2+ points (that's what makes a timeseries interesting)
+-    const multiPoint = [...map.entries()]
+-      .filter(([, entries]) => entries.length >= 2)
+-      .sort((a, b) => {
+-        // Sort by measure then entity
+-        const [measureA] = a[0].split(":");
+-        const [measureB] = b[0].split(":");
+-        if (measureA !== measureB) return measureA.localeCompare(measureB);
+-        return a[0].localeCompare(b[0]);
+-      });
+-    return multiPoint;
+-  }, [facts]);
+-
+-  if (series.length === 0) {
+-    return (
+-      <p className="text-muted-foreground text-sm">
+-        No measures with multiple time observations found. Facts need both a <code>measure</code> and <code>asOf</code> field,
+-        and at least 2 observations of the same measure for the same entity.
+-      </p>
+-    );
+-  }
+-
+-  return (
+-    <div className="space-y-8">
+-      {series.map(([seriesKey, entries]) => {
+-        const [measureId, entityId] = seriesKey.split(":");
+-        const def = factMeasures[measureId];
+-        const hasNumeric = entries.some(e => e.numeric != null || e.low != null);
+-        // All pages using any fact in this series
+-        const allPages = entries.flatMap(e => factUsage[e.key] || []);
+-        const uniquePages = allPages.filter((p, i, arr) => arr.findIndex(q => q.id === p.id) === i);
+-
+-        return (
+-          <div key={seriesKey} className="border border-border rounded-lg p-4">
+-            <div className="flex items-baseline gap-2 mb-3 flex-wrap">
+-              <h3 className="text-base font-semibold text-foreground">
+-                {def?.label || measureId}
+-              </h3>
+-              <span className="text-sm text-muted-foreground">&mdash;</span>
+-              <Link href={entityHrefs[entityId] || `/wiki/${entityId}`} className="text-sm text-primary hover:underline">
+-                {entityId}
+-              </Link>
+-              {def?.direction && (
+-                <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+-                  {def.direction === "higher" ? "\u2191" : "\u2193"}
+-                </span>
+-              )}
+-              {def?.unit && (
+-                <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+-                  {def.unit}
+-                </span>
+-              )}
+-              {uniquePages.length > 0 && (
+-                <span className="ml-auto">
+-                  <UsedInBadge pages={uniquePages} />
+-                </span>
+-              )}
+-            </div>
+-
+-            {/* Mini bar chart for numeric timeseries */}
+-            {hasNumeric && (
+-              <MiniBarChart entries={entries} def={def} />
+-            )}
+-
+-            {/* Data table */}
+-            <table className="w-full text-sm border-collapse mt-2">
+-              <thead>
+-                <tr className="text-left text-muted-foreground">
+-                  <th className="pb-1 pr-4 font-medium">Date</th>
+-                  <th className="pb-1 pr-4 font-medium">Value</th>
+-                  {entries.some(e => e.low != null) && (
+-                    <th className="pb-1 pr-4 font-medium">Range</th>
+-                  )}
+-                  <th className="pb-1 pr-4 font-medium">Fact ID</th>
+-                  <th className="pb-1 font-medium">Note</th>
+-                </tr>
+-              </thead>
+-              <tbody>
+-                {entries.map((fact) => (
+-                  <tr key={fact.key} className="border-t border-border">
+-                    <td className="py-1.5 pr-4 font-mono text-xs">{fact.asOf}</td>
+-                    <td className="py-1.5 pr-4">
+-                      <ValueDisplay fact={fact} />
+-                    </td>
+-                    {entries.some(e => e.low != null) && (
+-                      <td className="py-1.5 pr-4 text-muted-foreground text-xs">
+-                        {fact.low != null && fact.high != null
+-                          ? `${formatWithMeasure(fact.low, def)} \u2013 ${formatWithMeasure(fact.high, def)}`
+-                          : "\u2014"}
+-                      </td>
+-                    )}
+-                    <td className="py-1.5 pr-4 font-mono text-xs text-muted-foreground">{fact.factId}</td>
+-                    <td className="py-1.5 text-muted-foreground text-xs max-w-[300px] truncate">
+-                      {fact.note || "\u2014"}
+-                    </td>
+-                  </tr>
+-                ))}
+-              </tbody>
+-            </table>
+-          </div>
+-        );
+-      })}
+-    </div>
+-  );
+-}
+-
+-// === Shared components ===
+-
+-function SourceBadge({ fact }: { fact: FactEntry }) {
+-  if (fact.sourceTitle) {
+-    return (
+-      <span className="flex items-center gap-1 text-xs max-w-[200px]">
+-        <a
+-          href={fact.source}
+-          target="_blank"
+-          rel="noopener noreferrer"
+-          className="text-primary hover:underline truncate"
+-          title={fact.sourceTitle}
+-        >
+-          {fact.sourcePublication || fact.sourceTitle}
+-        </a>
+-        {fact.sourceCredibility != null && (
+-          <span className={`inline-block px-1 py-px rounded text-[9px] font-medium shrink-0 ${
+-            fact.sourceCredibility >= 4 ? "bg-green-500/15 text-green-600 dark:text-green-400" :
+-            fact.sourceCredibility >= 3 ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400" :
+-            "bg-red-500/15 text-red-600 dark:text-red-400"
+-          }`}>
+-            {fact.sourceCredibility}/5
+-          </span>
+-        )}
+-      </span>
+-    );
+-  }
+-  if (fact.source) {
+-    try {
+-      return (
+-        <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">
+-          {new URL(fact.source).hostname.replace("www.", "")}
+-        </a>
+-      );
+-    } catch {
+-      return <span className="text-xs text-muted-foreground truncate">{fact.source}</span>;
+-    }
+-  }
+-  return <span className="text-xs text-muted-foreground">{"\u2014"}</span>;
+-}
+-
+-/** Rich measure badge with hover tooltip showing full measure metadata */
+-function MeasureBadge({
+-  measureId,
+-  factMeasures,
+-}: {
+-  measureId?: string;
+-  factMeasures: Record<string, FactMeasureDef>;
+-}) {
+-  if (!measureId) return <span className="text-muted-foreground text-xs">&mdash;</span>;
+-  const def = factMeasures[measureId];
+-
+-  return (
+-    <div className="relative group inline-block">
+-      <span className="text-xs px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded dark:bg-violet-900 dark:text-violet-300 cursor-help">
+-        {def?.label || measureId}
+-      </span>
+-      {/* Hover tooltip */}
+-      <div className="absolute z-50 invisible group-hover:visible bottom-full left-0 mb-1 w-64 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+-        <div className="font-semibold mb-1">{def?.label || measureId}</div>
+-        <div className="font-mono text-muted-foreground mb-1.5">{measureId}</div>
+-        {def?.description && (
+-          <p className="text-muted-foreground mb-2 leading-relaxed">{def.description}</p>
+-        )}
+-        <div className="space-y-0.5">
+-          {def?.unit && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-20 shrink-0">Unit:</span>
+-              <span>{def.unit}</span>
+-            </div>
+-          )}
+-          {def?.category && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-20 shrink-0">Category:</span>
+-              <span className="capitalize">{def.category}</span>
+-            </div>
+-          )}
+-          {def?.direction && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-20 shrink-0">Direction:</span>
+-              <span>{def.direction === "higher" ? "↑ higher is better" : "↓ lower is better"}</span>
+-            </div>
+-          )}
+-          {def?.applicableTo && def.applicableTo.length > 0 && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-20 shrink-0">Applies to:</span>
+-              <span>{def.applicableTo.join(", ")}</span>
+-            </div>
+-          )}
+-          {def?.display && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-20 shrink-0">Format:</span>
+-              <span className="font-mono">
+-                {def.display.prefix || ""}{"{n}"}{def.display.suffix || ""}
+-                {def.display.divisor ? ` (÷${def.display.divisor.toLocaleString("en-US")})` : ""}
+-              </span>
+-            </div>
+-          )}
+-          {def?.relatedMeasures && def.relatedMeasures.length > 0 && (
+-            <div className="flex gap-2 pt-0.5">
+-              <span className="text-muted-foreground w-20 shrink-0 leading-relaxed">Related:</span>
+-              <span className="leading-relaxed">
+-                {def.relatedMeasures.map((rm, i) => (
+-                  <span key={rm}>
+-                    {i > 0 && ", "}
+-                    <span className="font-mono">{rm}</span>
+-                  </span>
+-                ))}
+-              </span>
+-            </div>
+-          )}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-/** Value display with hover tooltip showing raw numeric & format info */
+-function ValueDisplay({ fact }: { fact: FactEntry }) {
+-  const hasRange = fact.low != null && fact.high != null;
+-  const hasTooltip = fact.numeric != null || hasRange || fact.note;
+-
+-  const displayValue = (
+-    <span>
+-      {fact.value || (fact.numeric !== undefined ? String(fact.numeric) : "\u2014")}
+-      {hasRange && !fact.value && (
+-        <span className="text-muted-foreground text-xs ml-1">
+-          ({formatCompact(fact.low!)} \u2013 {formatCompact(fact.high!)})
+-        </span>
+-      )}
+-    </span>
+-  );
+-
+-  if (!hasTooltip) return displayValue;
+-
+-  return (
+-    <div className="relative group inline-block">
+-      <span className="cursor-help border-b border-dotted border-muted-foreground/50">
+-        {displayValue}
+-      </span>
+-      <div className="absolute z-50 invisible group-hover:visible bottom-full left-0 mb-1 w-56 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+-        {fact.note && (
+-          <p className="text-muted-foreground mb-2 leading-relaxed">{fact.note}</p>
+-        )}
+-        <div className="space-y-0.5 font-mono">
+-          {fact.numeric != null && (
+-            <div className="flex gap-2">
+-              <span className="text-muted-foreground w-16 shrink-0">numeric:</span>
+-              <span>{fact.numeric.toLocaleString("en-US")}</span>
+-            </div>
+-          )}
+-          {hasRange && (
+-            <>
+-              <div className="flex gap-2">
+-                <span className="text-muted-foreground w-16 shrink-0">low:</span>
+-                <span>{fact.low!.toLocaleString("en-US")}</span>
+-              </div>
+-              <div className="flex gap-2">
+-                <span className="text-muted-foreground w-16 shrink-0">high:</span>
+-                <span>{fact.high!.toLocaleString("en-US")}</span>
+-              </div>
+-            </>
+-          )}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-/** Shows how many pages use this fact, with a hover list of page links */
+-function UsedInBadge({ pages }: { pages: FactUsagePage[] }) {
+-  if (pages.length === 0) {
+-    return <span className="text-xs text-muted-foreground/50">&mdash;</span>;
+-  }
+-
+-  return (
+-    <div className="relative group inline-block">
+-      <span className={`text-xs px-1.5 py-0.5 rounded cursor-help font-medium ${
+-        pages.length >= 5 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" :
+-        pages.length >= 2 ? "bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300" :
+-        "bg-muted text-muted-foreground"
+-      }`}>
+-        {pages.length} {pages.length === 1 ? "page" : "pages"}
+-      </span>
+-      {/* Hover tooltip with page list */}
+-      <div className="absolute z-50 invisible group-hover:visible bottom-full right-0 mb-1 w-64 p-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+-        <div className="font-medium mb-1.5 text-muted-foreground">Used in {pages.length} {pages.length === 1 ? "page" : "pages"}:</div>
+-        <div className="space-y-1 max-h-48 overflow-y-auto">
+-          {pages.map((p) => (
+-            <div key={p.id} className="truncate">
+-              <span className="text-primary">{p.title}</span>
+-              <span className="text-muted-foreground ml-1 font-mono">/{p.id}</span>
+-            </div>
+-          ))}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-/** Minimal horizontal bar chart for numeric timeseries */
+-function MiniBarChart({ entries, def }: { entries: FactEntry[]; def?: FactMeasureDef }) {
+-  // Get numeric values, using midpoint of range if no exact numeric
+-  const points = entries.map(e => ({
+-    asOf: e.asOf || "",
+-    value: e.numeric ?? (e.low != null && e.high != null ? (e.low + e.high) / 2 : null),
+-    isRange: e.low != null && e.high != null,
+-    low: e.low,
+-    high: e.high,
+-  })).filter(p => p.value != null);
+-
+-  if (points.length < 2) return null;
+-
+-  const maxVal = Math.max(...points.map(p => p.isRange && p.high ? p.high : p.value!));
+-  if (maxVal === 0) return null;
+-
+-  return (
+-    <div className="space-y-1 mb-3">
+-      {points.map((point, i) => {
+-        const pct = (point.value! / maxVal) * 100;
+-        const lowPct = point.isRange && point.low != null ? (point.low / maxVal) * 100 : pct;
+-        const highPct = point.isRange && point.high != null ? (point.high / maxVal) * 100 : pct;
+-        return (
+-          <div key={i} className="flex items-center gap-2">
+-            <span className="text-xs text-muted-foreground w-[70px] text-right font-mono shrink-0">
+-              {point.asOf}
+-            </span>
+-            <div className="flex-1 h-5 bg-muted rounded-sm relative overflow-hidden">
+-              {point.isRange ? (
+-                <>
+-                  {/* Range bar */}
+-                  <div
+-                    className="absolute top-0 h-full bg-primary/20 rounded-sm"
+-                    style={{ left: `${lowPct}%`, width: `${highPct - lowPct}%` }}
+-                  />
+-                  {/* Midpoint */}
+-                  <div
+-                    className="absolute top-0 h-full bg-primary/60 rounded-sm"
+-                    style={{ width: `${pct}%`, maxWidth: "2px", left: `${pct}%` }}
+-                  />
+-                </>
+-              ) : (
+-                <div
+-                  className="h-full bg-primary/40 rounded-sm transition-all"
+-                  style={{ width: `${pct}%` }}
+-                />
+-              )}
+-            </div>
+-            <span className="text-xs text-muted-foreground w-[90px] shrink-0">
+-              {formatWithMeasure(point.value!, def)}
+-            </span>
+-          </div>
+-        );
+-      })}
+-    </div>
+-  );
+-}
+-
+-function formatCompact(n: number): string {
+-  if (Math.abs(n) >= 1e12) return `${(n / 1e12).toFixed(1)}T`;
+-  if (Math.abs(n) >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+-  if (Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+-  if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+-  return n % 1 === 0 ? String(n) : n.toFixed(2);
+-}
+-
+-/** Format a numeric value using the measure's display config if available.
+- *  Note: percentages are stored as decimals (0.4 = 40%) in fact.numeric/low/high. */
+-function formatWithMeasure(n: number, def?: FactMeasureDef): string {
+-  if (def?.display) {
+-    const { divisor, prefix, suffix } = def.display;
+-    const val = divisor ? n / divisor : n;
+-    const formatted = val % 1 === 0 ? String(val) : val.toFixed(1);
+-    return `${prefix || ""}${formatted}${suffix || ""}`;
+-  }
+-  if (def?.unit === "USD") {
+-    if (Math.abs(n) >= 1e12) return `$${cleanNum(n / 1e12)} trillion`;
+-    if (Math.abs(n) >= 1e9) return `$${cleanNum(n / 1e9)} billion`;
+-    if (Math.abs(n) >= 1e6) return `$${cleanNum(n / 1e6)} million`;
+-    return `$${n.toLocaleString("en-US")}`;
+-  }
+-  if (def?.unit === "percent") {
+-    // Stored as decimal (0.4 = 40%), convert back to display percentage
+-    const pct = n * 100;
+-    return `${pct % 1 === 0 ? String(pct) : pct.toFixed(1)}%`;
+-  }
+-  if (def?.unit === "count") {
+-    if (Math.abs(n) >= 1e9) return `${cleanNum(n / 1e9)} billion`;
+-    if (Math.abs(n) >= 1e6) return `${cleanNum(n / 1e6)} million`;
+-    return n.toLocaleString("en-US");
+-  }
+-  return formatCompact(n);
+-}
+-
+-function cleanNum(n: number): string {
+-  return n % 1 === 0 ? String(n) : n.toFixed(1);
+-}
+diff --git a/apps/web/src/components/mdx-components.tsx b/apps/web/src/components/mdx-components.tsx
+index 2a35d9c19..2c98a0272 100644
+--- a/apps/web/src/components/mdx-components.tsx
++++ b/apps/web/src/components/mdx-components.tsx
+@@ -122,25 +122,15 @@ function Stub({ children }: { children?: React.ReactNode }) {
+ }
+ 
+ // Legacy component names still referenced in MDX content, rendered as stubs.
+-// Dead stubs removed: Code, Steps, Icon, FileTree
++// Dead stubs removed: Code, Steps, Icon, FileTree, plus 32 names no MDX file
++//   in content/ renders (DataCrux, PageIndex, RiskDashboard, Table*, ...).
++// EstimateBox is kept: crux/lib/rules/estimate-boxes.ts still anticipates it.
+ // Ported stubs removed: Badge, DisagreementMap,
+ //   FactorRelationshipDiagram, ImpactList, KeyPeople,
+ //   KeyQuestions, ModelsList, Section, TabItem, Tabs, Tags
+ const stubNames = [
+-  "AnthropicFact", "ArticleSources",
+-  "ConceptsDirectory", "DataCrux", "DataEstimateBox",
+-  "DualOutcomeChart", "EntityGraph", "EstimateBox",
+-  "FactorAttributionMatrix", "FactorGauges",
+-  "FullModelDiagram", "ImpactGrid",
+-  "InsightGridExperiments", "InsightScoreMatrix", "InsightsTable",
+-  "KnowledgeTreemap",
+-  "OutcomesTable", "PageIndex", "PixelDensityMap",
+-  "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
+-  "RiskDashboard", "RiskTrajectoryExperiments",
+-  "RootFactorsTable", "ScenariosTable", "SparseKnowledgeGrid",
+-  "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
+-  "TableRow", "TagBrowser", "TimelineViz", "TopicQuestionGrid",
+-  "TrajectoryLines",
++  "ArticleSources", "ConceptsDirectory", "EstimateBox",
++  "InsightsTable", "TagBrowser", "TimelineViz",
+ ] as const;
+ 
+ const stubs = Object.fromEntries(stubNames.map((name) => [name, Stub]));
+diff --git a/apps/web/src/components/wiki/factbase/index.ts b/apps/web/src/components/wiki/factbase/index.ts
+deleted file mode 100644
+index d5852e492..000000000
+--- a/apps/web/src/components/wiki/factbase/index.ts
++++ /dev/null
+@@ -1,18 +0,0 @@
+-export { FBFactTable } from "./FBFactTable";
+-export { FBRecordTable } from "./FBRecordTable";
+-export { FBFactValue } from "./FBFactValue";
+-export { FBEntityFacts } from "./FBEntityFacts";
+-export { FBRecordCollection } from "./FBRecordCollection";
+-export { FBEntitySidebar } from "./FBEntitySidebar";
+-export { FBRefLink } from "./FBRefLink";
+-export { FBAutoFacts } from "./FBAutoFacts";
+-
+-// Backwards compatibility aliases — remove after Phase 2 MDX migration
+-export { FBFactTable as KBFactTable } from "./FBFactTable";
+-export { FBRecordTable as KBRecordTable } from "./FBRecordTable";
+-export { FBFactValue as KBFactValue } from "./FBFactValue";
+-export { FBEntityFacts as KBEntityFacts } from "./FBEntityFacts";
+-export { FBRecordCollection as KBRecordCollection } from "./FBRecordCollection";
+-export { FBEntitySidebar as KBEntitySidebar } from "./FBEntitySidebar";
+-export { FBRefLink as KBRefLink } from "./FBRefLink";
+-export { FBAutoFacts as KBAutoFacts } from "./FBAutoFacts";
+diff --git a/apps/web/src/lib/__tests__/fetch-paginated.test.ts b/apps/web/src/lib/__tests__/fetch-paginated.test.ts
+deleted file mode 100644
+index 0b6202875..000000000
+--- a/apps/web/src/lib/__tests__/fetch-paginated.test.ts
++++ /dev/null
+@@ -1,194 +0,0 @@
+-import { describe, it, expect, vi, beforeEach } from "vitest";
+-
+-// Mock wiki-server before importing the module under test
+-vi.mock("@lib/wiki-server", () => ({
+-  fetchDetailed: vi.fn(),
+-}));
+-
+-import { fetchAllPaginated } from "../fetch-paginated";
+-import { fetchDetailed } from "@lib/wiki-server";
+-import type { FetchResult } from "@lib/wiki-server";
+-
+-const mockFetchDetailed = vi.mocked(fetchDetailed);
+-
+-beforeEach(() => {
+-  vi.clearAllMocks();
+-});
+-
+-describe("fetchAllPaginated", () => {
+-  it("returns all items when they fit in a single page", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: true,
+-      data: { items: [{ id: 1 }, { id: 2 }], total: 2 },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-      pageSize: 10,
+-    });
+-
+-    expect(result.ok).toBe(true);
+-    if (result.ok) {
+-      expect(result.data.items).toEqual([{ id: 1 }, { id: 2 }]);
+-      expect(result.data.total).toBe(2);
+-      expect(result.data.pagesFetched).toBe(1);
+-    }
+-    expect(mockFetchDetailed).toHaveBeenCalledTimes(1);
+-  });
+-
+-  it("fetches multiple pages in parallel and concatenates results", async () => {
+-    // First page: total=5, pageSize=2 → 3 pages needed
+-    mockFetchDetailed
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        data: { items: [{ id: 1 }, { id: 2 }], total: 5 },
+-      } as FetchResult<Record<string, unknown>>)
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        data: { items: [{ id: 3 }, { id: 4 }], total: 5 },
+-      } as FetchResult<Record<string, unknown>>)
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        data: { items: [{ id: 5 }], total: 5 },
+-      } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-      pageSize: 2,
+-    });
+-
+-    expect(result.ok).toBe(true);
+-    if (result.ok) {
+-      expect(result.data.items).toEqual([
+-        { id: 1 },
+-        { id: 2 },
+-        { id: 3 },
+-        { id: 4 },
+-        { id: 5 },
+-      ]);
+-      expect(result.data.total).toBe(5);
+-      expect(result.data.pagesFetched).toBe(3);
+-    }
+-    expect(mockFetchDetailed).toHaveBeenCalledTimes(3);
+-  });
+-
+-  it("fails if the first page fails", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: false,
+-      error: { type: "server-error", status: 500, statusText: "Internal Server Error" },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-    });
+-
+-    expect(result.ok).toBe(false);
+-    if (!result.ok) {
+-      expect(result.error.type).toBe("server-error");
+-    }
+-  });
+-
+-  it("fails if any intermediate page fails (no silent partial data)", async () => {
+-    mockFetchDetailed
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        data: { items: [{ id: 1 }], total: 3 },
+-      } as FetchResult<Record<string, unknown>>)
+-      .mockResolvedValueOnce({
+-        ok: false,
+-        error: { type: "connection-error", message: "timeout" },
+-      } as FetchResult<Record<string, unknown>>)
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        data: { items: [{ id: 3 }], total: 3 },
+-      } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-      pageSize: 1,
+-    });
+-
+-    expect(result.ok).toBe(false);
+-    if (!result.ok) {
+-      expect(result.error.type).toBe("connection-error");
+-    }
+-  });
+-
+-  it("fails if response lacks a numeric total field", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: true,
+-      data: { items: [{ id: 1 }] },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-    });
+-
+-    expect(result.ok).toBe(false);
+-    if (!result.ok) {
+-      expect(result.error.type).toBe("connection-error");
+-      expect((result.error as { message: string }).message).toContain("total");
+-    }
+-  });
+-
+-  it("fails if response lacks the expected items key", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: true,
+-      data: { wrongKey: [{ id: 1 }], total: 1 },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    const result = await fetchAllPaginated<{ id: number }>({
+-      path: "/api/things",
+-      itemsKey: "items",
+-    });
+-
+-    expect(result.ok).toBe(false);
+-    if (!result.ok) {
+-      expect(result.error.type).toBe("connection-error");
+-      expect((result.error as { message: string }).message).toContain("items");
+-    }
+-  });
+-
+-  it("appends extraParams to the URL", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: true,
+-      data: { claims: [{ id: 1 }], total: 1 },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    await fetchAllPaginated<{ id: number }>({
+-      path: "/api/claims/all",
+-      itemsKey: "claims",
+-      extraParams: "includeSources=true",
+-      pageSize: 500,
+-    });
+-
+-    expect(mockFetchDetailed).toHaveBeenCalledWith(
+-      "/api/claims/all?limit=500&offset=0&includeSources=true",
+-      expect.any(Object)
+-    );
+-  });
+-
+-  it("passes revalidate and timeoutMs to fetchDetailed", async () => {
+-    mockFetchDetailed.mockResolvedValueOnce({
+-      ok: true,
+-      data: { items: [], total: 0 },
+-    } as FetchResult<Record<string, unknown>>);
+-
+-    await fetchAllPaginated({
+-      path: "/api/things",
+-      itemsKey: "items",
+-      revalidate: 60,
+-      timeoutMs: 5000,
+-    });
+-
+-    expect(mockFetchDetailed).toHaveBeenCalledWith(
+-      expect.any(String),
+-      { revalidate: 60, timeoutMs: 5000 }
+-    );
+-  });
+-});
+diff --git a/apps/web/src/lib/fetch-paginated.ts b/apps/web/src/lib/fetch-paginated.ts
+deleted file mode 100644
+index cfc0c29db..000000000
+--- a/apps/web/src/lib/fetch-paginated.ts
++++ /dev/null
+@@ -1,162 +0,0 @@
+-/**
+- * Shared helper for fetching all pages from a paginated wiki-server endpoint.
+- *
+- * All paginated wiki-server endpoints return `{ <key>: T[], total, limit, offset }`.
+- * This helper fetches page 1 to learn `total`, then fetches remaining pages
+- * in parallel and concatenates the results.
+- *
+- * Error policy: if any intermediate page fails, the entire fetch fails.
+- * This avoids silently returning partial data as if it were complete.
+- */
+-
+-import { fetchDetailed, type FetchResult } from "./wiki-server";
+-
+-export interface FetchAllPaginatedOptions {
+-  /** API path prefix, e.g. "/api/statements" */
+-  path: string;
+-  /** Key in the response object that holds the array, e.g. "statements" or "claims" */
+-  itemsKey: string;
+-  /** Max items per page (default: 500). Must not exceed the server's maxLimit. */
+-  pageSize?: number;
+-  /** Extra query params to append (e.g. "includeSources=true") */
+-  extraParams?: string;
+-  /** Next.js ISR revalidate in seconds (default: 300) */
+-  revalidate?: number;
+-  /** Per-request timeout in ms (default: 30000) */
+-  timeoutMs?: number;
+-  /** Total time budget in ms. If exceeded between pages, stops and fails (default: 90000) */
+-  deadlineMs?: number;
+-}
+-
+-export interface FetchAllPaginatedResult<T> {
+-  items: T[];
+-  total: number;
+-  /** Number of pages fetched */
+-  pagesFetched: number;
+-}
+-
+-/**
+- * Fetch all items from a paginated wiki-server endpoint.
+- *
+- * Fetches the first page to learn the total, then fetches remaining pages
+- * in parallel. Fails if any page request fails — never returns partial data.
+- */
+-export async function fetchAllPaginated<T>(
+-  options: FetchAllPaginatedOptions
+-): Promise<FetchResult<FetchAllPaginatedResult<T>>> {
+-  const {
+-    path,
+-    itemsKey,
+-    pageSize = 500,
+-    extraParams,
+-    revalidate = 300,
+-    timeoutMs = 30_000,
+-    deadlineMs = 90_000,
+-  } = options;
+-
+-  const deadline = Date.now() + deadlineMs;
+-
+-  function buildUrl(limit: number, offset: number): string {
+-    const params = `limit=${limit}&offset=${offset}`;
+-    const extra = extraParams ? `&${extraParams}` : "";
+-    const sep = path.includes("?") ? "&" : "?";
+-    return `${path}${sep}${params}${extra}`;
+-  }
+-
+-  // Fetch first page to learn total
+-  const first = await fetchDetailed<Record<string, unknown>>(
+-    buildUrl(pageSize, 0),
+-    { revalidate, timeoutMs }
+-  );
+-  if (!first.ok) return first;
+-
+-  const rawTotal = first.data.total;
+-  if (typeof rawTotal !== "number" || !Number.isFinite(rawTotal)) {
+-    return {
+-      ok: false,
+-      error: {
+-        type: "connection-error",
+-        message: `Expected numeric "total" in response, got ${typeof rawTotal} (${String(rawTotal)})`,
+-      },
+-    };
+-  }
+-  const total = rawTotal;
+-  const firstItems = first.data[itemsKey] as T[];
+-  if (!Array.isArray(firstItems)) {
+-    return {
+-      ok: false,
+-      error: {
+-        type: "connection-error",
+-        message: `Expected array at response key "${itemsKey}", got ${typeof first.data[itemsKey]}`,
+-      },
+-    };
+-  }
+-
+-  // Single page — done
+-  if (total <= pageSize) {
+-    return {
+-      ok: true,
+-      data: { items: firstItems, total, pagesFetched: 1 },
+-    };
+-  }
+-
+-  // Check deadline before launching parallel fetches
+-  if (Date.now() > deadline) {
+-    return {
+-      ok: false,
+-      error: {
+-        type: "connection-error",
+-        message: `Deadline exceeded after first page (${total} total items, ${Math.ceil(total / pageSize)} pages needed)`,
+-      },
+-    };
+-  }
+-
+-  const totalPages = Math.ceil(total / pageSize);
+-  console.warn(
+-    `[fetchAllPaginated] ${path}: ${total} items across ${totalPages} pages — fetching remaining ${totalPages - 1} pages in parallel`
+-  );
+-
+-  // Fetch remaining pages in parallel
+-  const remainingPromises: Promise<FetchResult<Record<string, unknown>>>[] = [];
+-  for (let offset = pageSize; offset < total; offset += pageSize) {
+-    remainingPromises.push(
+-      fetchDetailed<Record<string, unknown>>(buildUrl(pageSize, offset), {
+-        revalidate,
+-        timeoutMs,
+-      })
+-    );
+-  }
+-
+-  const pages = await Promise.all(remainingPromises);
+-
+-  // Fail if any page errored — don't silently return partial data
+-  const all = [...firstItems];
+-  for (let i = 0; i < pages.length; i++) {
+-    const page = pages[i];
+-    if (!page.ok) {
+-      return {
+-        ok: false,
+-        error: {
+-          type: "connection-error",
+-          message: `Page ${i + 2}/${totalPages} failed: ${page.error.type === "connection-error" ? page.error.message : `${page.error.type}`}`,
+-        },
+-      };
+-    }
+-    const pageItems = page.data[itemsKey] as T[];
+-    if (!Array.isArray(pageItems)) {
+-      return {
+-        ok: false,
+-        error: {
+-          type: "connection-error",
+-          message: `Page ${i + 2}: expected array at "${itemsKey}", got ${typeof page.data[itemsKey]}`,
+-        },
+-      };
+-    }
+-    all.push(...pageItems);
+-  }
+-
+-  return {
+-    ok: true,
+-    data: { items: all, total, pagesFetched: totalPages },
+-  };
+-}
