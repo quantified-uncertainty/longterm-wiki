@@ -113,8 +113,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3(patch_hash=7dvij2yy7s65yjvp5o2ymxrkkq)
       js-yaml:
-        specifier: '>=4.2.0'
-        version: 4.2.0
+        specifier: ^4.3.2
+        version: 4.3.2
       pdf-parse:
         specifier: ^2.4.5
         version: 2.4.5
@@ -342,8 +342,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3(patch_hash=7dvij2yy7s65yjvp5o2ymxrkkq)
       js-yaml:
-        specifier: '>=4.2.0'
-        version: 4.2.0
+        specifier: ^4.3.2
+        version: 4.3.2
       katex:
         specifier: ^0.16.32
         version: 0.16.32
@@ -3880,8 +3880,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@4.2.0:
-    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
+  js-yaml@4.3.2:
+    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
 
   jsdom@29.0.1:
@@ -8747,7 +8747,7 @@ snapshots:
 
   gray-matter@4.0.3(patch_hash=7dvij2yy7s65yjvp5o2ymxrkkq):
     dependencies:
-      js-yaml: 4.2.0
+      js-yaml: 4.3.2
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -8986,7 +8986,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@4.2.0:
+  js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
 
