@@ -200,7 +200,7 @@ async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesR
   // is tolerated (the entity is silently skipped and counted toward a
   // threshold), but N consecutive failures abort the whole sweep — same
   // pattern as the groundskeeper health-check tracker
-  // (`.claude/rules/error-handling.md`). Without this, a down sourcing
+  // (`docs/agent-rules/error-handling.md`). Without this, a down sourcing
   // endpoint would make every entity report `needsCuration: 0`, producing
   // an empty "nothing to curate" list that the outer command can't
   // distinguish from a legitimate "all clean" state.

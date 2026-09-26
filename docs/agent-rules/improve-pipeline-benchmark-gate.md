@@ -41,7 +41,7 @@ The marker:
 - Keyword is case-insensitive (`benchmark-skip`, `BENCHMARK-SKIP`).
 - Only the first match is honored.
 
-When **not** to use it: a real, unintended regression. Override is for "I know this drops the metric and I have a reason"; it is not "the suite is flaky, override and move on." If you suspect flakiness, file a Linear ticket — multiple back-to-back overrides without ticketed cause is a red flag per `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags".
+When **not** to use it: a real, unintended regression. Override is for "I know this drops the metric and I have a reason"; it is not "the suite is flaky, override and move on." If you suspect flakiness, file a Linear ticket — multiple back-to-back overrides without ticketed cause is a red flag per `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags".
 
 ## Cost & runtime
 

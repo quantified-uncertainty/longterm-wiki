@@ -4,7 +4,7 @@ description: Always use slot-specific port from .env DEV_PORT, never guess or us
 type: feedback
 ---
 
-Always check `.env` for `DEV_PORT` and `.claude/rules/environment-setup.md` before starting a dev server. Port 3001 belongs to the user's main dev server — never use it from agent slots. Convention is `3010 + slot number` (a6 = 3016).
+Always check `.env` for `DEV_PORT` and `docs/agent-rules/environment-setup.md` before starting a dev server. Port 3001 belongs to the user's main dev server — never use it from agent slots. Convention is `3010 + slot number` (a6 = 3016).
 
 **Why:** User corrected after agent started dev servers on wrong ports (3001, then 3099). The port info was in `.env` and documented in environment-setup.md but was not checked.
 

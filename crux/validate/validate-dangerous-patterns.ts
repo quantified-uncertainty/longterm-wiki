@@ -10,7 +10,7 @@
  * Patterns flagged:
  *
  *   1. Silent .catch() — `.catch(() => {})` swallows errors with no diagnostic.
- *      Banned per `.claude/rules/error-handling.md`.
+ *      Banned per `docs/agent-rules/error-handling.md`.
  *      Suppression: `// catch-ok: <reason>`
  *
  *   2. Warn-only .catch() — `.catch((e) => console.warn(...))` or

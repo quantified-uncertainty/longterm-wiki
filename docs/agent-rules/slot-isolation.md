@@ -1,5 +1,7 @@
 # Slot Isolation — NEVER Touch Other Agent Slots
 
+> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+
 ## The Rule
 
 Each agent slot (`lw/a1` through `lw/a20`) is an **independent workspace** with its own Claude Code session. You own exactly ONE slot — the one you're running in. Every other slot is off-limits.

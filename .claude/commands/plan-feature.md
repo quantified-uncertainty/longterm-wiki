@@ -14,7 +14,7 @@ Deep, multi-pass planning process for significant new functionality. Uses ~17 pa
 
 **Cost:** ~$15-25, 20-40 minutes.
 
-**Discipline this skill enforces:** `.claude/rules/agent-planning-discipline.md` (auto-loaded). Read it now if you haven't this session — it explains the failure modes (over-scoping, additive-only red-teams, framing without empirical evidence, sunk-cost commitment from early Phase 0 PRs) that this skill's structure exists to prevent.
+**Discipline this skill enforces:** `docs/agent-rules/agent-planning-discipline.md` (auto-loaded). Read it now if you haven't this session — it explains the failure modes (over-scoping, additive-only red-teams, framing without empirical evidence, sunk-cost commitment from early Phase 0 PRs) that this skill's structure exists to prevent.
 
 ---
 
@@ -88,7 +88,7 @@ Read both agent results. Then write `/tmp/plan-feature-evidence.md` with:
 
 If the user wants to proceed despite weak evidence, document the choice in the eventual plan body under "Open Questions" — "Empirical evidence weak; proceeded anyway because [user reason]." This makes the assumption legible to the next reader.
 
-**Why this gate is non-negotiable:** see `.claude/rules/agent-planning-discipline.md` § "Don't outsource framing to agents." The QUA-943 v4 plan locked in 5 months of scope without this gate — it cannot be re-introduced as a soft guideline.
+**Why this gate is non-negotiable:** see `docs/agent-rules/agent-planning-discipline.md` § "Don't outsource framing to agents." The QUA-943 v4 plan locked in 5 months of scope without this gate — it cannot be re-introduced as a soft guideline.
 
 ---
 
@@ -229,7 +229,7 @@ If an area doesn't apply, write "N/A — [reason]" rather than omitting it.
 
 ### 5c. Red team — ≥3 parallel agents with explicitly different mandates
 
-Write the draft plan to `/tmp/feature-plan-draft.md` using the Write tool. **Each reviewer below has a different mandate by design** — see `.claude/rules/agent-planning-discipline.md` § "Watch the additive-only red-team smell" for why two same-mandate red-teams (the QUA-943 v4 anti-pattern) produce 19 mitigations and 0 deletions. The deletion-only reviewer is non-negotiable.
+Write the draft plan to `/tmp/feature-plan-draft.md` using the Write tool. **Each reviewer below has a different mandate by design** — see `docs/agent-rules/agent-planning-discipline.md` § "Watch the additive-only red-team smell" for why two same-mandate red-teams (the QUA-943 v4 anti-pattern) produce 19 mitigations and 0 deletions. The deletion-only reviewer is non-negotiable.
 
 Each agent reads `/tmp/feature-plan-draft.md` from disk before evaluating.
 
@@ -396,7 +396,7 @@ Step 3 — if the umbrella has a sibling epic (e.g. this plan complements QUA-54
 pnpm crux linear comment QUA-544 "Sibling: QUA-NNN tracks [complementary axis]. See [link]."
 ```
 
-Project picking: follow `.claude/rules/linear-project-ownership.md`. If unsure, ask the user.
+Project picking: follow `docs/agent-rules/linear-project-ownership.md`. If unsure, ask the user.
 
 ### 7d. CHECKPOINT 3 — Final report
 

@@ -111,7 +111,7 @@ If you genuinely need a one-shot forensic read of a finished task file,
 that's fine — the counter only fires on the third occurrence in a
 session. To unblock the current call, switch to Monitor.
 
-See .claude/rules/wait-on-subagents.md for the full pattern guide and
+See docs/agent-rules/wait-on-subagents.md for the full pattern guide and
 QUA-1069 for the data behind this hook.
 EOF
 exit 2

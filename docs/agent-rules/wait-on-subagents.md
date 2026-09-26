@@ -1,5 +1,7 @@
 # Waiting on Subagents — Use Monitor, Not `cat`
 
+> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+
 When you dispatch a subagent (`Agent` / `TaskCreate` / `./ws dispatch`) or
 launch a background process (`Bash` with `run_in_background`), **wait on
 it with `Monitor`, not by repeated `cat` of its task-output file**.

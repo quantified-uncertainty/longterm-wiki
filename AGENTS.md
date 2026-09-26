@@ -2,7 +2,7 @@
 
 This file exists because Codex (and a few other agent runtimes) look for `AGENTS.md` by convention. The canonical instructions live in `CLAUDE.md` and are agent-neutral despite the filename.
 
-**Read `CLAUDE.md` and follow it as written.** It is the single source of truth for repo conventions, the MANDATORY first action (`pnpm crux sys agent-checklist init`), the wiki architecture, the issue-tracking workflow, and the tier-1/tier-2 rule split. Do not duplicate or paraphrase its content here.
+**Read `CLAUDE.md` and follow it as written.** It is the single source of truth for repo conventions, the wiki architecture, the hard safety rules, and the table of on-demand docs under `docs/agent-rules/`. Do not duplicate or paraphrase its content here.
 
 ## Agent runtime — what's specific to Codex (vs Claude Code)
 
@@ -11,7 +11,7 @@ This file exists because Codex (and a few other agent runtimes) look for `AGENTS
 | Claude Code | `CLAUDE.md` | `.claude/settings.json` | `.claude/commands/` | `docs/agent-workflows/` when extracted; otherwise `.claude/commands/` | `CLAUDE_PROJECT_DIR` |
 | Codex | `AGENTS.md` (this file → reads `CLAUDE.md`) | `.codex/hooks.json` | `.agents/skills/` | `docs/agent-workflows/` when extracted; otherwise `.claude/commands/` | `CODEX_PROJECT_DIR` |
 
-The hook scripts themselves live in `.claude/hooks/*.sh` (single source of truth — Codex's `.codex/hooks.json` references the same files). Each script reads `${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-...}}` so it works in both runtimes.
+The hook scripts themselves live in `.claude/hooks/*.sh` (single source of truth — Codex's `.codex/hooks.json` references the same files). Each script reads `${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-...}}` so it works in both runtimes. Only the safety hooks are registered by default; the parallel-slot hooks live in `.codex/hooks.fleet.json` / `.claude/settings.fleet.json` (see `docs/agent-rules/fleet-mode.md`).
 
 The `.agents/skills/source-command-*` directories are thin pointers to
 canonical command bodies. The canonical body lives in

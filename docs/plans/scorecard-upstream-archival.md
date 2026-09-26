@@ -576,18 +576,18 @@ So link rot risk is **medium for SaferAI** (continuous update means historical p
 
 ### 12.5 Pass 5 — Scope creep and ticket hygiene
 
-Per `.claude/rules/ticket-sizing.md`:
+Per `docs/agent-rules/ticket-sizing.md`:
 
 - **Phase 1 as one PR**: schema + crux client + 2 ingester families + 1 backfill script. Touches 4-5 surfaces. Borderline; 5/5 of the "split it" red flags are not present (no mixed shapes, no batch processing, no >1K rows, no "phase" wording in body, no "and" connector). Can ship as one PR. If reviewer pushback, split into "schema + crux client (no behavior change)" and "ingester wiring per family".
 - **Phase 2**: writing evidence at sync time. One handler change + tests. Single shape. Fits one PR.
 - **Phase 3**: drift detection. Separate ticket; defer.
 - **Backfill**: should be folded into Phase 2, not its own ticket — it's the "run the new code path against existing data" call.
 
-Per `.claude/rules/linear-project-ownership.md`: source-check work goes in **Source-Check & Verification**. All three phases qualify.
+Per `docs/agent-rules/linear-project-ownership.md`: source-check work goes in **Source-Check & Verification**. All three phases qualify.
 
-Per `.claude/rules/proactive-github-filing.md`: I'm proposing 3 tickets in §11 (revised down from 5). I should **not** file these without explicit ask — the user requested a doc, not implementation. §11 should clarify "to be filed if/when this design is approved, by the user, not by this session."
+Per `docs/agent-rules/proactive-github-filing.md`: I'm proposing 3 tickets in §11 (revised down from 5). I should **not** file these without explicit ask — the user requested a doc, not implementation. §11 should clarify "to be filed if/when this design is approved, by the user, not by this session."
 
-Per `.claude/rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + emit a Linear ticket (auto-filed) so a human can decide.
+Per `docs/agent-rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + optionally file a Linear ticket so a human can decide.
 
 ### 12.6 Revised recommendation
 

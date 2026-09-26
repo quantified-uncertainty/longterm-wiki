@@ -7,7 +7,7 @@
  * 3. The consolidated .claude/session-log.md (legacy format)
  *
  * IMPORTANT: If you change the session entry format, also update:
- *   - .claude/rules/session-logging.md (the format spec for contributors)
+ *   - docs/agent-rules/session-logging.md (the format spec for contributors)
  *   - The tests in app/scripts/lib/__tests__/session-log-parser.test.mjs
  *
  * If you change where session files are stored, also update:

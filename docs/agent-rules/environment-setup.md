@@ -1,5 +1,7 @@
 # Environment Setup
 
+> **Mostly fleet-specific.** The slot, port and wiki-server-from-slot sections apply to parallel agent slots (`docs/agent-rules/fleet-mode.md`). The worktree setup section applies to any Claude Code worktree.
+
 ## Worktree setup (Claude Code worktrees only)
 
 This applies to **Claude Code git worktrees** (`.claude/worktrees/xyz/`), not `lw/` agent slots. Agent slots (`lw/a1`, `lw/a2`, ...) are full clones managed by `crux agent-workspace` and don't need symlinks.

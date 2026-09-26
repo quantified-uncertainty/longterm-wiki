@@ -1,5 +1,7 @@
 # Agent Session Workflow — MANDATORY
 
+> **Hook enforcement is fleet-only.** The hooks described below (checklist injection, stop-time verification) run only with fleet mode enabled (`docs/agent-rules/fleet-mode.md`). The checklist and close-out steps still apply to any session that uses `/agent-init` or `/agent-ship`.
+
 Every session that involves writing or changing code MUST follow this workflow.
 
 ## Step 0: Create a feature branch
@@ -85,7 +87,7 @@ The checklist is not a nice-to-have piece of paper the agent can forget exists. 
 - **`.claude/hooks/inject-wip-checklist.sh`** (`UserPromptSubmit` event) — emits a compact `<system-reminder>` on every user turn with the progress count (`3/16 done`) and the slugs of still-unchecked items. If the file is missing (quick-fix session, pre-init turn), the hook is a silent no-op. The point: the checklist is in the prompt on every turn, so "I forgot the file existed" is no longer a possible failure mode. Same mechanism `MEMORY.md` auto-context uses.
 - **`.claude/hooks/verify-checklist-on-stop.sh`** (`Stop` event) — reads the agent's last assistant message from the transcript and checks for ship-intent phrases (`/agent-ship`, `ready to ship`, `ready for review`, `session done`, etc.). If the agent is trying to wrap the session AND there are still unchecked items, the hook blocks the stop (exit 2) and lists what's left. The hook is narrow on purpose: blocking every Stop would loop the agent on every turn, so it only fires at the moment of real shipping intent. Fails open on transcript read errors and no-ops when the checklist file is missing.
 
-Both hooks are registered in `.claude/settings.json`. If you need to bypass one (e.g., debugging the hook itself), temporarily move the file aside — do not add an `env` bypass flag, the enforcement exists precisely because bypasses get left on.
+Both hooks are registered in `.claude/settings.fleet.json` and are active only when that file is copied to `.claude/settings.local.json` (see `docs/agent-rules/fleet-mode.md`). If you need to bypass one (e.g., debugging the hook itself), temporarily move the file aside — do not add an `env` bypass flag, the enforcement exists precisely because bypasses get left on.
 
 To check items off during a session, edit `.claude/wip-checklist.md` directly: change `[ ]` to `[x]` for done items, or `[~]` with `<!-- N/A: reason -->` for items that don't apply. The Layer 1 reminder updates on the next user turn.
 
@@ -109,13 +111,13 @@ Observed this session:
 - QUA-156 marked Done but migration actually stuck    → filed:QUA-302 (Urgent)
 ```
 
-You cannot end the session until every observation has a disposition. **"I'll remember for next time" is explicitly forbidden** — the 2026-04-11 incident cascade happened because problems were noticed but never tracked. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags" for which observations *must* be filed (not just deferred).
+You cannot end the session until every observation has a disposition. **"I'll remember for next time" is explicitly forbidden** — the 2026-04-11 incident cascade happened because problems were noticed but never tracked. See `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags" for which observations *must* be filed (not just deferred).
 
 ### Step 2b: Close out
 
 **If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
 
-**Multi-PR sessions — review each PR before the next one, not in a batch at the end.** When a single session ships N independent PRs in sequence (e.g. a coordinator clearing a ticket list), run `/agent-review-pr` *per PR* between ship and moving to the next ticket. Batching reviews to the end of the session means findings can only ship as follow-up PRs once the originals have merged — inverting the "review before ship" intent of `.claude/rules/dispatched-agent-review.md`. The 2026-04-13 tier1/tier2 session generated 3 follow-up PRs this way; one caught a real "fix-instance-not-system" miss (QUA-418 table dead-links) that grep-before-ship would have found in the original PR.
+**Multi-PR sessions — review each PR before the next one, not in a batch at the end.** When a single session ships N independent PRs in sequence (e.g. a coordinator clearing a ticket list), run `/agent-review-pr` *per PR* between ship and moving to the next ticket. Batching reviews to the end of the session means findings can only ship as follow-up PRs once the originals have merged — inverting the "review before ship" intent of `docs/agent-rules/dispatched-agent-review.md`. The 2026-04-13 tier1/tier2 session generated 3 follow-up PRs this way; one caught a real "fix-instance-not-system" miss (QUA-418 table dead-links) that grep-before-ship would have found in the original PR.
 
 **If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.
 
@@ -129,13 +131,13 @@ When you (as a coordinator or individual contributor) rescope a ticket based on 
 
 A rescope based on "I read the schema and believe X" is as unreliable as a migration written without `SELECT COUNT(*)`. **The mental model is not enough — you have to count the actual rows.**
 
-This rule is the same lesson encoded in `.claude/rules/database-migrations.md` § "Adding CHECK constraints on enum columns", applied to a different context: that rule binds dispatch briefs and migration authors; this rule binds coordinators rewriting scope.
+This rule is the same lesson encoded in `docs/agent-rules/database-migrations.md` § "Adding CHECK constraints on enum columns", applied to a different context: that rule binds dispatch briefs and migration authors; this rule binds coordinators rewriting scope.
 
 ### Why the rule exists
 
 Two real incidents in a single coordinator session on 2026-04-14 (QUA-408 work in slot a6) shipped because the dispatcher trusted code inspection instead of counting rows:
 
-- **QUA-492 (halt)**: I wrote a dispatch brief saying "Phase 1 is 90% done — add CHECK constraints and delete legacy branches." Slot a15 ran the mandatory enumeration as its first step and discovered `entity_resources.resource_id` was 0% canonical (4,182 legacy rows), `resources.id` was 0% canonical (22,878 legacy rows), and `facts.fact_id` was only 65% canonical (776 legacy rows). The CHECK constraint would have failed `VALIDATE CONSTRAINT` against 35–100% of the target columns. Slot a15 halted cleanly per `.claude/rules/proactive-github-filing.md` § "Misdiagnosis discovered". I (the dispatcher) had never run the enumeration before writing the brief — I pattern-matched from the epic body's claim that "migration is done" and trusted it.
+- **QUA-492 (halt)**: I wrote a dispatch brief saying "Phase 1 is 90% done — add CHECK constraints and delete legacy branches." Slot a15 ran the mandatory enumeration as its first step and discovered `entity_resources.resource_id` was 0% canonical (4,182 legacy rows), `resources.id` was 0% canonical (22,878 legacy rows), and `facts.fact_id` was only 65% canonical (776 legacy rows). The CHECK constraint would have failed `VALIDATE CONSTRAINT` against 35–100% of the target columns. Slot a15 halted cleanly per `docs/agent-rules/proactive-github-filing.md` § "Misdiagnosis discovered". I (the dispatcher) had never run the enumeration before writing the brief — I pattern-matched from the epic body's claim that "migration is done" and trusted it.
 - **QUA-498 (incomplete rescope)**: After the QUA-492 halt, I rescoped QUA-498 from "design canonical format" to "populate `resources.stable_id` for NULL rows + migrate FKs to sid_". I inspected the schema, confirmed the column existed, and wrote the rescope comment. Shortly after, another session (QUA-503) ran a full enumeration and found 5,002 **bare10 legacy rows** I had missed — they had populated stable_ids in legacy format. My rescope was directionally correct but incomplete; Phase A as written would have shipped a CHECK constraint that rejected those 5,002 rows. Another potential re-halt.
 
 Both incidents have the same shape: **read the code, find what you need, stop before running a data query, ship a brief that's wrong**. See QUA-492 / QUA-498 / QUA-503 comments and QUA-508 for the full discovery trail.

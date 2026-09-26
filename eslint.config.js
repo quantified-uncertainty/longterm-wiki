@@ -68,7 +68,7 @@ export default tseslint.config(
       // QUA-388 Phase 2: catches the highest-hit-rate pattern from the
       // PR-review survey — unhandled promises that silently swallow
       // errors. Either `await`, `void`, or `.catch(...)` the result.
-      // See `.claude/rules/error-handling.md` for the in-repo policy on
+      // See `docs/agent-rules/error-handling.md` for the in-repo policy on
       // when each is appropriate.
       '@typescript-eslint/no-floating-promises': 'error',
     },

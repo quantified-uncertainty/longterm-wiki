@@ -16,7 +16,7 @@ Coord sessions can't edit files on `main` (PreToolUse hook blocks it), so every 
 /worktree -b <new-branch>    # create new branch from origin/main
 ```
 
-`<branch>` may be either form (`codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `codex/` automatically when missing. The lowercase prefix matches the convention in `.claude/rules/agent-session-workflow.md`.
+`<branch>` may be either form (`codex/qua-665-foo` or `qua-665-foo`); the skill prefixes `codex/` automatically when missing. The lowercase prefix matches the convention in `docs/agent-rules/agent-session-workflow.md`.
 
 ## Implementation
 

@@ -8,7 +8,7 @@ There are **52 `validate-*.ts` files** in `crux/validate/` (plus ~20 test files 
 - Wire it into the wrong pipeline (daily instead of gate)
 - Miss the blocking-vs-advisory distinction
 - Duplicate existing validators (four separate `validate-factbase-*-refs.ts` files exist)
-- Write a validator without using the validator-first pattern from `.claude/rules/implementation-quality.md`
+- Write a validator without using the validator-first pattern from `docs/agent-rules/implementation-quality.md`
 
 ---
 
@@ -156,7 +156,7 @@ Grouped by what they check. **Before writing a new validator, grep this list.**
 - **Resources**: `resource-refs`, `resource-quality`, `orphan-entities`
 - **Data integrity**: `data`, `consistency`, `quality`, `daily`, `unified`
 
-## Validator-first pattern (read `.claude/rules/implementation-quality.md`)
+## Validator-first pattern (read `docs/agent-rules/implementation-quality.md`)
 
 When applying a structural rule across >5 files, **write the validator first**, then fix violations using its output as the work queue. A validator is cheaper than trusting grep to find everything.
 

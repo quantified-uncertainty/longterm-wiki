@@ -10,7 +10,7 @@ Signaling start and done is **handled automatically** by `pnpm crux sys agent-ch
 
 `crux linear start` and `crux sys agent-checklist init --linear=QUA-NNN` refuse competing claims (exit 2). Three signals are consulted: PG `agent_sessions` (authoritative), Linear start comments, then open PRs. To override a stale claim: `--force` (annotates Linear with a `⚠ Claimed with --force` marker). See `pnpm crux linear --help` for the full source order and rationale, or `docs/agent-rules/linear-integration.md` for QUA-406/QUA-440 history.
 
-**Coordinators dispatching to a slot:** the dedup check fires in the slot, not in the coordinator. The coordinator has separate pre-flight responsibilities — see `.claude/rules/dispatched-agent-review.md` § "Dispatcher pre-flight".
+**Coordinators dispatching to a slot:** the dedup check fires in the slot, not in the coordinator. The coordinator has separate pre-flight responsibilities — see `docs/agent-rules/dispatched-agent-review.md` § "Dispatcher pre-flight".
 
 ## Filing new issues
 
@@ -21,7 +21,7 @@ pnpm crux linear search "your topic here"
 pnpm crux linear create "Descriptive title" --description="..." --project="<Project Name>"
 ```
 
-Do NOT use `gh issue create` or `pnpm crux gh issues create` for new issues. See `.claude/rules/proactive-github-filing.md` for what merits a ticket and `.claude/rules/linear-project-ownership.md` to pick the right project.
+Do NOT use `gh issue create` or `pnpm crux gh issues create` for new issues. See `docs/agent-rules/proactive-github-filing.md` for what merits a ticket and `docs/agent-rules/linear-project-ownership.md` to pick the right project.
 
 ## PR management (stays on GitHub)
 
