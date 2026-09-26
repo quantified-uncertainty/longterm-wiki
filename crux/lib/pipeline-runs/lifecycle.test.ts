@@ -243,7 +243,7 @@ describe('withPipelineRun', () => {
 
       // The body waits for a manually-resolved promise so we control
       // exactly when it returns.
-      let releaseBody: (() => void) | null = null;
+      let releaseBody = null as (() => void) | null;
       const blocked = new Promise<void>((resolve) => {
         releaseBody = resolve;
       });
@@ -290,7 +290,7 @@ describe('withPipelineRun', () => {
 
       const { withPipelineRun } = await import('./lifecycle.ts');
 
-      let releaseBody: (() => void) | null = null;
+      let releaseBody = null as (() => void) | null;
       const blocked = new Promise<void>((resolve) => {
         releaseBody = resolve;
       });
@@ -490,10 +490,10 @@ describe('withPipelineRun', () => {
       // for outer (full spend = 0.10 + 0.05 + 0.20 = 0.35).
       expect(mockEnd).toHaveBeenCalledTimes(2);
       const innerCall = mockEnd.mock.calls.find(
-        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.05,
+        ([, payload]) => (payload as { costUsd?: number }).costUsd === 0.05,
       );
       const outerCall = mockEnd.mock.calls.find(
-        ([, payload]: [string, { costUsd?: number }]) => payload.costUsd === 0.35,
+        ([, payload]) => (payload as { costUsd?: number }).costUsd === 0.35,
       );
       expect(innerCall).toBeDefined();
       expect(outerCall).toBeDefined();

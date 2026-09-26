@@ -672,3 +672,42 @@ describe("createDefaultRateLimiters", () => {
     expect(writeLimiter.maxKeys).toBe(10_000);
   });
 });
+
+describe("no API key configured", () => {
+  const savedNodeEnv = process.env.NODE_ENV;
+
+  function buildNoKeyApp() {
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    const app = new Hono();
+    app.use(
+      "*",
+      rateLimitMiddleware({
+        readLimiter: new RateLimiter({ maxRequests: 1, windowMs: 60_000 }),
+        writeLimiter: new RateLimiter({ maxRequests: 1, windowMs: 60_000 }),
+        skipPaths: ["/health"],
+      })
+    );
+    app.get("/api/pages", (c) => c.json({ ok: true }));
+    return app;
+  }
+
+  afterEach(() => {
+    process.env.NODE_ENV = savedNodeEnv;
+  });
+
+  const req = { headers: { Authorization: "Bearer anything", "X-Forwarded-For": "7.7.7.7" } };
+
+  it("treats any Bearer token as authenticated in local dev", async () => {
+    process.env.NODE_ENV = "test";
+    const app = buildNoKeyApp();
+    expect((await app.request("/api/pages", req)).status).toBe(200);
+    expect((await app.request("/api/pages", req)).status).toBe(200);
+  });
+
+  it("does not let an arbitrary token skip the limiter in production", async () => {
+    process.env.NODE_ENV = "production";
+    const app = buildNoKeyApp();
+    expect((await app.request("/api/pages", req)).status).toBe(200);
+    expect((await app.request("/api/pages", req)).status).toBe(429);
+  });
+});

@@ -21,11 +21,7 @@ import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
 import { truncate } from '../lib/text-utils.ts';
 
 // Consolidated orphan domain imports
-import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
-import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
-import { commands as backfillStableIdsCommands } from './backfill-stable-ids.ts';
 import { commands as backfillSourcesCommands } from './backfill-sources.ts';
-import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stable-ids.ts';
 import { commands as importGrantsCommands } from './import-grants.ts';
 import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
@@ -1225,8 +1221,6 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   const serverUrl = getServerUrl();
 
   console.log('NOTE: This command syncs career data from FactBase YAML + experts.yaml only.');
-  console.log('      Bulk career enrichment data is managed separately via:');
-  console.log('        crux/scripts/sync-careers-to-personnel.ts + crux/scripts/career-data.json');
   console.log('      This sync is additive (upsert) and will NOT delete existing records.\n');
 
   console.log('Extracting career data from FactBase...');
@@ -1510,11 +1504,7 @@ export const commands = {
   'sync-careers': syncCareersCommand,
   default: scanCommand,
   // Consolidated from backfill-* orphan domains
-  'backfill-grantee-ids': backfillGranteeIdsCommands.default,
-  'backfill-program-ids': backfillProgramIdsCommands.default,
-  'backfill-stable-ids': backfillStableIdsCommands.run,
   'backfill-sources': backfillSourcesCommands.default,
-  'backfill-yaml-stable-ids': backfillYamlStableIdsCommands.run,
   // Consolidated from import-* orphan domains
   'import-grants': importGrantsCommands.default,
   'import-grants-sync': importGrantsCommands.sync,
@@ -1596,11 +1586,7 @@ Commands:
   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
 
   Backfill (consolidated from backfill-* domains):
-  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
-  backfill-program-ids [--dry-run]       Link grants to funding programs
-  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
   backfill-sources [--dry-run|--apply]   Find source URLs for records with no source
-  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
 
   Import (consolidated from import-* domains):
   import-grants               Analyze grant import stats (default)

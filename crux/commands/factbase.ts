@@ -16,13 +16,11 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { validate } from '../../packages/factbase/src/validate.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
-import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
 import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
 import { commands as sourceDiscoverCommands } from './factbase-source-discover.ts';
 import { commands as backfillSourcesCommands } from './factbase-backfill-sources.ts';
 import { commands as resourceUnverifiablesCommands } from './factbase-resource-unverifiables.ts';
-import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { commands as verdictsCommands } from './factbase-verdicts.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
@@ -1178,7 +1176,6 @@ export const commands = {
   fact: factCommand,
   stale: staleCommand,
   'needs-update': needsUpdateCommand,
-  migrate: kbMigrateCommands.default,
   'sync-sources': syncSourcesCommand,
   'sourcing': sourcingCommand,
   'source-backfill': sourceBackfillCommands.default,
@@ -1186,9 +1183,6 @@ export const commands = {
   'backfill-sources': backfillSourcesCommands.default,
   'resource-unverifiables': resourceUnverifiablesCommands.default,
   'add-fact': addFactCommand,
-  // Consolidated from factbase-migrate-entities domain
-  'migrate-entities': migrateEntitiesCommands.run,
-  'migrate-entities-status': migrateEntitiesCommands.status,
   // QUA-930: FactBase-scoped wrapper around POST /api/sourcing/cleanup-orphans
   'verdicts': verdictsCommands.default,
 };
@@ -1211,15 +1205,12 @@ Commands:
   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
   import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
   import-990 --discover <query>         Search ProPublica by org name
-  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   sourcing          Check KB facts against source URLs using LLM
   source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
   source-discover       Find canonical source URL(s) for one fact via LLM + web search (QUA-926)
   backfill-sources      NULL→source backfill loop wrapping source-discover, with verify chain (QUA-933) [--apply] [--batch]
   resource-unverifiables Replace weak sources for facts with verdict=unverifiable (QUA-934) [--apply] [--batch]
-  migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
-  migrate-entities-status       Show migration status (files in each format)
   verdicts prune-orphans        Delete orphan fact verdicts (QUA-930) [--apply]
 
 Options:

@@ -288,3 +288,26 @@ describe("submitBatch", () => {
     expect(await submitBatch([])).toEqual([]);
   });
 });
+
+describe("buildProposeRequest — record types the endpoint rejects", () => {
+  it.each(["publication", "organization-fact"] as const)(
+    "throws a clear error for %s instead of crashing on the FK map",
+    (recordType) => {
+      expect(() =>
+        buildProposeRequest({
+          ...VALID,
+          recordType,
+          record: { title: "x" },
+          entityRefs: { person: "someone", organization: "anthropic" },
+        })
+      ).toThrow(
+        new RegExp(`recordType "${recordType}" is not accepted by /api/enrichment/propose`)
+      );
+    }
+  );
+
+  it("still builds supported record types", () => {
+    const body = buildProposeRequest(VALID);
+    expect(body.row).toMatchObject({ name: "Series A", companyId: "anthropic" });
+  });
+});

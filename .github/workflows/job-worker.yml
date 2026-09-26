@@ -19,8 +19,10 @@ run-name: "Job Worker${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }
 #   - auto-update-digest: fetch news digest and create page-improve jobs
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       job_type:

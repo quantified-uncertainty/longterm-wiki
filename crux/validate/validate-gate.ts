@@ -276,14 +276,10 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'typecheck-crux',
-    name: 'TypeScript type check — crux (advisory)',
+    name: 'TypeScript type check — crux',
     command: tsc.command,
     args: [...tsc.args, '--noEmit', '-p', '../../crux/tsconfig.json'],
     cwd: APP_DIR,
-    // Fail-open: crux has its own tsconfig with relaxed settings and
-    // a known baseline of pre-existing errors. Blocking on crux type
-    // errors would prevent shipping app-only fixes.
-    advisory: true,
   },
   {
     id: 'returning-guard',

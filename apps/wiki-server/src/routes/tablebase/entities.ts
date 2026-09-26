@@ -855,9 +855,8 @@ const entitiesApp = new Hono()
 
   // ---- GET /export ----
   // Returns the full entity shape (including metadata, relatedEntries,
-  // customFields) for all entities in one response. Used by the PG-backed
-  // build pipeline (apps/web/scripts/build-data-from-pg.mjs) to replace the
-  // ~2,800 per-entity fetches it used to do via GET /:id.
+  // customFields) for all entities in one response. Used by the sourcing
+  // item collector (crux/lib/sourcing/item-collectors.ts, entityType=ai-model).
   //
   // Mirrors the GET /api/facts/export pattern.
   //

@@ -87,11 +87,18 @@ export function deriveRecordId(responseHash: string): string {
  * corresponding sync schema expects. Single source of truth for the FK
  * contract — the docstring on `EnrichmentProposal.entityRefs` in `types.ts`
  * should match this table exactly.
+ *
+ * Only record types that `/api/enrichment/propose` accepts have an entry
+ * (see `SUPPORTED_RECORD_TYPES` in
+ * apps/wiki-server/src/routes/enrichment/enrichment.ts). `publication` and
+ * `organization-fact` are emitted by importers but rejected by the server,
+ * so `buildProposeRequest` refuses them with a clear error instead of
+ * guessing an FK mapping.
  */
-const ENTITY_REF_FK_MAP: Record<
+const ENTITY_REF_FK_MAP: Partial<Record<
   EnrichmentRecordType,
   ReadonlyArray<[keyof NonNullable<EnrichmentProposal["entityRefs"]>, string]>
-> = {
+>> = {
   "funding-rounds": [["organization", "companyId"]],
   personnel: [
     ["organization", "organizationId"],
@@ -122,9 +129,16 @@ export function buildProposeRequest(
   // One spread, then in-place mutation: FK columns pulled from entityRefs
   // (without overwriting values already in the record), and an id derived
   // from responseHash so the same response always upserts to the same row.
+  const fkMap = ENTITY_REF_FK_MAP[p.recordType];
+  if (!fkMap) {
+    throw new Error(
+      `recordType "${p.recordType}" is not accepted by /api/enrichment/propose ` +
+        `(supported: ${Object.keys(ENTITY_REF_FK_MAP).join(", ")})`
+    );
+  }
   const row: Record<string, unknown> = { ...p.record };
   if (p.entityRefs) {
-    for (const [refKey, rowKey] of ENTITY_REF_FK_MAP[p.recordType]) {
+    for (const [refKey, rowKey] of fkMap) {
       const refValue = p.entityRefs[refKey];
       if (refValue != null && row[rowKey] == null) {
         row[rowKey] = refValue;

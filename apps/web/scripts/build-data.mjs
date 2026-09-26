@@ -99,7 +99,7 @@ import {
   generateLinkHealth,
   generateEntityMatrix,
 } from './lib/output-writer.mjs';
-import { getServerUrl } from './lib/wiki-server-env.mjs';
+import { getServerUrl, shouldWriteToServer } from './lib/wiki-server-env.mjs';
 
 // ---------------------------------------------------------------------------
 // Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
@@ -107,6 +107,14 @@ import { getServerUrl } from './lib/wiki-server-env.mjs';
 const hasQuickFlag = process.argv.includes('--quick');
 const SCOPE = hasQuickFlag ? 'content' : (process.argv.find(a => a.startsWith('--scope='))?.split('=')[1] || 'full');
 const CONTENT_ONLY = SCOPE === 'content';
+
+// Writes to the wiki-server happen only for merged code (main/production CI,
+// the Vercel production build) — never for PR builds. Reads are unaffected.
+// See shouldWriteToServer() for the full policy.
+const SERVER_WRITES = shouldWriteToServer();
+if (!CONTENT_ONLY && getServerUrl()) {
+  console.log(`Wiki-server writes: ${SERVER_WRITES.write ? 'enabled' : 'disabled'} (${SERVER_WRITES.reason})\n`);
+}
 
 if (CONTENT_ONLY) {
   console.log('⚡ Running in content-only scope (skipping git dates, block IR, redundancy, server sync, LLM files)\n');
@@ -921,7 +929,11 @@ async function main() {
   database.riskStats = riskStats;
 
   // Record risk snapshots to wiki server (optional)
-  await syncRiskSnapshots(pages, CONTENT_ONLY);
+  if (CONTENT_ONLY || SERVER_WRITES.write) {
+    await syncRiskSnapshots(pages, CONTENT_ONLY);
+  } else {
+    console.log('  riskSnapshots: not written (server writes disabled for this build)');
+  }
 
   // =========================================================================
   // PAGE RESOURCES — compute page → resourceId mappings at build time.
@@ -1052,6 +1064,8 @@ async function main() {
   // Sync page links to wiki-server (optional — skips if server unavailable)
   if (CONTENT_ONLY) {
     console.log('  linkSync: skipped (content-only scope)');
+  } else if (getServerUrl() && !SERVER_WRITES.write) {
+    console.log('  linkSync: not written (server writes disabled for this build)');
   } else if (getServerUrl()) {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId);
     await syncLinksAndRefreshGraph(linkSignals);
@@ -1199,6 +1213,8 @@ async function main() {
   // =========================================================================
   if (CONTENT_ONLY) {
     console.log('  buildMetricsSync: skipped (content-only scope)');
+  } else if (getServerUrl() && !SERVER_WRITES.write) {
+    console.log('  buildMetricsSync: not written (server writes disabled for this build)');
   } else if (getServerUrl()) {
     await syncBuildMetrics({ pages, updateScheduleItems });
   }
@@ -1238,7 +1254,11 @@ async function main() {
 
   // Sync policy stakeholders to wiki-server PG table (populates things table too)
   if (!CONTENT_ONLY) {
-    await syncPolicyStakeholders(typedEntities);
+    if (SERVER_WRITES.write) {
+      await syncPolicyStakeholders(typedEntities);
+    } else {
+      console.log('  policy-stakeholder-sync: not written (server writes disabled for this build)');
+    }
     // Now fetch the stakeholder IDs (which were 0 if this is the first sync)
     database.policyStakeholderIds = await fetchPolicyStakeholderIds();
   }

@@ -45,7 +45,6 @@ Commands:
   polish         Post-improvement cleanup and polish
   review         Adversarial review — find gaps in a page (~$0.50/page)
   suggest-links  Suggest relatedEntries cross-links for entities
-  strip-scores   Strip scoring fields from MDX frontmatter (assessment migration)
 
 Options:
   --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
@@ -385,16 +384,9 @@ Enrich Domain - Standalone enrichment tools for wiki content
 ```
 Commands:
   entity-links   Insert <EntityLink> tags for entity mentions
-  fact-refs      Wrap canonical numbers with <F> fact-ref tags
 
 Options (entity-links):
   --apply           Write EntityLink insertions to MDX file
-  --all             Scan all knowledge-base pages
-  --limit=N         Limit pages when using --all
-  --json            JSON output (one object per page)
-
-Options (fact-refs):
-  --apply           Write <F> tag insertions to MDX file
   --all             Scan all knowledge-base pages
   --limit=N         Limit pages when using --all
   --json            JSON output (one object per page)
@@ -406,10 +398,6 @@ Examples:
   crux w enrich entity-links openai --apply         Insert EntityLinks into openai.mdx
   crux w enrich entity-links --all --limit=10       Preview for top 10 pages
   crux w enrich entity-links --all --apply          Apply EntityLinks across wiki
-
-  crux w enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
-  crux w enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
-  crux w enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
 
 Note: References are now auto-generated at build time (build-data.mjs → pageResources).
 The 'crux w enrich references' command has been removed.
@@ -1013,11 +1001,8 @@ Commands:
   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
   import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
   import-990 --discover <query>         Search ProPublica by org name
-  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   sourcing          Check KB facts against source URLs using LLM
-  migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
-  migrate-entities-status       Show migration status (files in each format)
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
@@ -1118,10 +1103,6 @@ Commands:
   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
 
   Backfill (consolidated from backfill-* domains):
-  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
-  backfill-program-ids [--dry-run]       Link grants to funding programs
-  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
-  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
 
   Import (consolidated from import-* domains):
   import-grants               Analyze grant import stats (default)

@@ -5,7 +5,7 @@ description: The world's first comprehensive AI regulation, adopting a risk-base
 sidebar:
   order: 70
 subcategory: legislation
-lastEdited: 2026-03-19
+lastEdited: 2026-09-26
 update_frequency: 7
 summary: Comprehensive overview of the EU AI Act's risk-based regulatory framework, particularly its two-tier approach to foundation models that distinguishes between standard and systemic risk AI systems. The analysis provides valuable implementation details and governance structure but cuts off before addressing key criticisms and global implications.
 clusters:
@@ -22,7 +22,7 @@ import { EntityLink } from '@components/wiki';
 | **Scope** | EU member states (with extraterritorial reach) |
 | **Adopted** | May/June 2024 |
 | **Entry into Force** | August 1, 2024 |
-| **Full Applicability** | August 2, 2026 |
+| **General Applicability** | August 2, 2026 (high-risk rules deferred to December 2, 2027 and August 2, 2028)[^ec-ai-act-2026-08] |
 | **Key Innovation** | Risk-based tiered regulation of foundation models |
 | **Maximum Penalties** | €35M or 7% global turnover |
 | **Enforcement Body** | European AI Office |
@@ -37,7 +37,7 @@ import { EntityLink } from '@components/wiki';
 
 The **EU AI Act** (Regulation (EU) 2024/1689) is the world's first comprehensive legal framework regulating artificial intelligence, representing a landmark attempt to govern AI systems based on their potential risks to safety, fundamental rights, and society.[^rc-135b][^rc-d4e4] The regulation adopts a **risk-based approach** that classifies AI systems into four tiers—unacceptable risk (prohibited), high-risk (strict obligations), limited risk (transparency requirements), and minimal risk (largely unregulated)—with special provisions for **foundation models** and general-purpose AI (GPAI) systems.[^rc-c27a][^rc-6648]
 
-Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^rc-8ffe][^rc-8eaa] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took effect February 2, 2025, GPAI model obligations apply from August 2, 2025, and most high-risk provisions become fully applicable by August 2, 2026.[^rc-61d9][^rc-ce50]
+Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^rc-8ffe][^rc-8eaa] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took effect February 2, 2025, and GPAI model obligations have applied since August 2, 2025.[^rc-61d9][^rc-ce50] The Act became generally applicable on August 2, 2026, but an amending regulation, the Digital Omnibus on AI (political agreement May 7, 2026; in force July 27, 2026), deferred the high-risk rules to December 2, 2027 for Annex III use cases and August 2, 2028 for AI embedded in products covered by Annex I.[^ec-ai-act-2026-08]
 
 The regulation has sparked significant controversy, particularly regarding its approach to foundation models. Critics argue it may stifle European AI innovation while supporters contend it provides necessary safeguards and legal certainty. The Act's two-tiered framework for GPAI models—distinguishing between standard foundation models and those posing "systemic risk"—emerged from contentious negotiations between the European Parliament, Council, and member states including France, Germany, and Italy.[^rc-e300][^rc-0282]
 
@@ -89,9 +89,12 @@ Following entry into force, the Act applies via a phased schedule with obligatio
 |------|-----------|
 | **August 1, 2024** | Regulation enters into force (20 days after publication in the Official Journal on July 12, 2024) |
 | **February 2, 2025** | **6-month mark**: Prohibitions on unacceptable-risk AI systems take effect (Article 5). AI literacy obligations (Article 4) also apply from this date. |
-| **August 2, 2025** | **12-month mark**: GPAI/general-purpose AI model obligations take effect (Chapter V). The European AI Office becomes fully operational for GPAI enforcement. New GPAI models placed on the market must comply immediately. |
-| **August 2, 2026** | **24-month mark**: High-risk AI system obligations (Annex III) and most remaining provisions become fully applicable. Full enforcement begins across all risk tiers. |
-| **August 2, 2027** | GPAI models already on the market before August 2, 2025 must achieve full compliance (two-year grace period for legacy models). High-risk systems listed in Annex II also fall under full compliance. |
+| **August 2, 2025** | **12-month mark**: GPAI/general-purpose AI model obligations take effect (Chapter V). The European AI Office begins supervising GPAI providers, although its enforcement powers apply only from August 2, 2026.[^ec-enforcement-framework-2026-08] New GPAI models placed on the market must comply immediately. |
+| **August 2, 2026** | **24-month mark**: The Act became generally applicable,[^ec-ai-act-2026-08] transparency obligations for chatbots, deepfakes, and AI-generated content took effect, and the AI Office and national authorities began enforcing the Act.[^ec-enforcement-start-2026-07] High-risk obligations originally due on this date were deferred by the Digital Omnibus on AI. |
+| **December 2, 2026** | Marking obligations for AI-generated content apply to certain systems already on the market before August 2, 2026;[^hunton-omnibus-2026-07] the prohibition on AI systems that generate non-consensual intimate imagery or child sexual abuse material takes effect.[^ec-enforcement-framework-2026-08] |
+| **August 2, 2027** | GPAI models already on the market before August 2, 2025 must achieve full compliance (two-year grace period for legacy models). |
+| **December 2, 2027** | High-risk obligations apply to stand-alone systems in Annex III areas such as employment and education.[^hunton-omnibus-2026-07] |
+| **August 2, 2028** | High-risk obligations apply to AI systems embedded in products regulated under Annex I.[^hunton-omnibus-2026-07] |
 
 ### February 2025: Prohibited Systems and AI Literacy
 
@@ -108,18 +111,20 @@ Enforcement sanctions for prohibited practices (fines up to €35M or 7% of glob
 
 - Providers of general-purpose AI (GPAI) models must comply with transparency, copyright, and technical documentation requirements
 - GPAI models above the 10²⁵ FLOP systemic-risk threshold face enhanced obligations including adversarial testing, incident reporting, and cybersecurity measures
-- The **European AI Office** became fully operational as the primary GPAI enforcement body, housed within DG CONNECT (established by Commission decision on January 24, 2024, and formally launched on February 21, 2024)
+- The **European AI Office** took up its role as the primary GPAI supervisory body, housed within DG CONNECT (established by Commission decision on January 24, 2024, and formally launched on February 21, 2024); its powers to enforce the GPAI obligations, including requests for information and fines, applied only from August 2, 2026[^ec-enforcement-framework-2026-08]
 - The **AI Board**, comprising Member State representatives, was formally established to coordinate national enforcement
 
 GPAI models already on the market before August 2, 2025 received a two-year grace period, with full compliance required by **August 2, 2027**.
 
 ### August 2026: General Application
 
-**August 2, 2026** marks full general applicability of the Act. From this date:
+**August 2, 2026** marked the general applicability of the Act. From this date:
 
-- High-risk AI systems listed in Annex III (employment, credit, education, law enforcement, border control, etc.) must meet all requirements: mandatory risk assessments, conformity assessments, CE marking, EU database registration, and human oversight
-- Limited-risk systems (chatbots, deepfakes, emotion recognition) face full transparency obligations
-- National market surveillance authorities are empowered to supervise and enforce compliance across all risk tiers
+- Transparency obligations took effect: chatbots and other interactive AI systems must tell users they are interacting with AI, deepfakes must be labelled, and AI-generated or altered content must carry machine-readable marks (for this marking duty only, systems already on the market have a grace period until December 2, 2026)[^ec-enforcement-start-2026-07][^hunton-omnibus-2026-07]
+- The AI Office and national authorities began enforcing the Act[^ec-enforcement-start-2026-07]
+- A voluntary **Code of Practice on Transparency of AI-generated Content**, which the Commission and the AI Board confirmed as an adequate compliance tool, had been signed by about 190 organisations by the end of July 2026[^ec-transparency-cop-2026-07]
+
+The requirements for high-risk AI systems listed in Annex III (employment, credit, education, law enforcement, border control, etc.), including risk management, conformity assessment, CE marking, EU database registration, and human oversight, were originally due on this date but were deferred to December 2, 2027 by the Digital Omnibus on AI.[^ec-ai-act-2026-08]
 
 ## Risk-Based Regulatory Framework
 
@@ -130,7 +135,7 @@ The AI Act establishes four risk levels for AI systems, each with corresponding 
 | Risk Level | Examples | Requirements | Timeline |
 |------------|----------|--------------|----------|
 | **Unacceptable** | Social scoring, subliminal manipulation, real-time biometric ID in public (with exceptions), untargeted facial recognition scraping | Complete prohibition | February 2, 2025[^rc-cdcb] |
-| **High-Risk** | CV-scanning tools, critical infrastructure AI, AI in education/employment/law enforcement, product safety systems | Mandatory risk assessments, EU database registration, conformity assessment, CE marking, human oversight, lifecycle monitoring | August 2, 2026[^rc-02ad] |
+| **High-Risk** | CV-scanning tools, critical infrastructure AI, AI in education/employment/law enforcement, product safety systems | Mandatory risk assessments, EU database registration, conformity assessment, CE marking, human oversight, lifecycle monitoring | December 2, 2027 (Annex III); August 2, 2028 (Annex I products)[^ec-ai-act-2026-08] |
 | **Limited** | Chatbots, <EntityLink id="E96" name="deepfakes">deepfakes</EntityLink>, emotion recognition systems | Transparency obligations (label AI-generated content, disclose AI interaction) | August 2, 2026[^rc-27b6] |
 | **Minimal** | Spam filters, video games, AI-enabled inventory systems | No specific obligations beyond existing laws | Already applicable[^rc-7d57] |
 
@@ -146,8 +151,9 @@ The Act bans AI practices deemed to pose unacceptable risks to fundamental right
 6. Inference of sensitive characteristics (race, political opinions, sexual orientation)
 7. Biometric categorization systems that discriminate
 8. AI systems that manipulate human behavior to circumvent free will
+9. AI systems that generate non-consensual sexually explicit or intimate content or child sexual abuse material, such as "nudification" apps
 
-These prohibitions took effect on **February 2, 2025**, making them the first enforceable provisions of the Act.[^rc-eef1]
+The original prohibitions took effect on **February 2, 2025**, making them the first enforceable provisions of the Act.[^rc-eef1] The ninth was added by the Digital Omnibus on AI and takes effect in December 2026.[^ec-ai-act-2026-08]
 
 ## Foundation Models and GPAI Regulation
 
@@ -214,16 +220,18 @@ The Chairs and Vice-Chairs were a crucial component of the Code of Practice draf
 
 The Commission and AI Board have confirmed this code as an adequate voluntary compliance tool that may serve as a mitigating factor when determining fines for violations.[^rc-78c3]
 
+The final code was published on July 10, 2025, in three chapters (Transparency, Copyright, and Safety and Security), the last of which applies only to providers of models with systemic risk. Signatories include Amazon, Anthropic, Google, IBM, Microsoft, Mistral AI, and OpenAI; xAI signed only the Safety and Security chapter and must demonstrate compliance with the transparency and copyright obligations by other means.[^ec-gpai-cop-2026-07] Meta declined to sign, with its chief global affairs officer Joel Kaplan stating that the code "introduces a number of legal uncertainties for model developers."[^techcrunch-meta-2025-07]
+
 ## Governance and Enforcement
 
 ### European AI Office
 
-The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), serves as the primary enforcement body for GPAI models.[^rc-33a7][^rc-51b3] Launched on February 21, 2024, it became operational for enforcement purposes on August 2, 2025.[^rc-c959]
+The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), serves as the primary enforcement body for GPAI models.[^rc-33a7][^rc-51b3] Launched on February 21, 2024, it took up supervision of GPAI providers when their obligations applied on August 2, 2025,[^rc-c959] and its enforcement powers took effect on August 2, 2026.[^ec-enforcement-framework-2026-08]
 
 In general, the AI Act is enforced at EU level by the European Commission mainly in form of its so-called AI Office with regard to general-purpose AI (GPAI) and, otherwise, at the level of the EU Member States.[^rc-b65c]
 
 - **Lucilla Sioli**: Heads the AI Office (former DG CNECT Director for AI)
-- **Dragoş Tudorache**: Heads the unit on risks of very capable GPAI models (former co-leader of the AI Act in Parliament)
+- **Matthieu Delescluse**: Heads the AI safety unit (appointed December 2025; the post had been vacant since the Office's units were set up in June 2024)[^mlex-delescluse-2025-12]
 - **Kilian Gross**: Leads the unit on compliance, uniform enforcement, and investigations (key EU AI Act negotiator)
 - **Juha Heikkilä**: AI Office Adviser for International Affairs
 
@@ -234,6 +242,8 @@ The AI Office has significant enforcement powers:[^rc-6c68][^rc-6c68]
 - Requiring risk mitigation measures
 - Recalling models from the market
 - Imposing fines up to 3% of global annual turnover or €15 million, whichever is higher
+
+The Digital Omnibus on AI extended the AI Office's oversight to certain AI systems, including those built on general-purpose models and those embedded in very large online platforms and search engines.[^ec-omnibus-2026-07][^ec-enforcement-framework-2026-08] On September 1, 2026, the Commission said it had sent requests for information to more than 30 companies in the AI sector, the first use of its new enforcement powers; it did not name the recipients, and a spokesperson said the questions concerned mostly safety and copyright.[^afp-rfi-2026-09]
 
 ### Multi-Level Governance Structure
 
@@ -309,7 +319,7 @@ Member States will designate very different national competent authorities, whic
 - **Compliance burden**: Particularly for SMEs and researchers who may lack resources for extensive documentation and risk assessments
 - **Loopholes**: Compute-intensive models may quickly become outdated as a metric; workarounds for training data disclosure requirements
 
-Proposed amendments have sought to address some concerns by delaying high-risk system obligations to December 2027, but privacy advocates like **Max Schrems** have criticized provisions allowing AI training on special category data to fix bias as undermining GDPR protections.[^rc-ad4b]
+The Digital Omnibus on AI (Regulation (EU) 2026/1744), which entered into force on July 27, 2026, addressed some of these concerns by delaying high-risk obligations to December 2, 2027 for Annex III systems and August 2, 2028 for AI embedded in Annex I products.[^hunton-omnibus-2026-07] During the legislative process, privacy advocates like **Max Schrems** criticized the proposal's provisions allowing AI training on special category data to fix bias as undermining GDPR protections;[^rc-ad4b] the adopted text restored a stricter standard for processing such data for bias detection and correction.[^hunton-omnibus-2026-07]
 
 The Act's phased implementation has also faced criticism. While prohibited systems were banned in February 2025, full GPAI compliance doesn't occur until August 2025-2027, creating a window where potentially risky systems can operate under legacy frameworks.[^rc-8e3a]
 
@@ -318,18 +328,18 @@ The Act's phased implementation has also faced criticism. While prohibited syste
 [^rc-cb96]
 
 - **GDPR**: Data protection requirements for AI training data; controversies over "legitimate interests" basis for processing
-- **Digital Services Act (DSA)**: Enforcement of AI-generated content moderation; recent cases include €120M fines against platform X in December 2025 for failing to control AI-generated sexual content
+- **Digital Services Act (DSA)**: Enforcement of AI-generated content moderation; in December 2025 the Commission fined X €120 million for DSA transparency breaches concerning its "blue checkmark" design, advertising repository, and researcher data access,[^ec-x-fine-2025-12] and in January 2026 it opened a separate formal investigation into risks from X's deployment of Grok, including manipulated sexually explicit images[^hns-grok-2026-01]
 - **Copyright Directive**: Article 50 transparency deadline in 2026 for training data disclosure
-- **Proposed Chat Control**: Ongoing debates about scanning for child abuse material, with temporary measures extended to April 2026
+- **Proposed Chat Control**: Ongoing debates about scanning for child abuse material; the interim rules permitting voluntary detection lapsed on April 3, 2026 and were reinstated in July 2026 until April 3, 2028, excluding end-to-end encrypted communications[^eucrim-csam-2026-08]
 
 The January 21, 2026 joint opinion by the European Data Protection Board (EDPB) and European Data Protection Supervisor (EDPS) criticized unclear divisions between the AI Office's role for GPAI supervision and EDPS oversight, calling for amendments to avoid governance overlaps.[^rc-ff8f]
 
 ### Shifting Political Priorities (2025-2026)
 
-Recent political discourse has shown a shift from the Act's original **fundamental rights framing** toward concerns about **over-regulation harming competitiveness**.[^rc-1ecc] As of early 2026:
+Recent political discourse has shown a shift from the Act's original **fundamental rights framing** toward concerns about **over-regulation harming competitiveness**.[^rc-1ecc] During 2025–2026:
 
 - European policymakers increasingly emphasize the risk that strict AI rules may cause Europe to fall further behind the US and China
-- Proposals circulate for simplifying GPAI obligations and extending transition periods
+- Proposals to simplify the Act and extend transition periods culminated in the Digital Omnibus on AI, proposed on November 19, 2025 and in force since July 27, 2026, which lengthened the high-risk timelines[^ec-omnibus-2026-07]
 - The contrast with US deregulation under recent executive orders raises questions about regulatory arbitrage
 - Parliament debates in January 2026 focused on stronger DSA-AI Act synergies for enforcement against deepfakes and illegal AI-generated content
 
@@ -384,10 +394,36 @@ Several major questions remain about the Act's effectiveness and evolution:
 
 5. **Regulatory arbitrage**: How will the Act's approach interact with US deregulation and Chinese state-directed AI development? Will global companies develop separate systems for different jurisdictions or push for regulatory harmonization?
 
-6. **Implementation consistency**: Will the phased rollout and proposed delays (e.g., extending high-risk obligations to December 2027) undermine the Act's effectiveness, or will they provide necessary flexibility for organizations to adapt?
+6. **Implementation consistency**: Will the phased rollout and the Digital Omnibus delays (high-risk obligations deferred to December 2, 2027 and August 2, 2028) undermine the Act's effectiveness, or will they provide necessary flexibility for organizations to adapt?[^ec-ai-act-2026-08]
 
 7. **Systemic risk designation**: How will the Commission operationalize its discretion to designate foundation models as posing systemic risk beyond the compute threshold? Will this process be transparent and predictable?
 
 8. **Open-source implications**: How will the Act affect open-source foundation models like Llama, Mistral, and others? Will compliance burdens disproportionately affect open development compared to proprietary systems?
 
 ## Sources
+
+[^ec-ai-act-2026-08]: [AI Act | Shaping Europe's digital future](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+
+[^ec-omnibus-2026-07]: [AI Omnibus enters into force](https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force)
+
+[^hunton-omnibus-2026-07]: [EU Digital Omnibus on AI Enters Into Force](https://www.hunton.com/privacy-and-cybersecurity-law-blog/eu-digital-omnibus-on-ai-enters-into-force)
+
+[^ec-enforcement-start-2026-07]: [Commission starts enforcing AI Act rules and new transparency requirements on 2 August](https://digital-strategy.ec.europa.eu/en/news/commission-starts-enforcing-ai-act-rules-and-new-transparency-requirements-2-august)
+
+[^ec-enforcement-framework-2026-08]: [The enforcement framework of the AI Act](https://digital-strategy.ec.europa.eu/en/policies/enforcement-ai-act)
+
+[^ec-transparency-cop-2026-07]: [Code of Practice on Transparency of AI-generated Content](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content)
+
+[^ec-gpai-cop-2026-07]: [The General-Purpose AI Code of Practice](https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai)
+
+[^techcrunch-meta-2025-07]: [Meta refuses to sign EU's AI code of practice](https://techcrunch.com/2025/07/18/meta-refuses-to-sign-eus-ai-code-of-practice/)
+
+[^mlex-delescluse-2025-12]: [Matthieu Delescluse appointed AI safety head in EU Commission's AI office](https://www.mlex.com/mlex/articles/2424075/matthieu-delescluse-appointed-ai-safety-head-in-eu-commission-s-ai-office)
+
+[^afp-rfi-2026-09]: [EU questions dozens of companies using new AI powers](https://www.freemalaysiatoday.com/category/world/2026/09/01/eu-questions-dozens-of-companies-using-new-ai-powers)
+
+[^ec-x-fine-2025-12]: [Commission fines X €120 million under the Digital Services Act](https://digital-strategy.ec.europa.eu/en/news/commission-fines-x-eu120-million-under-digital-services-act)
+
+[^hns-grok-2026-01]: [EU opens new investigation into Grok on X](https://www.helpnetsecurity.com/2026/01/26/european-commission-grok-x-investigation/)
+
+[^eucrim-csam-2026-08]: [Interim Rules on Voluntary CSAM Detection Reinstated Until 2028](https://eucrim.eu/news/interim-rules-on-voluntary-csam-detection-reinstated-until-2028/)
