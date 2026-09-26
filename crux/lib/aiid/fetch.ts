@@ -14,7 +14,7 @@
 import { mkdtempSync, createWriteStream, readdirSync, readFileSync, rmSync, statSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
-import { execFileSync } from "child_process";
+import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from "child_process";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import { escapeRegex } from "../claim-text-utils.ts";
@@ -121,9 +121,9 @@ export interface TarEntry {
  * See QUA-733 (the regression) and its review-pass for the full story.
  */
 export function listTarEntries(archivePath: string): TarEntry[] {
-  const tarOpts = {
-    stdio: ["ignore", "pipe", "pipe"] as const,
-    encoding: "utf-8" as const,
+  const tarOpts: ExecFileSyncOptionsWithStringEncoding = {
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf-8",
     maxBuffer: 64 * 1024 * 1024, // AIID dump has ~30k entries; 64 MB string is plenty
   };
 
