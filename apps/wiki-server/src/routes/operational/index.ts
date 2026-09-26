@@ -2,7 +2,7 @@
  * Operational routes — sessions, agents, jobs, monitoring, infrastructure.
  *
  * Covers: health, sessions, agent sessions, active agents, jobs, artifacts,
- * integrity, auto-update runs/news, groundskeeper runs, GitHub issues/pulls,
+ * auto-update runs/news, groundskeeper runs, GitHub issues/pulls,
  * monitoring.
  */
 export { healthRoute, type HealthRoute } from "./health.js";
@@ -12,7 +12,6 @@ export { activeAgentsRoute, type ActiveAgentsRoute } from "./active-agents.js";
 export { agentSessionEventsRoute, type AgentSessionEventsRoute } from "./agent-session-events.js";
 export { jobsRoute, type JobsRoute } from "./jobs.js";
 export { artifactsRoute, type ArtifactsRoute } from "./artifacts.js";
-export { integrityRoute, type IntegrityRoute } from "./integrity.js";
 export { autoUpdateRunsRoute, type AutoUpdateRunsRoute } from "./auto-update-runs.js";
 export { autoUpdateNewsRoute, type AutoUpdateNewsRoute } from "./auto-update-news.js";
 export { groundskeeperRunsRoute, type GroundskeeperRunsRoute } from "./groundskeeper-runs.js";
@@ -21,5 +20,4 @@ export { githubPullsRoute, type GithubPullsRoute, type OpenPR, type CheckResult,
 export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";
 export { qaChecksRoute, type QaChecksRoute } from "./qa-checks.js";
 export { dataQualityRoute, type DataQualityRoute } from "./data-quality.js";
-export { operationsLogRoute, type OperationsLogRoute } from "./operations-log.js";
 export { frameworkReviewRoute, type FrameworkReviewRoute } from "./framework-review.js";
