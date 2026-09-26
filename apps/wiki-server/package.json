@@ -17,7 +17,7 @@
     "@longterm-wiki/factbase": "workspace:*",
     "@longterm-wiki/id-utils": "workspace:*",
     "@longterm-wiki/url-utils": "workspace:*",
-    "@hono/node-server": "^1.19.10",
+    "@hono/node-server": "^2.0.10",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.13.5",
     "pino": "^10.3.1",
@@ -30,7 +30,7 @@
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.11",
     "vite": "7.3.5"
   }
 }
