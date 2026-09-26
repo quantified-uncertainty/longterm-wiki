@@ -8,10 +8,6 @@
  *   crux w enrich entity-links <page-id>           Preview EntityLink insertions
  *   crux w enrich entity-links <page-id> --apply   Write EntityLinks to file
  *   crux w enrich entity-links --all [--limit=N]   Batch across wiki
- *
- *   crux w enrich fact-refs <page-id>              Preview <F> tag insertions
- *   crux w enrich fact-refs <page-id> --apply      Write <F> tags to file
- *   crux w enrich fact-refs --all [--limit=N]      Batch across wiki
  */
 
 import { buildCommands } from '../lib/cli.ts';
@@ -23,12 +19,8 @@ const SCRIPTS = {
     passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
     positional: true,
   },
-  'fact-refs': {
-    script: 'enrich/enrich-fact-refs.ts',
-    description: 'Wrap canonical numbers with <F> fact-ref tags',
-    passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
-    positional: true,
-  },
+  // Note: 'fact-refs' was removed — enrichFactRefs() is a no-op since the
+  // data/facts/*.yaml pipeline was retired (still called by the improve pipeline).
   // Note: 'references' was removed — References are now auto-generated at build
   // time via pageResources in build-data.mjs. The CLI command is no longer needed.
 };
@@ -52,12 +44,6 @@ Options (entity-links):
   --limit=N         Limit pages when using --all
   --json            JSON output (one object per page)
 
-Options (fact-refs):
-  --apply           Write <F> tag insertions to MDX file
-  --all             Scan all knowledge-base pages
-  --limit=N         Limit pages when using --all
-  --json            JSON output (one object per page)
-
 All tools are idempotent — running twice on the same page produces no extra changes.
 
 Examples:
@@ -65,10 +51,6 @@ Examples:
   crux w enrich entity-links openai --apply         Insert EntityLinks into openai.mdx
   crux w enrich entity-links --all --limit=10       Preview for top 10 pages
   crux w enrich entity-links --all --apply          Apply EntityLinks across wiki
-
-  crux w enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
-  crux w enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
-  crux w enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
 
 Note: References are now auto-generated at build time (build-data.mjs → pageResources).
 The 'crux w enrich references' command has been removed.

@@ -85,19 +85,12 @@ import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
 import * as importScorecardsCommands from './commands/import-scorecards.ts';
-import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
-import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
-import * as importQuriPersonnelCommands from './commands/import-quri-personnel.ts';
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
 import * as researchAreasCommands from './commands/research-areas.ts';
 import * as autoVerifyStakeholdersCommands from './commands/legislation/auto-verify-stakeholders.ts';
-import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
-import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
-import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
-import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
 import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
 import * as sourcingRetroScanSubjectsCommands from './commands/sourcing-retro-scan-subjects.ts';
@@ -108,7 +101,6 @@ import * as sourcingSuggestUrlsCommands from './commands/sourcing-suggest-urls.t
 import * as sourcingApplySuggestionsCommands from './commands/sourcing-apply-suggestions.ts';
 import * as sourcingCleanupOrphansCommands from './commands/sourcing-cleanup-orphans.ts';
 import * as sourcingResolveContradictedCommands from './commands/sourcing-resolve-contradicted.ts';
-import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
 import * as sourcingWikiPagesCommands from './commands/sourcing-wiki-pages.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
@@ -192,25 +184,17 @@ const domains = {
   'pr-patrol': prPatrolCommands,
   'health-monitor': healthMonitorCommands,
   factbase: factbaseCommands,
-  kb: factbaseCommands, // deprecated alias
   'import-990': factbaseImport990Commands,
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
   'import-scorecards': importScorecardsCommands,
-  'backfill-grantee-ids': backfillGranteeIdsCommands,
-  'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
-  'import-quri-personnel': importQuriPersonnelCommands,
   people: peopleCommands,
   orgs: orgsCommands,
   'research-areas': researchAreasCommands,
   'auto-verify-stakeholders': autoVerifyStakeholdersCommands,
-  'backfill-stable-ids': backfillStableIdsCommand,
-  'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
-  'backfill-pr-outcomes': backfillPrOutcomesCommands,
-  'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: verifyEntityCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
   'sourcing-recheck': sourcingRecheckCommands,
@@ -222,7 +206,6 @@ const domains = {
   'sourcing-apply-suggestions': sourcingApplySuggestionsCommands,
   'sourcing-cleanup-orphans': sourcingCleanupOrphansCommands,
   'sourcing-resolve-contradicted': sourcingResolveContradictedCommands,
-  'migrate-citations': migrateCitationsCommands,
   'sourcing-wiki-pages': sourcingWikiPagesCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,

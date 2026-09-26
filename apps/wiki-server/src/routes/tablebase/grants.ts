@@ -527,8 +527,8 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /all-program-ids ----
   // Returns all grant IDs with their current programId, organizationId,
-  // source, name, and notes. Used by backfill-program-ids to match grants
-  // to funding programs.
+  // source, name, and notes. Was used by the one-shot `crux tb
+  // backfill-program-ids` command (since removed); no remaining crux caller.
   .get("/all-program-ids", async (c) => {
     const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
@@ -561,7 +561,8 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- PATCH /batch-update-program ----
   // Updates programId for multiple grants using bulk SQL.
-  // Used by the backfill-program-ids command.
+  // Was used by the one-shot `crux tb backfill-program-ids` command (since
+  // removed); no remaining crux caller.
   .patch("/batch-update-program", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
