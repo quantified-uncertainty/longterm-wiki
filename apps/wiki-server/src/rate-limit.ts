@@ -28,7 +28,7 @@
  */
 
 import type { Context, MiddlewareHandler } from "hono";
-import { verifyToken } from "./auth.js";
+import { resolveAuthMode, verifyToken } from "./auth.js";
 import { logger } from "./logger.js";
 
 // ---------------------------------------------------------------------------
@@ -328,8 +328,12 @@ export function rateLimitMiddleware(
     const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
     const authHeader = c.req.header("Authorization");
     const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    // With no key, any token counts as authenticated only in local dev;
+    // in production that would let anyone skip the limiter (see auth.ts).
     const isAuthenticated = token != null && (
-      !expectedKey || verifyToken(token, expectedKey)
+      expectedKey
+        ? verifyToken(token, expectedKey)
+        : resolveAuthMode() === "open-dev"
     );
 
     if (isAuthenticated) {
