@@ -87,7 +87,6 @@ The gate check and CI pipeline should fail-closed: if something goes wrong, run 
 Every fail-open exception in the gate must have a comment explaining why. Current documented exceptions:
 
 - **assign-ids**: Wiki-server may be unavailable; build-data has a local fallback
-- **typecheck-crux**: Known baseline of pre-existing errors; separate baseline check enforces limits
 - **mdx-compile**: Advisory smoke-test; full Next.js build is authoritative
 - **gate-triage LLM call**: Optimization only; timeout/error means run everything
 

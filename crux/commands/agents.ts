@@ -506,9 +506,10 @@ async function closeCommand(
       output += `${c.yellow}⚠ Failed to look up agent session for ${branch}: ${msg}${c.reset}\n`;
       output += `${c.dim}  Skipping cleanup so you can retry. Re-run \`crux sys agents close\` once the wiki-server is reachable.${c.reset}\n`;
       sessionCloseFailed = true;
-    } else if (sessionResult && 'ok' in sessionResult && !sessionResult.ok && sessionResult.error !== 'not_found') {
-      // Wiki-server returned a non-2xx that isn't 404 — same blast
-      // radius as a thrown error.
+    } else if (sessionResult && 'ok' in sessionResult && !sessionResult.ok) {
+      // Wiki-server returned a non-2xx — same blast radius as a thrown
+      // error. (ApiError has no 'not_found' member, so a former
+      // `error !== 'not_found'` clause here was always true; removed.)
       const msg = (sessionResult as { message?: string }).message ?? 'unknown error';
       output += `${c.yellow}⚠ Wiki-server lookup error for ${branch}: ${msg}${c.reset}\n`;
       output += `${c.dim}  Skipping cleanup so you can retry.${c.reset}\n`;
