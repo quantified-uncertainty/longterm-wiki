@@ -67,7 +67,7 @@
     "typescript-eslint": "^8.59.1",
     "unified": "^11.0.5",
     "vite": "7.3.5",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.11"
   },
   "pnpm": {
     "overrides": {
