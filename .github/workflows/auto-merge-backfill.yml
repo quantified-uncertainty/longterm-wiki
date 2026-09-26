@@ -15,8 +15,10 @@ run-name: "Auto-Merge Backfill PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAU
 # diffs are mechanical.
 
 on:
-  schedule:
-    - cron: '*/20 * * * *'   # every 20 minutes
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: '*/20 * * * *'   # every 20 minutes
   workflow_dispatch:
 
 permissions:

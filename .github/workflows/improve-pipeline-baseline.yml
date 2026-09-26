@@ -18,8 +18,10 @@ run-name: "Improve Pipeline Baseline${{ vars.AUTOMATION_PAUSED == 'true' && ' [P
 # gives a stable rolling baseline with at most one day of staleness.
 
 on:
-  schedule:
-    - cron: '0 7 * * *'  # Daily 07:00 UTC (after auto-update at ~06:00)
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: '0 7 * * *'  # Daily 07:00 UTC (after auto-update at ~06:00)
   workflow_dispatch:
     inputs:
       budget:

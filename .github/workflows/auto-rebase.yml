@@ -12,8 +12,10 @@ run-name: "Auto-Rebase PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
 #   5. Skip PRs with the `stage:merging` label (in merge queue — rebase would invalidate entry)
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'   # every 4 hours
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: '0 */4 * * *'   # every 4 hours
   workflow_dispatch:          # allow manual trigger
 
 permissions:

@@ -12,10 +12,12 @@ run-name: "Scheduled Maintenance${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSE
 # the "Run maintenance" step's env (see QUA-612).
 
 on:
-  schedule:
-    - cron: "30 7 * * 1-5" # Daily: weekdays 7:30am UTC
-    - cron: "0 9 * * 0" # Weekly: Sunday 9am UTC
-    - cron: "0 10 1 * *" # Monthly: 1st of month 10am UTC
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: "30 7 * * 1-5" # Daily: weekdays 7:30am UTC
+  #  - cron: "0 9 * * 0" # Weekly: Sunday 9am UTC
+  #  - cron: "0 10 1 * *" # Monthly: 1st of month 10am UTC
   workflow_dispatch:
     inputs:
       cadence:
