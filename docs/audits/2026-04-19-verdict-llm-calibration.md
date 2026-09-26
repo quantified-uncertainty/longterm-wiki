@@ -2,7 +2,7 @@
 
 **Linear:** [QUA-635](https://linear.app/quantifieduncertainty/issue/QUA-635) (parent [QUA-637](https://linear.app/quantifieduncertainty/issue/QUA-637) — coverage expansion burst)
 **Date:** 2026-04-19
-**Scripts:** `crux/calibration/{build-corpus.ts, run-calibration.ts, analyze-results.ts}`
+**Scripts:** `crux/calibration/{build-corpus.ts, run-calibration.ts, analyze-results.ts}` (removed from the tree after this audit concluded; recover with `git show e35e704fa:crux/calibration/<file>`)
 **Raw data:** `crux/calibration/data/{corpus.json, results-haiku.json, results-sonnet.json, metrics.json}`
 
 ## TL;DR

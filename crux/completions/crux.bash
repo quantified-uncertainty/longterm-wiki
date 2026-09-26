@@ -38,7 +38,7 @@ _crux_complete() {
   # ---------------------------------------------------------------------------
   local groups="w wiki fb factbase tb tablebase gh sys system"
   local toplevel="query context"
-  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants backfill-grantee-ids backfill-program-ids import-divisions import-funding-programs people orgs research-areas backfill-stable-ids backfill-yaml-stable-ids factbase-migrate-entities verify qa-sweep matrix tablebase pages"
+  local all_domains="validate analyze fix content generate visual resources updates auto-update check-links edit-log importance ci maintain review citations grokipedia issues agent-checklist entity pr wiki-server query jobs context enrich sessions research evals health epic ids agents agent-session-events audits release pr-patrol factbase footnotes agent-workspace import-grants import-divisions import-funding-programs people orgs research-areas verify qa-sweep matrix tablebase pages"
 
   # ---------------------------------------------------------------------------
   # Level 2: domains within each group
@@ -46,15 +46,15 @@ _crux_complete() {
 
   # wiki group (w/wiki): content-focused domains + flattened content commands
   local wiki_domains="validate fix content citations footnotes generate visual enrich importance updates auto-update analyze pages resources check-links qa-sweep evals research grokipedia"
-  local wiki_flattened="improve iterate create regrade grade grade-content polish review suggest-links strip-scores"
+  local wiki_flattened="improve iterate create regrade grade grade-content polish review suggest-links"
 
   # factbase group (fb/factbase): factbase domains + flattened factbase commands
   local fb_domains="factbase"
-  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
+  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update sync-sources verify add-fact"
 
   # tablebase group (tb/tablebase): tablebase-related domains + flattened commands
   local tb_domains="tablebase matrix entity ids people orgs research-areas verify"
-  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
 
   # github group (gh): GitHub-related domains + flattened issues commands
   local gh_domains="issues pr ci epic release review pr-patrol"
@@ -68,12 +68,12 @@ _crux_complete() {
   # ---------------------------------------------------------------------------
   local cmds_validate="all unified compile links entity-links cross-links mermaid style consistency data refs sidebar orphans quality schema edit-logs session-logs financials numeric-consistency drizzle-journal gate id-server-sync hallucination-risk entity-refs directory-pages cross-entity cross-check to-rdjsonl"
   local cmds_fix="all entity-links cross-links broken-links markdown escaping dollars comparisons frontmatter imports orphaned-footnotes related-pages frontmatter-order"
-  local cmds_content="improve iterate create regrade grade grade-content polish review suggest-links strip-scores"
+  local cmds_content="improve iterate create regrade grade grade-content polish review suggest-links"
   local cmds_issues="list next search create comment update-body update-title lint start done cleanup close"
   local cmds_pr="create ready detect check overlaps fix-body rebase-all validate-test-plan resolve-conflicts"
   local cmds_agent_checklist="init check verify status complete snapshot pre-push-check"
-  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
-  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
+  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update sync-sources verify add-fact"
+  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
   local cmds_query="search entity facts related backlinks page recent-changes recent-edits citations risk stats blocks"
   local cmds_context="for-issue for-page for-entity for-topic"
   local cmds_ci="status pause-actions resume-actions main-status"
