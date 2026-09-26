@@ -19,7 +19,7 @@ on:
   # schedule disabled — labs rarely change frameworks AND the script's first
   # production run benefits from manual oversight (some URLs may have moved
   # since the manifest was authored). Re-enable once the manual runs settle.
-  # Treatment matches `auto-update.yml` per `.claude/rules/auto-update-system.md`:
+  # Treatment matches `auto-update.yml` per `docs/agent-rules/auto-update-system.md`:
   # if you uncomment the schedule, also add `refresh-frameworks.yml` to the
   # workflow-staleness list in `crux/health/health-check.ts::workflowFiles`.
   # Tracked in QUA-31 alongside the auto-update re-enable question.

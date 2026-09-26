@@ -55,7 +55,7 @@ pnpm crux linear create "Descriptive title" \
   --project="<Project Name>"
 ```
 
-`--project` is **required** (or pass `--parent=QUA-NNN` to inherit). The CLI refuses with exit 2 otherwise — see `.claude/rules/linear-project-ownership.md` for which project to pick. Bypass with `--allow-no-project` only if the issue genuinely has no home yet.
+`--project` is **required** (or pass `--parent=QUA-NNN` to inherit). The CLI refuses with exit 2 otherwise — see `docs/agent-rules/linear-project-ownership.md` for which project to pick. Bypass with `--allow-no-project` only if the issue genuinely has no home yet.
 
 For longer descriptions, use `--description-file=/tmp/description.md`.
 

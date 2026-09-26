@@ -9,7 +9,7 @@
 
 Reasoning:
 1. **Our `./ws` + `crux sys dispatch` + `crux pr-patrol` stack is roughly equivalent in capability** to ComposioHQ AO and Overstory, and is purpose-built for this codebase (slot model, port allocation, `agent_sessions` PG dedup, Linear/GH integration, audit log, `--force` reconciliation). Replacing it would be a multi-week migration to gain… roughly the same thing, with a different bug surface.
-2. **Mission Control, AO, and Overstory all assume "single repo, agents = worktrees inside it"**. We deliberately rejected worktrees (`.claude/rules/worktree-isolation-bug.md`) in favor of independent-clone slots after a confirmed Claude Code bug (#42282) corrupted parent CWD. Any tool that re-introduces worktrees is a regression for us.
+2. **Mission Control, AO, and Overstory all assume "single repo, agents = worktrees inside it"**. We deliberately rejected worktrees (`docs/agent-rules/worktree-isolation-bug.md`) in favor of independent-clone slots after a confirmed Claude Code bug (#42282) corrupted parent CWD. Any tool that re-introduces worktrees is a regression for us.
 3. **Agent Teams (official) is interesting for a different problem** — *intra-session* parallelism inside a single coordinator (research with competing hypotheses, parallel review). It does NOT solve cross-session dispatch. Worth enabling experimentally for high-token review/research tasks, with `teammateMode: in-process` (no tmux split panes — we already manage tmux ourselves).
 4. **`bassimeledath/dispatch` is the only tool that solves a problem we don't already solve well**: keeping the *coordinator's* context lean by spawning fire-and-forget workers from inside the coordinator's own session. Our `./ws dispatch` solves dispatch from the shell, not from inside Claude — every coordinator dispatch currently bloats the coordinator's context with the full task description + status polling. Worth a 1-day spike.
 
@@ -228,4 +228,4 @@ If it's a clear win, add a `crux sys dispatch --via=skill` mode that uses the sk
 - [builderz-labs/mission-control](https://github.com/builderz-labs/mission-control)
 - [ComposioHQ/agent-orchestrator](https://github.com/ComposioHQ/agent-orchestrator)
 - [bassimeledath/dispatch](https://github.com/bassimeledath/dispatch) and [10x Your Claude Code Window Size with Dispatch](https://www.bassimeledath.com/blog/dispatch)
-- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/.claude/rules/worktree-isolation-bug.md`, `lw/a10/docs/agent-rules/dispatched-agent-review.md`
+- Local baseline: `lw/README.md`, `lw/a10/crux/commands/dispatch.ts`, `lw/a10/crux/commands/agent-workspace.ts`, `lw/a10/docs/agent-rules/worktree-isolation-bug.md`, `lw/a10/docs/agent-rules/dispatched-agent-review.md`

@@ -1,5 +1,7 @@
 # Environment Setup
 
+> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+
 ## Worktree setup (Claude Code worktrees only)
 
 This applies to **Claude Code git worktrees** (`.claude/worktrees/xyz/`), not `lw/` agent slots. Agent slots (`lw/a1`, `lw/a2`, ...) are full clones managed by `crux agent-workspace` and don't need symlinks.

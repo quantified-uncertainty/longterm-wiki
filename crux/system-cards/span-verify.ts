@@ -4,7 +4,7 @@
  * For every non-null field the extractor returned, check that its excerpt
  * appears in the source text. Fields without a grounded excerpt are
  * dropped to null and logged — treating them as hallucinations per
- * `.claude/rules/implementation-quality.md` (adversarial inputs).
+ * `docs/agent-rules/implementation-quality.md` (adversarial inputs).
  *
  * Matching tiers (cheap → expensive):
  *   1. exact substring match (case-insensitive)

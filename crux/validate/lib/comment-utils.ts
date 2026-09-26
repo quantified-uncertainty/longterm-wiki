@@ -7,7 +7,7 @@
  * - validate-typed-client.ts (direct apiRequest<T> calls — QUA-770)
  *
  * Both validators were independently walking string state and extracting
- * inline comments. Per `.claude/rules/implementation-quality.md` §
+ * inline comments. Per `docs/agent-rules/implementation-quality.md` §
  * "Pattern fixes must be global", this module hosts the shared
  * implementation so both validators stay in sync.
  */

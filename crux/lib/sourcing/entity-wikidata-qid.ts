@@ -56,7 +56,7 @@ function loadCache(): Map<string, string> {
     // Fail-open per QUA-724: any read/parse failure (missing file, EPERM,
     // YAML syntax error, ...) means the gate stays disabled rather than
     // tripping every caller. We log at warn so file-shape regressions are
-    // still visible; per `.claude/rules/error-handling.md` no catch is
+    // still visible; per `docs/agent-rules/error-handling.md` no catch is
     // silent.
     if (process.env.NODE_ENV !== 'test') {
       const msg = e instanceof Error ? e.message : String(e);

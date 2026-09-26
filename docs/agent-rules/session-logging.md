@@ -1,3 +1,5 @@
+> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+
 - **Session logs are stored in PostgreSQL** via the wiki-server API. They are no longer committed to git. The `/agent-ship` skill handles syncing the session log to the DB automatically.
 - **Always include the `checks:` field** — run `pnpm crux sys agent-checklist snapshot` immediately before creating the session log and paste the output verbatim. This captures the checklist state at ship time as a machine-readable audit trail. The `initiated_at` timestamp reveals whether the checklist was initialized at session start (good) or created at the last minute (red flag). If no checklist was used, the command outputs `checks: {initialized: false}` — include that too, honestly. A missing `checks:` field generates a validation warning.
 - **Format is machine-parsed**: The `date`, `branch`, `title`, `pages`, `pr`, `model`, `duration`, and `cost` fields are parsed by the wiki-server sessions API to build the `/internal/page-changes` dashboard. Validated by Zod schema in the server's `api-types.ts`.

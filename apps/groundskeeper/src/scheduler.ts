@@ -255,7 +255,7 @@ export function registerTask(
 
       // Update active agent step + heartbeat
       if (groundskeeperAgentId) {
-        // catch-ok: agent step updates are best-effort heartbeat telemetry per .claude/rules/error-handling.md (high-frequency, non-correctness)
+        // catch-ok: agent step updates are best-effort heartbeat telemetry per docs/agent-rules/error-handling.md (high-frequency, non-correctness)
         updateActiveAgent(config, groundskeeperAgentId, {
           currentStep: `${name}: ${result.summary ?? event} (${Math.round(durationMs / 1000)}s)`,
         }).catch((e: unknown) => logger.warn({ error: e instanceof Error ? e.message : String(e), event: "agent_update_failed" }, "Failed to update active agent step")); // catch-ok: heartbeat telemetry

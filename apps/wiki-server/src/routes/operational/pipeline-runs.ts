@@ -186,7 +186,7 @@ const pipelineRunsApp = new Hono()
   // Multiplied by ~700 entities/night that would be ~42K spurious audit
   // rows daily. Heartbeats are not durable history — start, end, and
   // status changes still write to the audit log. See
-  // `.claude/rules/audit-log.md` § "Bulk backfills — skip the universal
+  // `docs/agent-rules/audit-log.md` § "Bulk backfills — skip the universal
   // audit trigger" for the same mechanism on bulk migrations.
   .patch("/:id/heartbeat", async (c) => {
     const id = c.req.param("id");

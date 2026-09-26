@@ -290,7 +290,7 @@ const activeAgentsApp = new Hono()
           // Non-critical for the heartbeat response, but we want to know if
           // this starts failing: a silent regression here would break the
           // PG-first dedup's freshness signal without any symptom until the
-          // next collision. See .claude/rules/error-handling.md — every
+          // next collision. See docs/agent-rules/error-handling.md — every
           // catch must log, re-throw, or document why neither.
           logger.warn(
             {

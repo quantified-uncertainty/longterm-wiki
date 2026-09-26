@@ -120,7 +120,7 @@ Not triggered by:
 ## Related artifacts
 
 - `/plan-feature` skill — operationalizes these rules in the planning workflow (framing-approval gate, empirical archaeology pass, ≥3 diverse reviewers)
-- `.claude/rules/proactive-github-filing.md` § "Hypothetical problems you have not observed" — same instinct applied to ticket filing
-- `.claude/rules/implementation-quality.md` § "Bug fixes — TDD workflow" step 0 — same principle applied to fixes (verify the symptom exists before writing the fix)
+- `docs/agent-rules/proactive-github-filing.md` § "Hypothetical problems you have not observed" — same instinct applied to ticket filing
+- `docs/agent-rules/implementation-quality.md` § "Bug fixes — TDD workflow" step 0 — same principle applied to fixes (verify the symptom exists before writing the fix)
 - QUA-1045 — the v4/v5 retrospective that produced this file
 - QUA-943 — the umbrella where the planning failure happened
