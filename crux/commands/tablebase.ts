@@ -1225,8 +1225,6 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   const serverUrl = getServerUrl();
 
   console.log('NOTE: This command syncs career data from FactBase YAML + experts.yaml only.');
-  console.log('      Bulk career enrichment data is managed separately via:');
-  console.log('        crux/scripts/sync-careers-to-personnel.ts + crux/scripts/career-data.json');
   console.log('      This sync is additive (upsert) and will NOT delete existing records.\n');
 
   console.log('Extracting career data from FactBase...');
