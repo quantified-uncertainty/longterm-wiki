@@ -87,12 +87,7 @@ Five SID/ID validators in `crux/validate/`:
 
 ## Migration scripts (when you need them)
 
-Three historical migrations under `crux/scripts/`:
-- `migrate-kb-slugs-to-stableids.ts` — slug → sid_ conversion
-- `migrate-ref-slugs.ts` — bulk reference rewrite
-- `migrate-resource-hex-to-stableid.ts` — hex → sid_ conversion
-
-These are one-shot historical scripts. Do not run them unless you're migrating data; look at them for patterns when writing a new one-shot migration.
+The historical one-shot ID migrations (`migrate-kb-slugs-to-stableids.ts` — slug → sid_, `migrate-ref-slugs.ts` — bulk reference rewrite, `migrate-resource-hex-to-stableid.ts` — hex → sid_, `normalize-stableids.ts`, `qua-503-*`) have been run and were removed from `crux/scripts/`. Recover them from git history (`git log --diff-filter=D --name-only -- crux/scripts/`) if you need a pattern for a new one-shot migration.
 
 ## Known rough edges (don't re-discover)
 

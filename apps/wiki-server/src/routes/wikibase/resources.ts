@@ -2122,7 +2122,7 @@ const resourcesApp = new Hono()
   // Scans the resources table for URL-canonical-equivalent duplicates and,
   // when `apply: true`, merges each cluster atomically (per-cluster
   // transaction). Returns a full report of clusters, canonical picks, FK
-  // moves, and errors. Meant to be invoked by `crux/scripts/dedup-resources.ts`.
+  // moves, and errors. Originally driven by the QUA-561 one-shot CLI wrapper (since removed; see git history).
   .post(
     "/dedup",
     zv("json", z.object({ apply: z.boolean().default(false) })),
