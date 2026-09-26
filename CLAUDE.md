@@ -50,7 +50,8 @@ pnpm setup:quick                     # install + build data (first run)
 pnpm build-data:content              # rebuild database.json, no server needed
 pnpm dev                             # site on $DEV_PORT (default 3001)
 pnpm test                            # all vitest suites; pnpm test:crux for crux only
-cd apps/web && npx tsc --noEmit      # app typecheck (also apps/wiki-server)
+cd apps/web && npx tsc --noEmit      # web typecheck
+cd apps/wiki-server && npx tsc --noEmit   # wiki-server typecheck
 pnpm crux w fix escaping             # run after editing any MDX
 pnpm crux w fix markdown             # run after editing any MDX
 pnpm crux w validate gate --scope=content --fix   # fast content gate (~15s)

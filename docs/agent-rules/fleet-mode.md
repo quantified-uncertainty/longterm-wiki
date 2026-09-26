@@ -25,7 +25,9 @@ Claude Code merges hooks from `settings.local.json` with `settings.json`, so
 this adds the fleet hooks on top of the defaults. If the slot already has a
 `settings.local.json`, merge the `hooks` entries by hand. For Codex, merge
 `.codex/hooks.fleet.json` into the slot's `.codex/hooks.json`. To turn it off,
-delete the local file.
+remove the fleet hook entries you added (delete `.claude/settings.local.json`
+only if it holds nothing else, and remove the merged entries from
+`.codex/hooks.json`).
 
 The fleet hooks, all still in `.claude/hooks/`:
 

@@ -1,6 +1,6 @@
 # Agent Session Workflow — MANDATORY
 
-> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+> **Hook enforcement is fleet-only.** The hooks described below (checklist injection, stop-time verification) run only with fleet mode enabled (`docs/agent-rules/fleet-mode.md`). The checklist and close-out steps still apply to any session that uses `/agent-init` or `/agent-ship`.
 
 Every session that involves writing or changing code MUST follow this workflow.
 
@@ -87,7 +87,7 @@ The checklist is not a nice-to-have piece of paper the agent can forget exists. 
 - **`.claude/hooks/inject-wip-checklist.sh`** (`UserPromptSubmit` event) — emits a compact `<system-reminder>` on every user turn with the progress count (`3/16 done`) and the slugs of still-unchecked items. If the file is missing (quick-fix session, pre-init turn), the hook is a silent no-op. The point: the checklist is in the prompt on every turn, so "I forgot the file existed" is no longer a possible failure mode. Same mechanism `MEMORY.md` auto-context uses.
 - **`.claude/hooks/verify-checklist-on-stop.sh`** (`Stop` event) — reads the agent's last assistant message from the transcript and checks for ship-intent phrases (`/agent-ship`, `ready to ship`, `ready for review`, `session done`, etc.). If the agent is trying to wrap the session AND there are still unchecked items, the hook blocks the stop (exit 2) and lists what's left. The hook is narrow on purpose: blocking every Stop would loop the agent on every turn, so it only fires at the moment of real shipping intent. Fails open on transcript read errors and no-ops when the checklist file is missing.
 
-Both hooks are registered in `.claude/settings.json`. If you need to bypass one (e.g., debugging the hook itself), temporarily move the file aside — do not add an `env` bypass flag, the enforcement exists precisely because bypasses get left on.
+Both hooks are registered in `.claude/settings.fleet.json` and are active only when that file is copied to `.claude/settings.local.json` (see `docs/agent-rules/fleet-mode.md`). If you need to bypass one (e.g., debugging the hook itself), temporarily move the file aside — do not add an `env` bypass flag, the enforcement exists precisely because bypasses get left on.
 
 To check items off during a session, edit `.claude/wip-checklist.md` directly: change `[ ]` to `[x]` for done items, or `[~]` with `<!-- N/A: reason -->` for items that don't apply. The Layer 1 reminder updates on the next user turn.
 

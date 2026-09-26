@@ -1,6 +1,6 @@
 # Environment Setup
 
-> **Fleet mode only.** This applies when many agents run in parallel slots with the fleet hooks enabled (`docs/agent-rules/fleet-mode.md`). A single session can ignore it.
+> **Mostly fleet-specific.** The slot, port and wiki-server-from-slot sections apply to parallel agent slots (`docs/agent-rules/fleet-mode.md`). The worktree setup section applies to any Claude Code worktree.
 
 ## Worktree setup (Claude Code worktrees only)
 

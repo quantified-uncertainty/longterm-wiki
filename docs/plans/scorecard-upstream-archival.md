@@ -587,7 +587,7 @@ Per `docs/agent-rules/linear-project-ownership.md`: source-check work goes in **
 
 Per `docs/agent-rules/proactive-github-filing.md`: I'm proposing 3 tickets in §11 (revised down from 5). I should **not** file these without explicit ask — the user requested a doc, not implementation. §11 should clarify "to be filed if/when this design is approved, by the user, not by this session."
 
-Per `docs/agent-rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + emit a Linear ticket (auto-filed) so a human can decide.
+Per `docs/agent-rules/error-handling.md`: archival should be **best-effort**. Don't fail the whole grade sync if one wave's URL 404s. Log warning + leave FK null + optionally file a Linear ticket so a human can decide.
 
 ### 12.6 Revised recommendation
 
