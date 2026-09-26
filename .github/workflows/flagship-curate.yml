@@ -9,8 +9,10 @@ run-name: "Flagship Curate${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
 # trust loop has a single rolling thread to monitor.
 
 on:
-  schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
   workflow_dispatch:
     inputs:
       limit:

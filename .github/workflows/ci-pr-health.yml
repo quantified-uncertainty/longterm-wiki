@@ -13,9 +13,11 @@ run-name: "CI & PR Health${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || 
 # Issues are created/updated/closed automatically under the "wellness" label.
 
 on:
-  schedule:
-    - cron: "10 8 * * *" # 8:10 AM UTC daily (staggered +10min from server-api-health to avoid duplicate issue creation)
-    - cron: "10 20 * * *" # 8:10 PM UTC daily
+  # schedule disabled 2026-09: repo idle since 2026-06-25; re-enable by uncommenting.
+  # Manual runs still work via workflow_dispatch.
+  # schedule:
+  #  - cron: "10 8 * * *" # 8:10 AM UTC daily (staggered +10min from server-api-health to avoid duplicate issue creation)
+  #  - cron: "10 20 * * *" # 8:10 PM UTC daily
   workflow_dispatch:
 
 concurrency:
