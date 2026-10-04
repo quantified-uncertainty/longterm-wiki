@@ -5,6 +5,7 @@ import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { computePersonCoverage, getPersonSignals } from "@/components/coverage/coverage-score";
 import { resolveSlugAlias, getKBEntitySlug } from "@/data/factbase";
 import { isAnySid } from "@/lib/stable-id";
+import { isHiddenPerson } from "@/lib/hidden-people";
 import { titleToSlug } from "@/lib/slug-utils";
 import {
   resolvePersonBySlug,
@@ -61,8 +62,15 @@ export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
 }
 
-/** Resolve a slug to a person entity (TableBase-first, wiki-server fallback). */
+/** Resolve a slug to a person entity, or undefined if it is on the hidden list. */
 function resolvePersonEntity(slug: string): Entity | undefined {
+  const entity = resolvePersonEntityUnfiltered(slug);
+  if (isHiddenPerson(slug, entity?.name)) return undefined;
+  return entity;
+}
+
+/** Resolve a slug to a person entity (TableBase-first, wiki-server fallback). */
+function resolvePersonEntityUnfiltered(slug: string): Entity | undefined {
   const resolved = resolvePersonBySlug(slug);
   if (resolved) {
     return {
@@ -94,6 +102,13 @@ function resolvePersonEntity(slug: string): Entity | undefined {
 
 /** Async fallback: try wiki-server for entities not in local data. */
 async function resolvePersonFromServer(slug: string): Promise<Entity | undefined> {
+  if (isHiddenPerson(slug)) return undefined;
+  const entity = await resolvePersonFromServerUnfiltered(slug);
+  if (entity && isHiddenPerson(entity.name)) return undefined;
+  return entity;
+}
+
+async function resolvePersonFromServerUnfiltered(slug: string): Promise<Entity | undefined> {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL || process.env.PROD_LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) return undefined;
   try {

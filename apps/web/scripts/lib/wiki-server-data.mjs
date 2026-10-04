@@ -12,6 +12,7 @@
 import { createHash } from 'node:crypto';
 import { getServerUrl, getApiKey } from './wiki-server-env.mjs';
 import { assignSlugs as assignRecordSlugs } from './record-slugs.mjs';
+import { isHiddenPerson } from '../../src/lib/hidden-people.ts';
 
 // ---------------------------------------------------------------------------
 // Shared ID detection helpers
@@ -1712,9 +1713,27 @@ export async function mergePGRecordsIntoKB(kb, opts = {}) {
   }
 
   // --- Process personnel ---
+  // Drop rows for people on the site-wide hidden list (see hidden-people.ts).
+  const visiblePersonnelResult =
+    personnelResult.status === 'fulfilled' && personnelResult.value?.ok
+      ? {
+          ...personnelResult,
+          value: {
+            ...personnelResult.value,
+            items: personnelResult.value.items.filter((row) => {
+              const hidden = isHiddenPerson(
+                row.personSlug, row.personTitle, row.personDisplayName,
+                row.personEntityId, row.personId,
+              );
+              if (hidden) console.log(`  kb-pg personnel: hiding row ${row.id} (hidden person)`);
+              return !hidden;
+            }),
+          },
+        }
+      : personnelResult;
   personnelCount = mergeCollection(
     'personnel',
-    personnelResult,
+    visiblePersonnelResult,
     ['key-persons', 'board-seats', 'career-history'],
     (row) => {
       if (row.roleType === 'career') return row.personEntityId || row.personId;
