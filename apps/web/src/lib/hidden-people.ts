@@ -14,10 +14,16 @@
 /** Person entity slugs (the `/people/<slug>` path segment). */
 export const HIDDEN_PERSON_SLUGS: ReadonlySet<string> = new Set([
   "olivia-jimenez",
+  "ben-hoskin",
 ]);
 
 /** Display names, matched case-insensitively with punctuation and spacing normalized. */
-const HIDDEN_PERSON_NAMES = ["Olivia Jimenez", "Olivia G. Jimenez"];
+const HIDDEN_PERSON_NAMES = [
+  "Olivia Jimenez",
+  "Olivia G. Jimenez",
+  "Ben Hoskin",
+  "Benjamin Hoskin",
+];
 
 function normalizeName(name: string): string {
   return name
