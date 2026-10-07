@@ -54,7 +54,7 @@ if [[ ! -e "$ENV_FILE" ]]; then
 fi
 
 # Auto-prefix `codex/` if missing (so `worktree qua-665-foo` works).
-# Lowercase per .claude/rules/agent-session-workflow.md branch convention.
+# Lowercase per docs/agent-rules/agent-session-workflow.md branch convention.
 if [[ ! "$BRANCH" =~ ^(codex/|claude/|main$|production$) ]]; then
   BRANCH="codex/$BRANCH"
 fi

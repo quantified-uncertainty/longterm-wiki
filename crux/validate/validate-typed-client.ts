@@ -11,7 +11,7 @@
  *  create one using `InferResponseType<>`."
  *
  * Part of QUA-770 (Tier 5 of QUA-154 — Eliminate skipEntityValidation and
- * direct apiRequest bypasses). Also referenced in `.claude/rules/agent-session-workflow.md`
+ * direct apiRequest bypasses). Also referenced in `docs/agent-rules/agent-session-workflow.md`
  * as "API callers match server response shape (use InferResponseType or typed client)".
  *
  * Pattern flagged:

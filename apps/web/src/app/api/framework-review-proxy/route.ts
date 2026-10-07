@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
+import { checkAdminWrite } from "@lib/admin-write-auth";
 
 /**
  * Proxy for /api/framework-review/* (QUA-710 / Phase 4-C).
@@ -18,6 +19,11 @@ import { getWikiServerConfig } from "@lib/wiki-server";
  *
  * Unknown paths return 400 — the allowlist is the security boundary
  * (no path-traversal, no hitting other wiki-server routes).
+ *
+ * POSTs additionally require an admin token (`checkAdminWrite`): without
+ * it this route would let anyone publish versions or set verdicts using
+ * the server's API key. GETs stay open — the same data is already
+ * rendered on the public dashboard page.
  */
 
 const ID_RE = /^[A-Za-z0-9_-]{1,200}$/;
@@ -83,6 +89,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = checkAdminWrite(request);
+  if (!auth.ok) {
+    return NextResponse.json(
+      { error: auth.error, message: auth.message },
+      { status: auth.status },
+    );
+  }
   return forward(request, "POST");
 }
 

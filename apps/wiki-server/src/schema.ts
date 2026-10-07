@@ -1076,7 +1076,7 @@ export const agentSessions = pgTable(
     linearId: text("linear_id"),
     // Agent slot number (a0..a99). Derived from the cwd ancestor walk at init
     // time; used by the dedup query to distinguish "same slot resumption"
-    // from "different slot collision". See .claude/rules/github-issue-tracking.md.
+    // from "different slot collision". See docs/agent-rules/github-issue-tracking.md.
     slotNumber: integer("slot_number"),
     checklistMd: text("checklist_md").notNull(),
     worktree: text("worktree"), // working directory path for collision detection
@@ -1438,7 +1438,7 @@ export const groundskeeperRuns = pgTable(
  *
  * `status` is CHECK-constrained to the v1 enum (running / committed /
  * aborted / oscillation / partial_failure). Widening requires the
- * enum-enumeration procedure in `.claude/rules/database-migrations.md`.
+ * enum-enumeration procedure in `docs/agent-rules/database-migrations.md`.
  */
 export const pipelineRuns = pgTable(
   "pipeline_runs",

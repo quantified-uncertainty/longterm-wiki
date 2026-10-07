@@ -84,7 +84,6 @@ export const GROUPS: Record<string, GroupDef> = {
       'sourcing-recheck',
       'sourcing-retro-scan-subjects',
       'sourcing-cleanup-orphans',
-      'migrate-citations',
       'legislation',
       'bluesky',
       'races',

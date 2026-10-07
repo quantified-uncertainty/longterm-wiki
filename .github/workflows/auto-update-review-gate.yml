@@ -58,6 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
 
       - name: Run citation audit
         id: audit

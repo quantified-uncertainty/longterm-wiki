@@ -112,7 +112,9 @@ describe('checkImproveEntityMutex', () => {
     // startedAt is 1 min ago → within freshness.
     const row = makeRow({
       runId: 'fresh-no-beat',
-      heartbeatAt: null,
+      // The inferred RPC type says string | undefined, but the column is
+      // nullable in PG and the route can return null.
+      heartbeatAt: null as unknown as PipelineRunRow['heartbeatAt'],
       startedAt: new Date(T0 - 60_000).toISOString(),
     });
     const result = await checkImproveEntityMutex({

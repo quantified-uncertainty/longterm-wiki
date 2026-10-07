@@ -122,25 +122,15 @@ function Stub({ children }: { children?: React.ReactNode }) {
 }
 
 // Legacy component names still referenced in MDX content, rendered as stubs.
-// Dead stubs removed: Code, Steps, Icon, FileTree
+// Dead stubs removed: Code, Steps, Icon, FileTree, plus 32 names no MDX file
+//   in content/ renders (DataCrux, PageIndex, RiskDashboard, Table*, ...).
+// EstimateBox is kept: crux/lib/rules/estimate-boxes.ts still anticipates it.
 // Ported stubs removed: Badge, DisagreementMap,
 //   FactorRelationshipDiagram, ImpactList, KeyPeople,
 //   KeyQuestions, ModelsList, Section, TabItem, Tabs, Tags
 const stubNames = [
-  "AnthropicFact", "ArticleSources",
-  "ConceptsDirectory", "DataCrux", "DataEstimateBox",
-  "DualOutcomeChart", "EntityGraph", "EstimateBox",
-  "FactorAttributionMatrix", "FactorGauges",
-  "FullModelDiagram", "ImpactGrid",
-  "InsightGridExperiments", "InsightScoreMatrix", "InsightsTable",
-  "KnowledgeTreemap",
-  "OutcomesTable", "PageIndex", "PixelDensityMap",
-  "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
-  "RiskDashboard", "RiskTrajectoryExperiments",
-  "RootFactorsTable", "ScenariosTable", "SparseKnowledgeGrid",
-  "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
-  "TableRow", "TagBrowser", "TimelineViz", "TopicQuestionGrid",
-  "TrajectoryLines",
+  "ArticleSources", "ConceptsDirectory", "EstimateBox",
+  "InsightsTable", "TagBrowser", "TimelineViz",
 ] as const;
 
 const stubs = Object.fromEntries(stubNames.map((name) => [name, Stub]));

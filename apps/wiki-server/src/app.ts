@@ -54,7 +54,6 @@ import { activeAgentsRoute } from "./routes/operational/active-agents.js";
 import { agentSessionEventsRoute } from "./routes/operational/agent-session-events.js";
 import { jobsRoute } from "./routes/operational/jobs.js";
 import { artifactsRoute } from "./routes/operational/artifacts.js";
-import { integrityRoute } from "./routes/operational/integrity.js";
 import { autoUpdateRunsRoute } from "./routes/operational/auto-update-runs.js";
 import { autoUpdateNewsRoute } from "./routes/operational/auto-update-news.js";
 import { groundskeeperRunsRoute } from "./routes/operational/groundskeeper-runs.js";
@@ -67,7 +66,6 @@ import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
 import { qaChecksRoute } from "./routes/operational/qa-checks.js";
 import { dataQualityRoute } from "./routes/operational/data-quality.js";
 import { thingsSearchRefreshRoute } from "./routes/operational/things-search-refresh.js";
-import { operationsLogRoute } from "./routes/operational/operations-log.js";
 import { auditLogRoute } from "./routes/operational/audit-log.js";
 import { frameworkReviewRoute } from "./routes/operational/framework-review.js";
 
@@ -221,7 +219,6 @@ export function createApp() {
   // Citation & sourcing system (operational, not part of a Base)
   app.route("/api/citations", citationsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
-  app.route("/api/integrity", integrityRoute);
 
   // Claims-first sourcing (#3253)
   app.route("/api/claims", claimsRoute);
@@ -256,7 +253,6 @@ export function createApp() {
   app.route("/api/qa-checks", qaChecksRoute);
   app.route("/api/data-quality", dataQualityRoute);
   app.route("/api/things-search", thingsSearchRefreshRoute);
-  app.route("/api/operations-log", operationsLogRoute);
   app.route("/api/audit-log", auditLogRoute);
   app.route("/api/framework-review", frameworkReviewRoute);
 

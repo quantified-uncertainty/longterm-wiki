@@ -18,7 +18,7 @@ Evidence from four scout reports: `docs/adrs/research/0003-validator-economics/{
 
 **Failure modes concentrate by class.** Lint-style content invariants produce most false positives (QUA-755 local/CI divergence; QUA-787 CI doesn't run `validate-factbase-record-refs` at all). QUA-86 found a 46% gate-override rate before being Canceled — dated, weakest plank in the evidence chain. The clearest *missing*-validator cost is QUA-302: a CHECK constraint added without row-count enumeration cost 12h prod outage + 7 cascading PRs. Schema-level invariants pay for themselves; lint-level concentrate friction. **Validators also have their own bug surface** — QUA-761 (`entitylink-ids --fix` mis-renamed Kratsios→Trump) and QUA-966 (`validate-entity-schema-drift --update` corrupted its own baseline) are silent-corruption bugs in auto-fix paths.
 
-**Bypass policy conflict.** `.claude/rules/proactive-github-filing.md:77` classifies "silencing a validator" as a symptom-patch red flag. Any deletion or demotion will trip that rule unless explicitly carved out.
+**Bypass policy conflict.** `docs/agent-rules/proactive-github-filing.md:77` classifies "silencing a validator" as a symptom-patch red flag. Any deletion or demotion will trip that rule unless explicitly carved out.
 
 ## Options considered
 
@@ -67,5 +67,5 @@ Evidence from four scout reports: `docs/adrs/research/0003-validator-economics/{
 - Linear: QUA-1085 (dispatch); QUA-504 (taxonomy); QUA-524/525/528 (shipped); QUA-829, QUA-808, QUA-801–805 (open tail)
 - Incidents: QUA-302, QUA-755, QUA-86 (Canceled — number is dated), QUA-761, QUA-966, QUA-299
 - Related ADRs: ADR-0001, ADR-0004
-- Code: `crux/validate/validate-gate.ts:244` (`PARALLEL_STEPS`), `:226` (`UNIFIED_BLOCKING_RULES`), `.claude/rules/proactive-github-filing.md:77,80`
+- Code: `crux/validate/validate-gate.ts:244` (`PARALLEL_STEPS`), `:226` (`UNIFIED_BLOCKING_RULES`), `docs/agent-rules/proactive-github-filing.md:77,80`
 - Research: `docs/adrs/research/0003-validator-economics/{codebase,docs,internal-data,linear}.md`

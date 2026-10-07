@@ -55,7 +55,7 @@ The report categorizes work into priority tiers. Review the output and decide wh
 
 ### Filing new issues
 
-When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost. `--project` is required (see `.claude/rules/linear-project-ownership.md` to pick one):
+When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost. `--project` is required (see `docs/agent-rules/linear-project-ownership.md` to pick one):
 ```bash
 pnpm crux linear create "Descriptive title" \
   --description="What's wrong and why it matters" \

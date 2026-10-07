@@ -122,7 +122,7 @@ jq -c 'select(.type == "health_scan_error")' ~/.cache/pr-patrol/runs.jsonl | tai
 
 ## See also
 
-- `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags"
+- `docs/agent-rules/proactive-github-filing.md` § "Mandatory tracking — red flags"
 - QUA-297 — Health-Gate Patrol parent issue + retrospective
 - `crux/pr-patrol/health-scan.ts` — the scanners
 - `crux/pr-patrol/health-gate.ts` — the gate wiring

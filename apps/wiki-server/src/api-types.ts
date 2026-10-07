@@ -1615,7 +1615,7 @@ export const RecordGroundskeeperRunBatchSchema = z.object({
 /**
  * v1 status enum. Mirrors the CHECK constraint on `pipeline_runs.status`.
  * Widening requires a follow-up migration that enumerates prod row
- * distribution first — see `.claude/rules/database-migrations.md`.
+ * distribution first — see `docs/agent-rules/database-migrations.md`.
  */
 export const VALID_PIPELINE_RUN_STATUSES = [
   "running",

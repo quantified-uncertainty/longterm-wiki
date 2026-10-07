@@ -82,6 +82,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
 
       - name: Restore auto-update state
         uses: actions/cache/restore@v4
@@ -101,6 +102,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LLM_PAYLOAD_CAPTURE_RATE: ${{ vars.LLM_PAYLOAD_CAPTURE_RATE }}
         run: |
           ARGS="--budget=${{ inputs.budget || '30' }} --count=${{ inputs.count || '3' }} --verbose"
 
