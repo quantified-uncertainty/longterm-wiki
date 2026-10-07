@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isHiddenPerson } from "@/lib/hidden-people";
+import { scrubbedProxyResponse } from "@/lib/scrubbed-proxy-response";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
@@ -6,7 +8,7 @@ import { getWikiServerConfig } from "@lib/wiki-server";
  *
  * Proxies entity profile requests to the wiki-server so that the client-side
  * viewer can fetch data without exposing wiki-server credentials.
- * Streams the response body through without parsing/re-serializing.
+ * Hidden people (see hidden-people.ts) are scrubbed from the response.
  */
 export async function GET(request: NextRequest) {
   const entity = request.nextUrl.searchParams.get("entity");
@@ -15,6 +17,10 @@ export async function GET(request: NextRequest) {
       { error: "validation_error", message: "entity parameter is required" },
       { status: 400 }
     );
+  }
+
+  if (isHiddenPerson(entity.trim())) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
   const config = getWikiServerConfig();
@@ -32,11 +38,7 @@ export async function GET(request: NextRequest) {
       signal: AbortSignal.timeout(15_000),
     });
 
-    // Stream response body through without parse+reserialize
-    return new NextResponse(res.body, {
-      status: res.status,
-      headers: { "content-type": res.headers.get("content-type") ?? "application/json" },
-    });
+    return await scrubbedProxyResponse(res);
   } catch (err) {
     return NextResponse.json(
       {
