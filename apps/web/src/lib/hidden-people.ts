@@ -18,6 +18,7 @@ export const HIDDEN_PERSON_SLUGS: ReadonlySet<string> = new Set([
   "olivia-jimenez",
   "ben-hoskin",
   "david-field",
+  "aidan-ogara",
 ]);
 
 /** PG entity ids of hidden people, for rows that reference them only by id. */
@@ -25,6 +26,7 @@ const HIDDEN_PERSON_IDS: ReadonlySet<string> = new Set([
   "zm6ciQBsFr", // Olivia Jimenez
   "5hsN7xhTbY", // Ben Hoskin
   "TFZKE3nLUb", // David Field (VARA co-founder)
+  "SM7cEzpYvl", // Aidan O'Gara
 ]);
 
 /** Display names, matched case-insensitively with punctuation and spacing normalized. */
@@ -34,6 +36,7 @@ const HIDDEN_PERSON_NAMES = [
   "Ben Hoskin",
   "Benjamin Hoskin",
   "David Field",
+  "Aidan O'Gara",
 ];
 
 function normalizeName(name: string): string {

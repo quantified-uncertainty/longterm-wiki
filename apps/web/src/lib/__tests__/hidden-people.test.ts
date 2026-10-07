@@ -14,6 +14,8 @@ describe("isHiddenPerson", () => {
     expect(isHiddenPerson("Olivia Jiménez")).toBe(true);
     expect(isHiddenPerson("new:Olivia G. Jimenez")).toBe(true);
     expect(isHiddenPerson("Benjamin Hoskin")).toBe(true);
+    expect(isHiddenPerson("Aidan O’Gara")).toBe(true);
+    expect(isHiddenPerson("sid_SM7cEzpYvl")).toBe(true);
   });
 
   it("checks every candidate and ignores empty ones", () => {

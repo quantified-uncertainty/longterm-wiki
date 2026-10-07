@@ -2071,17 +2071,6 @@
   relatedEntries:
     - id: openai
       type: organization
-- id: aidan-ogara
-  stableId: sid_SM7cEzpYvl
-  type: person
-  title: Aidan O'Gara
-  role: Researcher
-  description: Lead author on "Hardware-Enabled Mechanisms for Verifying Responsible AI Development" (arXiv:2505.03742, May 2025), a comprehensive paper on compute quantity and cluster configuration verification mechanisms.
-  knownFor:
-    - Hardware-Enabled Mechanisms for Verifying AI Training Properties
-  tags:
-    - hardware-governance
-    - compute-governance
 - id: aaron-scher
   stableId: sid_yDK4NovwS8
   type: person
