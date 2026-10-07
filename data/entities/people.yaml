@@ -659,7 +659,7 @@
   wikiId: E576
   type: person
   title: Issa Rice
-  description: Issa Rice is an independent researcher who has created valuable knowledge infrastructure tools like Timelines Wiki and AI Watch for the EA and AI safety communities, though his work focuses on data aggregation rather than original research. His contributions are primarily utilitarian reference material rather than original analytical contributions to AI safety.
+  description: "Issa Rice is an independent researcher who created knowledge-infrastructure tools for the EA and AI safety communities, including Timelines Wiki, AI Watch and Org Watch."
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -715,7 +715,7 @@
   wikiId: E580
   type: person
   title: Vidur Kapur
-  description: Vidur Kapur is a superforecaster and AI policy researcher involved in multiple forecasting organizations and the Sentinel early warning system, contributing to AI risk assessment and EA Forum discussions. While he appears to be a competent practitioner in forecasting and risk assessment, his individual contributions to the field remain modest in scale.
+  description: "Vidur Kapur is a superforecaster and AI policy researcher involved in several forecasting organizations and the Sentinel early warning system."
   clusters:
     - ai-safety
     - epistemics
@@ -725,7 +725,7 @@
   wikiId: E581
   type: person
   title: Vipul Naik
-  description: Vipul Naik is a mathematician and EA community member who has funded ~$255K in contract research (primarily to Sebastian Sanchez and Issa Rice) and created the Donations List Website tracking $72.8B in philanthropic donations. His main contribution is transparency infrastructure for EA funding patterns and donation tracking.
+  description: "Vipul Naik is a mathematician and EA community member who funded contract research on EA knowledge infrastructure and created the Donations List Website, which tracks philanthropic donations."
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -2621,30 +2621,6 @@
       source: EA Forum profile
       sourceUrl: https://forum.effectivealtruism.org/posts/EGxuPPKsf3CjhcdpM/consider-donating-to-alex-bores-author-of-the-raise-act
   lastUpdated: 2026-04
-- id: rebecca-lasher
-  stableId: sid_YKtqDKysGb
-  type: person
-  title: Rebecca Lasher
-  description: "Candidate in the NY-12 Democratic primary (2026). Backed by anti-regulation PAC spending from Leading the Future. Note: research found no public figure matching this name in the NY-12 race — may be confused with Micah Lasher, who is a confirmed candidate."
-  tags:
-    - politics
-  lastUpdated: 2026-04
-- id: brad-schlossberg
-  stableId: sid_6b2Vi6bhfX
-  type: person
-  title: Brad Schlossberg
-  description: Candidate in the NY-12 Democratic primary (2026).
-  tags:
-    - politics
-  lastUpdated: 2026-03
-- id: mike-conway
-  stableId: sid_6lQRx57F7M
-  type: person
-  title: Mike Conway
-  description: "Candidate in the NY-12 Democratic primary (2026). Note: may refer to George Conway, who is a confirmed candidate in the NY-12 primary."
-  tags:
-    - politics
-  lastUpdated: 2026-04
 - id: valerie-foushee
   stableId: sid_aJJNryIYDC
   type: person
@@ -2693,14 +2669,6 @@
       view: Mildly supportive (light-touch) — pro-innovation framing with "clear rules without hampering innovation"
       source: Campaign issues page
       sourceUrl: https://www.melissabeanforcongress.com/issues
-  lastUpdated: 2026-04
-- id: jake-gober
-  stableId: sid_Zs43I3aG72
-  type: person
-  title: Jake Gober
-  description: "Republican candidate in the TX-10 primary (2026). Anti-regulation stance on AI policy. Note: may be confused with Chris Gober, who won the TX-10 Republican primary."
-  tags:
-    - politics
   lastUpdated: 2026-04
 - id: pete-ricketts
   stableId: sid_E6W6VILiNn
@@ -3259,30 +3227,6 @@
   type: person
   title: Elena Meirzadeh
   description: Solid-state chemistry researcher at Columbia University. Foresight Fellow (2023).
-  relatedEntries: []
-- id: alia-abbas
-  stableId: sid_zsRuvTJL0A
-  type: person
-  title: Alia Abbas
-  description: Physics and materials engineering researcher. Foresight Prodigy Fellow (2023).
-  relatedEntries: []
-- id: natasha-asmi
-  stableId: sid_Lar4TaohoD
-  type: person
-  title: Natasha Asmi
-  description: Scientific ecosystem infrastructure researcher at Halogen. Foresight Prodigy Fellow (2023).
-  relatedEntries: []
-- id: akash-patel
-  stableId: sid_6bkO20mLYD
-  type: person
-  title: Akash Patel
-  description: Medicine and nanotech researcher at BandX. Foresight Prodigy Fellow (2023).
-  relatedEntries: []
-- id: pavi-dhiman
-  stableId: sid_L727R6bnP2
-  type: person
-  title: Pavi Dhiman
-  description: Young researcher and Foresight Prodigy Fellow (2023). One of the youngest fellows at 16 years old at time of selection.
   relatedEntries: []
 - id: aj-kourabi
   stableId: sid_aqSu5pvw4Q

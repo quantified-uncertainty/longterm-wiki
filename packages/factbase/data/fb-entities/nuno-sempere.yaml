@@ -15,13 +15,7 @@ facts:
       catastrophe early warning; built Metaforecast.org; ranked 2nd all-time on INFER platform"
     asOf: 2026-03
     notes: Enriched from wiki page
-  - id: f_nPcY8fL6kA
-    property: born-year
-    value: 1998
-    notes: "Born October 10, 1998; enriched from wiki page; source is Estonian business registry (indirect — lists birth year for board member regulatory compliance)"
-    source: https://inforegister.ee/en/2329278-ID
-
   - id: f_nPfB4gN9mD
     property: education
-    value: "Studied Mathematics and Philosophy (dropped out); subsequently studied development economics"
+    value: "Studied Mathematics and Philosophy; subsequently studied development economics"
     notes: Enriched from wiki page
