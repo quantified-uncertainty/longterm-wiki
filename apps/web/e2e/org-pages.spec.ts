@@ -98,7 +98,6 @@ const ORG_SLUGS = [
   "turion",
   "uk-aisi",
   "us-aisi",
-  "vara",
   "xai",
 ];
 

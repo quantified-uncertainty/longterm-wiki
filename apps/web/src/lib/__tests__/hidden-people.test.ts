@@ -4,6 +4,7 @@ import { isHiddenPerson } from "../hidden-people";
 describe("isHiddenPerson", () => {
   it("matches hidden slugs", () => {
     expect(isHiddenPerson("olivia-jimenez")).toBe(true);
+    expect(isHiddenPerson("ben-hoskin")).toBe(true);
   });
 
   it("matches hidden names regardless of case, punctuation and accents", () => {
@@ -11,6 +12,7 @@ describe("isHiddenPerson", () => {
     expect(isHiddenPerson("olivia g jimenez")).toBe(true);
     expect(isHiddenPerson("Olivia Jiménez")).toBe(true);
     expect(isHiddenPerson("new:Olivia G. Jimenez")).toBe(true);
+    expect(isHiddenPerson("Benjamin Hoskin")).toBe(true);
   });
 
   it("checks every candidate and ignores empty ones", () => {

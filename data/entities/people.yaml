@@ -1391,7 +1391,7 @@
   stableId: sid_KKCwTYU4Zw
   type: person
   title: Jacob Hilton
-  description: President and researcher at the Alignment Research Center (ARC). One of three permanent researchers at ARC Theory (along with Paul Christiano and Mark Xu) following the spin-out of ARC Evals as METR in December 2023. Sits on ARC's board alongside Buck Shlegeris and Ben Hoskin. ARC focuses on theoretical alignment research, including heuristic arguments for understanding neural network behavior.
+  description: President and researcher at the Alignment Research Center (ARC). One of three permanent researchers at ARC Theory (along with Paul Christiano and Mark Xu) following the spin-out of ARC Evals as METR in December 2023. Sits on ARC's board. ARC focuses on theoretical alignment research, including heuristic arguments for understanding neural network behavior.
   customFields:
     - label: Role
       value: President and Researcher
