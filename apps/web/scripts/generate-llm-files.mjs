@@ -124,7 +124,10 @@ function extractContent(filePath) {
     return null;
   }
 
-  let content = readFileSync(fullPath, 'utf-8');
+  return extractContentText(readFileSync(fullPath, 'utf-8'));
+}
+
+export function extractContentText(content) {
 
   // Remove frontmatter (between --- markers)
   content = content.replace(/^---\n[\s\S]*?\n---\n/, '');

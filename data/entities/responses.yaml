@@ -55,9 +55,7 @@
   jurisdiction: California
   session: 2023-2024
   fullTextUrl: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1047
-  vetoReason: Governor Newsom cited concerns that the bill focuses on model size (compute/cost) rather than deployment
-    risk. He argued smaller models in high-risk contexts would not be covered, while large models in benign contexts
-    would be over-regulated. He preferred federal regulation and signed 18 other narrower AI bills simultaneously.
+  vetoReason: Governor Newsom cited concerns that the bill focuses on model size (compute/cost) rather than deployment risk. He argued smaller models in high-risk contexts would not be covered, while large models in benign contexts would be over-regulated. He preferred federal regulation and signed 18 other narrower AI bills simultaneously.
   votes:
     - chamber: Senate Judiciary Committee
       date: April 2, 2024
@@ -121,130 +119,70 @@
       description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment
       category: Pre-deployment
       billSection: § 22603(b)
-      details: Developers must conduct risk assessments (b)(1), perform testing and maintain records (b)(2), implement
-        safeguards based on test results (b)(3), and establish traceability for model copies (b)(4). Testing must
-        evaluate whether the model could be used to create CBRN weapons, execute cyberattacks causing more than \$500M
-        in damage, or act with limited human oversight in ways causing comparable harm.
-      billQuote: '"Assess whether the covered model is reasonably capable of causing or materially enabling a critical harm...
-        Record and retain test results providing sufficient detail for third-party replication... Take reasonable care
-        implementing appropriate safeguards preventing critical harm."'
-      amendmentNotes: Original bill (Feb 2024) used "reasonable assurance" standard. The August 19, 2024 amendment changed
-        this to "reasonable care," a well-established common law tort standard. The April 30, 2024 amendment narrowed
-        "hazardous capability" definitions, later replaced entirely with "critical harm" framing.
+      details: Developers must conduct risk assessments (b)(1), perform testing and maintain records (b)(2), implement safeguards based on test results (b)(3), and establish traceability for model copies (b)(4). Testing must evaluate whether the model could be used to create CBRN weapons, execute cyberattacks causing more than \$500M in damage, or act with limited human oversight in ways causing comparable harm.
+      billQuote: '"Assess whether the covered model is reasonably capable of causing or materially enabling a critical harm... Record and retain test results providing sufficient detail for third-party replication... Take reasonable care implementing appropriate safeguards preventing critical harm."'
+      amendmentNotes: Original bill (Feb 2024) used "reasonable assurance" standard. The August 19, 2024 amendment changed this to "reasonable care," a well-established common law tort standard. The April 30, 2024 amendment narrowed "hazardous capability" definitions, later replaced entirely with "critical harm" framing.
     - title: Shutdown Capability
       description: Full shutdown of all model instances including during training, before beginning training
       category: Pre-deployment
       billSection: § 22603(a)(2)
-      details: Developers must maintain the ability to promptly enact a full shutdown — defined as the cessation of training,
-        covered model operation, and all controlled derivatives. This requirement applies before beginning training, not
-        just before deployment.
-      billQuote: '"Implement capability to promptly enact full shutdown... consider shutdown risks to critical infrastructure
-        when enacting shutdown."'
-      amendmentNotes: The August 19, 2024 amendment clarified that shutdown applies only to models "controlled by a
-        developer," addressing concerns that open-source releases would be impossible. The August 22, 2024 amendment
-        further refined open-source exemptions (unless >$50M revenue from derivatives).
+      details: Developers must maintain the ability to promptly enact a full shutdown — defined as the cessation of training, covered model operation, and all controlled derivatives. This requirement applies before beginning training, not just before deployment.
+      billQuote: '"Implement capability to promptly enact full shutdown... consider shutdown risks to critical infrastructure when enacting shutdown."'
+      amendmentNotes: The August 19, 2024 amendment clarified that shutdown applies only to models "controlled by a developer," addressing concerns that open-source releases would be impossible. The August 22, 2024 amendment further refined open-source exemptions (unless >$50M revenue from derivatives).
     - title: Cybersecurity
       description: Protection of model weights from theft; secure infrastructure; incident response plans
       category: Security
       billSection: § 22603(a)(1)
-      details: Requires cybersecurity protections to prevent unauthorized access to, misuse of, or unsafe post-training
-        modifications of the covered model. Protections must be appropriate to risk levels including advanced persistent
-        threats (defined as adversaries with sophisticated expertise and significant resources enabling multiple attack
-        vectors).
-      billQuote: '"Implement reasonable administrative, technical, physical cybersecurity protections preventing unauthorized
-        access, misuse, or unsafe modifications appropriate to risk levels including advanced persistent threats."'
-      amendmentNotes: Substantively unchanged from original bill. The "advanced persistent threat" definition was retained
-        throughout, targeting nation-state-level adversaries.
+      details: Requires cybersecurity protections to prevent unauthorized access to, misuse of, or unsafe post-training modifications of the covered model. Protections must be appropriate to risk levels including advanced persistent threats (defined as adversaries with sophisticated expertise and significant resources enabling multiple attack vectors).
+      billQuote: '"Implement reasonable administrative, technical, physical cybersecurity protections preventing unauthorized access, misuse, or unsafe modifications appropriate to risk levels including advanced persistent threats."'
+      amendmentNotes: Substantively unchanged from original bill. The "advanced persistent threat" definition was retained throughout, targeting nation-state-level adversaries.
     - title: Safety & Security Protocol
       description: Written protocol with objective compliance requirements and testing procedures
       category: Pre-deployment
       billSection: § 22603(a)(3)–(7)
-      details: Developers must create a written Safety and Security Protocol (SSP) before beginning training, designate
-        responsible senior personnel (a)(4), retain all documentation for at least 5 years (a)(5), review and update the
-        protocol annually (a)(6), and publish a redacted version publicly (a)(7). The SSP must include objective
-        criteria for determining compliance.
-      billQuote: '"Implement written, separate safety and security protocol [specifying] protections and procedures for
-        reasonable care avoiding critical harm risk [and] objective compliance requirements with sufficient detail and
-        specificity... Conspicuously publish redacted protocol; transmit redacted copy to Attorney General."'
-      amendmentNotes: Earlier versions required protocols to be submitted to a new Frontier Model Division. The August 19,
-        2024 amendment eliminated the Division entirely and transferred functions to the Government Operations Agency.
-        Also replaced "certifications" with "compliance statements" and removed perjury penalties for false statements.
+      details: Developers must create a written Safety and Security Protocol (SSP) before beginning training, designate responsible senior personnel (a)(4), retain all documentation for at least 5 years (a)(5), review and update the protocol annually (a)(6), and publish a redacted version publicly (a)(7). The SSP must include objective criteria for determining compliance.
+      billQuote: '"Implement written, separate safety and security protocol [specifying] protections and procedures for reasonable care avoiding critical harm risk [and] objective compliance requirements with sufficient detail and specificity... Conspicuously publish redacted protocol; transmit redacted copy to Attorney General."'
+      amendmentNotes: Earlier versions required protocols to be submitted to a new Frontier Model Division. The August 19, 2024 amendment eliminated the Division entirely and transferred functions to the Government Operations Agency. Also replaced "certifications" with "compliance statements" and removed perjury penalties for false statements.
     - title: Third-Party Auditing
       description: Annual independent audits starting Jan 1, 2026; 5-year record retention
       category: Oversight
       billSection: § 22603(e)
-      details: Beginning January 1, 2026, developers must retain independent auditors to assess compliance annually. Audit
-        reports must include detailed compliance assessments, noncompliance instances, improvement recommendations, and
-        internal controls assessments. Reports submitted to the Attorney General; the Board of Frontier Models sets
-        auditing standards and can approve or deny auditor qualifications.
-      billQuote: '"Beginning January 1, 2026, developers must annually retain third-party auditors for independent compliance
-        audits... [Reports must include] detailed compliance assessment, identified noncompliance instances and
-        improvement recommendations, [and] lead auditor signature certifying results."'
-      amendmentNotes: Earlier versions had auditors regulated by the Frontier Model Division. The August 19, 2024 amendment
-        moved regulatory authority to the Government Operations Agency via the new Board of Frontier Models (Government
-        Code § 11547.6).
+      details: Beginning January 1, 2026, developers must retain independent auditors to assess compliance annually. Audit reports must include detailed compliance assessments, noncompliance instances, improvement recommendations, and internal controls assessments. Reports submitted to the Attorney General; the Board of Frontier Models sets auditing standards and can approve or deny auditor qualifications.
+      billQuote: '"Beginning January 1, 2026, developers must annually retain third-party auditors for independent compliance audits... [Reports must include] detailed compliance assessment, identified noncompliance instances and improvement recommendations, [and] lead auditor signature certifying results."'
+      amendmentNotes: Earlier versions had auditors regulated by the Frontier Model Division. The August 19, 2024 amendment moved regulatory authority to the Government Operations Agency via the new Board of Frontier Models (Government Code § 11547.6).
     - title: Incident Reporting
       description: Report AI safety incidents to Attorney General within 72 hours
       category: Oversight
       billSection: § 22603(g)–(h)
-      details: Section (g) requires reporting AI safety incidents to the Attorney General within 72 hours. Section (h)
-        separately requires compliance statements within 30 days of first deployment. Section (f) requires annual
-        compliance statements signed by the CTO or senior officer.
-      billQuote: '"Developers report each AI safety incident to Attorney General within 72 hours of learning about it...
-        Developers submit compliance statements within 30 days of first deployment."'
-      amendmentNotes: Originally, incident reports went to the Frontier Model Division. The August 19, 2024 amendment renamed
-        annual "certifications under penalty of perjury" to "compliance statements" and removed the perjury penalty
-        entirely, replacing it with civil liability for false statements.
+      details: Section (g) requires reporting AI safety incidents to the Attorney General within 72 hours. Section (h) separately requires compliance statements within 30 days of first deployment. Section (f) requires annual compliance statements signed by the CTO or senior officer.
+      billQuote: '"Developers report each AI safety incident to Attorney General within 72 hours of learning about it... Developers submit compliance statements within 30 days of first deployment."'
+      amendmentNotes: Originally, incident reports went to the Frontier Model Division. The August 19, 2024 amendment renamed annual "certifications under penalty of perjury" to "compliance statements" and removed the perjury penalty entirely, replacing it with civil liability for false statements.
     - title: Whistleblower Protection
       description: Prohibit retaliation; anonymous reporting process; 7-year complaint retention
       category: Worker protections
       billSection: § 22607
-      details: Employers may not retaliate against employees who disclose information about potential violations to regulators
-        or the public. Companies must establish an anonymous reporting process for employees to flag safety concerns
-        internally. "Employee" is defined broadly to include contractors, subcontractors, unpaid advisors, and corporate
-        officers assessing critical harm risk.
-      billQuote: '"Developers [may not] prevent employees from disclosing information to Attorney General or Labor
-        Commissioner about developer noncompliance... [or] retaliate against employees for protected disclosures...
-        Developers provide reasonable anonymous internal disclosure processes."'
-      amendmentNotes: Whistleblower protections were strengthened through the June 20, 2024 and August 19, 2024 amendments.
-        The broad definition of "employee" including unpaid advisors and corporate officers was refined. Reporting
-        target changed from Frontier Model Division to AG/Labor Commissioner in the August 19 amendment.
+      details: Employers may not retaliate against employees who disclose information about potential violations to regulators or the public. Companies must establish an anonymous reporting process for employees to flag safety concerns internally. "Employee" is defined broadly to include contractors, subcontractors, unpaid advisors, and corporate officers assessing critical harm risk.
+      billQuote: '"Developers [may not] prevent employees from disclosing information to Attorney General or Labor Commissioner about developer noncompliance... [or] retaliate against employees for protected disclosures... Developers provide reasonable anonymous internal disclosure processes."'
+      amendmentNotes: Whistleblower protections were strengthened through the June 20, 2024 and August 19, 2024 amendments. The broad definition of "employee" including unpaid advisors and corporate officers was refined. Reporting target changed from Frontier Model Division to AG/Labor Commissioner in the August 19 amendment.
     - title: Compute Cluster Reporting
       description: Clusters >10^26 ops/second must report to state with customer information
       category: Transparency
       billSection: § 22604
-      details: Operators of computing clusters (machines connected by 100+ Gbps networking with 10^20+ ops/second capacity)
-        must implement Know Your Customer (KYC) procedures, verify customer identities, retain IP address logs for 7
-        years, assess whether customers intend to train covered models, and maintain the ability to shut down customer
-        access. Targets cloud compute providers like AWS, Google Cloud, Azure.
-      billQuote: '"Obtain prospective customer identifying information including identity, payment source details, email, and
-        contact information... Assess whether customers intend training covered models... Retain customer IP addresses
-        and access and administrative action dates and times."'
-      amendmentNotes: Records originally made available to Frontier Model Division rather than AG (changed August 19, 2024).
-        The July 3, 2024 amendment clarified compute cluster reporting requirements. The August 19, 2024 amendment added
-        the \$10M fine-tuning threshold, reducing the number of cloud compute customers triggering these obligations.
+      details: Operators of computing clusters (machines connected by 100+ Gbps networking with 10^20+ ops/second capacity) must implement Know Your Customer (KYC) procedures, verify customer identities, retain IP address logs for 7 years, assess whether customers intend to train covered models, and maintain the ability to shut down customer access. Targets cloud compute providers like AWS, Google Cloud, Azure.
+      billQuote: '"Obtain prospective customer identifying information including identity, payment source details, email, and contact information... Assess whether customers intend training covered models... Retain customer IP addresses and access and administrative action dates and times."'
+      amendmentNotes: Records originally made available to Frontier Model Division rather than AG (changed August 19, 2024). The July 3, 2024 amendment clarified compute cluster reporting requirements. The August 19, 2024 amendment added the \$10M fine-tuning threshold, reducing the number of cloud compute customers triggering these obligations.
     - title: Liability Framework
       description: Affirmative defense for compliance; AG can sue for violations causing harm; penalties up to 10% of training costs
       category: Enforcement
       billSection: § 22606
-      details: Penalties are 10% of training cost for a first violation, 30% for subsequent violations. Compute cluster
-        violations carry separate penalties of \$50K/\$100K per violation up to \$10M aggregate. The AG can seek
-        injunctive relief, actual damages, punitive damages, and attorney's fees. Only the AG can bring enforcement
-        actions — no private right of action.
-      billQuote: '"Civil penalties not exceeding 10% of model training cost (first violation) or 30% (subsequent
-        violations)... Liability-waiving contracts are void. Courts may disregard corporate formalities imposing joint
-        and several liability on affiliated entities if deliberately structured to avoid liability."'
-      amendmentNotes: This section changed the most. The June 20, 2024 amendment reduced liability from strict to negligence
-        standard and added affirmative defenses. The August 19, 2024 amendment removed all criminal penalties (including
-        perjury for false certifications), narrowed pre-harm enforcement (AG can only act when critical harm is imminent
-        or has occurred), eliminated Frontier Model Division enforcement, and changed the standard from "reasonable
-        assurance" to "reasonable care."
+      details: Penalties are 10% of training cost for a first violation, 30% for subsequent violations. Compute cluster violations carry separate penalties of \$50K/\$100K per violation up to \$10M aggregate. The AG can seek injunctive relief, actual damages, punitive damages, and attorney's fees. Only the AG can bring enforcement actions — no private right of action.
+      billQuote: '"Civil penalties not exceeding 10% of model training cost (first violation) or 30% (subsequent violations)... Liability-waiving contracts are void. Courts may disregard corporate formalities imposing joint and several liability on affiliated entities if deliberately structured to avoid liability."'
+      amendmentNotes: This section changed the most. The June 20, 2024 amendment reduced liability from strict to negligence standard and added affirmative defenses. The August 19, 2024 amendment removed all criminal penalties (including perjury for false certifications), narrowed pre-harm enforcement (AG can only act when critical harm is imminent or has occurred), eliminated Frontier Model Division enforcement, and changed the standard from "reasonable assurance" to "reasonable care."
   stakeholders:
     - name: Governor Gavin Newsom
       entityId: sid_tDwxa07Urw
       position: oppose
-      reason: Vetoed SB 1047 on September 29, 2024, citing concerns that the bill focused on model size rather than deployment
-        risk, and that smaller models in high-risk contexts would not be covered
+      reason: Vetoed SB 1047 on September 29, 2024, citing concerns that the bill focused on model size rather than deployment risk, and that smaller models in high-risk contexts would not be covered
       source: https://www.gov.ca.gov/2024/09/29/governor-newsom-signs-suite-of-artificial-intelligence-legislation/
       importance: high
       context:
@@ -256,8 +194,7 @@
       entityId: sid_y4bieqSeag
       position: support
       role: Co-sponsor (via CAIS Action Fund)
-      reason: Co-sponsored SB 1047 through its CAIS Action Fund; helped build a broad coalition including 70+ academic
-        researchers, 120+ frontier AI company employees, unions, and advocacy organizations
+      reason: Co-sponsored SB 1047 through its CAIS Action Fund; helped build a broad coalition including 70+ academic researchers, 120+ frontier AI company employees, unions, and advocacy organizations
       source: https://safesecureai.org/support
       importance: high
       context:
@@ -267,8 +204,7 @@
     - name: Future of Life Institute
       entityId: sid_d9sWZtyVwg
       position: support
-      reason: Published detailed analysis supporting SB 1047; after veto, Executive Director Anthony Aguirre warned the
-        decision 'leaves Californians vulnerable to considerable risks' from unregulated advanced AI
+      reason: Published detailed analysis supporting SB 1047; after veto, Executive Director Anthony Aguirre warned the decision 'leaves Californians vulnerable to considerable risks' from unregulated advanced AI
       source: https://futureoflife.org/statement/statement-veto-of-sb-1047/
       importance: medium
       context:
@@ -279,9 +215,7 @@
     - name: Yoshua Bengio
       entityId: sid_nGFBXZeM3d
       position: support
-      reason: Co-authored August 7, 2024 letter to California leadership with Hinton, Russell, and Lessig calling SB 1047 the
-        'bare minimum for effective regulation'; wrote Fortune op-ed arguing 'We cannot let corporations grade their own
-        homework'
+      reason: Co-authored August 7, 2024 letter to California leadership with Hinton, and Lessig calling SB 1047 the 'bare minimum for effective regulation'; wrote Fortune op-ed arguing 'We cannot let corporations grade their own homework'
       source: https://safesecureai.org/experts
       importance: high
       context:
@@ -292,8 +226,7 @@
     - name: Geoffrey Hinton
       entityId: sid_5N5UqXNkkg
       position: support
-      reason: Co-authored August 7, 2024 expert letter calling SB 1047 a 'very sensible approach'; stated 'it's critical that
-        we have legislation with real teeth to address the risks' and endorsed the AI employee support letter
+      reason: Co-authored August 7, 2024 expert letter calling SB 1047 a 'very sensible approach'; stated 'it's critical that we have legislation with real teeth to address the risks' and endorsed the AI employee support letter
       source: https://time.com/7008947/california-ai-bill-letter/
       importance: high
       context:
@@ -301,17 +234,6 @@
         - 2024 Nobel Prize in Physics (with John Hopfield) for neural network foundations
         - Co-authored foundational deep learning papers with Bengio (also supporter)
         - Former advisor to Google DeepMind (which opposes the bill)
-    - name: Stuart Russell
-      entityId: sid_ZxUirlzHke
-      position: support
-      reason: Co-authored August 7, 2024 expert letter with Bengio, Hinton, and Lessig arguing that catastrophic AI risks are
-        imminent and SB 1047 represents the 'bare minimum' of needed regulation
-      source: https://safesecureai.org/experts
-      importance: high
-      context:
-        - UC Berkeley professor; director of CHAI (Center for Human-Compatible AI)
-        - CHAI funded by Open Philanthropy, Elon Musk Foundation
-        - Author of 'Human Compatible' (2019); co-author of leading AI textbook
     - name: Elon Musk
       entityId: sid_69vftmr1jg
       position: support
@@ -321,14 +243,12 @@
       context:
         - CEO of xAI (competitor to OpenAI, which opposes the bill)
         - Co-founded OpenAI in 2015; departed board in 2018; sued OpenAI in 2024
-        - Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)
+        - Early funder of CHAI (also supporter) and DeepMind (pre-Google acquisition)
         - Owns X (Twitter), the platform where much SB-1047 debate occurred
     - name: OpenAI
       entityId: sid_1LcLlMGLbw
       position: oppose
-      reason: Sent opposition letter to Governor Newsom on August 20, 2024, arguing SB 1047 would stifle innovation, drive AI
-        development out of California, and create 'impractical compliance requirements'; 113+ of its own employees later
-        signed a letter supporting the bill
+      reason: Sent opposition letter to Governor Newsom on August 20, 2024, arguing SB 1047 would stifle innovation, drive AI development out of California, and create 'impractical compliance requirements'; 113+ of its own employees later signed a letter supporting the bill
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
       importance: high
       context:
@@ -351,8 +271,7 @@
     - name: Google DeepMind
       entityId: sid_A4XoubikkQ
       position: oppose
-      reason: Google claimed in letters to lawmakers that SB 1047 would make 'California one of the world's least favorable
-        jurisdictions for AI development'; 19 DeepMind employees broke with company position to sign support letter
+      reason: Google claimed in letters to lawmakers that SB 1047 would make 'California one of the world's least favorable jurisdictions for AI development'; 19 DeepMind employees broke with company position to sign support letter
       source: https://calmatters.org/economy/technology/2024/08/ai-regulation-showdown/
       importance: high
       context:
@@ -363,9 +282,7 @@
     - name: Meta AI
       entityId: sid_tt0f5PYDCw
       position: oppose
-      reason: Deputy chief privacy officer Rob Sherman argued in June letter that bill would 'deter AI innovation in
-        California'; after passage, Meta stated it would 'stifle AI development' and 'break from the state's long
-        tradition of fostering open-source innovation'
+      reason: Deputy chief privacy officer Rob Sherman argued in June letter that bill would 'deter AI innovation in California'; after passage, Meta stated it would 'stifle AI development' and 'break from the state's long tradition of fostering open-source innovation'
       source: https://calmatters.org/economy/technology/2024/08/ai-regulation-showdown/
       importance: high
       context:
@@ -376,8 +293,7 @@
     - name: Y Combinator
       entityId: sid_d9BCHgtnlw
       position: oppose
-      reason: CEO Garry Tan signed June 2024 letter to California lawmakers claiming 'AI software developers could go to jail'
-        under SB 1047; actively campaigned against the bill on social media
+      reason: CEO Garry Tan signed June 2024 letter to California lawmakers claiming 'AI software developers could go to jail' under SB 1047; actively campaigned against the bill on social media
       source: https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying
       importance: medium
       context:
@@ -388,9 +304,7 @@
     - name: Andreessen Horowitz
       entityId: sid_u2YCulQ1lg
       position: oppose
-      reason: Launched stopsb1047.com campaign; chief legal officer Jaikumar Ramaswamy submitted opposition letter arguing
-        bill 'will burden startups'; spent $39,750 on SB-1047 lobbying in Q2 2024; hired one of Newsom's closest
-        advisors as lobbyist
+      reason: Launched stopsb1047.com campaign; chief legal officer Jaikumar Ramaswamy submitted opposition letter arguing bill 'will burden startups'; spent $39,750 on SB-1047 lobbying in Q2 2024; hired one of Newsom's closest advisors as lobbyist
       source: https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/
       importance: high
       context:
@@ -401,9 +315,7 @@
     - name: Yann LeCun
       entityId: sid_cMbVUVK29Q
       position: oppose
-      reason: Publicly rebuked SB 1047 supporters the day after Hinton endorsed the bill; argued it would have 'apocalyptic
-        consequences on the AI ecosystem' and that 'without open-source AI, there is no AI start-up ecosystem and no
-        academic research on large models'
+      reason: Publicly rebuked SB 1047 supporters the day after Hinton endorsed the bill; argued it would have 'apocalyptic consequences on the AI ecosystem' and that 'without open-source AI, there is no AI start-up ecosystem and no academic research on large models'
       source: https://venturebeat.com/ai/ai-safety-showdown-yann-lecun-slams-californias-sb-1047-as-geoffrey-hinton-backs-new-regulations
       importance: medium
       context:
@@ -413,9 +325,7 @@
     - name: Andrew Ng
       entityId: sid_v13BF4zP2A
       position: oppose
-      reason: Wrote TIME op-ed arguing SB 1047 makes 'a fundamental mistake of regulating AI technology instead of AI
-        applications'; called it 'anti-open source, anti-innovation'; campaigned against the bill on X and LinkedIn
-        throughout summer 2024
+      reason: Wrote TIME op-ed arguing SB 1047 makes 'a fundamental mistake of regulating AI technology instead of AI applications'; called it 'anti-open source, anti-innovation'; campaigned against the bill on X and LinkedIn throughout summer 2024
       source: https://time.com/7016134/california-sb-1047-ai/
       importance: medium
       context:
@@ -426,9 +336,7 @@
     - name: Fei-Fei Li
       entityId: sid_QzcX3bShmQ
       position: oppose
-      reason: Published Fortune open letter on August 6, 2024, warning SB 1047 would 'have significant unintended
-        consequences' and 'cripple public sector and academic AI research'; later appointed by Newsom to expert panel
-        drafting alternative regulation
+      reason: Published Fortune open letter on August 6, 2024, warning SB 1047 would 'have significant unintended consequences' and 'cripple public sector and academic AI research'; later appointed by Newsom to expert panel drafting alternative regulation
       source: https://fortune.com/2024/08/06/godmother-of-ai-says-californias-ai-bill-will-harm-us-ecosystem-tech-politics/
       importance: medium
       context:
@@ -439,9 +347,7 @@
     - name: Max Tegmark
       entityId: sid_3KjUCZCV8w
       position: support
-      reason: MIT professor and FLI co-founder; argued it would be 'incongruous to say that there is a 10-25% chance that
-        advanced AI will cause an extinction-level catastrophe, but then argue that the culpable AI companies should
-        only receive fines after a catastrophe occurs'
+      reason: MIT professor and FLI co-founder; argued it would be 'incongruous to say that there is a 10-25% chance that advanced AI will cause an extinction-level catastrophe, but then argue that the culpable AI companies should only receive fines after a catastrophe occurs'
       source: https://futureoflife.org/statement/statement-veto-of-sb-1047/
       importance: medium
       context:
@@ -451,9 +357,7 @@
     - name: Dan Hendrycks
       entityId: sid_VoNqoBJkyg
       position: support
-      reason: CAIS director who helped draft the original bill; called its passage 'a landmark moment for AI safety';
-        organized AI safety research community support and stated the bill was 'in the long-term interest of industry'
-        because 'a major safety incident would likely be the biggest roadblock to further advancement'
+      reason: CAIS director who helped draft the original bill; called its passage 'a landmark moment for AI safety'; organized AI safety research community support and stated the bill was 'in the long-term interest of industry' because 'a major safety incident would likely be the biggest roadblock to further advancement'
       source: https://sd11.senate.ca.gov/news/senator-wieners-landmark-ai-bill-passes-assembly
       importance: high
       context:
@@ -474,8 +378,7 @@
     - name: California Chamber of Commerce
       entityId: sid_dfTNfp0gNE
       position: oppose
-      reason: Led industry opposition coalition from earliest stages; commissioned study concluding the bill would 'hurt
-        economy/industry'; objected to 'vague and impractical' requirements and potential criminal liability
+      reason: Led industry opposition coalition from earliest stages; commissioned study concluding the bill would 'hurt economy/industry'; objected to 'vague and impractical' requirements and potential criminal liability
       source: https://advocacy.calchamber.com/2024/09/29/calchamber-statement-on-governors-veto-of-sb-1047/
       importance: medium
       context:
@@ -485,9 +388,7 @@
     - name: AI Alliance
       entityId: sid_aF9wqaoCNa
       position: oppose
-      reason: Published formal opposition statement arguing the bill would 'slow innovation, thwart advancements in safety and
-        security, and undermine California's economic growth'; raised concerns about technically infeasible shutdown
-        requirements for open-source models
+      reason: Published formal opposition statement arguing the bill would 'slow innovation, thwart advancements in safety and security, and undermine California's economic growth'; raised concerns about technically infeasible shutdown requirements for open-source models
       source: https://thealliance.ai/core-projects/sb1047
       importance: medium
       context:
@@ -496,8 +397,7 @@
         - Focuses on open-source AI; bill's liability framework seen as threat to open model releases
     - name: 113+ AI Company Employees
       position: support
-      reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom
-        urging him to sign the bill (Sep 9, 2024)
+      reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill (Sep 9, 2024)
       source: https://sfstandard.com/2024/09/09/ai-workers-support-wiener-bill/
       importance: high
       context:
@@ -507,9 +407,7 @@
       entityId: sid_etCe7rcH1g
       position: support
       role: Co-sponsor
-      reason: Youth-led AI accountability organization; co-sponsored SB 1047 alongside CAIS Action Fund and Economic Security
-        California Action; founder Sneha Revanur described the bill as outlining 'responsible guardrails for large-scale
-        AI systems'
+      reason: Youth-led AI accountability organization; co-sponsored SB 1047 alongside CAIS Action Fund and Economic Security California Action; founder Sneha Revanur described the bill as outlining 'responsible guardrails for large-scale AI systems'
       source: https://safesecureai.org/support
       importance: medium
       context:
@@ -518,9 +416,7 @@
     - name: Imbue
       entityId: sid_hCtMHcUWaw
       position: support
-      reason: As a potential frontier model developer, submitted letter stating the bill 'strikes an appropriate balance
-        between promoting responsible innovation and mitigating potential risks'; called itself 'proof that all frontier
-        model developers can implement robust safety practices while remaining competitive'
+      reason: As a potential frontier model developer, submitted letter stating the bill 'strikes an appropriate balance between promoting responsible innovation and mitigating potential risks'; called itself 'proof that all frontier model developers can implement robust safety practices while remaining competitive'
       source: https://safesecureai.org/support
       importance: medium
       context:
@@ -529,38 +425,32 @@
     - name: Gladstone AI
       entityId: sid_HkfUxsbBLQ
       position: support
-      reason: AI safety advisory firm that authored a RAND-commissioned report on catastrophic AI risks; supported the bill as
-        consistent with its findings on the need for frontier AI regulation
+      reason: AI safety advisory firm that authored a RAND-commissioned report on catastrophic AI risks; supported the bill as consistent with its findings on the need for frontier AI regulation
       source: https://safesecureai.org/support
       importance: low
     - name: Nonlinear
       entityId: sid_PfIAYFXC9Q
       position: support
-      reason: AI safety organization that endorsed SB 1047 as part of the broader effective altruism and AI safety community
-        coalition supporting the bill
+      reason: AI safety organization that endorsed SB 1047 as part of the broader effective altruism and AI safety community coalition supporting the bill
       source: https://safesecureai.org/support
       importance: low
     - name: Economic Security Project Action
       entityId: sid_2ecnsQqcRg
       position: support
       role: Co-sponsor
-      reason: Co-sponsored SB 1047 through its Economic Security California Action affiliate; Director Teri Olle represented
-        the organization in legislative hearings; commissioned YouGov poll showing 80% national support for SB 1047's
-        provisions
+      reason: Co-sponsored SB 1047 through its Economic Security California Action affiliate; Director Teri Olle represented the organization in legislative hearings; commissioned YouGov poll showing 80% national support for SB 1047's provisions
       source: https://economicsecurity.us/news/assembly-advances-sb1047-positioning-california-as-the-leader-in-ai-safety/
       importance: medium
     - name: Apart Research
       entityId: sid_5WqgebIWFQ
       position: support
-      reason: AI safety research organization that endorsed SB 1047 as part of the coalition of safety-focused labs supporting
-        frontier model regulation
+      reason: AI safety research organization that endorsed SB 1047 as part of the coalition of safety-focused labs supporting frontier model regulation
       source: https://safesecureai.org/support
       importance: low
     - name: Elicit
       entityId: sid_2VexoROapg
       position: support
-      reason: AI research assistant company that endorsed SB 1047, adding to the coalition of AI companies demonstrating that
-        safety regulation is compatible with building useful AI products
+      reason: AI research assistant company that endorsed SB 1047, adding to the coalition of AI companies demonstrating that safety regulation is compatible with building useful AI products
       source: https://safesecureai.org/support
       importance: low
     - name: Panoplia Labs
@@ -578,8 +468,7 @@
     - name: Redwood Research
       entityId: sid_dwMzc9WzPa
       position: support
-      reason: AI safety research organization that endorsed SB 1047; CEO Buck Shlegeris was publicly critical of Newsom's veto
-        decision
+      reason: AI safety research organization that endorsed SB 1047; CEO Buck Shlegeris was publicly critical of Newsom's veto decision
       source: https://safesecureai.org/support
       importance: low
     - name: FAR AI
@@ -591,44 +480,37 @@
     - name: Foresight Institute
       entityId: sid_NPPTvNqRXA
       position: support
-      reason: Research organization focused on beneficial emerging technologies that endorsed SB 1047 as part of the broad
-        coalition supporting frontier AI safety regulation
+      reason: Research organization focused on beneficial emerging technologies that endorsed SB 1047 as part of the broad coalition supporting frontier AI safety regulation
       source: https://safesecureai.org/support
       importance: low
     - name: Chamber of Progress
       entityId: sid_IEav94hygQ
       position: oppose
-      reason: Led tech coalition urging Newsom to veto; stated 'The California legislature is passing laws based on science
-        fiction fantasies'; co-signed August 27, 2024 joint veto letter with Bay Area Council, Engine, NetChoice, R
-        Street Institute, and others
+      reason: Led tech coalition urging Newsom to veto; stated 'The California legislature is passing laws based on science fiction fantasies'; co-signed August 27, 2024 joint veto letter with Bay Area Council, Engine, NetChoice, R Street Institute, and others
       source: https://progresschamber.org/news/ca-legislature-passes-ai-bill/
       importance: medium
     - name: TechNet
       entityId: sid_0PNw6yTH0g
       position: oppose
-      reason: Bipartisan network of technology CEOs that joined the industry coalition opposing SB 1047, arguing the bill
-        would create burdensome compliance costs and regulatory uncertainty
+      reason: Bipartisan network of technology CEOs that joined the industry coalition opposing SB 1047, arguing the bill would create burdensome compliance costs and regulatory uncertainty
       source: https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf
       importance: low
     - name: Consumer Technology Association
       entityId: sid_b89p7duRrQ
       position: oppose
-      reason: CEO Gary Shapiro praised the veto; CTA had sent August 30, 2024 veto letter arguing the bill would 'restrict
-        development of AI tools designed for safety' and 'direct users to less safe foreign models'
+      reason: CEO Gary Shapiro praised the veto; CTA had sent August 30, 2024 veto letter arguing the bill would 'restrict development of AI tools designed for safety' and 'direct users to less safe foreign models'
       source: https://www.cta.tech/Resources/Newsroom/Media-Releases/2024/September/CTA-Statement-on-Governor-Newsom-Veto-of-AI-Bill
       importance: low
     - name: R Street Institute
       entityId: sid_yfAYuNTKxQ
       position: oppose
-      reason: Free-market think tank that co-led coalition urging Newsom to veto; argued the bill 'regulates model development
-        instead of misuse' and that the harms it addressed were 'entirely theoretical'
+      reason: Free-market think tank that co-led coalition urging Newsom to veto; argued the bill 'regulates model development instead of misuse' and that the harms it addressed were 'entirely theoretical'
       source: https://www.rstreet.org/outreach/coalition-urges-governor-newsom-to-consider-vetoing-sb-1047/
       importance: low
     - name: Competitive Enterprise Institute
       entityId: sid_Le8eSvx8EQ
       position: oppose
-      reason: Free-market policy organization that joined the CalChamber-led coalition letter opposing SB 1047 on grounds that
-        it would stifle innovation and impose impractical requirements
+      reason: Free-market policy organization that joined the CalChamber-led coalition letter opposing SB 1047 on grounds that it would stifle innovation and impose impractical requirements
       source: https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf
       importance: low
   keyPoliticians:
@@ -648,17 +530,13 @@
     - name: Dan Hendrycks
       entityId: sid_VoNqoBJkyg
       role: Technical lead — CAIS director
-      description: Director of CAIS, whose lobbying arm (CAIS Action Fund) co-sponsored the bill. The bill was heavily
-        inspired by CAIS technical work. Also co-authored the 2023 Statement on AI Risk.
+      description: Director of CAIS, whose lobbying arm (CAIS Action Fund) co-sponsored the bill. The bill was heavily inspired by CAIS technical work. Also co-authored the 2023 Statement on AI Risk.
     - name: Nathan Calvin
       role: Primary policy drafter — Senior Policy Counsel, CAIS Action Fund
-      description: Spearheaded collaboration with Senator Wiener's office and Encode Justice on the bill's legislative
-        language. Appeared on 80,000 Hours podcast (ep. 199) to discuss the bill in detail. Served as the primary policy
-        operative shaping the bill through the legislative process.
+      description: Spearheaded collaboration with Senator Wiener's office and Encode Justice on the bill's legislative language. Appeared on 80,000 Hours podcast (ep. 199) to discuss the bill in detail. Served as the primary policy operative shaping the bill through the legislative process.
     - name: Sneha Revanur
       role: Co-sponsor lead — Founder, Encode Justice
-      description: Founded Encode Justice at age 15 in 2020. Coordinated Hollywood support for the bill, resulting in 120+
-        celebrities signing a letter to Governor Newsom urging him to sign.
+      description: Founded Encode Justice at age 15 in 2020. Coordinated Hollywood support for the bill, resulting in 120+ celebrities signing a letter to Governor Newsom urging him to sign.
   amendments:
     - date: March 20, 2024
       description: Initial committee amendments; defined covered model thresholds (>10^26 FLOP or >$100M training cost)
@@ -673,22 +551,17 @@
       description: Senate Judiciary Committee amendments; narrowed hazardous capability definitions
       url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104795AMD
     - date: June 20, 2024
-      description: Added safe harbors and affirmative defenses for compliant developers; reduced liability from strict to
-        negligence standard
+      description: Added safe harbors and affirmative defenses for compliant developers; reduced liability from strict to negligence standard
       url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104792AMD
     - date: July 3, 2024
       description: Clarified compute cluster reporting requirements and fine-tuning thresholds
       url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104791AMD
     - date: August 19, 2024
-      description: 'Major overhaul after Assembly Appropriations hearing: removed Frontier Model Division (enforcement stays
-        with AG); removed all criminal penalties; changed legal standard from "reasonable assurance" to "reasonable
-        care"; narrowed pre-harm enforcement (AG only acts on actual harm or imminent threat); added fine-tuning safe
-        harbor (<$10M exempts fine-tuner); expanded Board of Frontier Models from 5 to 9 members'
+      description: 'Major overhaul after Assembly Appropriations hearing: removed Frontier Model Division (enforcement stays with AG); removed all criminal penalties; changed legal standard from "reasonable assurance" to "reasonable care"; narrowed pre-harm enforcement (AG only acts on actual harm or imminent threat); added fine-tuning safe harbor (<$10M exempts fine-tuner); expanded Board of Frontier Models from 5 to 9 members'
       author: Senator Wiener
       url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104790AMD
     - date: August 22, 2024
-      description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined
-        whistleblower protections
+      description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined whistleblower protections
       url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104789AMD
   customFields:
     - label: Introduced
@@ -746,10 +619,7 @@
       type: person
     - id: us-executive-order
       type: policy
-  description: SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California
-    state legislation that would have required safety testing and liability measures for developers of the most powerful
-    AI models. Passed the legislature with strong majorities (Senate 32-1, Assembly 48-16) but was vetoed by Governor
-    Newsom, who cited concerns about regulating based on model size rather than risk.
+  description: SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California state legislation that would have required safety testing and liability measures for developers of the most powerful AI models. Passed the legislature with strong majorities (Senate 32-1, Assembly 48-16) but was vetoed by Governor Newsom, who cited concerns about regulating based on model size rather than risk.
   tags:
     - regulation
     - state-policy
@@ -3660,9 +3530,7 @@
   title: Pause / Moratorium
   policyStatus: proposed
   scope: International
-  description: Proposals to pause or slow frontier AI development until safety is better understood, offering potentially
-    high safety benefits if implemented but facing significant coordination challenges and currently lacking adoption by
-    major AI laboratories.
+  description: Proposals to pause or slow frontier AI development until safety is better understood, offering potentially high safety benefits if implemented but facing significant coordination challenges and currently lacking adoption by major AI laboratories.
   tags:
     - moratorium
     - development-pause
@@ -3675,8 +3543,6 @@
   relatedEntries:
     - id: sid_d9sWZtyVwg
       type: organization
-    - id: sid_ZxUirlzHke
-      type: person
     - id: sid_SUZgWeZLNA
       type: risk
     - id: sid_Wa3RyF9Y9A
@@ -5793,38 +5659,33 @@
       category: Education
   stakeholders:
     - name: Michael Kratsios
+      role: Assistant to the President for Science and Technology
+      reason: Said the framework "will unleash American ingenuity to win the global AI race, delivering breakthroughs that create jobs, lower costs, and improve lives"
+      source: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
       entityId: sid_okZhiBvBoj
       position: support
       importance: high
-      role: Assistant to the President for Science and Technology
-      reason: Said the framework "will unleash American ingenuity to win the global AI race, delivering breakthroughs that
-        create jobs, lower costs, and improve lives"
-      source: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
     - name: Alliance for Secure AI
+      reason: CEO Brendan Steinhauser said the proposed regulations provide "no path to accountability" for harms caused by AI
       entityId: sid_ewHH8hqYZD
       position: oppose
       importance: medium
-      reason: CEO Brendan Steinhauser said the proposed regulations provide "no path to accountability" for harms caused by AI
     - name: Public First Action (Anthropic-backed)
+      reason: The organization said the plan echoes the lack of regulation in the social media industry and lacks substance
+      entityId: sid_NeUHBH9hGa
       position: oppose
       importance: medium
-      reason: Brad Carson said the plan echoes the lack of regulation in the social media industry and lacks substance
-      entityId: sid_NeUHBH9hGa
     - name: 50 Republican House Members
+      reason: Sent letter in March 2026 calling state regulation efforts important for holding tech industry accountable; opposed blanket federal preemption
       position: oppose
       importance: high
-      reason: Sent letter in March 2026 calling state regulation efforts important for holding tech industry accountable;
-        opposed blanket federal preemption
     - name: R Street Institute
-      position: support
-      importance: medium
       reason: Praised the pro-innovation, national-framework approach
       source: https://www.rstreet.org/commentary/white-house-ai-legislative-vision-stresses-need-for-a-pro-innovation-national-framework/
       entityId: sid_yfAYuNTKxQ
-  description: Legislative blueprint released March 20, 2026. Seven sections covering child safety, energy/infrastructure,
-    intellectual property, free speech, innovation, workforce, and federal preemption. Urges Congress to preempt state
-    AI laws and adopt "light-touch" regulatory approach. Leaves AI/copyright fair-use questions to courts. Not law
-    itself — a framework for congressional action.
+      position: support
+      importance: medium
+  description: Legislative blueprint released March 20, 2026. Seven sections covering child safety, energy/infrastructure, intellectual property, free speech, innovation, workforce, and federal preemption. Urges Congress to preempt state AI laws and adopt "light-touch" regulatory approach. Leaves AI/copyright fair-use questions to courts. Not law itself — a framework for congressional action.
   tags:
     - legislative-framework
     - federal-policy
@@ -6710,20 +6571,7 @@
   stableId: sid_RQVmYNQrbD
   type: approach
   title: AI Safety Policy Lobbying
-  description: "Direct engagement with legislators and executive branch officials to shape AI regulation and safety
-    policy. Spans the spectrum from EA-aligned catastrophic risk prevention to broader AI accountability advocacy. Key
-    organizations operate in two clusters. The AI safety / longtermist cluster includes Americans for Responsible
-    Innovation (bipartisan congressional lobbying, EA-funded), AI Policy Institute (public opinion polling + advocacy),
-    Center for AI Policy (shut down May 2025, \\$484K total lobbying spend), CAIS Action Fund (translating technical
-    safety research to policy), and IAPS (fellowship pipeline). The broader AI accountability cluster includes Access
-    Now (led 110+ org EU AI Act coalition), Encode Justice (youth-led advocacy to Congress/OSTP), and FLI (Pro-Human AI
-    Declaration with 150+ org coalition, EU AI Act advocacy). Lobbying effectiveness varies: direct congressional
-    engagement (ARI, CAIP) is high-touch but expensive per-contact; coalition lobbying (Access Now, FLI) scales better
-    internationally; public opinion campaigning (AIPI) builds political cover for legislators. The collapse of CAIP due
-    to funding suggests the field is underfunded relative to industry lobbying. Verified lobbying data (Senate LDA,
-    2025): all six pro-safety orgs with federal filings combined spent roughly \\$3.4M — less than Meta spends in a
-    single quarter (\\$26.3M total 2025). 774 organizations lobbied on AI in 2025, with 82% representing corporate
-    interests. ARI is the largest pro-safety AI lobbying spender at \\$2.1M/year."
+  description: "Direct engagement with legislators and executive branch officials to shape AI regulation and safety policy. Spans the spectrum from EA-aligned catastrophic risk prevention to broader AI accountability advocacy. Key organizations operate in two clusters. The AI safety / longtermist cluster includes CAIS Action Fund (translating technical safety research to policy), and IAPS (fellowship pipeline). The broader AI accountability cluster includes Access Now (led 110+ org EU AI Act coalition), Encode Justice (youth-led advocacy to Congress/OSTP), and FLI (Pro-Human AI Declaration with 150+ org coalition, EU AI Act advocacy). Lobbying effectiveness varies: direct congressional engagement is high-touch but expensive per-contact; coalition lobbying (Access Now, FLI) scales better internationally; public opinion campaigning builds political cover for legislators. Verified lobbying data (Senate LDA, 2025): all six pro-safety orgs with federal filings combined spent roughly \\$3.4M — less than Meta spends in a single quarter (\\$26.3M total 2025). 774 organizations lobbied on AI in 2025, with 82% representing corporate interests."
   tags:
     - lobbying
     - policy-advocacy
@@ -6733,15 +6581,6 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: sid_IFjdCevnFg
-      type: organization
-      relationship: related
-    - id: sid_w7mwNxGtCQ
-      type: organization
-      relationship: related
-    - id: sid_V3NJg9djng
-      type: organization
-      relationship: related
     - id: sid_0HsrqIftUg
       type: organization
       relationship: related

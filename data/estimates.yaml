@@ -342,22 +342,6 @@
       value: Tractable but hard
       date: "2023"
       notes: Solvable with sustained effort but not guaranteed
-- id: stuart-russell-s-risk-assessment
-  variable: Stuart Russell's Risk Assessment
-  category: risk
-  estimates:
-    - source: Existential risk
-      value: Significant
-      date: "2019"
-      notes: Comparable to nuclear war and climate change
-    - source: Timeline
-      value: Uncertain, potentially decades
-      date: "2021"
-      notes: Emphasizes uncertainty, warns against overconfidence
-    - source: Technical difficulty
-      value: Solvable but requires paradigm shift
-      date: "2019"
-      notes: Need to change how we build AI systems fundamentally
 - id: toby-ord-s-risk-assessment
   variable: Toby Ord's Risk Assessment
   category: risk

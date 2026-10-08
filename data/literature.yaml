@@ -22,13 +22,13 @@ categories:
         linkLabel: "MIRI Technical Report"
 
       - title: "Human Compatible: AI and the Problem of Control"
-        authors: ["Stuart Russell"]
+        authors: []
         year: 2019
         type: Book
         summary: "Argues that the standard AI objective of achieving fixed goals is fundamentally flawed. Proposes a new paradigm: AI systems that are uncertain about human preferences and defer to human guidance. Introduces concepts around value learning, assistance games, and corrigibility."
-        importance: "Reframes alignment as learning and remaining uncertain about human values, rather than maximizing fixed objectives. Influential among researchers working on cooperative inverse reinforcement learning and assistance."
-        link: "https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/"
-        linkLabel: "Penguin Books"
+        importance: Reframes alignment as learning and remaining uncertain about human values, rather than maximizing fixed objectives. Influential among researchers working on cooperative inverse reinforcement learning and assistance.
+        link: https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/
+        linkLabel: Penguin Books
 
   - id: technical-safety
     name: Technical Safety
@@ -112,14 +112,17 @@ categories:
         linkLabel: "arXiv:1805.00899"
 
       - title: "Scalable agent alignment via reward modeling: a research direction"
-        authors: ["Jan Leike", "David Krueger", "Tom Everitt", "et al."]
-        organization: "DeepMind"
+        authors:
+          - Jan Leike
+          - Tom Everitt
+          - et al.
+        organization: DeepMind
         year: 2018
         type: Paper
-        summary: "Influential research agenda laying out iterated amplification and reward modeling as a path to alignment. Proposes decomposing alignment into reward modeling, policy optimization, and safe exploration."
-        importance: "Shaped research agendas at DeepMind, OpenAI, and Anthropic. Provided a concrete roadmap connecting RLHF to scalable oversight."
-        link: "https://arxiv.org/abs/1811.07871"
-        linkLabel: "arXiv:1811.07871"
+        summary: Influential research agenda laying out iterated amplification and reward modeling as a path to alignment. Proposes decomposing alignment into reward modeling, policy optimization, and safe exploration.
+        importance: Shaped research agendas at DeepMind, OpenAI, and Anthropic. Provided a concrete roadmap connecting RLHF to scalable oversight.
+        link: https://arxiv.org/abs/1811.07871
+        linkLabel: arXiv:1811.07871
 
       - title: "Eliciting Latent Knowledge (ELK)"
         authors: ["Paul Christiano", "Mark Xu", "Ajeya Cotra"]
@@ -549,23 +552,26 @@ categories:
         linkLabel: "darioamodei.com"
 
       - title: "Artificial Intelligence: A Modern Approach"
-        authors: ["Stuart Russell", "Peter Norvig"]
+        authors:
+          - Peter Norvig
         year: 1995
         type: Textbook
-        summary: "The most widely used AI textbook worldwide, covering search, knowledge representation, planning, learning, perception, and more. Now in 4th edition (2020)."
-        importance: "Used in 1,500+ universities across 135 countries. The standard reference for AI education."
-        link: "https://aima.cs.berkeley.edu/"
-        linkLabel: "AIMA"
+        summary: The most widely used AI textbook worldwide, covering search, knowledge representation, planning, learning, perception, and more. Now in 4th edition (2020).
+        importance: Used in 1,500+ universities across 135 countries. The standard reference for AI education.
+        link: https://aima.cs.berkeley.edu/
+        linkLabel: AIMA
 
-      - title: "Research Priorities for Robust and Beneficial Artificial Intelligence"
-        authors: ["Stuart Russell", "Max Tegmark", "et al."]
-        organization: "Future of Life Institute"
+      - title: Research Priorities for Robust and Beneficial Artificial Intelligence
+        authors:
+          - Max Tegmark
+          - et al.
+        organization: Future of Life Institute
         year: 2015
         type: Open Letter
-        summary: "Open letter signed by thousands of AI researchers calling for expanded AI safety research alongside capability research."
-        importance: "Helped mainstream AI safety concerns. Demonstrated broad expert support for safety research. Catalyzed significant new funding for the field."
-        link: "https://futureoflife.org/data/documents/research_priorities.pdf"
-        linkLabel: "Future of Life Institute"
+        summary: Open letter signed by thousands of AI researchers calling for expanded AI safety research alongside capability research.
+        importance: Helped mainstream AI safety concerns. Demonstrated broad expert support for safety research. Catalyzed significant new funding for the field.
+        link: https://futureoflife.org/data/documents/research_priorities.pdf
+        linkLabel: Future of Life Institute
 
   - id: additional
     name: Additional Critical Papers

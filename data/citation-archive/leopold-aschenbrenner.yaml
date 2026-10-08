@@ -1,7 +1,7 @@
 pageId: leopold-aschenbrenner
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 69
-verified: 56
+verified: 53
 broken: 13
 unverifiable: 0
 citations:
@@ -293,14 +293,14 @@ citations:
     note: null
   - footnote: 29
     url: https://www.centeraipolicy.org/work/influential-safety-researcher-sounds-alarm-on-openais-failure-to-take-security-seriously
-    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure - Center for AI Policy
+    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure -
     claimContext: The firing occurred just before Aschenbrenner's equity cliff and amid broader turmoil at OpenAI. The Superalignment team dissolved shortly after, with both Jan Leike and Ilya Sutskever departing the company. Leike publicly stated he had been "sailing against the wind" and that safety concerns were n
     fetchedAt: 2026-02-22T01:57:29.862Z
     httpStatus: 200
-    pageTitle: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP
-    contentSnippet: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP CAIP Media CAIP Media Donate All Work Opinion Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously Jason Green-Lowe June 4, 2024 The Center for AI Policy applauds Leopold Aschenbrenner, a safety researcher at OpenAI who was allegedly fired for sounding the alarm about OpenAI’s failure to take security seriously. Aschenbrenner has j
+    pageTitle: null
+    contentSnippet: null
     contentLength: 38514
-    status: verified
+    status: pending
     note: null
   - footnote: 30
     url: https://situational-awareness.ai
@@ -733,25 +733,25 @@ citations:
     note: null
   - footnote: 71
     url: https://www.centeraipolicy.org/work/influential-safety-researcher-sounds-alarm-on-openais-failure-to-take-security-seriously
-    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure - Center for AI Policy
-    claimContext: The Center for AI Policy praised his evidence-based analysis and called for increased federal AI regulation and permanent funding for explainability research based on concerns he raised.[^71] His work has been featured in major media outlets and he has appeared on prominent podcasts including a 4.5-
+    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure -
+    claimContext: ""
     fetchedAt: 2026-02-22T01:57:44.278Z
     httpStatus: 200
-    pageTitle: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP
-    contentSnippet: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP CAIP Media CAIP Media Donate All Work Opinion Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously Jason Green-Lowe June 4, 2024 The Center for AI Policy applauds Leopold Aschenbrenner, a safety researcher at OpenAI who was allegedly fired for sounding the alarm about OpenAI’s failure to take security seriously. Aschenbrenner has j
+    pageTitle: null
+    contentSnippet: null
     contentLength: 38514
-    status: verified
+    status: pending
     note: null
   - footnote: 72
     url: https://fluidself.org/books/science/situational-awareness
     linkText: "Situational Awareness: The Decade Ahead - FluidSelf"
-    claimContext: The Center for AI Policy praised his evidence-based analysis and called for increased federal AI regulation and permanent funding for explainability research based on concerns he raised.[^71] His work has been featured in major media outlets and he has appeared on prominent podcasts including a 4.5-
+    claimContext: ""
     fetchedAt: 2026-02-22T01:57:44.156Z
     httpStatus: 200
     pageTitle: Situational Awareness - by Leopold Aschenbrenner
     contentSnippet: "Situational Awareness - by Leopold Aschenbrenner Situational Awareness - by Leopold Aschenbrenner From GPT-4 to AGI: Counting the OOMs AGI by 2027 is strikingly plausible. GPT-2 to GPT-4 took us from ~preschooler to ~smart high-schooler abilities in 4 years. Tracing trendlines in compute (~0.5 orders of magnitude or OOMs/year), algorithmic efficiencies (~0.5 OOMs/year), and “unhobbling” gains (from chatbot to agent), we should expect another preschooler-to-high-schooler-sized qualitative jump by"
     contentLength: 124373
-    status: verified
+    status: pending
     note: null
   - footnote: 73
     url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness

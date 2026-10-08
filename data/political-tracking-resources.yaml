@@ -305,17 +305,6 @@
     Directly focused on security implications of emerging tech. Closely
     aligned with EA concerns about AI governance.
 
-- id: center-ai-policy
-  title: Center for AI Policy (CAIP)
-  url: https://www.centeraipolicy.org
-  category: ai-policy
-  description: >-
-    AI safety policy development and advocacy. Produces congressional
-    engagement strategies focused on catastrophic AI risk.
-  free: true
-  hasApi: false
-  eaRelevance: very-high
-  eaNotes: Explicitly focused on AI catastrophic risk mitigation through policy. EA-aligned.
 
 - id: transparency-coalition-ai
   title: Transparency Coalition AI Legislation Tracker

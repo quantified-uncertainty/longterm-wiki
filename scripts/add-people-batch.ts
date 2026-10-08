@@ -274,15 +274,6 @@ const PEOPLE: PersonData[] = [
     description: "Fei-Fei Li is the Sequoia Professor of Computer Science at Stanford University and co-director of the Stanford Human-Centered AI Institute (HAI). She created ImageNet, the large-scale visual recognition dataset that catalyzed the deep learning revolution. She has been a leading voice on human-centered AI development and served as Google Cloud's Chief Scientist of AI/ML.",
   },
   {
-    slug: "david-krueger",
-    name: "David Krueger",
-    role: "Assistant Professor",
-    notableFor: "Cambridge professor researching AI alignment and safety; work on deceptive alignment and goal misgeneralization",
-    education: "PhD in Computer Science, University of Montreal",
-    website: "https://www.davidscottkrueger.com",
-    description: "David Krueger is an assistant professor at the University of Cambridge working on AI alignment and safety. His research focuses on understanding and mitigating risks from advanced AI, including work on goal misgeneralization, deceptive alignment, and the theoretical foundations of AI safety. He has been active in organizing AI safety research community events.",
-  },
-  {
     slug: "timnit-gebru",
     name: "Timnit Gebru",
     bornYear: 1983,

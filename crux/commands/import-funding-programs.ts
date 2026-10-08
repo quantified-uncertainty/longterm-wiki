@@ -379,7 +379,7 @@ const PROGRAMS: FundingProgramDef[] = [
     totalBudget: 6_500_000,
     status: "awarded",
     source: "https://futureoflife.org/grant-program/2015-grant-program/",
-    notes: "$6.5M distributed. Largest grant $1.5M to FHI (Nick Bostrom). Recipients included MIRI, UC Berkeley (Stuart Russell).",
+    notes: "$6.5M distributed. Largest grant $1.5M to FHI (Nick Bostrom). Recipients included MIRI, UC Berkeley.",
   },
   {
     idSeed: "prog|fli|2018-agi-safety",
