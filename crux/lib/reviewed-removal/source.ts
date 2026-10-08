@@ -70,6 +70,17 @@ export function checkFiles(root: string, changes: SourceChange[], rollback = fal
     if (actual !== expected) throw new Error('Source changed since review: ' + change.file);
   }
 }
+/** Recover interrupted file writes only when every file is on a reviewed side. */
+export function reconcileFiles(root: string, changes: SourceChange[], applied: boolean): void {
+  const pending: SourceChange[] = [];
+  for (const change of changes) {
+    const filename = safeFile(root, change.file);
+    const actual = fs.existsSync(filename) ? fs.readFileSync(filename, 'utf8') : null;
+    if (actual !== change.before && actual !== change.after) throw new Error('Source changed since review: ' + change.file);
+    if (actual !== (applied ? change.after : change.before)) pending.push(change);
+  }
+  writeFiles(root, pending, !applied);
+}
 export function writeFiles(root: string, changes: SourceChange[], rollback = false): void {
   checkFiles(root, changes, rollback);
   const written: SourceChange[] = [];

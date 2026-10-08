@@ -3,7 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { applyDatabase, checkDatabase, rollbackDatabase, type Receipt } from './database.ts';
-import { checkFiles, writeFiles } from './source.ts';
+import { checkFiles, writeFiles, reconcileFiles } from './source.ts';
 import { digest, validatePlan, type Plan } from './model.ts';
 import { commitWithRecovery } from './commit.ts';
 
@@ -58,9 +58,7 @@ try {
     if(saved.receipt.planDigest!==digest(plan))throw new Error('Receipt does not match this plan');
     if(command==='reconcile'){
       const actual=await state(saved.executionId),after=actual==='applied';
-      try{checkFiles(root,plan.files,after);}catch{
-        checkFiles(root,plan.files,!after);writeFiles(root,plan.files,!after);
-      }
+      reconcileFiles(root,plan.files,after);
       save({...saved,status:after?'committed':'rolled-back'});
       console.log(JSON.stringify({reconciled:true,databaseState:actual}));
     }else{

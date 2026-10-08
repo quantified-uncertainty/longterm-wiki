@@ -5,7 +5,7 @@ import path from 'node:path';
 import { canonical, digest, rowKey, tableOrder, validatePlan, type Plan, type Target } from './model.ts';
 import { createMatcher, resolveName } from './matcher.ts';
 import { createRedactor } from './redaction.ts';
-import { editRanges, editYaml, checkFiles, writeFiles } from './source.ts';
+import { editRanges, editYaml, checkFiles, writeFiles, reconcileFiles } from './source.ts';
 import { runCheck } from '../../validate/validate-reviewed-removal.ts';
 import {commitWithRecovery} from './commit.ts';
 import {discoverRecords} from './discovery.ts';
@@ -16,6 +16,20 @@ import {checkDatabase, rollbackDatabase} from './database.ts';
 const targets: Target[]=[{name:'Ada Example',type:'person',aliases:['Ada Example'],ids:['sid_example','ada-example'],contextAliases:['Example']},{name:'Example Institute',type:'organization',aliases:['Example Institute','EXI'],ids:['sid_institute']}];
 function fixture(): Plan { return {version:1,targets,reviewed:false,operations:[{table:'entities',key:{id:1},before:{id:1,name:'Ada Example'},after:null,targets:['Ada Example'],reason:'Delete profile'}],files:[],schema:[{table_name:'entities',column_name:'id',sql_type:'integer',not_null:true,generated:'',default_expression:null},{table_name:'entities',column_name:'name',sql_type:'text',not_null:true,generated:'',default_expression:null}],constraints:[],refreshViews:[]}; }
 describe('reviewed removal',()=>{
+  it('reconciles interrupted mixed file writes and rejects unrelated edits before changing any file',()=>{
+    const root=fs.mkdtempSync(path.join(os.tmpdir(),'removal-reconcile-'));
+    fs.mkdirSync(path.join(root,'data'));
+    const changes=['a','b'].map(name=>({file:'data/'+name+'.md',before:'before '+name,after:'after '+name,targets:['Ada Example']}));
+    try{
+      for(const change of changes)fs.writeFileSync(path.join(root,change.file),change.before);
+      writeFiles(root,[changes[0]]);reconcileFiles(root,changes,false);checkFiles(root,changes);
+      writeFiles(root,[changes[0]]);reconcileFiles(root,changes,true);checkFiles(root,changes,true);
+      fs.writeFileSync(path.join(root,changes[1].file),'unrelated edit');
+      expect(()=>reconcileFiles(root,changes,false)).toThrow('Source changed since review');
+      expect(fs.readFileSync(path.join(root,changes[0].file),'utf8')).toBe('after a');
+      expect(fs.readFileSync(path.join(root,changes[1].file),'utf8')).toBe('unrelated edit');
+    }finally{fs.rmSync(root,{recursive:true,force:true});}
+  });
   it('rejects foreign-key changes before considering reviewed deletions',async()=>{
     const plan=fixture();
     const tx={unsafe:async(query:string)=>{
