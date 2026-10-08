@@ -265,7 +265,7 @@ describe("parseOffice", () => {
     it("parses candidate in district primary", () => {
       const result = parseOffice(
         "Republican candidate in the TX-10 primary (2026). Anti-regulation stance on AI policy.",
-        "jake-gober",
+        "example-candidate",
       );
       expect(result).not.toBeNull();
       expect(result!.officeType).toBe("representative");

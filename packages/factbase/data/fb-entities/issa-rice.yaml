@@ -2,11 +2,7 @@ entity: sid_nuR3te3Rkw
 facts:
   - id: f_z6ueVAGyzQ
     property: description
-    value: Issa Rice is an independent researcher who has created valuable knowledge
-      infrastructure tools like Timelines Wiki and AI Watch for the EA and AI
-      safety communities, though his work focuses on data aggregation rather
-      than original research. His contributions are primarily utilitarian
-      reference mater
+    value: "Issa Rice is an independent researcher who created knowledge-infrastructure tools for the EA and AI safety communities, including Timelines Wiki, AI Watch and Org Watch."
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_iR6tN2pQ8v

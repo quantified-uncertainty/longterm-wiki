@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { scrubbedProxyResponse } from "@/lib/scrubbed-proxy-response";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
@@ -52,10 +53,7 @@ export async function GET(request: NextRequest) {
       signal: AbortSignal.timeout(15_000),
     });
 
-    return new NextResponse(res.body, {
-      status: res.status,
-      headers: { "content-type": res.headers.get("content-type") ?? "application/json" },
-    });
+    return await scrubbedProxyResponse(res);
   } catch (err) {
     return NextResponse.json(
       {
