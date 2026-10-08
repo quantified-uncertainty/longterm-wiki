@@ -1,8 +1,8 @@
 pageId: ea-global
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 74
 verified: 60
-broken: 14
+broken: 12
 unverifiable: 0
 citations:
   - footnote: 1
@@ -96,24 +96,24 @@ citations:
   - footnote: 9
     url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
     linkText: Effective Altruism Global - Wikipedia
-    claimContext: By 2015, EA Global had expanded to three major events across different continents. The largest of these took place at Google's Mountain View campus and featured prominent speakers including <EntityLink id="elon-musk">Elon Musk</EntityLink>, Stuart J. Russell, and William MacAskill.[^9] These early c
+    claimContext: ""
     fetchedAt: 2026-02-22T01:53:20.433Z
     httpStatus: 403
     pageTitle: null
     contentSnippet: null
     contentLength: 0
-    status: broken
+    status: pending
     note: HTTP 403
   - footnote: 10
     url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
     linkText: Effective Altruism Global - Wikipedia
-    claimContext: By 2015, EA Global had expanded to three major events across different continents. The largest of these took place at Google's Mountain View campus and featured prominent speakers including <EntityLink id="elon-musk">Elon Musk</EntityLink>, Stuart J. Russell, and William MacAskill.[^9] These early c
+    claimContext: ""
     fetchedAt: 2026-02-22T01:53:20.434Z
     httpStatus: 403
     pageTitle: null
     contentSnippet: null
     contentLength: 0
-    status: broken
+    status: pending
     note: HTTP 403
   - footnote: 11
     url: https://en.wikipedia.org/wiki/Effective_Altruism_Global

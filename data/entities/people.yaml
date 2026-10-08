@@ -409,19 +409,6 @@
       value: Co-founder & Chief AGI Scientist
     - label: Known For
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
-- id: stuart-russell
-  stableId: sid_ZxUirlzHke
-  wikiId: E290
-  type: person
-  title: Stuart Russell
-  aliases:
-    - Stuart J. Russell
-  website: https://people.eecs.berkeley.edu/~russell/
-  relatedEntries:
-    - id: sid_zMfgJqiEPQ
-      type: organization
-    - id: sid_aE60G9uLyA
-      type: risk
 - id: toby-ord
   stableId: sid_8nmqy7vFiA
   wikiId: E355
@@ -1037,19 +1024,6 @@
       value: Professor and Co-Director, Stanford HAI
   tags:
     - ai
-- id: david-krueger
-  stableId: sid_ATFBoSnuqA
-  wikiId: E1304
-  type: person
-  title: David Krueger
-  description: |
-    David Krueger is an assistant professor at the University of Cambridge working on AI alignment and safety. His research focuses on understanding and mitigating risks from advanced AI, including work on goal misgeneralization, deceptive alignment, and the theoretical foundations of AI safety. He has been active in organizing AI safety research community events.
-  website: https://www.davidscottkrueger.com
-  customFields:
-    - label: Role
-      value: Assistant Professor
-  tags:
-    - ai
 - id: timnit-gebru
   stableId: sid_xVdjAKxCSQ
   wikiId: E1305
@@ -1093,7 +1067,7 @@
   stableId: sid_0tQftJKP4Q
   type: person
   title: Ben Goldhaber
-  description: 'Projects Lead at the Future of Life Foundation since early 2025, focused on incubating teams working on differentially beneficial technology. Former Director of FAR.Labs (mid-2023 to early 2025). Board member of QURI. Prior roles at Google, Cadmea, Hash, and Ought. Directed the inaugural AI for Human Reasoning Fellowship (30 fellows, Summer 2025). Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025) with Oliver Sourbut, proposing three-layer epistemic infrastructure: Ingestion Layer (cryptographic provenance), Structure Layer (inference and discourse mapping), and Assessment Layer (customizable credence computation). Led the technical roadmapping workshop that produced "Towards Guaranteed Safe AI" (arXiv:2405.06624, co-authored with Yoshua Bengio, Stuart Russell, Max Tegmark, and 13 others). Writes the "Gold Takes" Substack newsletter. Focus areas include AI-assisted provably secure software, AI-enhanced forecasting and sensemaking, and positive future visions through coordination mechanisms he calls "hyper-entities."'
+  description: 'Projects Lead at the Future of Life Foundation since early 2025, focused on incubating teams working on differentially beneficial technology. Former Director of FAR.Labs (mid-2023 to early 2025). Board member of QURI. Prior roles at Google, Cadmea, Hash, and Ought. Directed the inaugural AI for Human Reasoning Fellowship (30 fellows, Summer 2025). Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025) with Oliver Sourbut, proposing three-layer epistemic infrastructure: Ingestion Layer (cryptographic provenance), Structure Layer (inference and discourse mapping), and Assessment Layer (customizable credence computation). Led the technical roadmapping workshop that produced "Towards Guaranteed Safe AI" (arXiv:2405.06624, co-authored with Yoshua Bengio, Max Tegmark, and 13 others). Writes the "Gold Takes" Substack newsletter. Focus areas include AI-assisted provably secure software, AI-enhanced forecasting and sensemaking, and positive future visions through coordination mechanisms he calls "hyper-entities."'
   tags:
     - epistemic-tools
     - beneficial-ai
@@ -1273,7 +1247,7 @@
   stableId: sid_0bmt4zJZVg
   type: person
   title: Mark Nitzberg
-  description: Executive Director of the Center for Human-Compatible AI (CHAI) at UC Berkeley. Oversees CHAI's operations under the direction of founder Stuart Russell. CHAI is the leading academic research center for human-compatible AI, developing frameworks for AI systems that remain beneficial and deferential to humans.
+  description: Executive Director of the Center for Human-Compatible AI (CHAI) at UC Berkeley. Oversees CHAI's operations. CHAI is the leading academic research center for human-compatible AI, developing frameworks for AI systems that remain beneficial and deferential to humans.
   customFields:
     - label: Role
       value: Executive Director
@@ -1749,7 +1723,7 @@
     - id: sid_MEt9F7f50w
       type: approach
       relationship: leads-to
-  description: David "davidad" Dalrymple is a Programme Director at the UK's Advanced Research + Invention Agency (ARIA), where he leads the GBP 59 million Safeguarded AI programme aiming to develop AI systems with mathematical safety guarantees through formal verification. The youngest-ever MIT graduate degree recipient at age 16, he previously co-invented Filecoin and worked at Protocol Labs. Lead author of "Towards Guaranteed Safe AI" (2024) with co-authors including Yoshua Bengio, Stuart Russell, Max Tegmark, and Sanjit Seshia, proposing a framework of world models, safety specifications, and verifiers for provably safe AI systems.
+  description: David "davidad" Dalrymple is a Programme Director at the UK's Advanced Research + Invention Agency (ARIA), where he leads the GBP 59 million Safeguarded AI programme aiming to develop AI systems with mathematical safety guarantees through formal verification. The youngest-ever MIT graduate degree recipient at age 16, he previously co-invented Filecoin and worked at Protocol Labs. Lead author of "Towards Guaranteed Safe AI" (2024) with co-authors including Yoshua Bengio, Max Tegmark, and Sanjit Seshia, proposing a framework of world models, safety specifications, and verifiers for provably safe AI systems.
   customFields:
     - label: Role
       value: Programme Director, ARIA Safeguarded AI
@@ -2145,14 +2119,6 @@
   tags:
     - ai-research
     - ai-ethics
-- id: scott-aaronson
-  stableId: sid_ePBtKVxUkn
-  type: person
-  title: Scott Aaronson
-  description: Professor of Computer Science at UT Austin. Quantum computing and computational complexity expert. Spent a sabbatical at OpenAI working on AI safety and watermarking. Author of 'Shtetl-Optimized' blog.
-  tags:
-    - ai-safety
-    - computational-complexity
 - id: jason-wei
   stableId: sid_E4Al7y4BJF
   type: person
@@ -2905,12 +2871,6 @@
   type: person
   title: Giuliana Rotola
   description: Space studies and space law researcher. Foresight Fellow (2020).
-  relatedEntries: []
-- id: jeffrey-ladish
-  stableId: sid_HZSUA7YGIw
-  type: person
-  title: Jeffrey Ladish
-  description: Biosecurity researcher and advocate. Foresight Fellow (2020). Works on reducing catastrophic biological risks.
   relatedEntries: []
 - id: tessa-alexanian
   stableId: sid_NRW6ZB83dF
@@ -4107,15 +4067,6 @@
   tags:
     - ai-governance
     - responsible-ai
-  lastUpdated: 2026-03
-- id: yolanda-lannquist
-  stableId: sid_0ckUtuwpkw
-  type: person
-  title: Yolanda Lannquist
-  description: Head of AI policy at The Future Society. Works on international AI governance and emerging technology policy. Previously advised governments and international organizations on AI regulation.
-  tags:
-    - ai-governance
-    - international-policy
   lastUpdated: 2026-03
 - id: arthur-mensch
   stableId: sid_y6wrSRiJx8
@@ -6645,43 +6596,6 @@
   tags:
     - ai-governance
     - ai-ethics
-- id: daniel-colson
-  stableId: sid_k7Xw6otC8a
-  type: person
-  title: Daniel Colson
-  relatedEntries:
-    - id: sid_w7mwNxGtCQ
-      type: organization
-      relationship: leads-to
-  description: Co-founder and Executive Director of the AI Policy Institute (AIPI). Also founder and Executive Director of the AI Policy Network (AIPN). Researches implications of AI R&D automation and advocates for government policies to mitigate extreme risks from frontier AI.
-  customFields:
-    - label: Role
-      value: Co-founder and Executive Director
-    - label: Organization
-      value: AI Policy Institute
-  tags:
-    - ai-governance
-    - ai-policy
-- id: brad-carson
-  stableId: sid_PQYAd3EcSQ
-  type: person
-  title: Brad Carson
-  relatedEntries:
-    - id: sid_IFjdCevnFg
-      type: organization
-      relationship: leads-to
-    - id: sid_NeUHBH9hGa
-      type: organization
-      relationship: leads-to
-  description: Co-founder and President of Americans for Responsible Innovation (ARI). Co-founder of Public First Action (2025), a bipartisan AI-safety 501(c)(4) network supporting pro-regulation candidates in the 2026 U.S. elections. Former U.S. Congressman (OK-2, 2001-2005). Former Under Secretary of the Army and Acting Under Secretary of Defense for Personnel and Readiness. Former President of the University of Tulsa.
-  customFields:
-    - label: Role
-      value: Co-founder and President
-    - label: Organization
-      value: Americans for Responsible Innovation
-  tags:
-    - ai-governance
-    - ai-policy
 - id: chris-stewart
   stableId: sid_TkeOMpAV5w
   type: person
@@ -6696,49 +6610,6 @@
       value: Co-founder
     - label: Organization
       value: Public First Action
-  tags:
-    - ai-governance
-    - ai-policy
-- id: eric-gastfriend
-  stableId: sid_4dwqcYO3sZ
-  type: person
-  title: Eric Gastfriend
-  relatedEntries:
-    - id: sid_IFjdCevnFg
-      type: organization
-      relationship: leads-to
-  description: Co-founder and Executive Director of Americans for Responsible Innovation (ARI). Previously CEO and President of DynamiCare Health, a digital health startup. Focuses on building bipartisan support for AI safety legislation in Congress.
-  customFields:
-    - label: Role
-      value: Co-founder and Executive Director
-    - label: Organization
-      value: Americans for Responsible Innovation
-  tags:
-    - ai-governance
-    - ai-policy
-- id: doug-calidas
-  stableId: sid_kHKTVjWRe7
-  type: person
-  title: Doug Calidas
-  description: Senior Vice President of Government Affairs at Americans for Responsible Innovation (ARI). Former Chief of Staff to Senator Amy Klobuchar and former Chief Counsel to Senator Joe Manchin.
-  customFields:
-    - label: Role
-      value: SVP of Government Affairs
-    - label: Organization
-      value: Americans for Responsible Innovation
-  tags:
-    - ai-governance
-    - ai-policy
-- id: justin-bullock
-  stableId: sid_vlCND0FtTw
-  type: person
-  title: Justin Bullock
-  description: Vice President of Policy at Americans for Responsible Innovation (ARI). Non-resident Senior Fellow at the Global Governance Institute. Lecturer at Texas A&M University.
-  customFields:
-    - label: Role
-      value: VP of Policy
-    - label: Organization
-      value: Americans for Responsible Innovation
   tags:
     - ai-governance
     - ai-policy
@@ -6773,23 +6644,6 @@
   tags:
     - ai-governance
     - democracy
-- id: jason-green-lowe
-  stableId: sid_zvMaj29XJk
-  type: person
-  title: Jason Green-Lowe
-  relatedEntries:
-    - id: sid_V3NJg9djng
-      type: organization
-      relationship: leads-to
-  description: Executive Director of the Center for AI Policy (CAIP). Led CAIP's bipartisan congressional lobbying efforts on AI safety legislation from June 2023 until the organization ceased most operations around May 2025 due to funding constraints.
-  customFields:
-    - label: Role
-      value: Executive Director
-    - label: Organization
-      value: Center for AI Policy
-  tags:
-    - ai-governance
-    - ai-policy
 - id: ian-bassin
   stableId: sid_8uwYGwtLY2
   type: person
@@ -7866,26 +7720,6 @@
   type: person
   title: Joep Meindertsma
   description: Founder of PauseAI.
-- id: nicolas-miailhe
-  stableId: sid_znc8lhHNf9
-  type: person
-  title: Nicolas Miailhe
-  description: Co-founder of The Future Society.
-- id: simon-mueller
-  stableId: sid_Y6Ge9jQiet
-  type: person
-  title: Simon Mueller
-  description: Co-founder of The Future Society.
-- id: ionuts-lacusta
-  stableId: sid_UXgAQQLWOQ
-  type: person
-  title: Ionuts Lacusta
-  description: Co-founder of The Future Society.
-- id: hugo-zylberberg
-  stableId: sid_AYpMv9sXg3
-  type: person
-  title: Hugo Zylberberg
-  description: Co-founder of The Future Society.
 
 # QUA-836 — backfill missing scorecard publisher entity
 - id: zach-stein-perlman

@@ -398,7 +398,7 @@ function cleanName(name: string): string {
 
 /**
  * Check if two names are equivalent: all words in name A appear in name B
- * (case-insensitive, handles middle initials like "Stuart J. Russell").
+ * (case-insensitive, handles middle initials like "Ada J. Example").
  */
 function namesMatch(nameA: string, nameB: string): boolean {
   const wordsA = cleanName(nameA).toLowerCase().replace(/[.]/g, '').split(/\s+/).filter(Boolean);

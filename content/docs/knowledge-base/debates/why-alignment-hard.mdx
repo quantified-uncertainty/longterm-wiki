@@ -191,7 +191,7 @@ If optimization pressure is strong enough, nearly any value specification may be
 
 ### 1.5 Unintended Constraints
 
-**<EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink>'s wrong goal argument** (from <R id="sid_qc9xtlRwj2">Human Compatible</R>, 2019):
+**The wrong goal argument** (from <R id="sid_qc9xtlRwj2">Human Compatible</R>, 2019):
 
 Every simple goal statement has potential failure modes:
 
@@ -200,7 +200,7 @@ Every simple goal statement has potential failure modes:
 - "Maximize paperclips" → Destroy everything for paperclips
 - "Follow human instructions" → Susceptible to manipulation, conflicting instructions
 
-As Russell puts it: "If machines are more intelligent than humans, then giving them the wrong objective would basically be setting up a kind of a chess match between humanity and a machine that has an objective that's across purposes with our own."
+
 
 **Each needs implicit constraints**:
 - Don't harm humans
@@ -208,7 +208,7 @@ As Russell puts it: "If machines are more intelligent than humans, then giving t
 - Use common sense about side effects
 - But these constraints need specification too (potential infinite regress)
 
-Russell proposes three principles for beneficial AI: (1) the machine's only objective is to maximize the realization of human preferences, (2) the machine is initially uncertain about what those preferences are, and (3) the ultimate source of information about human preferences is human behavior. However, implementing these principles faces its own challenges—inverse reinforcement learning from behavior still underdetermines values, and the preference-learning limitations described in §1.2 apply here as well.
+Human Compatible proposes three principles for beneficial AI: (1) the machine's only objective is to maximize the realization of human preferences, (2) the machine is initially uncertain about what those preferences are, and (3) the ultimate source of information about human preferences is human behavior. However, implementing these principles faces its own challenges—inverse reinforcement learning from behavior still underdetermines values, and the preference-learning limitations described in §1.2 apply here as well.
 
 **Key insight**: Specifying terminal goals may not be sufficient. One may need to specify all the constraints, contexts, and exceptions—something close to the entire human value function.
 
@@ -899,7 +899,7 @@ These policy positions reflect both technical assessments and values about risk 
 
 ### Foundational Works
 
-- **<EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink>** (2019): <R id="sid_qc9xtlRwj2">Human Compatible: Artificial Intelligence and the Problem of Control</R> — Foundational argument for why specifying objectives is fundamentally problematic
+- <R id="sid_qc9xtlRwj2">Human Compatible: Artificial Intelligence and the Problem of Control</R> — Foundational argument for why specifying objectives is fundamentally problematic
 - **Yudkowsky & Soares** (2025): <R id="sid_OoHytVfIW8">If Anyone Builds It, Everyone Dies: Why Superhuman AI Would Kill Us All</R> — Extended statement of the pessimistic case for alignment difficulty
 
 ### Specification and Reward Learning

@@ -24,7 +24,6 @@ const NORMALIZATION_MAP = {
   // Space-to-hyphen (trivial)
   "far ai": "far-ai",
   "redwood research": "redwood-research",
-  "stuart russell": "stuart-russell",
   "paul christiano": "paul-christiano",
   "open philanthropy": "open-philanthropy",
   "coefficient giving": "coefficient-giving",
@@ -54,7 +53,6 @@ const NORMALIZATION_MAP = {
   "google deepmind": "deepmind",
   "future of life institute": "fli",
   "future-of-life-institute": "fli",
-  "russell": "stuart-russell",
   "manifold markets": "manifold",
   "metaculus aggregate": "metaculus",
   "kwa/metr": "metr",

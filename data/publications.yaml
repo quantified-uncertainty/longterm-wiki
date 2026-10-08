@@ -779,13 +779,6 @@
   peer_reviewed: false
   description: AI-related bills across all 50 states (1500+ bills tracked)
 
-- id: center-ai-policy
-  domains: [centeraipolicy.org]
-  name: Center for AI Policy
-  type: civic_data
-  credibility: 3
-  peer_reviewed: false
-  description: AI safety policy advocacy focused on catastrophic risk mitigation
 
 - id: ontheissues
   domains: [ontheissues.org]

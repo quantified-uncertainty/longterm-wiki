@@ -186,12 +186,12 @@ facts:
 
   - id: f_PWTfxjV4X6
     property: campaign
-    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Stuart Russell, Elon Musk, and Demis Hassabis."
+    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Elon Musk and Demis Hassabis."
     asOf: 2017-01
     source: https://futureoflife.org/open-letter/ai-principles/
 
   - id: f_ewg1hQG7EQ
     property: campaign
-    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve Wozniak, Elon Musk."
+    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Steve Wozniak, Elon Musk."
     asOf: 2023-03
     source: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
