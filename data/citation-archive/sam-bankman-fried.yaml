@@ -1,7 +1,7 @@
 pageId: sam-bankman-fried
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 30
-verified: 28
+verified: 25
 broken: 2
 unverifiable: 0
 citations:
@@ -62,14 +62,14 @@ citations:
     note: null
   - footnote: 6
     url: https://scottaaronson.blog/?p=7605
-    linkText: Scott Aaronson Blog - SBF Trial Coverage
+    linkText: Blog - SBF Trial Coverage
     claimContext: (footnote definition only, no inline reference found)
     fetchedAt: 2026-02-22T02:18:13.968Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentSnippet: null
     contentLength: 215748
-    status: verified
+    status: pending
     note: null
   - footnote: 7
     url: https://www.dwarkesh.com/p/sbf
@@ -183,14 +183,14 @@ citations:
     note: null
   - footnote: 17
     url: https://scottaaronson.blog/?p=7605
-    linkText: Scott Aaronson Blog - SBF Trial
+    linkText: Blog - SBF Trial
     claimContext: Bankman-Fried was arrested in the Bahamas in December 2022 and extradited to the United States. His trial began in October 2023 in the Southern District of New York before Judge Lewis Kaplan. Key witnesses against him included Caroline Ellison, former CEO of Alameda Research, and Adam Yedidia, a for
     fetchedAt: 2026-02-22T02:18:17.601Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentSnippet: null
     contentLength: 215749
-    status: verified
+    status: pending
     note: null
   - footnote: 18
     url: https://abcnews.go.com/alerts/SamBankmanFried
@@ -249,14 +249,14 @@ citations:
     note: null
   - footnote: 23
     url: https://scottaaronson.blog/?p=7605
-    linkText: Scott Aaronson Blog - SBF Analysis
+    linkText: Blog - SBF Analysis
     claimContext: Several critics have argued that the specific philosophical framework Bankman-Fried embraced — EA-influenced expected-value maximization with linear (rather than logarithmic) utility for money — provided both the motivation and the self-justification for his risk-taking. Under such reasoning, a suff
     fetchedAt: 2026-02-22T02:18:20.538Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentSnippet: null
     contentLength: 215748
-    status: verified
+    status: pending
     note: null
   - footnote: 24
     url: https://ethicsunwrapped.utexas.edu/crypto-ethics-ftx-and-sam-bankman-fried/

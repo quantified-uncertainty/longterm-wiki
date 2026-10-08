@@ -29,10 +29,7 @@ facts:
 
   - id: f_oA6a0dspU9
     property: program-note
-    value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond on
-      AI and institutions, Jennifer Pahlka on AI in government). Policy
-      departments: Climate, Criminal Justice, Immigration, Social Policy, State
-      Capacity, Government Affairs, Legal."
+    value: "AI policy addressed ad hoc through individual fellows (Jennifer Pahlka on AI in government). Policy departments: Climate, Criminal Justice, Immigration, Social Policy, State Capacity, Government Affairs, Legal."
     asOf: 2026-03
     source: https://www.niskanencenter.org/leadership-and-staff/
 

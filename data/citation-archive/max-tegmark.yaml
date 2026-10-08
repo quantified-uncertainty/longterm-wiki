@@ -1,8 +1,8 @@
 pageId: max-tegmark
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 67
-verified: 49
-broken: 18
+verified: 43
+broken: 17
 unverifiable: 0
 citations:
   - footnote: 1
@@ -62,14 +62,14 @@ citations:
     note: HTTP 403
   - footnote: 7
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    linkText: "- Review of Our Mathematical Universe"
     claimContext: Beyond AI safety, Tegmark is known for his controversial Mathematical Universe Hypothesis, which proposes that physical reality is fundamentally mathematical rather than merely described by mathematics. While this has attracted criticism from fellow scientists who characterize it as "science fiction
     fetchedAt: 2026-02-22T01:58:26.139Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417939
-    status: verified
+    status: pending
     note: null
   - footnote: 8
     url: https://logicism.fandom.com/wiki/Max_Tegmark
@@ -359,14 +359,14 @@ citations:
     note: null
   - footnote: 38
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    linkText: "- Review of Our Mathematical Universe"
     claimContext: "Tegmark proposed in 2007 that physical reality is not merely described by mathematics but *is* a mathematical structure—a position he acknowledges puts him on the \"most radical fringe\" of mathematical universe views.[^37] Under this hypothesis, our universe's mathematical regularities exist because "
     fetchedAt: 2026-02-22T01:58:35.281Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417939
-    status: verified
+    status: pending
     note: null
   - footnote: 39
     url: https://www.vice.com/en/article/the-mathematical-reality-of-reality-an-interview-with-cosmologist-max-tegmark/
@@ -381,47 +381,47 @@ citations:
     note: null
   - footnote: 40
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    linkText: "- Review of Our Mathematical Universe"
     claimContext: "Tegmark argues this view is optimistic for physics: if true, it predicts continued discoveries without fundamental roadblocks, whereas if false, physics faces potential dead ends.[^39] He defends the multiverse framework by tying different levels to falsifiable theories: Level II multiverses to infl"
     fetchedAt: 2026-02-22T01:58:35.220Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417938
-    status: verified
+    status: pending
     note: null
   - footnote: 41
     url: https://en.wikipedia.org/wiki/Max_Tegmark
     linkText: Max Tegmark - Wikipedia
-    claimContext: The Mathematical Universe Hypothesis has faced substantial criticism from the scientific community. Mathematician Edward Frenkel characterized it as "science fiction and mysticism" rather than science.[^41] Computer scientist Scott Aaronson argued in his review of Tegmark's book *Our Mathematical Un
+    claimContext: ""
     fetchedAt: 2026-02-22T01:58:37.171Z
     httpStatus: 403
     pageTitle: null
     contentSnippet: null
     contentLength: 0
-    status: broken
+    status: pending
     note: HTTP 403
   - footnote: 42
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
-    claimContext: The Mathematical Universe Hypothesis has faced substantial criticism from the scientific community. Mathematician Edward Frenkel characterized it as "science fiction and mysticism" rather than science.[^41] Computer scientist Scott Aaronson argued in his review of Tegmark's book *Our Mathematical Un
+    linkText: "- Review of Our Mathematical Universe"
+    claimContext: ""
     fetchedAt: 2026-02-22T01:58:37.671Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417939
-    status: verified
+    status: pending
     note: null
   - footnote: 43
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    linkText: "- Review of Our Mathematical Universe"
     claimContext: Critics have also pointed to what they see as internal contradictions. Aaronson noted "cognitive dissonance" in Tegmark's acceptance of cosmic inflation producing a Level I multiverse as more than speculation while treating the broader multiverse concept skeptically.[^43] A 2017 physics blog post ac
     fetchedAt: 2026-02-22T01:58:37.590Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417938
-    status: verified
+    status: pending
     note: null
   - footnote: 44
     url: https://poetryinphysics.wordpress.com/2017/12/14/disagreeing-with-our-mathematical-universe/
@@ -700,14 +700,14 @@ citations:
     note: fetch failed
   - footnote: 69
     url: https://scottaaronson.blog/?p=1753
-    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    linkText: "- Review of Our Mathematical Universe"
     claimContext: "**Mathematical Universe Hypothesis Testability**: The fundamental question of whether Tegmark's hypothesis is genuinely scientific or unfalsifiable remains contested. His framework allows him to accommodate both simple and complex physics laws, raising questions about what empirical observations cou"
     fetchedAt: 2026-02-22T01:58:47.398Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentSnippet: null
     contentLength: 417938
-    status: verified
+    status: pending
     note: null
   - footnote: 70
     url: https://futureoflife.org/ai-safety-index-summer-2025/

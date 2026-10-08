@@ -1,7 +1,7 @@
 pageId: lighthaven
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 35
-verified: 31
+verified: 30
 broken: 4
 unverifiable: 0
 citations:
@@ -381,12 +381,12 @@ citations:
     note: null
   - footnote: 35
     url: https://scottaaronson.blog/?p=8908
-    linkText: Scott Aaronson Blog Post
+    linkText: Blog Post
     claimContext: The venue's complex layout—while praised for facilitating serendipitous encounters—can also present navigation challenges for first-time attendees, described by some as "a bewildering maze of passageways, meeting-rooms, sleeping quarters, gardens, and vines."[^35]
     fetchedAt: 2026-02-22T02:16:10.663Z
     httpStatus: 200
     pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; Guess I&#8217;m A Rationalist Now
-    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; Guess I&#8217;m A Rationalist Now Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; &#8220;If Anyone Builds It, Everyone Dies&#8221; Trump and Iran, by popular request &raquo; Guess I&#8217;m A Rationalist Now A week ago I attended Le"
+    contentSnippet: null
     contentLength: 121092
-    status: verified
+    status: pending
     note: null

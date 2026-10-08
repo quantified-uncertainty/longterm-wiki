@@ -1052,11 +1052,6 @@
   links:
     eaForum: https://forum.effectivealtruism.org/topics/great-power-conflict
     eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
-- pageId: stuart-russell
-  links:
-    wikipedia: https://en.wikipedia.org/wiki/Stuart_J._Russell
-    wikidata: https://www.wikidata.org/wiki/Q7627055
-    grokipedia: https://grokipedia.com/page/Stuart_J._Russell
 - pageId: suffering-lock-in
   links:
     eaForum: https://forum.effectivealtruism.org/topics/s-risk

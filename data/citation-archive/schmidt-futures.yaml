@@ -1,7 +1,7 @@
 pageId: schmidt-futures
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 86
-verified: 73
+verified: 68
 broken: 13
 unverifiable: 0
 citations:
@@ -140,24 +140,24 @@ citations:
   - footnote: 13
     url: https://humancompatible.ai/news/2022/02/17/schmidt-futures-launches-ai2050-to-protect-our-human-future-in-the-age-of-artificial-intelligence%EF%BF%BC/
     linkText: Human Compatible AI - AI2050 Launch
-    claimContext: The year 2022 saw the launch of AI2050, a \$125 million program over five years focused on solving AI "hard problems" including safety and alignment.[^13] Inaugural fellows included prominent AI safety researcher Stuart Russell, who works on probabilistic programming for AI interpretability, provabl
+    claimContext: ""
     fetchedAt: 2026-02-22T01:49:44.669Z
     httpStatus: 200
     pageTitle: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence
-    contentSnippet: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence Stuart Russell has joined the inaugural cohort of AI2050 fellows, which has been tasked with solving the hard problems of AI. Eric and Wendy Schmidt have committed $125 Million in funding to the initiative over the next five years. Professor Russell’s work is focused on probabilistic programming with a goal of improving AI’s interpretabili
+    contentSnippet: null
     contentLength: 24435
-    status: verified
+    status: pending
     note: null
   - footnote: 14
     url: https://humancompatible.ai/news/2022/02/17/schmidt-futures-launches-ai2050-to-protect-our-human-future-in-the-age-of-artificial-intelligence%EF%BF%BC/
     linkText: Human Compatible AI - AI2050 Launch
-    claimContext: The year 2022 saw the launch of AI2050, a \$125 million program over five years focused on solving AI "hard problems" including safety and alignment.[^13] Inaugural fellows included prominent AI safety researcher Stuart Russell, who works on probabilistic programming for AI interpretability, provabl
+    claimContext: ""
     fetchedAt: 2026-02-22T01:49:44.636Z
     httpStatus: 200
     pageTitle: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence
-    contentSnippet: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence Stuart Russell has joined the inaugural cohort of AI2050 fellows, which has been tasked with solving the hard problems of AI. Eric and Wendy Schmidt have committed $125 Million in funding to the initiative over the next five years. Professor Russell’s work is focused on probabilistic programming with a goal of improving AI’s interpretabili
+    contentSnippet: null
     contentLength: 24435
-    status: verified
+    status: pending
     note: null
   - footnote: 15
     url: https://opengrants.io/schmidt-futures/
@@ -518,9 +518,9 @@ citations:
     fetchedAt: 2026-02-22T01:50:00.544Z
     httpStatus: 200
     pageTitle: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence
-    contentSnippet: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence Stuart Russell has joined the inaugural cohort of AI2050 fellows, which has been tasked with solving the hard problems of AI. Eric and Wendy Schmidt have committed $125 Million in funding to the initiative over the next five years. Professor Russell’s work is focused on probabilistic programming with a goal of improving AI’s interpretabili
+    contentSnippet: null
     contentLength: 24435
-    status: verified
+    status: pending
     note: null
   - footnote: 48
     url: https://ai2050.schmidtsciences.org
@@ -536,24 +536,24 @@ citations:
   - footnote: 49
     url: https://humancompatible.ai/news/2022/02/17/schmidt-futures-launches-ai2050-to-protect-our-human-future-in-the-age-of-artificial-intelligence%EF%BF%BC/
     linkText: Human Compatible AI - AI2050 Launch
-    claimContext: Inaugural fellows included Stuart Russell of UC Berkeley, a prominent AI safety researcher working on probabilistic programming for AI interpretability and provable safety.[^49] The 2024 cohort included five MIT faculty and two alumni focusing on various aspects of beneficial AI development.[^50]
+    claimContext: ""
     fetchedAt: 2026-02-22T01:50:00.721Z
     httpStatus: 200
     pageTitle: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence
-    contentSnippet: Schmidt Futures Launches AI2050 to Protect Our Human Future in the Age of Artificial Intelligence￼ &#8211; Center for Human-Compatible Artificial Intelligence Stuart Russell has joined the inaugural cohort of AI2050 fellows, which has been tasked with solving the hard problems of AI. Eric and Wendy Schmidt have committed $125 Million in funding to the initiative over the next five years. Professor Russell’s work is focused on probabilistic programming with a goal of improving AI’s interpretabili
+    contentSnippet: null
     contentLength: 24435
-    status: verified
+    status: pending
     note: null
   - footnote: 50
     url: https://imes.mit.edu/news-events/mit-affiliates-named-2024-schmidt-futures-ai2050-fellows-0
     linkText: MIT IMES - 2024 AI2050 Fellows
-    claimContext: Inaugural fellows included Stuart Russell of UC Berkeley, a prominent AI safety researcher working on probabilistic programming for AI interpretability and provable safety.[^49] The 2024 cohort included five MIT faculty and two alumni focusing on various aspects of beneficial AI development.[^50]
+    claimContext: ""
     fetchedAt: 2026-02-22T01:50:00.897Z
     httpStatus: 200
     pageTitle: MIT affiliates named 2024 Schmidt Futures AI2050 Fellows | Institute for Medical Engineering & Science
     contentSnippet: "MIT affiliates named 2024 Schmidt Futures AI2050 Fellows | Institute for Medical Engineering & Science Skip to main content News : MIT affiliates named 2024 Schmidt Futures AI2050 Fellows Five MIT faculty members, including a faculty member affiliated with IMES, and two additional alumni are honored with fellowships to advance research on beneficial AI. Jane Halpern | Department of Electrical Engineering and Computer Science Five MIT faculty members and two additional alumni were recently named "
     contentLength: 31659
-    status: verified
+    status: pending
     note: null
   - footnote: 51
     url: https://www.schmidtsciences.org/new-10-million-ai-safety-science-program-launched-for-foundational-research/

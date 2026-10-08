@@ -212,13 +212,7 @@
   type: organization
   orgType: safety-org
   title: Cooperative AI Foundation
-  description: >-
-    Research foundation with $15M funding (from Macroscopic Ventures) studying how AI
-    systems can learn to cooperate and how to design environments incentivizing cooperation.
-    Co-founded by Allan Dafoe (now Director of Frontier Safety and Governance at Google
-    DeepMind), Gillian Hadfield, and others. Published foundational "Open Problems in
-    Cooperative AI" (2020). Key focus areas include multi-agent cooperation, preventing
-    destructive AI competition, and human-AI coordination.
+  description: Research foundation with $15M funding (from Macroscopic Ventures) studying how AI systems can learn to cooperate and how to design environments incentivizing cooperation. Co-founded by Allan Dafoe (now Director of Frontier Safety and Governance at Google DeepMind) and others. Published foundational "Open Problems in Cooperative AI" (2020). Key focus areas include multi-agent cooperation, preventing destructive AI competition, and human-AI coordination.
   website: https://www.cooperativeai.com
   tags:
     - cooperative-ai
@@ -235,7 +229,7 @@
       relationship: leads-to
   customFields:
     - label: Funding
-      value: "$15M"
+      value: $15M
     - label: Founded
       value: "2021"
 
@@ -1920,26 +1914,6 @@
     - label: Known For
       value: Democratic AI experiment, values alignment philosophy
 
-- id: gillian-hadfield
-  stableId: sid_BtBqVgSMpw
-  type: person
-  title: Gillian Hadfield
-  description: >-
-    Professor at Johns Hopkins and Director of CIFAR program. Expert on AI governance and
-    regulatory markets. Argues for AI-enabled regulatory infrastructure that adapts faster
-    than traditional law. Key concept: "Rules for a Flat World."
-  tags:
-    - regulatory-markets
-    - ai-governance
-    - legal-innovation
-    - governance
-  clusters:
-    - governance
-  customFields:
-    - label: Role
-      value: Professor, Johns Hopkins / CIFAR
-    - label: Known For
-      value: Regulatory markets, "Rules for a Flat World"
 
 - id: alvin-roth
   stableId: sid_VbLkGGsSGt
@@ -2959,20 +2933,6 @@
     - label: Known For
       value: Security games (ARMOR at LAX), AI for social good
 
-- id: erik-brynjolfsson
-  stableId: sid_0DEGg8bIrQ
-  type: person
-  title: Erik Brynjolfsson
-  description: >-
-    Professor at Stanford and Director of the Digital Economy Lab. Co-author of "The Second
-    Machine Age." Pioneer in measuring IT productivity and economics of AI adoption.
-  tags: [digital-economy, ai-economics, productivity, coordination]
-  clusters: [governance]
-  customFields:
-    - label: Role
-      value: Professor, Stanford HAI / Digital Economy Lab
-    - label: Known For
-      value: "The Second Machine Age, digital economy research"
 
 - id: itai-ashlagi
   stableId: sid_LBZDvW1BAs

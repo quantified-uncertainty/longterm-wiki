@@ -384,10 +384,6 @@ targets:
     name: CNAS (Center for a New American Security)
     importance_rank: 73
     estimated_size_tier: small
-  - slug: the-future-society
-    name: The Future Society
-    importance_rank: 74
-    estimated_size_tier: small
   - slug: collective-intelligence-project
     name: Collective Intelligence Project
     importance_rank: 75

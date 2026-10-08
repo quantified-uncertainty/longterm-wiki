@@ -241,16 +241,13 @@
   wikiId: E368
   type: research-area
   title: Value Learning
-  description: "Research on AI systems that learn and internalize human values through interaction."
+  description: Research on AI systems that learn and internalize human values through interaction.
   tags:
     - value-learning
     - alignment
   clusters:
     - ai-safety
   relatedEntries:
-    - id: sid_ZxUirlzHke
-      type: person
-      relationship: research
     - id: sid_zMfgJqiEPQ
       type: organization
       relationship: research

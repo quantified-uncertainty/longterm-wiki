@@ -1,7 +1,7 @@
 pageId: eli-lifland
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 40
-verified: 38
+verified: 32
 broken: 2
 unverifiable: 0
 citations:
@@ -19,24 +19,24 @@ citations:
   - footnote: 2
     url: https://ai-2027.com/about
     linkText: AI 2027 About Page
-    claimContext: Lifland co-founded the <EntityLink id="ai-futures-project">AI Futures Project</EntityLink> alongside Daniel Kokotajlo and Thomas Larsen, and co-authored **AI 2027**, a detailed scenario forecast exploring potential <EntityLink id="agi-development">AGI development</EntityLink> trajectories.[^2][^3] T
+    claimContext: ""
     fetchedAt: 2026-02-22T02:12:51.455Z
     httpStatus: 200
     pageTitle: About — AI 2027
     contentSnippet: About — AI 2027 About Us The AI 2027 scenario is the first major release from the AI Futures Project . We’re a new nonprofit forecasting the future of AI. We created this website in collaboration with Lightcone Infrastructure . Get in touch You can reach us at info@ai-futures.org . We look forward to hearing from you. If you would like to run our tabletop exercise (or have us run it for you), please fill in this form . If you would like to get involved in steering toward a positive AGI future, w
     contentLength: 614096
-    status: verified
+    status: pending
     note: null
   - footnote: 3
     url: https://www.lawfaremedia.org/article/lawfare-daily--daniel-kokotajlo-and-eli-lifland-on-their-ai-2027-report
     linkText: Lawfare Media - Daniel Kokotajlo and Eli Lifland on AI 2027
-    claimContext: Lifland co-founded the <EntityLink id="ai-futures-project">AI Futures Project</EntityLink> alongside Daniel Kokotajlo and Thomas Larsen, and co-authored **AI 2027**, a detailed scenario forecast exploring potential <EntityLink id="agi-development">AGI development</EntityLink> trajectories.[^2][^3] T
+    claimContext: ""
     fetchedAt: 2026-02-22T02:12:51.668Z
     httpStatus: 200
     pageTitle: "Lawfare Daily: Daniel Kokotajlo and Eli Lifland on Their AI 2027 Report | Lawfare"
     contentSnippet: "Lawfare Daily: Daniel Kokotajlo and Eli Lifland on Their AI 2027 Report | Lawfare Kevin Frazier @kevintfrazier kevintfrazier.bsky.social Daniel Kokotajlo Eli Lifland Jen Patja Meet The Authors Subscribe to Lawfare Daniel Kokotajlo, former OpenAI researcher and Executive Director of the AI Futures Project, and Eli Lifland, a researcher with the AI Futures Project, join Kevin Frazier, AI Innovation and Law Fellow at Texas Law and Contributing Editor at Lawfare , to discuss what AI may look like in"
     contentLength: 109668
-    status: verified
+    status: pending
     note: null
   - footnote: 4
     url: https://www.elilifland.com
@@ -111,9 +111,9 @@ citations:
     fetchedAt: 2026-02-22T02:12:53.457Z
     httpStatus: 200
     pageTitle: AI 2027
-    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentSnippet: null
     contentLength: 1900943
-    status: verified
+    status: pending
     note: null
   - footnote: 11
     url: https://controlai.news/p/special-edition-the-future-of-ai
@@ -133,9 +133,9 @@ citations:
     fetchedAt: 2026-02-22T02:12:54.743Z
     httpStatus: 200
     pageTitle: AI 2027
-    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentSnippet: null
     contentLength: 1900943
-    status: verified
+    status: pending
     note: null
   - footnote: 13
     url: https://ai-2027.com
@@ -144,9 +144,9 @@ citations:
     fetchedAt: 2026-02-22T02:12:55.138Z
     httpStatus: 200
     pageTitle: AI 2027
-    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentSnippet: null
     contentLength: 1900943
-    status: verified
+    status: pending
     note: null
   - footnote: 14
     url: https://www.lawfaremedia.org/article/lawfare-daily--daniel-kokotajlo-and-eli-lifland-on-their-ai-2027-report
@@ -430,9 +430,9 @@ citations:
     fetchedAt: 2026-02-22T02:13:12.809Z
     httpStatus: 200
     pageTitle: AI 2027
-    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentSnippet: null
     contentLength: 1900943
-    status: verified
+    status: pending
     note: null
   - footnote: 40
     url: https://blog.ai-futures.org/p/clarifying-how-our-ai-timelines-forecasts

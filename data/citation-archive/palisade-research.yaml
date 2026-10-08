@@ -1,8 +1,8 @@
 pageId: palisade-research
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 24
-verified: 20
-broken: 4
+verified: 15
+broken: 2
 unverifiable: 0
 citations:
   - footnote: 1
@@ -51,25 +51,25 @@ citations:
     note: null
   - footnote: 5
     url: https://www.allamericanspeakers.com/speakers/462128/Jeffrey-Ladish
-    linkText: All American Speakers - Jeffrey Ladish
-    claimContext: Palisade Research was founded in **2023** by **Jeffrey Ladish**, a cybersecurity expert who previously built <EntityLink id="anthropic">Anthropic</EntityLink>'s information security program through his consulting firm Gordian Research.[^5][^6] Prior to founding Palisade, Ladish advised the White Hou
+    linkText: All American Speakers -
+    claimContext: ""
     fetchedAt: 2026-02-22T02:21:07.876Z
     httpStatus: 403
     pageTitle: null
     contentSnippet: null
     contentLength: 0
-    status: broken
+    status: pending
     note: HTTP 403
   - footnote: 6
     url: https://www.youtube.com/watch?v=rUk-prULFxs
     linkText: YouTube - Palisade Research Discussion
-    claimContext: Palisade Research was founded in **2023** by **Jeffrey Ladish**, a cybersecurity expert who previously built <EntityLink id="anthropic">Anthropic</EntityLink>'s information security program through his consulting firm Gordian Research.[^5][^6] Prior to founding Palisade, Ladish advised the White Hou
+    claimContext: ""
     fetchedAt: 2026-02-22T02:21:09.775Z
     httpStatus: 0
     pageTitle: null
     contentSnippet: null
     contentLength: 0
-    status: broken
+    status: pending
     note: fetch failed
   - footnote: 9
     url: https://www.lesswrong.com/posts/7Jr7matwXHj2Chugw/help-keep-ai-under-human-control-palisade-research-2026
@@ -78,20 +78,20 @@ citations:
     fetchedAt: 2026-02-22T02:21:10.414Z
     httpStatus: 200
     pageTitle: "Help keep AI under human control: Palisade Research 2026 fundraiser — LessWrong"
-    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Help keep AI under human control: Palisade Research 2026 fundraiser — LessWrong AI Personal Blog 2025 Top Fifty: 14 % 105 Help keep AI under human control: Palisade Research 2026 fundraiser by Jeffrey Ladish , benwr , Eli Tyre , John Steidley 18th Dec 2025 7 min read 66 105 TL;DR: Please consider donating to Palisade Research this year, especially if you care about red"
+    contentSnippet: null
     contentLength: 1230566
-    status: verified
+    status: pending
     note: null
   - footnote: 10
     url: https://palisaderesearch.org
     linkText: Palisade Research Homepage
-    claimContext: "- **2023**: Organization founded by Jeffrey Ladish; initial work on offensive AI capabilities and demonstrations for policymakers and the public[^9] - **October 11, 2024**: Submitted response to U.S. Department of Commerce's proposed AI reporting requirements, advocating stronger rules for dual-use "
+    claimContext: ""
     fetchedAt: 2026-02-22T02:21:09.579Z
     httpStatus: 200
     pageTitle: Home | Palisade Research
     contentSnippet: "Home | Palisade Research --> --> Palisade Research AI capabilities are improving rapidly. We study the capabilities and motivations of AI agents today to better understand the risk of losing control to AI agents forever. Light Dark ^ Palisade is on YouTube TOP NEW Feb 19, 2026 We’ve been working on a major video project, and we’re proud to announce that we’re launching it today, along with a new YouTube channel. Technical Report: Shutdown Resistance in Large Language Models, on robots! TOP NEW A"
     contentLength: 40917
-    status: verified
+    status: pending
     note: null
   - footnote: 11
     url: https://www.lesswrong.com/posts/7Jr7matwXHj2Chugw/help-keep-ai-under-human-control-palisade-research-2026
@@ -100,9 +100,9 @@ citations:
     fetchedAt: 2026-02-22T02:21:10.501Z
     httpStatus: 200
     pageTitle: "Help keep AI under human control: Palisade Research 2026 fundraiser — LessWrong"
-    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Help keep AI under human control: Palisade Research 2026 fundraiser — LessWrong AI Personal Blog 2025 Top Fifty: 14 % 105 Help keep AI under human control: Palisade Research 2026 fundraiser by Jeffrey Ladish , benwr , Eli Tyre , John Steidley 18th Dec 2025 7 min read 66 105 TL;DR: Please consider donating to Palisade Research this year, especially if you care about red"
+    contentSnippet: null
     contentLength: 1230565
-    status: verified
+    status: pending
     note: null
   - footnote: 12
     url: https://aijourn.com/ai-is-like-nuclear-energy-the-benefits-are-immense-but-so-are-the-risks-palisades-research-lead-dmitrii-volkov-on-navigating-ai-risks/
@@ -227,14 +227,14 @@ citations:
     note: null
   - footnote: 24
     url: https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/
-    linkText: ARI Policy Bytes - AI Safety Research Highlights of 2025
+    linkText: Policy Bytes - AI Safety Research Highlights of 2025
     claimContext: The organization's work has contributed to broader discussions about AI safety, with their shutdown resistance research corroborated in broader AI safety reviews in 2025.[^24] Their empirical demonstrations have helped communicate abstract AI risks to both technical and non-technical audiences, incl
     fetchedAt: 2026-02-22T02:21:15.832Z
     httpStatus: 200
-    pageTitle: AI Safety Research Highlights of 2025 - Americans for Responsible Innovation
-    contentSnippet: AI Safety Research Highlights of 2025 - Americans for Responsible Innovation AI Safety Research Highlights of 2025 December 19, 2025 Iskandar Haykel 2025 has shaped up to be a watershed year for AI safety and security. Frontier models showed improved potential to facilitate CBRN threats, lending greater salience to these catastrophic risks. Leading AI developers accordingly strengthened safeguards and protocols . The &#8220;first reported AI-orchestrated cyber espionage campaign&#8221;—allegedly
+    pageTitle: null
+    contentSnippet: null
     contentLength: 114986
-    status: verified
+    status: pending
     note: null
   - footnote: 27
     url: https://arxiv.org/html/2509.14260v1
@@ -243,9 +243,9 @@ citations:
     fetchedAt: 2026-02-22T02:21:15.489Z
     httpStatus: 200
     pageTitle: Shutdown Resistance in Large Language Models
-    contentSnippet: Shutdown Resistance in Large Language Models Shutdown Resistance in Large Language Models Jeremy Schlatter Palisade Research Benjamin Weinstein-Raun Palisade Research Jeffrey Ladish Palisade Research (September 2025) Abstract We show that several state-of-the-art large language models (including Grok 4, GPT-5, and Gemini 2.5 Pro) sometimes actively subvert a shutdown mechanism in their environment in order to complete a simple task, even when the instructions explicitly indicate not to interfere
+    contentSnippet: null
     contentLength: 134241
-    status: verified
+    status: pending
     note: null
   - footnote: 28
     url: https://www.eweek.com/news/palisade-ai-shutdown-resistance-update-october-2025/

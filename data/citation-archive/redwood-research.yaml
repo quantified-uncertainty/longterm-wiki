@@ -1,7 +1,7 @@
 pageId: redwood-research
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 45
-verified: 44
+verified: 43
 broken: 1
 unverifiable: 0
 citations:
@@ -441,9 +441,9 @@ citations:
     fetchedAt: 2026-02-22T02:12:42.484Z
     httpStatus: 200
     pageTitle: "[2405.19550] Stress-Testing Capability Elicitation With Password-Locked Models"
-    contentSnippet: "[2405.19550] Stress-Testing Capability Elicitation With Password-Locked Models --> Computer Science > Machine Learning arXiv:2405.19550 (cs) [Submitted on 29 May 2024] Title: Stress-Testing Capability Elicitation With Password-Locked Models Authors: Ryan Greenblatt , Fabien Roger , Dmitrii Krasheninnikov , David Krueger View a PDF of the paper titled Stress-Testing Capability Elicitation With Password-Locked Models, by Ryan Greenblatt and 3 other authors View PDF HTML (experimental) Abstract: To"
+    contentSnippet: null
     contentLength: 47693
-    status: verified
+    status: pending
     note: null
   - footnote: 42
     url: https://arxiv.org/abs/2411.17693
