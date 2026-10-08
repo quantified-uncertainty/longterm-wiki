@@ -1,7 +1,7 @@
 pageId: ai-timelines
-verifiedAt: 2026-02-20
+verifiedAt: ""
 totalCitations: 53
-verified: 47
+verified: 46
 broken: 6
 unverifiable: 0
 citations:
@@ -568,14 +568,14 @@ citations:
     note: null
   - footnote: 52
     url: https://ai-2027.com/
-    linkText: Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, and Romeo Dean, " — AI 2027 — " AI Futures Project, April 3, 2025.
-    claimContext: The AI 2027 report, published April 3, 2025 by the AI Futures Project (Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, and Romeo Dean), presents a detailed scenario analysis of AI development through 2027 and beyond.[^52] The scenario was informed by trend extrapolations, wargames, ex
+    linkText: Daniel Kokotajlo, Scott Alexander, Eli Lifland, and Romeo Dean, " — AI 2027 — " AI Futures Project, April 3, 2025.
+    claimContext: ""
     fetchedAt: 2026-02-20T04:21:51.517Z
     httpStatus: 200
     pageTitle: AI 2027
-    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentSnippet: null
     contentLength: 1900943
-    status: verified
+    status: pending
     note: null
   - footnote: 53
     url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/

@@ -1,7 +1,7 @@
 pageId: elicit
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 32
-verified: 28
+verified: 27
 broken: 4
 unverifiable: 0
 citations:
@@ -133,9 +133,9 @@ citations:
     fetchedAt: 2026-02-22T02:17:01.629Z
     httpStatus: 200
     pageTitle: Unbounded AI-Assisted Research with Elicit Founders Andreas Stuhlmüller and Jungwon Byun
-    contentSnippet: "Unbounded AI-Assisted Research with Elicit Founders Andreas Stuhlmüller and Jungwon Byun Latest news Episode Mathematical Superintelligence: Harmonic&#x27;s Vlad & Tudor on IMO Gold & Theories of Everything Episode Approaching the AI Event Horizon? Part 2, w/ Abhi Mahajan, Helen Toner, Jeremie Harris, @8teAPi Episode Approaching the AI Event Horizon? Part 1, w/ James Zou, Sam Hammond, Shoshannah Tekofsky, @8teAPi Log in Subscribe Follow Facebook --> Twitter Download more icon variants from https"
+    contentSnippet: null
     contentLength: 160395
-    status: verified
+    status: pending
     note: null
   - footnote: 13
     url: https://www.alignmentforum.org/posts/C4tR3BEpuWviT7Sje/2021-ai-alignment-literature-review-and-charity-comparison

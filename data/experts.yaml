@@ -268,28 +268,6 @@
       estimate: 40%
       confidence: medium
       date: "2023"
-- id: stuart-russell
-  name: Stuart Russell
-  affiliation: chai
-  role: Professor of Computer Science, CHAI Founder
-  website: https://people.eecs.berkeley.edu/~russell/
-  knownFor:
-    - Human Compatible
-    - inverse reinforcement learning
-    - AI safety advocacy
-  positions:
-    - topic: current-approaches-scale
-      view: Unlikely without changes
-      estimate: 25%
-      confidence: medium
-      source: Human Compatible (2019)
-      date: "2019-10"
-    - topic: p-ai-catastrophe
-      view: Concerned
-      estimate: 15-25%
-      confidence: medium
-      source: Interviews (2021-2023)
-      date: "2023"
 - id: nate-soares
   name: Nate Soares
   affiliation: miri
@@ -975,10 +953,6 @@
   affiliation: stanford-university
   role: Professor and Co-Director, Stanford HAI
 
-- id: david-krueger
-  name: David Krueger
-  affiliation: university-of-cambridge
-  role: Assistant Professor
 
 - id: timnit-gebru
   name: Timnit Gebru

@@ -1,7 +1,7 @@
 pageId: pause-ai
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 21
-verified: 16
+verified: 15
 broken: 5
 unverifiable: 0
 citations:
@@ -173,13 +173,13 @@ citations:
   - footnote: 16
     url: https://spectrum.ieee.org/ai-pause-letter-stokes-fear
     linkText: AI Pause Open Letter Stokes Fear and Controversy - IEEE Spectrum
-    claimContext: The movement has gained endorsements from thousands of AI researchers and industry leaders, including <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, and <EntityLink id="elon-musk">Elon Musk</EntityLink>, who signed an open lett
+    claimContext: ""
     fetchedAt: 2026-02-22T02:23:17.961Z
     httpStatus: 200
     pageTitle: ‘AI Pause’ Open Letter Stokes Fear and Controversy - IEEE Spectrum
     contentSnippet: null
     contentLength: 476141
-    status: verified
+    status: pending
     note: Academic publisher — URL accessible
   - footnote: 17
     url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/

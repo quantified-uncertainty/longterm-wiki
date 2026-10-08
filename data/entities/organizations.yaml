@@ -277,7 +277,6 @@
   wikiId: E57
   type: organization
   orgType: academic
-  # parentOrg = legally separate part of another org (not an internal division)
   parentOrg: uc-berkeley
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
@@ -291,13 +290,7 @@
       type: risk
     - id: sid_aUMeFdALrA
       type: research-area
-    - id: stuart-russell
-      type: person
-      relationship: leads-to
-  description: >-
-    The Center for Human-Compatible AI (CHAI) is an academic research center at UC Berkeley focused on ensuring AI
-    systems are beneficial to humans. Founded by Stuart Russell, author of the leading AI textbook, CHAI brings academic
-    rigor to AI safety research.
+  description: The Center for Human-Compatible AI (CHAI) is an academic research center at UC Berkeley focused on ensuring AI systems are beneficial to humans. CHAI brings academic rigor to AI safety research.
   tags:
     - inverse-reinforcement-learning
     - value-learning
@@ -307,8 +300,7 @@
   lastUpdated: 2025-12
   founded: "2016"
   headquarters: Berkeley, CA
-  keyPeople:
-    - stuart-russell
+  keyPeople: []
   safetyFocus: |
     Inverse reinforcement learning, assistance games, value alignment.
 - id: apollo-research
@@ -3697,17 +3689,12 @@
   orgType: academic
   title: University of Cambridge
   website: https://www.cam.ac.uk
-  description: >-
-    Historic UK research university. Home to CSER.
-  relatedEntries:
-    - id: david-krueger
-      type: person
-      relationship: research
+  description: Historic UK research university. Home to CSER.
+  relatedEntries: []
   tags:
     - academic
     - existential-risk
   lastUpdated: 2026-03
-
   founded: "1209"
   headquarters: Cambridge, UK
 - id: brown-university
@@ -4816,24 +4803,6 @@
     - justice
   lastUpdated: 2026-03
 
-- id: the-future-society
-  stableId: sid_u3Yf4JXH4Q
-  wikiId: E1213
-  type: organization
-  orgType: safety-org
-  summaryPage: safety-orgs-overview
-  title: The Future Society
-  website: https://thefuturesociety.org
-  description: >-
-    International nonprofit founded in 2014 at Harvard Kennedy School, focused on AI governance
-    and policy. Convened 44 civil society organizations for AI governance priorities survey and
-    played a key role at the 2025 Paris AI Action Summit. Works across the UN, OECD, and EU on
-    responsible AI governance frameworks.
-  tags:
-    - ai-governance
-    - ai-policy
-    - policy
-  lastUpdated: 2026-03
 
 - id: collective-intelligence-project
   stableId: sid_0TFmORNnKQ
@@ -6439,74 +6408,7 @@
       type: person
   lastUpdated: 2026-03
 
-- id: ai-policy-institute
-  stableId: sid_w7mwNxGtCQ
-  wikiId: E1982
-  type: organization
-  orgType: safety-org
-  summaryPage: safety-orgs-overview
-  title: AI Policy Institute
-  website: https://theaipi.org
-  founded: '2023'
-  headquarters: Washington, DC
-  description: >-
-    Washington DC-based policy advocacy organization founded in 2023, focused on channeling public
-    concern about AI into effective governance. Conducts polling on AI attitudes, engages with
-    policymakers and media, and advocates for responsible AI development. Works on issues including
-    deepfakes, autonomous AI agents, and AI safety standards. Led by Daniel Colson (Co-founder
-    and Executive Director). Also operates as "The AI Policy Network."
-  tags:
-    - ai-governance
-    - ai-policy
-    - advocacy
-    - polling
-  relatedEntries:
-    - id: sid_k7Xw6otC8a
-      type: person
-      relationship: leads-to
-  clusters:
-    - ai-safety
-    - governance
-  lastUpdated: 2026-03
 
-- id: americans-for-responsible-innovation
-  stableId: sid_IFjdCevnFg
-  wikiId: E1983
-  type: organization
-  orgType: safety-org
-  summaryPage: safety-orgs-overview
-  title: Americans for Responsible Innovation
-  website: https://responsibleinnovation.org
-  founded: '2023'
-  headquarters: Washington, DC
-  description: >-
-    Washington DC-based AI policy organization founded in late 2023 with significant funding from
-    effective altruism-aligned donors including Dustin Moskovitz. Led by Brad Carson (President,
-    former Congressman) and Eric Gastfriend (Executive Director). Focuses on building bipartisan
-    support for AI safety legislation in Congress, advocating for regulation analogous to other
-    industries. One of the major players influencing AI policy on Capitol Hill, with a focus on
-    catastrophic risk prevention.
-  tags:
-    - ai-governance
-    - ai-policy
-    - advocacy
-    - ea-community
-    - lobbying
-  relatedEntries:
-    - id: sid_PQYAd3EcSQ
-      type: person
-      relationship: leads-to
-    - id: sid_4dwqcYO3sZ
-      type: person
-      relationship: leads-to
-    - id: sid_kHKTVjWRe7
-      type: person
-    - id: sid_vlCND0FtTw
-      type: person
-  clusters:
-    - ai-safety
-    - governance
-  lastUpdated: 2026-03
 
 - id: brookings-ai
   stableId: sid_GrI1ZpreMg
@@ -6599,37 +6501,6 @@
       type: person
   lastUpdated: 2026-03
 
-- id: center-for-ai-policy
-  stableId: sid_V3NJg9djng
-  wikiId: E1987
-  type: organization
-  orgType: safety-org
-  orgStatus: defunct
-  summaryPage: safety-orgs-overview
-  title: Center for AI Policy
-  website: https://www.centeraipolicy.org
-  founded: '2023'
-  headquarters: Washington, DC
-  description: >-
-    Non-partisan 501(c)(4) nonprofit founded in June 2023 that worked with Congress through May
-    2025 to promote legislative solutions to catastrophic risks from advanced AI. Led by Executive
-    Director Jason Green-Lowe with 2 registered lobbyists. Total lobbying spend: $483,720
-    (cumulative through Q1 2025). Ceased most active operations around May 2025 due to funding
-    constraints (cash reserves ~$150K). Focused on bipartisan engagement with Congressional
-    offices on AI safety policy. Primary intervention type: direct congressional lobbying.
-  tags:
-    - ai-governance
-    - ai-policy
-    - lobbying
-    - defunct
-  relatedEntries:
-    - id: sid_zvMaj29XJk
-      type: person
-      relationship: leads-to
-  clusters:
-    - ai-safety
-    - governance
-  lastUpdated: 2026-03
 
 - id: center-for-democracy-and-technology
   stableId: sid_XkqcWk46oQ
@@ -8376,13 +8247,10 @@
   type: organization
   orgType: generic
   title: Public First Action
-  description: >-
-    Political 501(c)(4) organization co-founded by Brad Carson (D-OK) and
-    Chris Stewart (R-UT). Anthropic contributed \$20M; total network raised
-    approximately \$50M targeting \$75M. Operates two super PACs: Jobs and
-    Democracy PAC (Democratic races) and Defending Our Values PAC (Republican
-    races). Supports pro-regulation candidates in 2026 races.
-  tags: [political-action, ai-regulation]
+  description: "Political 501(c)(4) organization co-founded by Chris Stewart (R-UT). Anthropic contributed \\$20M; total network raised approximately \\$50M targeting \\$75M. Operates two super PACs: Jobs and Democracy PAC (Democratic races) and Defending Our Values PAC (Republican races). Supports pro-regulation candidates in 2026 races."
+  tags:
+    - political-action
+    - ai-regulation
   lastUpdated: 2026-03
 
 - id: jobs-and-democracy-pac

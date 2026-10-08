@@ -186,9 +186,6 @@ overrides:
   "Georgetown Center for Global Health Science and Security": "georgetown-cghss"
   "Georgetown University Initiative on Innovation, Development, and Evaluation": "georgetown-university"
   "Vera Institute of Justice": "vera-institute"
-  "The Future Society": "the-future-society"
-  "The Future Society, Inc.": "the-future-society"
-  "The Future Society (TFS)": "the-future-society"
   "Collective Intelligence Project": "collective-intelligence-project"
 
   # --- EA Orgs ---
@@ -471,7 +468,6 @@ overrides:
   "Zeroth Research / Fondazione Bruno Kessler": "zeroth-research"
 
   # --- SFF unmatched grantees ---
-  "AI Policy Institute (AIPI)": "ai-policy-institute"
   "Principles of Intelligent Behavior in Biological and Social Systems (PIBBSS)": "pibbss"
   "PIBBSS": "pibbss"
 

@@ -1,7 +1,7 @@
 pageId: openai-foundation
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 78
-verified: 69
+verified: 67
 broken: 9
 unverifiable: 0
 citations:
@@ -459,13 +459,13 @@ citations:
   - footnote: 42
     url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
     linkText: OpenAI Foundation Questions - Inside Philanthropy
-    claimContext: Nick Moës, Executive Director of The Future Society, called October 28, 2025, a "dark day for philanthropy," arguing that "the public will actually benefit less from OpenAI's immense profits" under the new structure compared to the original nonprofit model.[^42]
+    claimContext: ""
     fetchedAt: 2026-02-22T01:52:56.237Z
     httpStatus: 202
     pageTitle: null
     contentSnippet: null
     contentLength: 227
-    status: verified
+    status: pending
     note: null
   - footnote: 43
     url: https://www.lesswrong.com/posts/SHbEEFHqTuoveZcLr/inside-openai-s-controversial-plan-to-abandon-its-nonprofit
@@ -635,13 +635,13 @@ citations:
   - footnote: 58
     url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
     linkText: OpenAI Foundation Questions - Inside Philanthropy
-    claimContext: "**\"Dark Day for Philanthropy\"**: The Future Society's Nick Moës characterized the restructuring as \"a dark day for philanthropy,\" arguing \"the public will actually benefit less from OpenAI's immense profits\" under the new structure compared to the original nonprofit model where all surplus would hav"
+    claimContext: ""
     fetchedAt: 2026-02-22T01:53:08.366Z
     httpStatus: 202
     pageTitle: null
     contentSnippet: null
     contentLength: 227
-    status: verified
+    status: pending
     note: null
   - footnote: 59
     url: https://ips-dc.org/report-giving-pledge-at-15/

@@ -1,7 +1,7 @@
 pageId: leading-the-future
-verifiedAt: 2026-02-22
+verifiedAt: ""
 totalCitations: 25
-verified: 24
+verified: 23
 broken: 1
 unverifiable: 0
 citations:
@@ -239,13 +239,13 @@ citations:
   - footnote: 22
     url: https://newsletter.safe.ai/p/ai-safety-newsletter-62-big-tech
     linkText: AI safety newsletter on Big Tech backing super PAC
-    claimContext: A competing super PAC called **Public First**, co-founded by former Republican Representative Chris Stewart and former Democratic Representative Brad Carson, launched with a \$50 million fundraising goal to support pro-regulation candidates from both parties.[^20][^22] Carson argued that Leading the
+    claimContext: ""
     fetchedAt: 2026-02-22T02:20:41.840Z
     httpStatus: 200
     pageTitle: "AI Safety Newsletter #62: Big Tech Launches $100 Million pro-AI Super PAC"
     contentSnippet: "AI Safety Newsletter #62: Big Tech Launches $100 Million pro-AI Super PAC AI Safety Newsletter Subscribe Sign in AI Safety Newsletter #62: Big Tech Launches $100 Million pro-AI Super PAC Plus: Meta’s Chatbot Policies Prompt Backlash Amid AI Reorganization; China Reverses Course on Nvidia H20 Purchases Corin Katzke and Dan Hendrycks Aug 27, 2025 23 Share Article voiceover 0:00 -10:15 Audio playback is not supported on your browser. Please upgrade. Welcome to the AI Safety Newsletter by the Center"
     contentLength: 196142
-    status: verified
+    status: pending
     note: null
   - footnote: 23
     url: https://futurecaucus.org/lawmakers-face-mounting-tech-opposition-over-ai-rules/

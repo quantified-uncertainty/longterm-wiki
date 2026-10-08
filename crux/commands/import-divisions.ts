@@ -556,11 +556,10 @@ const DIVISIONS: DivisionDef[] = [
     parentOrgId: ORG_IDS.CHAI,
     name: "CHAI Research",
     divisionType: "lab",
-    lead: "Stuart Russell",
     status: "active",
     source: "https://humancompatible.ai/research",
     notes:
-      "Academic AI safety research lab at UC Berkeley founded by Stuart Russell. Researches value alignment, cooperative inverse reinforcement learning (CIRL), and human-AI interaction.",
+      "Academic AI safety research lab at UC Berkeley. Researches value alignment, cooperative inverse reinforcement learning (CIRL), and human-AI interaction.",
   },
 
   // ---- CAIS (Center for AI Safety) ----
