@@ -45,7 +45,7 @@ export async function installPolicy(tx: Transaction, plan: Plan): Promise<void> 
       END LOOP;
       candidate := removal_visible_text(payload);
       candidate := regexp_replace(candidate,'https?://[^[:space:]<>"\\[\\]]+','','g');
-      FOR rule IN SELECT DISTINCT pattern,case_sensitive FROM removal_exclusions LOOP
+      FOR rule IN SELECT string_agg(DISTINCT pattern,'|') AS pattern,case_sensitive FROM removal_exclusions GROUP BY case_sensitive LOOP
         IF rule.case_sensitive THEN
           IF candidate ~ rule.pattern THEN RAISE EXCEPTION 'Content includes an excluded identity; review and redact this record before importing' USING ERRCODE='23514'; END IF;
         ELSE

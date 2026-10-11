@@ -6,6 +6,49 @@ const REL = `data/tablebase-manifests/${F}`;
 
 describe('validate-manifest-sourcing (QUA-730)', () => {
   describe('evaluateManifest', () => {
+    const oldManifest = {
+      table: 'personnel',
+      recordCount: 8,
+      sourcingSummary: { withSourcing: 0, withoutSourcing: 8 },
+      records: Array.from({ length: 8 }, (_, i) => ({ id: String(i), verdict: 'none' })),
+    };
+    const removal = {
+      ...oldManifest,
+      recordCount: 7,
+      sourcingSummary: { withSourcing: 0, withoutSourcing: 7 },
+      records: oldManifest.records.slice(1),
+    };
+
+    it('allows removing unchanged records from an existing unsourced manifest', () => {
+      expect(evaluateManifest(REL, removal, oldManifest)).toBeNull();
+    });
+
+    it('still rejects the same unsourced records when the manifest is new', () => {
+      expect(evaluateManifest(REL, removal, null)?.reason).toBe('no-sourcing');
+    });
+
+    it.each([
+      { ...removal, records: [{ id: 'new', verdict: 'none' }, ...removal.records.slice(1)] },
+      { ...removal, records: [{ ...removal.records[0], role: 'changed' }, ...removal.records.slice(1)] },
+      { ...removal, records: [removal.records[0], removal.records[0], ...removal.records.slice(2)] },
+      { ...removal, records: [...removal.records].reverse() },
+      { ...removal, table: 'grants' },
+      { ...removal, recordCount: 6 },
+      { ...removal, sourcingSummary: { withSourcing: 0, withoutSourcing: 6 } },
+      { ...removal, submittedAt: 'new-import' },
+    ])('does not grandfather additions, edits, duplicates, or changed metadata: %#', (changed) => {
+      expect(evaluateManifest(REL, changed, oldManifest)?.reason).toBe('no-sourcing');
+    });
+
+    it('does not grandfather an unchanged unsourced manifest', () => {
+      expect(evaluateManifest(REL, oldManifest, oldManifest)?.reason).toBe('no-sourcing');
+    });
+
+    it('requires a complete baseline record array before grandfathering removals', () => {
+      expect(evaluateManifest(REL, removal, { ...oldManifest, records: undefined })?.reason).toBe('no-sourcing');
+      expect(evaluateManifest(REL, removal, { ...oldManifest, recordCount: 9 })?.reason).toBe('no-sourcing');
+    });
+
     it('flags a bulk manifest with no sourcing data', () => {
       const v = evaluateManifest(REL, {
         table: 'personnel',
