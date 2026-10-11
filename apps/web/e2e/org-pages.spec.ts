@@ -48,7 +48,6 @@ const ORG_SLUGS = [
   "goodfire",
   "govai",
   "gpai",
-  "gratified",
   "hewlett-foundation",
   "ibbis",
   "johns-hopkins-center-for-health-security",

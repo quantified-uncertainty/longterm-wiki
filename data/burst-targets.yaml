@@ -444,10 +444,6 @@ targets:
     name: Turion
     importance_rank: 88
     estimated_size_tier: tiny
-  - slug: gratified
-    name: Gratified
-    importance_rank: 89
-    estimated_size_tier: tiny
   - slug: futuresearch
     name: FutureSearch
     importance_rank: 90
