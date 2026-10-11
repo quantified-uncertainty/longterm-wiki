@@ -1,11 +1,11 @@
 {
   "table": "personnel",
-  "recordCount": 18,
+  "recordCount": 17,
   "recordsRejected": 0,
   "submittedAt": "2026-04-25T11:57:12.178Z",
   "sourcingSummary": {
     "withSourcing": 0,
-    "withoutSourcing": 18,
+    "withoutSourcing": 17,
     "verdicts": {
       "verified": 0,
       "contradicted": 0,
@@ -95,16 +95,6 @@
       "source": "https://www.longview.org/about/suryansh-mehta/",
       "notes": "Leads AI grantmaking, strategy, and donor advising; previously built Longview Content Team. Co-edited 'AI Safety, Ethics, and Society' textbook with Dan Hendrycks; co-founded Future Impact Group. Per Longview profile page.",
       "id": "CDeXDEvmS2",
-      "verdict": "none"
-    },
-    {
-      "personId": "sid_SM7cEzpYvl",
-      "organizationId": "sid_gV4U3qi2QA",
-      "role": "AI Program Officer",
-      "roleType": "career",
-      "source": "https://www.longview.org/about/aidan-ogara/",
-      "notes": "Conducts grant investigations in AI, particularly technical AI safety research. DPhil candidate in AI at Oxford; prior research at GovAI, Epoch, Cornell, AI Impacts, Center for AI Safety. Per Longview profile page.",
-      "id": "eFWetkXnqU",
       "verdict": "none"
     },
     {

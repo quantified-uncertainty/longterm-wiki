@@ -21,6 +21,8 @@
  * Scope: only files added or modified in the current branch's diff vs main.
  * Existing manifests on main are grandfathered — adding a check that
  * scanned all manifests would fail the gate against the baseline.
+ * Deleting existing records preserves that exemption only when the
+ * remaining records and metadata are unchanged, apart from their counts.
  *
  * Usage:
  *   npx tsx crux/validate/validate-manifest-sourcing.ts
@@ -29,6 +31,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
 import { join, basename } from 'path';
+import { isDeepStrictEqual } from 'node:util';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 
@@ -36,8 +39,10 @@ const MANIFEST_DIR = 'data/tablebase-manifests';
 const MIN_RECORDS_FOR_GATE = 5;
 
 interface ManifestSummary {
+  [key: string]: unknown;
   table?: string;
   recordCount?: number;
+  records?: unknown[];
   /**
    * Current schema (post-2026-04-09). The legacy schema below is rejected
    * for any newly-added manifest because it implies the writer regressed.
@@ -55,6 +60,36 @@ interface ManifestSummary {
     withVerification?: number;
     withoutVerification?: number;
   };
+}
+
+function manifestBase(): string {
+  try {
+    return execSync(
+      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
+      { cwd: PROJECT_ROOT, encoding: 'utf-8' },
+    ).trim();
+  } catch {
+    return '';
+  }
+}
+
+/** Only an unchanged subsequence of an existing manifest is grandfathered. */
+function removesOnlyRecords(before: ManifestSummary | null, after: ManifestSummary): boolean {
+  if (!before || !Array.isArray(before.records) || !Array.isArray(after.records)) return false;
+  if (before.records.length <= after.records.length || before.recordCount !== before.records.length || after.recordCount !== after.records.length) return false;
+  let next = 0;
+  for (const record of before.records) {
+    if (next < after.records.length && isDeepStrictEqual(record, after.records[next])) next++;
+  }
+  if (next !== after.records.length) return false;
+  const { records: _oldRecords, recordCount: _oldCount, ...oldMetadata } = before;
+  const { records: _newRecords, recordCount: _newCount, ...newMetadata } = after;
+  // For the all-unsourced manifests this gate rejects, adjust only the count
+  // of remaining unsourced records. All other metadata must remain identical.
+  if (before.sourcingSummary?.withSourcing === 0 && before.sourcingSummary.withoutSourcing === before.records.length) {
+    oldMetadata.sourcingSummary = { ...before.sourcingSummary, withoutSourcing: after.records.length };
+  }
+  return isDeepStrictEqual(oldMetadata, newMetadata);
 }
 
 interface Violation {
@@ -100,15 +135,7 @@ export function getAddedManifestFiles(): string[] {
   }
 
   // 1. Committed changes vs origin/main (or fallback to local main).
-  let base = '';
-  try {
-    base = execSync(
-      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' },
-    ).trim();
-  } catch {
-    base = '';
-  }
+  const base = manifestBase();
   if (base) {
     addLines(
       tryGit(['diff', '--name-only', '--diff-filter=AM', base, 'HEAD', '--', `${MANIFEST_DIR}/*.json`]),
@@ -167,8 +194,10 @@ function toCount(v: unknown): number {
 export function evaluateManifest(
   relPath: string,
   data: ManifestSummary | null,
+  previous: ManifestSummary | null = null,
 ): Violation | null {
   if (!data) return null;
+  if (removesOnlyRecords(previous, data)) return null;
 
   const recordCount = toCount(data.recordCount);
   if (recordCount <= MIN_RECORDS_FOR_GATE) return null;
@@ -218,7 +247,18 @@ export function evaluateManifest(
 function checkManifest(relPath: string): Violation | null {
   const absPath = join(PROJECT_ROOT, relPath);
   if (!existsSync(absPath)) return null; // Modified-then-deleted edge case.
-  return evaluateManifest(relPath, loadManifest(absPath));
+  let previous: ManifestSummary | null = null;
+  const base = manifestBase();
+  if (base) {
+    try {
+      previous = JSON.parse(execFileSync('git', ['show', `${base}:${relPath}`], {
+        cwd: PROJECT_ROOT, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'],
+      })) as ManifestSummary;
+    } catch {
+      // A new file or unreadable baseline gets the normal sourcing check.
+    }
+  }
+  return evaluateManifest(relPath, loadManifest(absPath), previous);
 }
 
 export interface ValidationResult {
@@ -248,7 +288,7 @@ export function runCheck(): ValidationResult {
 
   if (violations.length === 0) {
     console.log(
-      `${c.green}All ${files.length} new manifest(s) have at least one sourcing-verified record${c.reset}`,
+      `${c.green}All ${files.length} manifest(s) pass sourcing or only remove existing records${c.reset}`,
     );
   } else {
     console.log(

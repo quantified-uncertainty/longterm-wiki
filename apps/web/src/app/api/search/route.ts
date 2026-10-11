@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { scrubHiddenPeople } from "@/lib/hidden-people";
 
 /**
  * GET /api/search?q=...&limit=20
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    return NextResponse.json(scrubHiddenPeople(data) ?? {});
+    return NextResponse.json(data);
   } catch {
     return NextResponse.json(
       { error: "Wiki server unreachable" },
