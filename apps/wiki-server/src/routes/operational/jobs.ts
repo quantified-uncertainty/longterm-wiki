@@ -87,7 +87,7 @@ async function buildJobStats(db: DrizzleDb, hours: number) {
           eq(jobs.status, "completed"),
           sql`${jobs.startedAt} IS NOT NULL`,
           sql`${jobs.completedAt} IS NOT NULL`,
-          sql`${jobs.createdAt} >= ${recentCutoff}`
+          sql`${jobs.completedAt} >= ${recentCutoff}`
         )
       ).groupBy(jobs.type),
     db.select({
@@ -97,7 +97,7 @@ async function buildJobStats(db: DrizzleDb, hours: number) {
       }).from(jobs).where(
         and(
           sql`${jobs.status} IN ('completed', 'failed')`,
-          sql`${jobs.createdAt} >= ${recentCutoff}`
+          sql`${jobs.completedAt} >= ${recentCutoff}`
         )
       ).groupBy(jobs.type),
     db.select({ count: count() }).from(jobs)
@@ -106,11 +106,19 @@ async function buildJobStats(db: DrizzleDb, hours: number) {
 
   const typeSummary: Record<
     string,
-    { byStatus: Record<string, number>; avgDurationMs?: number; failureRate?: number }
+    {
+      byStatus: Record<string, number>;
+      avgDurationMs?: number;
+      failureRate?: number;
+      recentFinishedJobs: number;
+      recentFailedJobs: number;
+    }
   > = {};
 
   for (const row of byTypeStatus) {
-    if (!typeSummary[row.type]) typeSummary[row.type] = { byStatus: {} };
+    if (!typeSummary[row.type]) {
+      typeSummary[row.type] = { byStatus: {}, recentFinishedJobs: 0, recentFailedJobs: 0 };
+    }
     typeSummary[row.type].byStatus[row.status] = row.count;
   }
   for (const row of avgDuration) {
@@ -119,6 +127,8 @@ async function buildJobStats(db: DrizzleDb, hours: number) {
   for (const row of failureRate) {
     if (typeSummary[row.type] && row.total > 0) {
       typeSummary[row.type].failureRate = Number(row.failed) / row.total;
+      typeSummary[row.type].recentFinishedJobs = Number(row.total);
+      typeSummary[row.type].recentFailedJobs = Number(row.failed);
     }
   }
 

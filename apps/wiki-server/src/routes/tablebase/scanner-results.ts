@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, desc, count, sql, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import {
   tablebaseScannerResults,
@@ -428,7 +428,7 @@ const scannerResultsApp = new Hono()
         entityCount: count(),
       })
       .from(tablebaseScannerResults)
-      .where(sql`${tablebaseScannerResults.scanRunId} = ANY(${runIds})`)
+      .where(inArray(tablebaseScannerResults.scanRunId, runIds))
       .groupBy(tablebaseScannerResults.recordType, tablebaseScannerResults.scanRunId)
       .orderBy(tablebaseScannerResults.recordType, sql`MIN(${tablebaseScannerResults.scannedAt})`);
 

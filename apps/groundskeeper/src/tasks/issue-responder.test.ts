@@ -276,8 +276,12 @@ describe("issue-responder", () => {
       const result = await issueResponder(config);
       expect(result.success).toBe(true);
 
-      // Should have retried
-      expect(mockRemoveLabel).toHaveBeenCalledTimes(2);
+      // Check retries for the working label separately from trigger cleanup.
+      expect(mockRemoveLabel.mock.calls.filter(([request]) =>
+        request.name === "agent:working")).toHaveLength(2);
+      expect(mockRemoveLabel).toHaveBeenCalledWith(expect.objectContaining({
+        name: "groundskeeper-autofix",
+      }));
     });
 
     it("gives up after max retries but still reports success", async () => {
@@ -300,8 +304,11 @@ describe("issue-responder", () => {
       const result = await issueResponder(config);
       expect(result.success).toBe(true);
 
-      // Should have tried 3 times (initial + 2 retries)
-      expect(mockRemoveLabel).toHaveBeenCalledTimes(3);
+      // Each label gets its own initial attempt and two retries.
+      for (const name of ["agent:working", "groundskeeper-autofix"]) {
+        expect(mockRemoveLabel.mock.calls.filter(([request]) =>
+          request.name === name)).toHaveLength(3);
+      }
     });
   });
 

@@ -17,8 +17,8 @@ const FAILURE_RATE_THRESHOLD = 0.3;
 /** Minimum completed+failed jobs to compute a meaningful failure rate. */
 const FAILURE_RATE_MIN_SAMPLE = 10;
 
-/** Time window for failure rate and backlog checks (24 hours). */
-const STATS_WINDOW_MS = 24 * 60 * 60 * 1000;
+/** Time window for failures; pending backlog counts include all ages. */
+const STATS_WINDOW_HOURS = 24;
 
 interface ActiveAgent {
   sessionId: string;
@@ -38,6 +38,8 @@ interface JobStatsResponse {
       byStatus: Record<string, number>;
       avgDurationMs?: number;
       failureRate?: number;
+      recentFinishedJobs?: number;
+      recentFailedJobs?: number;
     }
   >;
 }
@@ -94,11 +96,10 @@ export async function jobWorkerHealth(
 
   // 2. Check job backlog and failure rate via /api/jobs/stats (time-windowed)
   // Use a 24h window so historical failures don't permanently poison the check.
-  const since = new Date(Date.now() - STATS_WINDOW_MS).toISOString();
   const statsResult = await apiRequest<JobStatsResponse>(
     config,
     "GET",
-    `/api/jobs/stats?since=${encodeURIComponent(since)}`,
+    `/api/jobs/stats?hours=${STATS_WINDOW_HOURS}`,
   );
   if (statsResult.ok && statsResult.data) {
     checksPerformed++;
@@ -114,9 +115,10 @@ export async function jobWorkerHealth(
       }
 
       // 3. Failure rate warning
-      const completedCount = info.byStatus["completed"] ?? 0;
-      const failedCount = info.byStatus["failed"] ?? 0;
-      const totalFinished = completedCount + failedCount;
+      // An older API may briefly omit these fields during a rolling deploy.
+      // Lifetime counts cannot substitute for a recent failure sample.
+      const failedCount = info.recentFailedJobs ?? 0;
+      const totalFinished = info.recentFinishedJobs ?? 0;
 
       if (totalFinished >= FAILURE_RATE_MIN_SAMPLE) {
         const rate = failedCount / totalFinished;
