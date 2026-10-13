@@ -1,5 +1,5 @@
 # ---- Stage 1: Install only worker dependencies ----
-FROM node:20-slim AS deps
+FROM node:24-slim AS deps
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -20,13 +20,13 @@ WORKDIR /deps
 # the gate fails if a file: dep is added without the matching COPY line.
 COPY packages/url-utils/ ./packages/url-utils/
 COPY docker/worker/package.json ./
+COPY patches/gray-matter@4.0.3.patch ./patches/gray-matter@4.0.3.patch
 RUN pnpm install --prod
 
 # ---- Stage 2: Runtime image ----
-# Node 20 required: tsx's ESM loader hits ERR_REQUIRE_CYCLE_MODULE on Node 22
-# due to its require(esm) cycle detection. Track tsx Node 22 support for upgrade.
-# Uses node:20-slim (Debian) instead of Alpine for Playwright/Chromium compatibility.
-FROM node:20-slim
+# Supported LTS runtime. The updated tsx loader is smoke-tested with the Crux CLI.
+# Uses Debian instead of Alpine for Playwright/Chromium compatibility.
+FROM node:24-slim
 WORKDIR /repo
 
 # Install Chromium system dependencies for Playwright.
@@ -57,7 +57,7 @@ COPY --from=deps /deps/node_modules ./node_modules
 
 # Verify tsx can load .ts files (catches missing deps or ESM config issues)
 RUN echo 'export const X = 1;' > /tmp/test.ts && \
-    node --import tsx/esm -e "import('/tmp/test.ts').then(m => { if (m.X !== 1) throw new Error('bad'); console.log('tsx verified'); })"
+    node --import tsx -e "import('/tmp/test.ts').then(m => { if (m.X !== 1) throw new Error('bad'); console.log('tsx verified'); })"
 
 # Copy crux source (worker + all transitive imports)
 COPY crux/ ./crux/
@@ -93,12 +93,12 @@ COPY data/ ./data/
 
 ENV NODE_ENV=production
 
-# Non-root user for security (use standard Debian adduser)
-RUN groupadd -r worker && useradd -r -g worker worker
+# Chromium needs a writable home for its crash database and browser configuration.
+RUN groupadd -r worker && useradd -r -m -g worker worker
 USER worker
 
 # Health endpoint port
 EXPOSE 3101
 
-CMD ["node", "--import", "tsx/esm", "crux/worker/run.ts", \
+CMD ["node", "--import", "tsx", "crux/worker/run.ts", \
      "--poll", "--poll-interval=5000", "--verbose"]
