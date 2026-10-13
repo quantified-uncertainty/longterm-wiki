@@ -40,9 +40,12 @@ test.describe("/search page", () => {
   test("shows browse state before typing", async ({ page }) => {
     // Browse state shows directory type links and featured entities
     await expect(page.getByText("Browse by type")).toBeVisible();
+    const browse = page.locator("section", {
+      has: page.getByRole("heading", { name: "Browse by type", exact: true }),
+    });
     // Should show entity type link chips (text includes count like "Organizations 133")
-    await expect(page.getByRole("link", { name: /^Organizations/ })).toBeVisible();
-    await expect(page.getByRole("link", { name: /^People/ })).toBeVisible();
+    await expect(browse.getByRole("link", { name: /^Organizations/ })).toBeVisible();
+    await expect(browse.getByRole("link", { name: /^People/ })).toBeVisible();
   });
 
   test("typing triggers search and shows results", async ({ page }) => {
