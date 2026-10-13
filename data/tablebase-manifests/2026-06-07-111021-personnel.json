@@ -1,0 +1,66 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-06-07T11:10:21.315Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "rFWc1QNcqO",
+      "organizationId": "sid_rYERluiUwH",
+      "role": "Co-Founder and Co-CEO",
+      "roleType": "key-person",
+      "isFounder": true,
+      "startDate": "2015",
+      "source": "https://chanzuckerberg.com/about/leaders/",
+      "notes": "Priscilla Chan co-founded CZI in December 2015 with Mark Zuckerberg and serves as Co-CEO. Confirmed on CZI leadership page as of 2026-06-07.",
+      "id": "pg1TAtoyTj",
+      "verdict": "none"
+    },
+    {
+      "personId": "sid_OxXXTxtbrA",
+      "organizationId": "sid_rYERluiUwH",
+      "role": "Co-Founder and Co-CEO",
+      "roleType": "key-person",
+      "isFounder": true,
+      "startDate": "2015",
+      "source": "https://chanzuckerberg.com/about/leaders/",
+      "notes": "Mark Zuckerberg co-founded CZI in December 2015 with Priscilla Chan and serves as Co-CEO. Confirmed on CZI leadership page as of 2026-06-07.",
+      "id": "i3TB5845xi",
+      "verdict": "none"
+    },
+    {
+      "personId": "KLIzOaZAVj",
+      "organizationId": "sid_rYERluiUwH",
+      "role": "President",
+      "roleType": "key-person",
+      "isFounder": false,
+      "startDate": "2025",
+      "source": "https://sfstandard.com/2025/06/09/chan-zuckerberg-initiative-politics-pr/",
+      "notes": "Lori Goler became CZI's first-ever President in May 2025, after 16 years as VP of Human Resources at Meta. Confirmed via SF Standard article dated 2025-06-09.",
+      "id": "iDgYvPIUZP",
+      "verdict": "none"
+    },
+    {
+      "personId": "MOwNadoXr3",
+      "organizationId": "sid_rYERluiUwH",
+      "role": "President, Learning Commons",
+      "roleType": "key-person",
+      "isFounder": false,
+      "startDate": "2017",
+      "source": "https://chanzuckerberg.com/about/leaders/",
+      "notes": "Sandra Liu Huang joined CZI in 2017 as Head of Education; currently serves as President of Learning Commons. Confirmed on CZI leadership page as of 2026-06-07.",
+      "id": "b7WvoHbzuL",
+      "verdict": "none"
+    }
+  ]
+}
