@@ -1,6 +1,7 @@
 "use client";
 
 import type { RpcDataQualityHistoryResult } from "@lib/wiki-server";
+import { formatDateDeterministic } from "@lib/format";
 
 type SnapshotRow = RpcDataQualityHistoryResult["snapshots"][number];
 
@@ -34,7 +35,7 @@ export function DataQualityTable({
           {snapshots.map((s) => (
             <tr key={s.id} className="border-b hover:bg-muted/50">
               <td className="p-2 whitespace-nowrap">
-                {new Date(s.capturedAt).toLocaleDateString()}
+                {formatDateDeterministic(s.capturedAt)}
               </td>
               <td className="p-2 text-right">{s.verdictsTotal}</td>
               <td className="p-2 text-right">
