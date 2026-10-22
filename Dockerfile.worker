@@ -1,5 +1,5 @@
 # ---- Stage 1: Install only worker dependencies ----
-FROM node:24-slim AS deps
+FROM node:24.22.1-slim AS deps
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -26,7 +26,7 @@ RUN pnpm install --prod
 # ---- Stage 2: Runtime image ----
 # Supported LTS runtime. The updated tsx loader is smoke-tested with the Crux CLI.
 # Uses Debian instead of Alpine for Playwright/Chromium compatibility.
-FROM node:24-slim
+FROM node:24.22.1-slim
 WORKDIR /repo
 
 # Install Chromium system dependencies for Playwright.
