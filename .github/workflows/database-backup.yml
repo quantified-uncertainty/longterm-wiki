@@ -31,7 +31,8 @@ jobs:
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
     if: vars.AUTOMATION_PAUSED != 'true'
     name: Backup database
-    runs-on: ubuntu-latest
+    # PostgreSQL 16 is available in the Ubuntu 24.04 package repositories.
+    runs-on: ubuntu-24.04
     outputs:
       backup_filename: ${{ steps.backup.outputs.backup_filename }}
 
