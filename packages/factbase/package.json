@@ -17,6 +17,6 @@
   "devDependencies": {
     "vitest": "4.1.12",
     "typescript": "^5.9.3",
-    "vite": "7.3.5"
+    "vite": "7.3.7"
   }
 }
