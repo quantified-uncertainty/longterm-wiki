@@ -15,6 +15,19 @@ import { test, expect, type Page } from "@playwright/test";
  * indicate an unresolved ID or rendering failure.
  */
 
+// Inspect the current page, without Next.js preloading unrelated link targets.
+// Keep networkidle below so database requests still finish before text is scanned.
+test.beforeEach(async ({ page }) => {
+  await page.route("**/*", async (route) => {
+    const headers = await route.request().allHeaders();
+    if (headers["next-router-prefetch"] === "1") {
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  });
+});
+
 // ─── Patterns that should NEVER appear in user-visible page text ────────────
 
 const RAW_ID_PATTERNS = [
