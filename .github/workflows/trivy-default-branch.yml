@@ -26,10 +26,10 @@ jobs:
     name: Trivy filesystem scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Run Trivy vulnerability scanner (filesystem)
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
           scan-type: fs
           scan-ref: .
@@ -39,7 +39,7 @@ jobs:
           ignore-unfixed: true
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3
         if: always()
         with:
           sarif_file: trivy-results.sarif
@@ -52,7 +52,7 @@ jobs:
       # ref. Re-uploading this clean scan under that category lets GitHub
       # reconcile and close those orphaned alerts.
       - name: Re-upload under deploy scan category to clear stale main alerts
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3
         if: always()
         with:
           sarif_file: trivy-results.sarif
