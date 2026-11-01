@@ -34,7 +34,7 @@
     "pdf-parse": "^2.4.5",
     "yaml": "^2.7.0",
     "youtube-transcript": "^1.2.1",
-    "zod": "^3.25.76"
+    "zod": "^4.6.6"
   },
   "optionalDependencies": {
     "@mendable/firecrawl-js": "^1.15.5"

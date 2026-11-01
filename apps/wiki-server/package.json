@@ -23,7 +23,7 @@
     "pino": "^10.3.1",
     "postgres": "^3.4.5",
     "yaml": "^2.7.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
