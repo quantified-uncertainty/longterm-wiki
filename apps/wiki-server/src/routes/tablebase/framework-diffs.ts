@@ -49,7 +49,7 @@ const SyncItemSchema = z.object({
   weakeningFlagged: z.boolean().optional(),
   strengtheningFlagged: z.boolean().optional(),
   neutralChangesCount: z.number().int().nonnegative().nullable().optional(),
-  diffDetails: z.record(z.unknown()).nullable().optional(),
+  diffDetails: z.record(z.string(), z.unknown()).nullable().optional(),
   overallDirection: z.enum(VALID_OVERALL).nullable().optional(),
   humanReviewed: z.boolean().optional(),
   reviewVerdict: z.enum(VALID_VERDICT).optional(),

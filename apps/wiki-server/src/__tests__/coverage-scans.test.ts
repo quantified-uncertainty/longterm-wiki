@@ -70,7 +70,7 @@ const SyncItemSchema = z.object({
   coverageScore: z.number().int().min(1).max(4),
   signalsFilled: z.number().int().min(0).default(0),
   signalsTotal: z.number().int().min(0).default(0),
-  signals: z.record(z.boolean()).default({}),
+  signals: z.record(z.string(), z.boolean()).default({}),
   scannedAt: z.string().datetime().optional(),
 });
 

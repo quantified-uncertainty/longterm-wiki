@@ -91,9 +91,9 @@ const SyncModelSystemCardItemSchema = z.object({
   languagesSupported: z.array(z.string().max(50)).max(200).nullable().optional(),
   safetyFramework: z.string().max(50).nullable().optional(),
   safetyTier: z.string().max(100).nullable().optional(),
-  safetyTierDomains: z.record(z.string().max(50)).nullable().optional(),
+  safetyTierDomains: z.record(z.string(), z.string().max(50)).nullable().optional(),
   safeguardsSummary: z.string().max(10_000).nullable().optional(),
-  classifierDetails: z.record(z.unknown()).nullable().optional(),
+  classifierDetails: z.record(z.string(), z.unknown()).nullable().optional(),
   fineTuningPolicy: z.string().max(100).nullable().optional(),
   deploymentChannels: z.array(z.string().max(50)).max(30).nullable().optional(),
   evalScoresCited: z.array(EvalScoreSchema).max(200).nullable().optional(),
@@ -109,7 +109,7 @@ const SyncModelSystemCardItemSchema = z.object({
   extractedAt: z.string().nullable().optional(), // ISO timestamp
   extractorVersion: z.string().max(100).nullable().optional(),
   extractionModel: z.string().max(200).nullable().optional(),
-  extractionConfidence: z.record(z.number().min(0).max(1)).nullable().optional(),
+  extractionConfidence: z.record(z.string(), z.number().min(0).max(1)).nullable().optional(),
   notes: z.string().max(10_000).nullable().optional(),
 });
 
