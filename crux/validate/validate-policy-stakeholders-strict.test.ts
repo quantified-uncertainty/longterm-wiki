@@ -60,7 +60,7 @@ describe("validate-policy-stakeholders-strict", () => {
         (i) => i.path.join(".") === "position",
       );
       expect(positionError).toBeDefined();
-      expect(positionError?.code).toBe("invalid_value");
+      expect(positionError!.message).toMatch(/Invalid enum value/);
     }
   });
 
@@ -140,7 +140,7 @@ describe("evaluatePolicies (negative paths)", () => {
     expect(positionFinding).toBeDefined();
     expect(positionFinding!.policyId).toBe("test-policy");
     expect(positionFinding!.stakeholder).toBe("Alice");
-    expect(positionFinding!.message).toMatch(/Invalid option/);
+    expect(positionFinding!.message).toMatch(/Invalid enum value/);
   });
 
   it("emits a finding when stakeholder name is missing (Zod rejects displayName)", () => {
