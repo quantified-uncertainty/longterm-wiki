@@ -92,7 +92,7 @@ const SyncResearchAreaItemSchema = z.object({
   firstProposed: z.string().max(200).nullable().optional(),
   firstProposedYear: z.number().int().nullable().optional(),
   tags: z.array(z.string()).optional().default([]),
-  metadata: z.record(z.unknown()).optional().default({}),
+  metadata: z.record(z.string(), z.unknown()).optional().default({}),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
 });

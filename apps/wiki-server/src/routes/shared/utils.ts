@@ -185,10 +185,10 @@ export function validationError(
  *
  * Empty path (root-level error) returns `""` so callers can omit the field.
  */
-function formatZodPath(path: ReadonlyArray<string | number>): string {
+function formatZodPath(path: readonly PropertyKey[]): string {
   return path.reduce<string>((acc, part) => {
     if (typeof part === "number") return `${acc}[${part}]`;
-    return acc ? `${acc}.${part}` : String(part);
+    return acc ? `${acc}.${String(part)}` : String(part);
   }, "");
 }
 
@@ -196,31 +196,21 @@ function formatZodPath(path: ReadonlyArray<string | number>): string {
  * Convert a `ZodError` into a structured `ValidationErrorBody` so callers
  * can pass it to {@link validationError}'s structured overload.
  *
- * Detects `invalid_enum_value` issues automatically and emits
+ * Detects invalid enum values and emits
  * `code: "enum_violation"` with `allowed[]` populated from the issue's
- * `options`. All other Zod issues collapse to `code: "zod"`.
+ * `values`. All other Zod issues collapse to `code: "zod"`.
  *
  * Picks the first issue when multiple exist — Phase 2 retry-with-feedback
  * only needs to know about one failure at a time, and the original
  * `error.message` preserves the full list under `message` for human-readable
  * fallback (and back-compat with legacy string-matching consumers).
  *
- * **JSON-safety contract.** This helper forwards the issue's `received`
- * field directly into `value`, inheriting the {@link ValidationErrorBody}
- * caveat that values must be JSON-safe (no `BigInt`, `Symbol`, function,
- * or circular reference). For `ZodError`s produced by `safeParse(json)` —
- * the case sync-factory uses — `received` is a primitive (`string`,
- * `number`, `boolean`, `null`) or the `ZodParsedType` enum (`"undefined"`,
- * `"object"`, etc.) and is always JSON-safe. Schemas with custom
- * `transform` outputs that re-fail downstream Zod checks could in
- * principle yield non-JSON-safe values; do not pass `ZodError`s from
- * such pipelines through this helper without sanitizing first.
- *
- * QUA-952: introduced for the Phase 0a-ii canary slice. Used by
- * `createSyncHandler` and any new callsite that wants structured Zod codes.
+ * The request body supplies rejected enum values and received types.
+ * Only JSON primitives are included as rejected enum values.
  */
 export function zodErrorToValidationBody(
-  error: z.ZodError
+  error: z.ZodError,
+  body?: unknown
 ): ValidationErrorBody {
   const issue = error.issues[0];
   if (!issue) {
@@ -229,20 +219,29 @@ export function zodErrorToValidationBody(
 
   const field = formatZodPath(issue.path) || undefined;
 
-  if (issue.code === "invalid_enum_value") {
+  const input = issue.path.reduce<unknown>((value, key) =>
+    value !== null && typeof value === "object" && Object.hasOwn(value, key)
+      ? (value as Record<PropertyKey, unknown>)[key]
+      : undefined,
+  body);
+
+  const enumOptions = issue.code === "invalid_value" && issue.values.length > 1
+    ? issue.values.filter((option) => typeof option === "string" || typeof option === "number")
+    : [];
+  if ((typeof input === "string" || typeof input === "number") &&
+    enumOptions.some((option) => typeof option === typeof input)) {
     return {
       code: "enum_violation",
       ...(field !== undefined ? { field } : {}),
-      value: issue.received,
-      allowed: [...issue.options],
+      value: input,
+      allowed: enumOptions,
       message: error.message,
     };
   }
 
-  // Many other ZodIssue variants (`invalid_type`, `invalid_literal`, etc.)
-  // carry a `received` field — surface it as `value` when available so a
-  // retry-with-feedback consumer can reprompt with the rejected input.
-  const value = (issue as { received?: unknown }).received;
+  const value = issue.code === "invalid_type" || enumOptions.length
+    ? (input === null ? "null" : Array.isArray(input) ? "array" : typeof input)
+    : undefined;
   return {
     code: "zod",
     ...(field !== undefined ? { field } : {}),

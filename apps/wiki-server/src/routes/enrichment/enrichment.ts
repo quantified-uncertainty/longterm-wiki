@@ -125,7 +125,7 @@ const ProposeRequestSchema = z
     recordType: z.enum(SUPPORTED_RECORD_TYPES),
     /** The record payload (shape per recordType — validated by the sync
      *  handler's own Zod schema).  Must include the record's `id`. */
-    row: z.record(z.unknown()),
+    row: z.record(z.string(), z.unknown()),
     sourceUrl: z.string().url().max(2000),
     /** Optional hash of the API response / page content — recorded in
      *  evidence for replayability. */

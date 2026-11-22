@@ -390,7 +390,6 @@ describe("zodErrorToValidationBody (direct unit)", () => {
         path: ["items", 0, "policyEntityId"],
         message: "Required",
         expected: "string",
-        received: "undefined",
       },
     ]);
     const body = zodErrorToValidationBody(err);
@@ -413,7 +412,6 @@ describe("zodErrorToValidationBody (direct unit)", () => {
         path: [0, "id"],
         message: "Required",
         expected: "string",
-        received: "undefined",
       },
     ]);
     const body = zodErrorToValidationBody(err);
@@ -421,7 +419,7 @@ describe("zodErrorToValidationBody (direct unit)", () => {
     expect(body.field).toBe("[0].id");
   });
 
-  it("populates allowed[] from invalid_enum_value options", async () => {
+  it("populates allowed[] from an enum issue", async () => {
     const { z } = await import("zod");
     const { zodErrorToValidationBody } = await import(
       "../routes/shared/utils.js"
@@ -429,18 +427,35 @@ describe("zodErrorToValidationBody (direct unit)", () => {
 
     const err = new z.ZodError([
       {
-        code: "invalid_enum_value",
+        code: "invalid_value",
         path: ["position"],
         message: "Invalid enum value",
-        received: "endorse",
-        options: ["support", "oppose", "neutral", "mixed"],
+        values: ["support", "oppose", "neutral", "mixed"],
       },
     ]);
-    const body = zodErrorToValidationBody(err);
+    const body = zodErrorToValidationBody(err, { position: "endorse" });
 
     expect(body.code).toBe("enum_violation");
     expect(body.field).toBe("position");
     expect(body.value).toBe("endorse");
     expect(body.allowed).toEqual(["support", "oppose", "neutral", "mixed"]);
   });
+
+  it.each([[{}, "undefined"], [{ position: 2 }, "number"]])(
+    "reports the received type for invalid enum input %j",
+    async (input, receivedType) => {
+      const { z } = await import("zod");
+      const { zodErrorToValidationBody } = await import(
+        "../routes/shared/utils.js"
+      );
+      const result = z.object({ position: z.enum(["support", "oppose"]) }).safeParse(input);
+      if (result.success) throw new Error("Expected invalid enum input");
+
+      expect(zodErrorToValidationBody(result.error, input)).toMatchObject({
+        code: "zod",
+        field: "position",
+        value: receivedType,
+      });
+    },
+  );
 });

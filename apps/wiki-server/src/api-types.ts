@@ -533,8 +533,8 @@ export const UpsertCitationContentSchema = z.object({
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
   pageTitle: z.string().max(1000).nullable().optional(),
-  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
-  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
+  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().transform(v => v?.replace(/\0/g, '') ?? v).optional(),
+  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().transform(v => v?.replace(/\0/g, '') ?? v).optional(),
   contentLength: z.number().int().nullable().optional(),
   contentHash: z.string().max(64).nullable().optional(),
   /** How content was fetched: firecrawl, built-in, youtube-transcript, abstract */
@@ -893,7 +893,7 @@ export const UpsertResourceSchema = z.object({
   contextNote: z.string().max(500).nullable().optional(),
   resourcePurpose: z.string().max(100).nullable().optional(),
   resourceSubtype: z.string().max(100).nullable().optional(),
-  typeMetadata: z.record(z.unknown()).nullable().optional(),
+  typeMetadata: z.record(z.string(), z.unknown()).nullable().optional(),
   publisherEntityId: z.string().max(200).nullable().optional(),
   relatedEntityIds: z.array(z.string().max(200)).max(50).nullable().optional(),
   enrichmentStatus: z.string().max(50).nullable().optional(),
@@ -1181,7 +1181,7 @@ export const SyncEntitySchema = z.object({
     .max(100)
     .nullable()
     .optional(),
-  metadata: z.record(z.unknown()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 export type SyncEntity = z.infer<typeof SyncEntitySchema>;
 
@@ -1281,7 +1281,7 @@ export const STALE_JOB_TIMEOUT_MINUTES = 60;
 
 export const CreateJobSchema = z.object({
   type: z.string().min(1).max(100),
-  params: z.record(z.unknown()).nullable().optional(),
+  params: z.record(z.string(), z.unknown()).nullable().optional(),
   priority: z.number().int().min(0).max(1000).default(0),
   maxRetries: z.number().int().min(0).max(10).default(3),
   dedupKey: z.string().max(200).optional(),
@@ -1315,7 +1315,7 @@ export const ClaimJobSchema = z.object({
 export type ClaimJob = z.infer<typeof ClaimJobSchema>;
 
 export const CompleteJobSchema = z.object({
-  result: z.record(z.unknown()).nullable().optional(),
+  result: z.record(z.string(), z.unknown()).nullable().optional(),
   cost: z.number().nonnegative().finite().max(999999.9999).optional(),
 });
 export type CompleteJob = z.infer<typeof CompleteJobSchema>;
@@ -1364,7 +1364,7 @@ export const SaveArtifactsSchema = z.object({
   researchSummary: z.string().max(50000).nullable().optional(),
 
   // Citation audit artifacts
-  citationAudit: z.record(z.unknown()).nullable().optional(),
+  citationAudit: z.record(z.string(), z.unknown()).nullable().optional(),
 
   // Cost tracking
   costEntries: z.array(z.object({
@@ -1382,7 +1382,7 @@ export const SaveArtifactsSchema = z.object({
   })).max(50).nullable().optional(),
 
   // Quality gate
-  qualityMetrics: z.record(z.unknown()).nullable().optional(),
+  qualityMetrics: z.record(z.string(), z.unknown()).nullable().optional(),
   qualityGatePassed: z.boolean().nullable().optional(),
   qualityGaps: z.array(z.string().max(1000)).max(50).nullable().optional(),
 
@@ -1539,7 +1539,7 @@ export const RegisterAgentSchema = z.object({
   issueNumber: z.number().int().positive().nullable().optional(),
   model: z.string().max(200).nullable().optional(),
   worktree: z.string().max(1000).nullable().optional(),
-  metadata: z.record(z.unknown()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 export type RegisterAgent = z.infer<typeof RegisterAgentSchema>;
 
@@ -1550,7 +1550,7 @@ export const UpdateAgentSchema = z.object({
   issueNumber: z.number().int().positive().nullable().optional(),
   prNumber: z.number().int().positive().nullable().optional(),
   filesTouched: z.array(z.string().max(500)).max(200).nullable().optional(),
-  metadata: z.record(z.unknown()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 export type UpdateAgent = z.infer<typeof UpdateAgentSchema>;
 
@@ -1571,7 +1571,7 @@ export const CreateAgentEventSchema = z.object({
   agentId: z.number().int().positive(),
   eventType: z.enum(VALID_AGENT_EVENT_TYPES),
   message: z.string().min(1).max(5000),
-  metadata: z.record(z.unknown()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 export type CreateAgentEvent = z.infer<typeof CreateAgentEventSchema>;
 
@@ -1599,7 +1599,7 @@ export const RecordGroundskeeperRunSchema = z.object({
   errorMessage: z.string().max(10000).nullable().optional(),
   consecutiveFailures: z.number().int().min(0).nullable().optional(),
   circuitBreakerActive: z.boolean().optional().default(false),
-  metadata: z.record(z.unknown()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   timestamp: z.string().datetime().optional(),
 });
 export type RecordGroundskeeperRun = z.infer<typeof RecordGroundskeeperRunSchema>;
@@ -1663,13 +1663,13 @@ function jsonByteSize(value: unknown): number {
 }
 
 const BoundedJsonObjectSchema = z
-  .record(z.unknown())
+  .record(z.string(), z.unknown())
   .refine((v) => jsonByteSize(v) <= MAX_ERROR_PAYLOAD_BYTES, {
     message: `errorPayload must serialize to <= ${MAX_ERROR_PAYLOAD_BYTES} bytes`,
   });
 
 const BoundedFollowupSchema = z
-  .record(z.unknown())
+  .record(z.string(), z.unknown())
   .refine((v) => jsonByteSize(v) <= MAX_FOLLOWUP_BYTES, {
     message: `followupActions item must serialize to <= ${MAX_FOLLOWUP_BYTES} bytes`,
   });
@@ -1749,7 +1749,7 @@ export const RecordLlmPayloadSchema = z.object({
   label: z.string().max(200).nullable().optional(),
   model: z.string().min(1).max(200),
   viaOpenrouter: z.boolean().optional(),
-  request: z.record(z.unknown()),
+  request: z.record(z.string(), z.unknown()),
   response: z.string(),
   tokensInput: TokenCountSchema,
   tokensOutput: TokenCountSchema,
@@ -1792,7 +1792,7 @@ export const RecordIncidentSchema = z.object({
   title: z.string().min(1).max(500),
   detail: z.string().max(5000).optional(),
   checkSource: z.string().max(100).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   githubIssueNumber: z.number().int().positive().optional(),
 });
 
@@ -1802,7 +1802,7 @@ export const UpdateIncidentSchema = z.object({
   status: IncidentStatusSchema.optional(),
   resolvedBy: z.string().max(200).optional(),
   detail: z.string().max(5000).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   githubIssueNumber: z.number().int().positive().optional(),
 });
 
@@ -1907,7 +1907,7 @@ export const ProposeClaimsSchema = z.object({
         claimText: z.string().min(1).max(5000),
         targetField: z.string().max(200).optional(),
         proposedValue: z.string().max(5000).optional(),
-        proposedData: z.record(z.unknown()).optional(),
+        proposedData: z.record(z.string(), z.unknown()).optional(),
         resourceId: z.string().min(1).max(200).optional(),
         sourceUrl: z.string().url().max(2000),
         agentEvidence: z.string().min(1).max(5000).optional(),

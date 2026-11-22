@@ -177,7 +177,7 @@ export const frontmatterSchemaRule = {
     const result = frontmatterSchema.safeParse(frontmatter);
 
     if (!result.success) {
-      for (const error of result.error.errors) {
+      for (const error of result.error.issues) {
         const field = error.path.join('.');
         issues.push(new Issue({
           rule: 'frontmatter-schema',

@@ -23,7 +23,12 @@ export const SyncStakeholderItemSchema = z.object({
   policyEntityId: z.string().min(1).max(200),
   stakeholderEntityId: z.string().max(200).nullable().optional(),
   stakeholderDisplayName: z.string().min(1).max(500),
-  position: z.enum(VALID_POSITIONS),
+  position: z.enum(VALID_POSITIONS, {
+    error: (issue) =>
+      typeof issue.input === "string"
+        ? `Invalid enum value. Expected one of: ${VALID_POSITIONS.join(", ")}`
+        : undefined,
+  }),
   importance: z.enum(VALID_IMPORTANCE).nullable().optional(),
   reason: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
