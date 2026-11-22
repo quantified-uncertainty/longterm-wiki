@@ -33,7 +33,6 @@ overrides:
   '@hono/node-server@<1.19.13': '>=1.19.13'
   fast-xml-parser@>=5.0.0 <5.5.7: '>=5.5.7'
   next@>=13.0.0 <15.5.15: '>=15.5.15'
-  follow-redirects@<=1.15.11: '>=1.16.0'
   dompurify@<=3.3.3: ~3.4.17
   hono@<4.12.14: '>=4.12.14'
   axios@>=1.0.0 <1.15.0: '>=1.15.0'
@@ -99,7 +98,7 @@ overrides:
   katex@<0.18.2: ~0.18.2
   source-map-js@<1.2.2: ^1.2.2
   sharp@<0.35.5: ~0.35.5
-  follow-redirects@<1.16.1: 1.16.1
+  follow-redirects@<1.16.2: 1.16.2
 
 patchedDependencies:
   gray-matter@4.0.3:
@@ -3653,8 +3652,8 @@ packages:
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
 
-  follow-redirects@1.16.1:
-    resolution: {integrity: sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==}
+  follow-redirects@1.16.2:
+    resolution: {integrity: sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -7977,7 +7976,7 @@ snapshots:
 
   axios@1.20.0:
     dependencies:
-      follow-redirects: 1.16.1
+      follow-redirects: 1.16.2
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -8738,7 +8737,7 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  follow-redirects@1.16.1:
+  follow-redirects@1.16.2:
     optional: true
 
   form-data@4.0.6:

@@ -99,7 +99,6 @@
       "@hono/node-server@<1.19.13": ">=1.19.13",
       "fast-xml-parser@>=5.0.0 <5.5.7": ">=5.5.7",
       "next@>=13.0.0 <15.5.15": ">=15.5.15",
-      "follow-redirects@<=1.15.11": ">=1.16.0",
       "dompurify@<=3.3.3": "~3.4.17",
       "hono@<4.12.14": ">=4.12.14",
       "axios@>=1.0.0 <1.15.0": ">=1.15.0",
@@ -165,7 +164,7 @@
       "katex@<0.18.2": "~0.18.2",
       "source-map-js@<1.2.2": "^1.2.2",
       "sharp@<0.35.5": "~0.35.5",
-      "follow-redirects@<1.16.1": "1.16.1"
+      "follow-redirects@<1.16.2": "1.16.2"
     },
     "patchedDependencies": {
       "gray-matter@4.0.3": "patches/gray-matter@4.0.3.patch"
