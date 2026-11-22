@@ -1,4 +1,4 @@
-FROM node:24.22.1-alpine AS base
+FROM node:24.22.1-alpine AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN apk upgrade --no-cache && corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -30,8 +30,15 @@ COPY packages/id-utils/ ./packages/id-utils/
 COPY packages/factbase/ ./packages/factbase/
 COPY packages/url-utils/ ./packages/url-utils/
 
+# Copy the installed workspace without the build stage's package-manager caches.
+FROM node:24.22.1-alpine AS runtime
+RUN apk upgrade --no-cache && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack && \
+    rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+COPY --from=build /repo /repo
+
 ENV NODE_ENV=production
 
 WORKDIR /repo/apps/wiki-server
 EXPOSE 3100
-CMD ["pnpm", "start"]
+CMD ["node", "--import", "tsx", "src/index.ts"]
