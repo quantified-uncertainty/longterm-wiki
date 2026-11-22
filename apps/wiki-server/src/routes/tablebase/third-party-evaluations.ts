@@ -113,7 +113,7 @@ const SyncThirdPartyEvalItemSchema = z.object({
     .max(VALID_RISK_DOMAINS.length),
   preDeployment: z.boolean().nullable().optional(),
   findingsSummary: z.string().max(4000).nullable().optional(),
-  capabilityLevelsAssessed: z.record(z.string().max(200)).nullable().optional(),
+  capabilityLevelsAssessed: z.record(z.string(), z.string().max(200)).nullable().optional(),
   methodologyUrl: z.string().max(2000).nullable().optional(),
   sourceFormat: z.enum(VALID_SOURCE_FORMATS).nullable().optional(),
   sourceHash: z.string().max(200).nullable().optional(),
@@ -122,7 +122,7 @@ const SyncThirdPartyEvalItemSchema = z.object({
   extractedAt: z.string().nullable().optional(), // ISO timestamp
   extractorVersion: z.string().max(100).nullable().optional(),
   extractionModel: z.string().max(200).nullable().optional(),
-  extractionConfidence: z.record(z.number().min(0).max(1)).nullable().optional(),
+  extractionConfidence: z.record(z.string(), z.number().min(0).max(1)).nullable().optional(),
   notes: z.string().max(10_000).nullable().optional(),
   // Inline join-table fan-out. Empty array clears all links for this evaluation;
   // omitted (undefined) leaves existing links untouched (partial sync).

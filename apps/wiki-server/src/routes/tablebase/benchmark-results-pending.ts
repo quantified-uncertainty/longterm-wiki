@@ -49,7 +49,7 @@ const SyncBenchmarkResultPendingItemSchema = z.object({
   testedBy: z.enum(VALID_TESTED_BY).default("unknown"),
   sourceUrl: z.string().max(2000).nullable().optional(),
   methodologyNotes: z.string().max(5000).nullable().optional(),
-  rawPayload: z.record(z.unknown()).nullable().optional(),
+  rawPayload: z.record(z.string(), z.unknown()).nullable().optional(),
   status: z.enum(VALID_STATUS).default("pending"),
   ingesterSource: z.string().min(1).max(100),
   resolvedToStableId: z.string().max(200).nullable().optional(),

@@ -71,7 +71,7 @@ const CleanupQuery = z.object({
   dry_run: z
     .enum(["true", "false", "1", "0"])
     .transform((v) => v === "true" || v === "1")
-    .default("false"),
+    .default(false),
 });
 
 // ---- Materialized view existence cache ----

@@ -477,7 +477,7 @@ export function createSyncHandler<
     if (!parsed.success) {
       // QUA-952 (Phase 0a-ii): emit structured `code` so callers can
       // dispatch retry-with-feedback on `enum_violation` vs generic `zod`.
-      return validationError(c, zodErrorToValidationBody(parsed.error));
+      return validationError(c, zodErrorToValidationBody(parsed.error, body));
     }
     const items: TItem[] = parsed.data.items as TItem[];
 

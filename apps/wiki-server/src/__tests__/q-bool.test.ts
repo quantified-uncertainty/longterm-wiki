@@ -52,12 +52,10 @@ describe("qBool", () => {
     expect(() => Schema.parse({ flag: "1" })).toThrow(z.ZodError);
   });
 
-  it("composes with .default('true') and .default('false')", () => {
-    // .default applies the default to the Zod *input* (pre-transform), so
-    // .default("true") → transform sees "true" → returns true. Pin this
-    // subtlety since a caller might plausibly write qBool.default("false").
-    const A = z.object({ flag: qBool.default("true") });
-    const B = z.object({ flag: qBool.default("false") });
+  it("composes with .prefault('true') and .prefault('false')", () => {
+    // A prefault supplies the input to the boolean transform.
+    const A = z.object({ flag: qBool.prefault("true") });
+    const B = z.object({ flag: qBool.prefault("false") });
     expect(A.parse({})).toEqual({ flag: true });
     expect(B.parse({})).toEqual({ flag: false });
     expect(A.parse({ flag: "false" })).toEqual({ flag: false });

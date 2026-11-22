@@ -345,7 +345,7 @@ export const VisualDefinition = z.object({
   usedIn: z.array(z.string()),               // Page IDs where this visual is embedded
   tags: z.array(z.string()).optional(),
   content: z.string(),                        // Visual code (Mermaid, JSX, etc.)
-  props: z.record(z.unknown()).optional(),     // Additional component props
+  props: z.record(z.string(), z.unknown()).optional(),     // Additional component props
   quality: z.number().min(0).max(100).optional(),
   lastReviewed: z.string().optional(),
   reviewNotes: z.array(z.string()).optional(),
@@ -377,7 +377,7 @@ export const ContentSection = z.object({
   mermaid: z.string().optional(),                 // Mermaid diagram source
   table: ContentTable.optional(),                 // Structured table data
   component: z.string().optional(),               // Custom component to render (e.g., "PageCauseEffectGraph")
-  componentProps: z.record(z.unknown()).optional(), // Props for custom component
+  componentProps: z.record(z.string(), z.unknown()).optional(), // Props for custom component
 });
 export type ContentSection = z.infer<typeof ContentSection>;
 

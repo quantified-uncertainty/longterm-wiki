@@ -38,9 +38,9 @@ const SyncDataSourceSchema = z.object({
   resourceId: z.string().max(100).nullable().optional(),
   publisherEntityId: z.string().max(100).nullable().optional(),
   updateFrequency: z.enum(VALID_UPDATE_FREQUENCIES).nullable().optional(),
-  columnMapping: z.record(z.string()).nullable().optional(),
-  sourceSchema: z.record(z.unknown()).nullable().optional(),
-  // Issue #4017 B5: typed schema replaces z.record(z.unknown()). The shape
+  columnMapping: z.record(z.string(), z.string()).nullable().optional(),
+  sourceSchema: z.record(z.string(), z.unknown()).nullable().optional(),
+  // Issue #4017 B5: typed schema replaces z.record(z.string(), z.unknown()). The shape
   // is {strategy, matchFields, fuzzyFields, exactFields} from grant-import manifests.
   verificationConfig: z.object({
     strategy: z.string().max(100),
