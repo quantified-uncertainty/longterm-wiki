@@ -1,0 +1,54 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-06-07T11:11:37.214Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "D8XD2gl8ln",
+      "organizationId": "sid_BEKEqQDmkQ",
+      "role": "Team Member / Admin",
+      "roleType": "key-person",
+      "isFounder": false,
+      "startDate": "2017",
+      "source": "https://www.lesswrong.com/posts/eR7Su77N2nK3e5YRZ/the-lesswrong-team-is-now-lightcone-infrastructure-come-work-3",
+      "notes": "Ben Pace is a LessWrong team member and admin, working full-time on the platform. Named in the 2021 Lightcone Infrastructure announcement post. Confirmed as of 2026-06-07.",
+      "id": "ynbNYMY1UE",
+      "verdict": "none"
+    },
+    {
+      "personId": "pHlPFGcpcY",
+      "organizationId": "sid_BEKEqQDmkQ",
+      "role": "Developer",
+      "roleType": "career",
+      "isFounder": false,
+      "startDate": "2017",
+      "source": "https://www.lesswrong.com/posts/eR7Su77N2nK3e5YRZ/the-lesswrong-team-is-now-lightcone-infrastructure-come-work-3",
+      "notes": "Raymond Arnold is a developer at LessWrong 2.0, part of the original LessWrong rebuild team. Named in the Lightcone Infrastructure announcement post. Confirmed as of 2026-06-07.",
+      "id": "jrJ6wqHncX",
+      "verdict": "none"
+    },
+    {
+      "personId": "3oHy7WIwnD",
+      "organizationId": "sid_BEKEqQDmkQ",
+      "role": "Operations Lead",
+      "roleType": "career",
+      "isFounder": false,
+      "startDate": "2017",
+      "source": "https://www.lesswrong.com/posts/eR7Su77N2nK3e5YRZ/the-lesswrong-team-is-now-lightcone-infrastructure-come-work-3",
+      "notes": "Ruby Bloom (Ruben Bloom / Ruby) leads LessWrong operations. Named in the Lightcone Infrastructure announcement post. Confirmed as of 2026-06-07.",
+      "id": "6JoSPosSEK",
+      "verdict": "none"
+    }
+  ]
+}

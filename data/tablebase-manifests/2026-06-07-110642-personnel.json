@@ -1,0 +1,30 @@
+{
+  "table": "personnel",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-06-07T11:06:42.291Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "sid_iEEm0cZ3tn",
+      "organizationId": "sid_2fEPReD49A",
+      "role": "Funder",
+      "roleType": "key-person",
+      "isFounder": true,
+      "startDate": "2017",
+      "source": "https://en.wikipedia.org/wiki/Vitalik_Buterin",
+      "notes": "Vitalik Buterin IS the funder — this entity represents his personal philanthropic activities. Began major donations in 2017 to MIRI, with landmark $665M gift to FLI in 2021 and ~$50M/year ongoing. Confirmed via Wikipedia as of 2026-06-07.",
+      "id": "AjNVCtNlUP",
+      "verdict": "none"
+    }
+  ]
+}

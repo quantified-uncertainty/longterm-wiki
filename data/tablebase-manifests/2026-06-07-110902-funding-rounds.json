@@ -1,0 +1,42 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-06-07T11:09:02.786Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_zMfgJqiEPQ",
+      "name": "Open Philanthropy Founding Grant",
+      "date": "2016-08",
+      "raised": 5555550,
+      "leadInvestor": "Open Philanthropy",
+      "instrument": "grant",
+      "source": "https://donations.vipulnaik.com/donee.php?donee=Center+for+Human-Compatible+AI",
+      "notes": "Founding grant from Open Philanthropy (recommended to Good Ventures) for CHAI's establishment at UC Berkeley. Amount $5,555,550 over five years. Confirmed via vipulnaik.com donations database and Open Philanthropy grant page as of 2026-06-07.",
+      "id": "UedpMZXhKG",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_zMfgJqiEPQ",
+      "name": "Open Philanthropy Multi-Year Renewal",
+      "date": "2021-01",
+      "raised": 11355246,
+      "leadInvestor": "Open Philanthropy",
+      "instrument": "grant",
+      "source": "https://donations.vipulnaik.com/donee.php?donee=Center+for+Human-Compatible+AI",
+      "notes": "Multi-year renewal grant from Open Philanthropy to CHAI, described as funding to 'expand research and student training'. Amount $11,355,246. Confirmed via vipulnaik.com donations database as of 2026-06-07.",
+      "id": "OWd1BRw2Z4",
+      "verdict": "none"
+    }
+  ]
+}

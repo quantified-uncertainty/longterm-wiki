@@ -1,0 +1,42 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-06-07T11:13:00.754Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "kiLEjAWWLk",
+      "organizationId": "sid_8q2GhtEmkA",
+      "role": "President",
+      "roleType": "key-person",
+      "isFounder": false,
+      "startDate": "2019",
+      "source": "https://news.harvard.edu/gazette/story/2019/09/john-palfrey-takes-over-the-macarthur-foundation-as-its-sixth-president/",
+      "notes": "John Palfrey became the sixth president of the MacArthur Foundation effective September 1, 2019. Previously head of the Phillips Academy. Confirmed via Harvard Gazette as of 2026-06-07.",
+      "id": "Jr7WzA3vRC",
+      "verdict": "none"
+    },
+    {
+      "personId": "E1T2R46XwK",
+      "organizationId": "sid_8q2GhtEmkA",
+      "role": "Board Chair",
+      "roleType": "board",
+      "isFounder": false,
+      "startDate": "2025",
+      "source": "https://www.macfound.org/press/press-releases/juan-salgado-elected-to-chair-macarthur-board",
+      "notes": "Juan Salgado was elected to chair the MacArthur Board of Directors in 2025, assuming the role in June 2025. He is Chancellor of City Colleges of Chicago and a 2015 MacArthur Fellow. Confirmed via MacArthur press release as of 2026-06-07.",
+      "id": "yWCncjbCqP",
+      "verdict": "none"
+    }
+  ]
+}
